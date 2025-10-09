@@ -101,6 +101,8 @@ fi
 
 load_image_to_kind quay.io/frrouting/frr:9.1.0 frr9
 load_image_to_kind quay.io/frrouting/frr:10.2.1 frr10
+load_image_to_kind quay.io/grout/frr:edge grout-frr
+load_image_to_kind quay.io/grout/grout:edge grout
 load_image_to_kind gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1 rbacproxy
 load_image_to_kind quay.io/metallb/frr-k8s:v0.0.17 frrk8s
 
