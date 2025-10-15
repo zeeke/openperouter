@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -797,7 +796,7 @@ func ensureValidator(cs clientset.Interface, pod *corev1.Pod) {
 	}
 	dst := fmt.Sprintf("%s/%s:/", pod.Namespace, pod.Name)
 	fullargs := []string{"cp", ValidatorPath, dst}
-	_, err := exec.Command(executor.Kubectl, fullargs...).CombinedOutput()
+	_, err := executor.Host.Exec(executor.Kubectl, fullargs...)
 	Expect(err).NotTo(HaveOccurred())
 
 	pod.Annotations["validator"] = "true"

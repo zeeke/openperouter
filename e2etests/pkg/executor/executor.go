@@ -4,6 +4,7 @@ package executor
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -31,6 +32,9 @@ func init() {
 
 func (hostExecutor) Exec(cmd string, args ...string) (string, error) {
 	out, err := exec.Command(cmd, args...).CombinedOutput()
+	if err != nil {
+		return string(out), fmt.Errorf("command on host failed [%s %v] failed. output %s", cmd, args, string(out))
+	}
 	return string(out), err
 }
 
