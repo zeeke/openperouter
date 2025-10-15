@@ -52,6 +52,8 @@ spec:
           - -c
           - |
             printf '#!/bin/sh\n exec /var/run/busybox/busybox tar "$@"' > /bin/tar && chmod a+x /bin/tar
+            printf '#!/bin/sh\n exec /var/run/busybox/busybox ip  "$@"' > /bin/ip  && chmod a+x /bin/ip
+
             /sbin/tini -- /sbin/docker-start &
             attempts=0
             until [[ -f /etc/frr/frr.log || $attempts -eq 60 ]]; do
