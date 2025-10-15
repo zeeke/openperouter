@@ -42,16 +42,18 @@ func validateFRRK8sSessionForHostSession(name string, hostsession v1alpha1.HostS
 }
 
 func validateSessionWithNeighbor(fromName, toName string, exec executor.Executor, neighborIP string, established bool) {
+	var neigh *frr.FRRNeighbor
 	Eventually(func() error {
-		neigh, err := frr.NeighborInfo(neighborIP, exec)
+		var err error
+		neigh, err = frr.NeighborInfo(neighborIP, exec)
 		if err != nil {
 			return err
 		}
 		if !established && neigh.BgpState == "Established" {
-			return fmt.Errorf("neighbor from %s to %s - %s is established", fromName, toName, neighborIP)
+			return fmt.Errorf("neighbor from %s to %s - %s is established. state: [%+v]", fromName, toName, neighborIP, neigh)
 		}
 		if established && neigh.BgpState != "Established" {
-			return fmt.Errorf("neighbor %s to %s - %s is not established", fromName, toName, neighborIP)
+			return fmt.Errorf("neighbor %s to %s - %s is not established. state: [%+v]", fromName, toName, neighborIP, neigh)
 		}
 		return nil
 	}, 5*time.Minute, time.Second).ShouldNot(HaveOccurred())
