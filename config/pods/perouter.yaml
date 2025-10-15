@@ -42,6 +42,8 @@ spec:
             mountPath: /etc/frr
           - name: grout-workdir
             mountPath: /var/run/grout
+          - name: boxybox-workdir
+            mountPath: /var/run/busybox
         # The command is FRR's default entrypoint & waiting for the log file to appear and tailing it.
         # If the log file isn't created in 60 seconds the tail fails and the container is restarted.
         # This workaround is needed to have the frr logs as part of kubectl logs -c frr < k8s-frr-podname >.
@@ -49,7 +51,8 @@ spec:
           - /bin/sh
           - -c
           - |
-            /sbin/tini -- /usr/lib/frr/frr-start &
+            printf '#!/bin/sh\n exec /var/run/busybox/busybox tar "$@"' > /bin/tar && chmod a+x /bin/tar
+            /sbin/tini -- /sbin/docker-start &
             attempts=0
             until [[ -f /etc/frr/frr.log || $attempts -eq 60 ]]; do
               sleep 1
@@ -67,6 +70,19 @@ spec:
         volumeMounts:
           - name: grout-workdir
             mountPath: /var/run/grout
+          - name: boxybox-workdir
+            mountPath: /var/run/busybox
+      - name: busybox
+        image: busybox:1.36.1-uclibc
+        command:
+          - /bin/sh
+          - -xc
+          - |
+            cp /bin/busybox /var/run/busybox/
+            sleep 100000
+        volumeMounts:
+          - name: boxybox-workdir
+            mountPath: /var/run/busybox
       - name: reloader
         image: quay.io/frrouting/frr:10.2.1
         imagePullPolicy: IfNotPresent
@@ -105,6 +121,8 @@ spec:
         - name: frrconfig
           emptyDir: {}
         - name: grout-workdir
+          emptyDir: {}
+        - name: boxybox-workdir
           emptyDir: {}
       initContainers:
         # Copies the initial config files with the right permissions to the shared volume.
