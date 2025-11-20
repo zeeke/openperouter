@@ -69,6 +69,10 @@ spec:
         - "-t"
         - --socket
         - /var/run/grout/grout.sock
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW", "SYS_ADMIN", "NET_BIND_SERVICE"]
+          privileged: true # Needed to create TAP interfaces. To remove
         volumeMounts:
           - name: grout-workdir
             mountPath: /var/run/grout

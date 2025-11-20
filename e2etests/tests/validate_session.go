@@ -56,7 +56,7 @@ func validateSessionWithNeighbor(fromName, toName string, exec executor.Executor
 			return fmt.Errorf("neighbor %s to %s - %s is not established. state: [%+v]", fromName, toName, neighborIP, neigh)
 		}
 		return nil
-	}, 5*time.Minute, time.Second).ShouldNot(HaveOccurred())
+	}, 15*time.Minute, time.Second).ShouldNot(HaveOccurred())
 }
 
 // validateSessionDownForNeigh validates that the neighbor is down

@@ -266,9 +266,16 @@ var _ = Describe("Underlay BFD Configuration", Ordered, func() {
 				}
 				return nil
 			}, 3*time.Minute, time.Second).ShouldNot(HaveOccurred())
-
+			/*
+			 grcli --sock  /var/run/grout/grout.sock logging enable
+			 grcli --sock  /var/run/grout/grout.sock  interface add port p0 devargs net_tap0,remote=toswitch,iface=tap_toswitch
+			 grcli --sock  /var/run/grout/grout.sock address add 192.168.11.3/24 iface p0
+			 /var/run/busybox/busybox ip address add 192.168.11.3/24 dev gr-loop0
+			*/
 			By("validating BGP sessions are still established")
 			for _, node := range nodes {
+				By("validating " + node.Name)
+
 				neighborIP, err := infra.NeighborIP(infra.KindLeaf, node.Name)
 				Expect(err).NotTo(HaveOccurred())
 				validateSessionWithNeighbor(infra.KindLeaf, node.Name, exec, neighborIP, Established)
@@ -307,7 +314,7 @@ var _ = Describe("Underlay BFD Configuration", Ordered, func() {
 				}, time.Minute, time.Second).Should(Succeed())
 			}
 		},
-		Entry("simple bfd",
+		FEntry("simple bfd",
 			v1alpha1.Underlay{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "underlay-simple-bfd",

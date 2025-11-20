@@ -1,5 +1,7 @@
 {{- define "localneighbor"}}
   neighbor {{ .LocalNeighbor.Addr }} remote-as {{ .LocalNeighbor.ASN }}
+  neighbor {{ .LocalNeighbor.Addr }} remote-as {{ .LocalNeighbor.ASN }}
+  neighbor {{ .LocalNeighbor.Addr }} ip-transparent
 
   address-family ipv4 unicast
   {{- range .ToAdvertiseIPv4 }}

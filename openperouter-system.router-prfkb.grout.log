@@ -1,0 +1,503 @@
+NOTICE: GROUT: main: starting grout version v0.13.0-33-gd3bab207
+NOTICE: GROUT: main: License available at https://git.dpdk.org/apps/grout/plain/licenses/BSD-3-clause.txt
+NOTICE: GROUT: gr_datapath_loop: [CPU 1] starting tid=156
+NOTICE: GROUT: gr_datapath_loop: [CPU 2] starting tid=157
+NOTICE: GROUT: gr_datapath_loop: [CPU 3] starting tid=158
+NOTICE: GROUT: gr_datapath_loop: [CPU 4] starting tid=159
+NOTICE: GROUT: gr_datapath_loop: [CPU 5] starting tid=160
+NOTICE: GROUT: gr_datapath_loop: [CPU 6] starting tid=161
+NOTICE: GROUT: gr_datapath_loop: [CPU 7] starting tid=162
+NOTICE: GROUT: gr_datapath_loop: [CPU 8] starting tid=163
+NOTICE: GROUT: gr_datapath_loop: [CPU 9] starting tid=164
+NOTICE: GROUT: gr_datapath_loop: [CPU 10] starting tid=165
+NOTICE: GROUT: gr_datapath_loop: [CPU 11] starting tid=166
+NOTICE: GROUT: gr_datapath_loop: [CPU 12] starting tid=167
+NOTICE: GROUT: gr_datapath_loop: [CPU 13] starting tid=168
+ERR: TAP: tap_nl_dump_ext_ack(): Cannot delete qdisc with handle of zero
+ERR: TAP: tap_mp_req_on_rxtx(): Failed to send start req to secondary 95
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:00:00:00:16 / IPv6 :: > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=110)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx gr-loop0] 6e:80:d2:3e:86:3f > 33:33:00:00:00:16 / IPv6 fe80::6c80:d2ff:fe3e:863f > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=90)
+NOTICE: GROUT: trace_log_packet: [rx gr-loop0] 6e:80:d2:3e:86:3f > 33:33:00:00:00:16 / IPv6 fe80::6c80:d2ff:fe3e:863f > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=90)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:00:00:00:16 / IPv6 :: > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=110)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx gr-loop0] 6e:80:d2:3e:86:3f > 33:33:00:00:00:16 / IPv6 fe80::6c80:d2ff:fe3e:863f > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=90)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx gr-loop0] 6e:80:d2:3e:86:3f > 33:33:00:00:00:16 / IPv6 fe80::6c80:d2ff:fe3e:863f > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=90)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:ff:98:52:28 / IPv6 :: > ff02::1:ff98:5228 ttl=255 proto=ICMPv6(58) / ICMPv6 neigh solicit who has fe80::ed:65ff:fe98:5228? / Option type=14 len=8(1), (pkt_len=86)
+NOTICE: GROUT: drop_packets: [ndp_ns_input_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:00:00:00:16 / IPv6 fe80::ed:65ff:fe98:5228 > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=130)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:00:00:00:16 / IPv6 fe80::ed:65ff:fe98:5228 > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=90)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:00:00:00:16 / IPv6 fe80::ed:65ff:fe98:5228 > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=130)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] 02:ed:65:98:52:28 > 33:33:00:00:00:16 / IPv6 fe80::ed:65ff:fe98:5228 > ff02::16 ttl=1 proto=HOPOPT(0) / ICMPv6 type=143 code=0, (pkt_len=90)
+NOTICE: GROUT: drop_packets: [ip6_input_not_member] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > ff:ff:ff:ff:ff:ff / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > ff:ff:ff:ff:ff:ff / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > ff:ff:ff:ff:ff:ff / ARP request who has 192.168.11.3? tell 192.168.11.2, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_request_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / ARP reply 192.168.11.2 is at aa:c1:ab:3a:ea:85, (pkt_len=42)
+NOTICE: GROUT: drop_packets: [arp_input_reply_drop] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
+NOTICE: GROUT: trace_log_packet: [rx p0] aa:c1:ab:3a:ea:85 > 02:ed:65:98:52:28 / IP 192.168.11.2 > 192.168.11.3 ttl=255 proto=UDP(17) / UDP 49178 > 3784, (pkt_len=66)
+NOTICE: GROUT: drop_packets: [error_no_local_ip] 1 packets
