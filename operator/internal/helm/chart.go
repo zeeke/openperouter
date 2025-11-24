@@ -85,6 +85,10 @@ func (h *Chart) Objects(envConfig envconfig.EnvConfig, crdConfig *operatorapi.Op
 }
 
 func patchChartValues(envConfig envconfig.EnvConfig, crdConfig *operatorapi.OpenPERouter, valuesMap map[string]interface{}) {
+	cri := "containerd"
+	if envConfig.IsOpenshift {
+		cri = "crio"
+	}
 	valuesMap["openperouter"] = map[string]interface{}{
 		"logLevel":                logLevelValue(crdConfig),
 		"multusNetworkAnnotation": crdConfig.Spec.MultusNetworkAnnotation,
@@ -111,6 +115,7 @@ func patchChartValues(envConfig envconfig.EnvConfig, crdConfig *operatorapi.Open
 		"crds": map[string]interface{}{
 			"enabled": false,
 		},
+		"cri": cri,
 	}
 
 	valuesMap["webhook"] = map[string]interface{}{
