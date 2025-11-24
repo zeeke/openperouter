@@ -94,12 +94,12 @@ func patchChartValues(envConfig envconfig.EnvConfig, crdConfig *operatorapi.Open
 			"tag":        envConfig.ControllerImage.Tag,
 		},
 		"serviceAccounts": map[string]interface{}{
-			"create": false,
+			"create": envConfig.IsOpenshift,
 			"controller": map[string]interface{}{
 				"name": "controller",
 			},
 			"perouter": map[string]interface{}{
-				"name": "default", // TODO: change this to perouter if/when that ServiceAccount gets actual RBACs attached.
+				"name": "perouter",
 			},
 		},
 		"frr": map[string]interface{}{
