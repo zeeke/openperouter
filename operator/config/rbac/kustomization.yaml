@@ -2,4 +2,6 @@ resources:
 - service_account.yaml
 - role.yaml
 - role_binding.yaml
+- controller_rbac.yaml
+- perouter_rbac.yaml
 - ../../../config/rbac

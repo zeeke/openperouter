@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2025-10-16T12:50:12Z"
+    createdAt: "2025-11-25T15:14:02Z"
     operators.operatorframework.io/builder: operator-sdk-v1.41.1
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
   name: openperouter-operator.v0.0.0
@@ -257,6 +257,14 @@ spec:
       permissions:
       - rules:
         - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
           - ""
           resources:
           - secrets
@@ -307,6 +315,16 @@ spec:
           - update
           - watch
         serviceAccountName: operator
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: perouter
     strategy: deployment
   installModes:
   - supported: false
