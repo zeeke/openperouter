@@ -144,6 +144,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	setupLog.Info("environment config", "config", envConfig)
+
 	if err = (&operator.OpenPERouterReconciler{
 		Client:    mgr.GetClient(),
 		Scheme:    mgr.GetScheme(),
