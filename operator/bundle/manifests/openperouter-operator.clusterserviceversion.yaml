@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2025-10-16T12:50:12Z"
+    createdAt: "2025-11-25T09:21:30Z"
     operators.operatorframework.io/builder: operator-sdk-v1.41.1
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
   name: openperouter-operator.v0.0.0
@@ -279,6 +279,7 @@ spec:
           - ""
           resources:
           - configmaps
+          - serviceaccounts
           - services
           verbs:
           - create
@@ -306,6 +307,17 @@ spec:
           - patch
           - update
           - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - create
+          - delete
+          - get
+          - patch
+          - update
         serviceAccountName: operator
     strategy: deployment
   installModes:

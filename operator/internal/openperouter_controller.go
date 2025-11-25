@@ -53,6 +53,9 @@ type OpenPERouterReconciler struct {
 // +kubebuilder:rbac:groups=apps,namespace=openperouter-system,resources=deployments;daemonsets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",namespace=openperouter-system,resources=services;configmaps,verbs=create;delete;get;update;patch
 // +kubebuilder:rbac:groups="",namespace=openperouter-system,resources=events,verbs=create;patch
+// +kubebuilder:rbac:groups="",namespace=openperouter-system,resources=serviceaccounts,verbs=create;delete;get;update;patch
+// +kubebuilder:rbac:groups="rbac.authorization.k8s.io",namespace=openperouter-system,resources=roles,verbs=create;delete;get;update;patch
+// +kubebuilder:rbac:groups="rbac.authorization.k8s.io",namespace=openperouter-system,resources=rolebindings,verbs=create;delete;get;update;patch
 
 // +kubebuilder:rbac:groups=openpe.openperouter.github.io,resources=openperouters,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=openpe.openperouter.github.io,resources=openperouters/status,verbs=get;update;patch
