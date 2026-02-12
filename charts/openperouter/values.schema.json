@@ -241,6 +241,86 @@
             },
             "default": {}
           },
+          "grout": {
+            "type": "object",
+            "description": "Configuration for the optional grout DPDK dataplane sidecar.",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "Enable grout sidecar for DPDK-accelerated L3 routing.",
+                "default": false
+              },
+              "image": {
+                "type": "object",
+                "description": "Configuration for the grout container image.",
+                "properties": {
+                  "repository": {
+                    "type": "string",
+                    "description": "The repository for the grout image.",
+                    "default": "quay.io/openperouter/grout"
+                  },
+                  "tag": {
+                    "type": "string",
+                    "description": "The tag for the grout image.",
+                    "default": "latest"
+                  },
+                  "pullPolicy": {
+                    "type": "string",
+                    "description": "The pull policy for the grout image.",
+                    "default": "IfNotPresent"
+                  }
+                },
+                "default": {
+                  "repository": "quay.io/openperouter/grout",
+                  "tag": "latest",
+                  "pullPolicy": "IfNotPresent"
+                }
+              },
+              "resources": {
+                "type": "object",
+                "description": "Resource requests and limits for the grout container.",
+                "properties": {
+                  "limits": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "integer"
+                      ]
+                    }
+                  },
+                  "requests": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "integer"
+                      ]
+                    }
+                  }
+                },
+                "default": {}
+              },
+              "testMode": {
+                "type": "boolean",
+                "description": "Enable test mode (no DPDK hardware required, uses TAP interfaces).",
+                "default": false
+              },
+              "ealArgs": {
+                "type": "string",
+                "description": "DPDK EAL arguments (advanced configuration, production only).",
+                "default": ""
+              },
+              "initScript": {
+                "type": "string",
+                "description": "Grout init script content with grcli commands to configure interfaces, routes, and VRFs.",
+                "default": ""
+              }
+            },
+            "default": {
+              "enabled": false
+            }
+          },
           "frr": {
             "type": "object",
             "description": "FRR container specific configuration.",
@@ -374,6 +454,9 @@
           },
           "nodemarker": {
             "resources": {}
+          },
+          "grout": {
+            "enabled": false
           },
           "frr": {
             "resources": {},
