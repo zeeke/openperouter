@@ -54,6 +54,34 @@ openperouter:
     healthProbePort: 9081
   nodemarker:
     resources: {}
+  # grout contains configuration for the optional grout DPDK dataplane sidecar.
+  # When enabled, grout runs alongside FRR and accelerates L3 forwarding via
+  # DPDK. FRR's dplane_grout module syncs routes automatically to grout.
+  grout:
+    # -- Enable grout sidecar for DPDK-accelerated L3 routing
+    enabled: false
+    image:
+      repository: quay.io/openperouter/grout
+      tag: "latest"
+      pullPolicy: IfNotPresent
+    # -- Resource requests/limits for grout container.
+    # In production (testMode: false), hugepages are required by DPDK.
+    resources:
+      requests:
+        memory: "4Gi"
+        hugepages-1Gi: "2Gi"
+      limits:
+        memory: "4Gi"
+        hugepages-1Gi: "2Gi"
+    # -- Enable test mode (no DPDK hardware required, uses TAP interfaces)
+    testMode: false
+    # -- Grout log level. Must be one of: `emerg`, `alert`, `crit`, `err`, `warning`, `notice`, `info` or `debug`.
+    logLevel: info
+    # -- DPDK EAL arguments (advanced configuration, production only)
+    ealArgs: ""
+    # -- Grout init script content. Contains grcli commands to configure grout
+    # interfaces, routes, and VRFs after startup. Leave empty for no init.
+    initScript: ""
   # frr contains configuration specific to the perouter FRR container,
   frr:
     image:

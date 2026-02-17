@@ -1,0 +1,20 @@
+# Helm values override for deploying OpenPERouter with Grout dataplane
+# in the containerlab environment (no DPDK hardware).
+#
+# Usage:
+#   make deploy-helm-grout
+# or:
+#   helm install openperouter charts/openperouter/ \
+#     --set openperouter.image.tag=<tag> \
+#     -f clab/grout-values.yaml \
+#     --namespace openperouter
+
+openperouter:
+  grout:
+    enabled: true
+    testMode: true
+    resources:
+      requests:
+        memory: "512Mi"
+      limits:
+        memory: "512Mi"
