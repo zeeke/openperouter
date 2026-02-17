@@ -315,6 +315,12 @@
                 "type": "string",
                 "description": "Grout init script content with grcli commands to configure interfaces, routes, and VRFs.",
                 "default": ""
+              },
+              "logLevel": {
+                "type": "string",
+                "description": "Grout log level.",
+                "enum": ["emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"],
+                "default": "info"
               }
             },
             "default": {

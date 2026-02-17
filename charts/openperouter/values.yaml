@@ -75,6 +75,8 @@ openperouter:
         hugepages-1Gi: "2Gi"
     # -- Enable test mode (no DPDK hardware required, uses TAP interfaces)
     testMode: false
+    # -- Grout log level. Must be one of: `emerg`, `alert`, `crit`, `err`, `warning`, `notice`, `info` or `debug`.
+    logLevel: info
     # -- DPDK EAL arguments (advanced configuration, production only)
     ealArgs: ""
     # -- Grout init script content. Contains grcli commands to configure grout

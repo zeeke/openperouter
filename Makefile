@@ -256,6 +256,10 @@ deploy-helm: helm kind deploy-cluster
 	sleep 2s # wait for daemonset to be created
 	$(KUBECTL) -n ${NAMESPACE} wait --for=condition=Ready --all pods --timeout 300s
 
+.PHONY: deploy-helm-grout
+deploy-helm-grout: HELM_ARGS += -f clab/grout-values.yaml
+deploy-helm-grout: deploy-helm ## Deploy with grout dataplane enabled (test mode, no DPDK).
+
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | $(KUBECTL) delete --ignore-not-found=$(ignore-not-found) -f -
@@ -314,6 +318,10 @@ $(APIDOCSGEN): $(LOCALBIN)
 .PHONY: e2etests
 e2etests: ginkgo kubectl build-validator create-export-logs
 	$(GINKGO) -v $(GINKGO_ARGS) --timeout=3h ./e2etests/suite -- --kubectl=$(KUBECTL) $(TEST_ARGS) --hostvalidator $(VALIDATOR_PATH) --reporterpath=${KIND_EXPORT_LOGS}
+
+.PHONY: e2etests-grout
+e2etests-grout: ginkgo kubectl build-validator create-export-logs ## Run L3 Passthrough e2e tests against grout dataplane.
+	$(GINKGO) -v $(GINKGO_ARGS) --timeout=3h --label-filter='passthrough' ./e2etests/suite -- --kubectl=$(KUBECTL) $(TEST_ARGS) --hostvalidator $(VALIDATOR_PATH) --reporterpath=${KIND_EXPORT_LOGS}
 
 .PHONY: e2etests-hostmode-boot
 e2etests-hostmode-boot: ginkgo kubectl build-validator create-export-logs ## Run e2e tests for hostmode boot scenario (static config first, then K8s API).

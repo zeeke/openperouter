@@ -252,16 +252,17 @@ spec:
           - /bin/sh
           - -c
           - |
+            set -eu
             mkdir -p /var/run/grout
             {{- if .Values.openperouter.grout.testMode }}
-            grout --test-mode --log-level info &
+            grout --test-mode --log-level {{ .Values.openperouter.grout.logLevel | default "info" }} &
             {{- else }}
-            grout --log-level info {{ .Values.openperouter.grout.ealArgs }} &
+            grout --log-level {{ .Values.openperouter.grout.logLevel | default "info" }} {{ .Values.openperouter.grout.ealArgs }} &
             {{- end }}
             GROUT_PID=$!
             # Wait for grout socket to become available
             attempts=0
-            until [ -S /var/run/grout/grout.sock ] || [ $attempts -eq 30 ]; do
+            until [ -S /var/run/grout/grout.sock ] || [ "$attempts" -eq 30 ]; do
               sleep 1
               attempts=$((attempts + 1))
             done
@@ -291,13 +292,21 @@ spec:
         resources:
           {{- toYaml . | nindent 12 }}
         {{- end }}
+        startupProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - "test -S /var/run/grout/grout.sock"
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          failureThreshold: 12
         readinessProbe:
           exec:
             command:
               - /bin/sh
               - -c
               - "test -S /var/run/grout/grout.sock"
-          initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           exec:
@@ -305,7 +314,6 @@ spec:
               - grcli
               - -e
               - graph stats
-          initialDelaySeconds: 15
           periodSeconds: 20
       {{- end }}
       tolerations:
