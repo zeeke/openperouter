@@ -113,6 +113,37 @@ docker-build: ## Build docker image with the manager.
 	fi
 
 
+##@ Grout image builds
+
+GROUT_IMG_NAME ?= grout
+GROUT_IMG ?= $(IMG_REPO)/$(GROUT_IMG_NAME):$(IMG_TAG)
+GROUT_VERSION ?= edge
+FRR_GROUT_IMG ?= $(IMG_REPO)/frr-grout:$(IMG_TAG)
+
+.PHONY: docker-build-grout
+docker-build-grout: ## Build grout sidecar image.
+	@if [ "$(CONTAINER_ENGINE)" = "podman" ]; then \
+		sudo $(CONTAINER_ENGINE) build -t $(GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.grout .; \
+	else \
+		$(CONTAINER_ENGINE) build -t $(GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.grout .; \
+	fi
+
+.PHONY: docker-build-frr-grout
+docker-build-frr-grout: ## Build FRR base image with dplane_grout plugin.
+	@if [ "$(CONTAINER_ENGINE)" = "podman" ]; then \
+		sudo $(CONTAINER_ENGINE) build -t $(FRR_GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.frr-grout .; \
+	else \
+		$(CONTAINER_ENGINE) build -t $(FRR_GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.frr-grout .; \
+	fi
+
+.PHONY: docker-build-router-grout
+docker-build-router-grout: docker-build-frr-grout ## Build router image with grout/dplane_grout support.
+	@if [ "$(CONTAINER_ENGINE)" = "podman" ]; then \
+		sudo $(CONTAINER_ENGINE) build -t ${IMG} --build-arg FRR_IMAGE=$(FRR_GROUT_IMG) .; \
+	else \
+		$(CONTAINER_ENGINE) build -t ${IMG} --build-arg FRR_IMAGE=$(FRR_GROUT_IMG) .; \
+	fi
+
 TLS_VERIFY ?= "true"
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -257,7 +288,7 @@ deploy-helm: helm kind deploy-cluster
 	$(KUBECTL) -n ${NAMESPACE} wait --for=condition=Ready --all pods --timeout 300s
 
 .PHONY: deploy-helm-grout
-deploy-helm-grout: HELM_ARGS += -f clab/grout-values.yaml
+deploy-helm-grout: HELM_ARGS += -f clab/grout-values.yaml --set openperouter.grout.image.repository=$(IMG_REPO)/$(GROUT_IMG_NAME) --set openperouter.grout.image.tag=$(IMG_TAG)
 deploy-helm-grout: deploy-helm ## Deploy with grout dataplane enabled (test mode, no DPDK).
 
 .PHONY: undeploy
@@ -354,6 +385,10 @@ clean: kind ## Shutdown and clean up kind cluster(s) and containerlab topology.
 .PHONY: load-on-kind
 load-on-kind: ## Load the docker image into the kind cluster.
 	KIND=$(KIND) bash -c 'source clab/common.sh && load_local_image_to_kind ${IMG} router'
+
+.PHONY: load-on-kind-grout
+load-on-kind-grout: load-on-kind ## Load router and grout images into the kind cluster.
+	KIND=$(KIND) bash -c 'source clab/common.sh && load_local_image_to_kind $(GROUT_IMG) grout'
 
 .PHONY: load-on-multi-cluster
 load-on-multi-cluster: ## Load the docker image into both kind clusters.

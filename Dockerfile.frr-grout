@@ -1,0 +1,39 @@
+# Dockerfile for building an FRR image with the dplane_grout plugin.
+#
+# This image serves as the FRR_IMAGE base for the main router Dockerfile
+# when grout dataplane support is needed.
+#
+# Usage:
+#   make docker-build-frr-grout
+#   make docker-build-router-grout  (chains this + router build)
+
+ARG GROUT_VERSION=edge
+ARG FRR_VERSION=10
+
+FROM quay.io/centos/centos:stream9 AS builder
+ARG GROUT_VERSION
+ARG FRR_VERSION
+
+RUN mkdir -p /tmp/rootfs
+
+# Install FRR from official repo, plus grout-frr plugin.
+RUN dnf -y install https://rpm.frrouting.org/repo/frr-${FRR_VERSION}-repo.el9.noarch.rpm && \
+    dnf -y install --nodocs --setopt=install_weak_deps=0 --releasever 9 --installroot /tmp/rootfs \
+      frr \
+      https://github.com/DPDK/grout/releases/download/${GROUT_VERSION}/grout-frr.x86_64.rpm && \
+    dnf -y --installroot /tmp/rootfs clean all && \
+    rm -rf /tmp/rootfs/var/cache/* /tmp/rootfs/var/log/dnf* /tmp/rootfs/var/log/yum.*
+
+# Ensure FRR directories exist with correct ownership.
+RUN mkdir -p /tmp/rootfs/var/run/frr && \
+    chroot /tmp/rootfs chown -R frr:frr /etc/frr /var/run/frr
+
+# Install tini for proper PID 1 init handling (same as upstream grout Containerfile.frr).
+ADD https://github.com/krallin/tini/releases/download/v0.19.0/tini /tmp/rootfs/sbin/tini
+RUN chmod +x /tmp/rootfs/sbin/tini
+
+FROM scratch
+COPY --from=builder /tmp/rootfs/ /
+STOPSIGNAL SIGRTMIN+3
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["/usr/lib/frr/docker-start"]
