@@ -188,6 +188,63 @@ jobs:
           name: image-tar-openperouter
           path: /tmp/openperouter.tar
 
+  build-grout-test-images:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build grout sidecar image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.grout
+          tags: quay.io/openperouter/grout:main
+          outputs: type=docker,dest=/tmp/grout.tar
+          cache-from: type=gha,scope=grout
+          cache-to: type=gha,mode=max,scope=grout
+
+      - name: Build FRR+dplane_grout base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.frr-grout
+          tags: quay.io/openperouter/frr-grout:main
+          outputs: type=docker,dest=/tmp/frr-grout.tar
+          cache-from: type=gha,scope=frr-grout
+          cache-to: type=gha,mode=max,scope=frr-grout
+
+      - name: Load frr-grout image for router build
+        run: |
+          docker load -i /tmp/frr-grout.tar
+
+      - name: Build router image with grout support
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          build-args: FRR_IMAGE=quay.io/openperouter/frr-grout:main
+          tags: quay.io/openperouter/router:main-grout
+          outputs: type=docker,dest=/tmp/openperouter-grout.tar
+
+      - name: Upload grout artifact
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: image-tar-grout
+          path: /tmp/grout.tar
+
+      - name: Upload openperouter-grout artifact
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: image-tar-openperouter-grout
+          path: /tmp/openperouter-grout.tar
+
   e2etests:
     runs-on: ubuntu-22.04
     env:
@@ -280,3 +337,85 @@ jobs:
         uses: ./.github/workflows/composite/collectlogs
         with:
           artifact-name: kind-logs-${{ matrix.deployment }}
+
+  e2etests-grout:
+    runs-on: ubuntu-22.04
+    env:
+      NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:${{ needs.build-kind-node-image.outputs.kind-node-version }}
+    needs:
+      - build-kind-node-image
+      - unit-tests
+      - build-grout-test-images
+    steps:
+      - name: Free Disk Space
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo apt-get clean
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Install kernel modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install linux-modules-extra-$(uname -r)
+
+      - name: Download kind-node-openperouter image
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tar-kind-node-openperouter
+          path: /tmp
+
+      - name: Load kind-node-openperouter image
+        run: |
+          docker load -i /tmp/kind-node-openperouter.tar
+
+      - name: Download grout-enabled router image
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tar-openperouter-grout
+          path: /tmp
+
+      - name: Download grout sidecar image
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tar-grout
+          path: /tmp
+
+      - name: Load images
+        run: |
+          docker load -i /tmp/openperouter-grout.tar
+          docker tag quay.io/openperouter/router:main-grout quay.io/openperouter/router:main
+          docker load -i /tmp/grout.tar
+
+      - name: Deploy the cluster with grout
+        run: |
+          make deploy-helm-grout
+
+      - name: Run L3 Passthrough e2e tests
+        run: |
+          make e2etests-grout
+
+      - name: Export kind logs
+        if: ${{ failure() }}
+        run:
+          make kind-export-logs
+
+      - name: Collect Logs
+        if: ${{ failure() }}
+        uses: ./.github/workflows/composite/collectlogs
+        with:
+          artifact-name: kind-logs-grout

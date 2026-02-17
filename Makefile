@@ -288,8 +288,18 @@ deploy-helm: helm kind deploy-cluster
 	$(KUBECTL) -n ${NAMESPACE} wait --for=condition=Ready --all pods --timeout 300s
 
 .PHONY: deploy-helm-grout
-deploy-helm-grout: HELM_ARGS += -f clab/grout-values.yaml --set openperouter.grout.image.repository=$(IMG_REPO)/$(GROUT_IMG_NAME) --set openperouter.grout.image.tag=$(IMG_TAG)
-deploy-helm-grout: deploy-helm ## Deploy with grout dataplane enabled (test mode, no DPDK).
+deploy-helm-grout: helm kind deploy-cluster load-on-kind-grout ## Deploy with grout dataplane enabled (test mode, no DPDK).
+	$(KUBECTL) -n ${NAMESPACE} delete ds controller || true
+	$(KUBECTL) -n ${NAMESPACE} delete ds router || true
+	$(KUBECTL) -n ${NAMESPACE} delete deployment nodemarker || true
+	$(KUBECTL) create ns ${NAMESPACE} || true
+	$(KUBECTL) label ns ${NAMESPACE} pod-security.kubernetes.io/enforce=privileged
+	$(HELM) install openperouter charts/openperouter/ --set openperouter.image.tag=${IMG_TAG} \
+	--set openperouter.image.pullPolicy=IfNotPresent --set openperouter.logLevel=debug --namespace ${NAMESPACE} \
+	-f clab/grout-values.yaml --set openperouter.grout.image.repository=$(IMG_REPO)/$(GROUT_IMG_NAME) --set openperouter.grout.image.tag=$(IMG_TAG) \
+	$(HELM_ARGS)
+	sleep 2s # wait for daemonset to be created
+	$(KUBECTL) -n ${NAMESPACE} wait --for=condition=Ready --all pods --timeout 300s
 
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
