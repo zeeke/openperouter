@@ -8,5 +8,8 @@
     },
     "helm-values": {
       "enabled": false
+    },
+    "kubernetes": {
+        "enabled": false
     }
 }
