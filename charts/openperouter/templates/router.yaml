@@ -345,7 +345,9 @@ spec:
           emptyDir: {}
         {{- if .Values.openperouter.grout.enabled }}
         - name: grout-socket
-          emptyDir: {}
+          hostPath:
+            path: /var/run/openperouter/grout
+            type: DirectoryOrCreate
         {{- if not .Values.openperouter.grout.testMode }}
         - name: hugepages
           emptyDir:

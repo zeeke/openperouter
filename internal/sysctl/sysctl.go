@@ -12,14 +12,15 @@ import (
 	"github.com/vishvananda/netns"
 )
 
-// Sysctl represents a sysctl setting to be enabled.
+// Sysctl represents a sysctl setting to be applied.
 type Sysctl struct {
 	Path        string // The sysctl path under /proc/sys/
+	Value       string // The desired value ("0" or "1")
 	Description string // Human-readable description for logging
 }
 
-// Ensure enables the given sysctls in the target namespace.
-// Each sysctl is checked and only written if not already set to "1".
+// Ensure applies the given sysctls in the target namespace.
+// Each sysctl is checked and only written if not already at the desired value.
 func Ensure(namespace string, sysctls ...Sysctl) error {
 	ns, err := netns.GetFromPath(namespace)
 	if err != nil {
@@ -33,6 +34,10 @@ func Ensure(namespace string, sysctls ...Sysctl) error {
 
 	err = netnamespace.In(ns, func() error {
 		for _, s := range sysctls {
+			desiredValue := s.Value
+			if desiredValue == "" {
+				desiredValue = "1" // default to enable for backward compatibility
+			}
 			path := "/proc/sys/" + s.Path
 			data, err := os.ReadFile(path)
 			if err != nil {
@@ -40,11 +45,11 @@ func Ensure(namespace string, sysctls ...Sysctl) error {
 			}
 			currentValue := strings.TrimSpace(string(data))
 
-			if currentValue != "1" {
-				if err := os.WriteFile(path, []byte("1"), 0644); err != nil {
+			if currentValue != desiredValue {
+				if err := os.WriteFile(path, []byte(desiredValue), 0644); err != nil {
 					return fmt.Errorf("failed to write to %s: %w", path, err)
 				}
-				slog.Info("sysctl enabled", "path", s.Path, "description", s.Description, "namespace", namespace)
+				slog.Info("sysctl set", "path", s.Path, "value", desiredValue, "description", s.Description, "namespace", namespace)
 			}
 		}
 		return nil
@@ -59,6 +64,7 @@ func Ensure(namespace string, sysctls ...Sysctl) error {
 func IPv4Forwarding() Sysctl {
 	return Sysctl{
 		Path:        "net/ipv4/conf/all/forwarding",
+		Value:       "1",
 		Description: "IPv4 forwarding",
 	}
 }
@@ -67,7 +73,28 @@ func IPv4Forwarding() Sysctl {
 func IPv6Forwarding() Sysctl {
 	return Sysctl{
 		Path:        "net/ipv6/conf/all/forwarding",
+		Value:       "1",
 		Description: "IPv6 forwarding",
+	}
+}
+
+// DisableIPv4Forwarding returns the sysctl definition for disabling IPv4 forwarding.
+// Used when grout handles forwarding in the DPDK dataplane.
+func DisableIPv4Forwarding() Sysctl {
+	return Sysctl{
+		Path:        "net/ipv4/conf/all/forwarding",
+		Value:       "0",
+		Description: "IPv4 forwarding disabled (grout dataplane)",
+	}
+}
+
+// DisableIPv6Forwarding returns the sysctl definition for disabling IPv6 forwarding.
+// Used when grout handles forwarding in the DPDK dataplane.
+func DisableIPv6Forwarding() Sysctl {
+	return Sysctl{
+		Path:        "net/ipv6/conf/all/forwarding",
+		Value:       "0",
+		Description: "IPv6 forwarding disabled (grout dataplane)",
 	}
 }
 
@@ -78,6 +105,7 @@ func IPv6Forwarding() Sysctl {
 func ArpAcceptAll() Sysctl {
 	return Sysctl{
 		Path:        "net/ipv4/conf/all/arp_accept",
+		Value:       "1",
 		Description: "arp_accept on all interfaces",
 	}
 }
@@ -88,6 +116,7 @@ func ArpAcceptAll() Sysctl {
 func ArpAcceptDefault() Sysctl {
 	return Sysctl{
 		Path:        "net/ipv4/conf/default/arp_accept",
+		Value:       "1",
 		Description: "arp_accept on new interfaces",
 	}
 }
@@ -100,6 +129,7 @@ func ArpAcceptDefault() Sysctl {
 func AcceptUntrackedNAAll() Sysctl {
 	return Sysctl{
 		Path:        "net/ipv6/conf/all/accept_untracked_na",
+		Value:       "1",
 		Description: "accept_untracked_na on all interfaces",
 	}
 }
@@ -113,6 +143,7 @@ func AcceptUntrackedNAAll() Sysctl {
 func AcceptUntrackedNADefault() Sysctl {
 	return Sysctl{
 		Path:        "net/ipv6/conf/default/accept_untracked_na",
+		Value:       "1",
 		Description: "accept_untracked_na on new interfaces",
 	}
 }

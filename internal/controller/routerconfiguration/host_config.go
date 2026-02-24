@@ -9,6 +9,7 @@ import (
 	"log/slog"
 
 	"github.com/openperouter/openperouter/internal/conversion"
+	"github.com/openperouter/openperouter/internal/grout"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/hostnetwork/bridgerefresh"
 	"github.com/openperouter/openperouter/internal/sysctl"
@@ -17,6 +18,8 @@ import (
 type interfacesConfiguration struct {
 	targetNamespace    string
 	underlayFromMultus bool
+	groutEnabled       bool
+	groutSocketPath    string
 	nodeIndex          int
 	conversion.ApiConfigData
 }
@@ -53,16 +56,20 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 		return fmt.Errorf("failed to convert config to host configuration: %w", err)
 	}
 
-	slog.InfoContext(ctx, "ensuring sysctls")
-	if err := sysctl.Ensure(
-		config.targetNamespace,
-		sysctl.IPv4Forwarding(),
-		sysctl.IPv6Forwarding(),
+	slog.InfoContext(ctx, "ensuring sysctls", "groutEnabled", config.groutEnabled)
+	sysctls := []sysctl.Sysctl{
 		sysctl.ArpAcceptAll(),
 		sysctl.ArpAcceptDefault(),
 		sysctl.AcceptUntrackedNADefault(),
 		sysctl.AcceptUntrackedNAAll(),
-	); err != nil {
+	}
+	if config.groutEnabled {
+		// When grout is the dataplane, disable kernel forwarding so grout handles it.
+		sysctls = append(sysctls, sysctl.DisableIPv4Forwarding(), sysctl.DisableIPv6Forwarding())
+	} else {
+		sysctls = append(sysctls, sysctl.IPv4Forwarding(), sysctl.IPv6Forwarding())
+	}
+	if err := sysctl.Ensure(config.targetNamespace, sysctls...); err != nil {
 		return fmt.Errorf("failed to ensure sysctls: %w", err)
 	}
 
@@ -94,6 +101,14 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 		}
 	}
 
+	// When grout is enabled, create corresponding grout port interfaces for
+	// the underlay NIC and passthrough veth so grout handles forwarding.
+	if config.groutEnabled {
+		if err := configureGroutInterfaces(ctx, config, hostConfig); err != nil {
+			return fmt.Errorf("failed to configure grout interfaces: %w", err)
+		}
+	}
+
 	slog.InfoContext(ctx, "removing deleted vnis")
 	toCheck := make([]hostnetwork.VNIParams, 0, len(hostConfig.L3VNIs)+len(hostConfig.L2VNIs))
 	for _, vni := range hostConfig.L3VNIs {
@@ -108,10 +123,44 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 	bridgerefresh.StopForRemovedVNIs(hostConfig.L2VNIs)
 
 	if len(apiConfig.L3Passthrough) == 0 {
+		if config.groutEnabled {
+			client := grout.NewClient(config.groutSocketPath)
+			ptName := hostnetwork.PassthroughNames.NamespaceSide
+			if err := client.DeletePort(ctx, "pt-"+ptName); err != nil {
+				return fmt.Errorf("failed to delete grout passthrough port: %w", err)
+			}
+		}
 		if err := hostnetwork.RemovePassthrough(config.targetNamespace); err != nil {
 			return fmt.Errorf("failed to remove passthrough: %w", err)
 		}
 	}
+	return nil
+}
+
+// configureGroutInterfaces creates grout port interfaces that mirror the
+// kernel interfaces, allowing grout to handle packet forwarding via DPDK.
+func configureGroutInterfaces(ctx context.Context, config interfacesConfiguration, hostConfig conversion.HostConfigData) error {
+	slog.InfoContext(ctx, "configuring grout interfaces")
+	client := grout.NewClient(config.groutSocketPath)
+
+	// For each Underlay NIC, create a grout port with net_tap devargs
+	// that mirrors traffic from the kernel interface.
+	if hostConfig.Underlay.UnderlayInterface != "" {
+		nicName := hostConfig.Underlay.UnderlayInterface
+		if err := client.EnsurePort(ctx, "ul-"+nicName, grout.UnderlayDevargs(nicName)); err != nil {
+			return fmt.Errorf("failed to create grout port for underlay NIC %s: %w", nicName, err)
+		}
+	}
+
+	// For the passthrough veth pair, create a grout port linked to the
+	// namespace-side veth so grout can forward traffic through it.
+	if hostConfig.L3Passthrough != nil {
+		ptName := hostnetwork.PassthroughNames.NamespaceSide
+		if err := client.EnsurePort(ctx, "pt-"+ptName, grout.PassthroughDevargs(ptName)); err != nil {
+			return fmt.Errorf("failed to create grout port for passthrough veth %s: %w", ptName, err)
+		}
+	}
+
 	return nil
 }
 

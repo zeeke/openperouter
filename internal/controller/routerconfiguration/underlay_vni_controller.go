@@ -47,6 +47,8 @@ type PERouterReconciler struct {
 	LogLevel           string
 	Logger             *slog.Logger
 	UnderlayFromMultus bool
+	GroutEnabled       bool
+	GroutSocketPath    string
 	FRRConfigPath      string
 	FRRReloadSocket    string
 	StaticConfigDir    string
@@ -116,7 +118,7 @@ func (r *PERouterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, err
 	}
 
-	err = Reconcile(ctx, config, r.UnderlayFromMultus, nodeIndex, r.LogLevel, r.FRRConfigPath, targetNS, updater)
+	err = Reconcile(ctx, config, r.UnderlayFromMultus, r.GroutEnabled, r.GroutSocketPath, nodeIndex, r.LogLevel, r.FRRConfigPath, targetNS, updater)
 	if nonRecoverableHostError(err) {
 		if err := router.HandleNonRecoverableError(ctx); err != nil {
 			slog.Error("failed to handle non recoverable error", "error", err)
