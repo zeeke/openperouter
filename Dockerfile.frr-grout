@@ -16,10 +16,12 @@ ARG FRR_VERSION
 
 RUN mkdir -p /tmp/rootfs
 
-# Install FRR from official repo, plus grout-frr plugin.
+# Install FRR from official repo, plus grout-frr plugin and grcli.
+# The grout RPM provides grcli which the controller uses to configure grout ports.
 RUN dnf -y install https://rpm.frrouting.org/repo/frr-${FRR_VERSION}-repo.el9.noarch.rpm && \
     dnf -y install --nodocs --setopt=install_weak_deps=0 --releasever 9 --installroot /tmp/rootfs \
       frr \
+      https://github.com/DPDK/grout/releases/download/${GROUT_VERSION}/grout.x86_64.rpm \
       https://github.com/DPDK/grout/releases/download/${GROUT_VERSION}/grout-frr.x86_64.rpm && \
     dnf -y --installroot /tmp/rootfs clean all && \
     rm -rf /tmp/rootfs/var/cache/* /tmp/rootfs/var/log/dnf* /tmp/rootfs/var/log/yum.*

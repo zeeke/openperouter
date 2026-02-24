@@ -35,7 +35,7 @@ func (c *Client) EnsurePort(ctx context.Context, name, devargs string) error {
 	}
 
 	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs)
-	if err := c.run(ctx, "add", "interface", "port", name, "devargs", devargs); err != nil {
+	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs); err != nil {
 		return fmt.Errorf("creating grout port %s: %w", name, err)
 	}
 	return nil
@@ -53,7 +53,7 @@ func (c *Client) DeletePort(ctx context.Context, name string) error {
 	}
 
 	slog.InfoContext(ctx, "deleting grout port", "name", name)
-	if err := c.run(ctx, "del", "interface", "port", name); err != nil {
+	if err := c.run(ctx, "interface", "del", name); err != nil {
 		return fmt.Errorf("deleting grout port %s: %w", name, err)
 	}
 	return nil
@@ -61,7 +61,7 @@ func (c *Client) DeletePort(ctx context.Context, name string) error {
 
 // portExists checks whether a port with the given name exists in grout.
 func (c *Client) portExists(ctx context.Context, name string) (bool, error) {
-	out, err := c.runOutput(ctx, "show", "interface", "name", name)
+	out, err := c.runOutput(ctx, "interface", "show", "name", name)
 	if err != nil {
 		// grcli returns an error when the interface doesn't exist
 		if strings.Contains(err.Error(), "No such") || strings.Contains(out, "No such") {
