@@ -113,6 +113,37 @@ docker-build: ## Build docker image with the manager.
 	fi
 
 
+##@ Grout image builds
+
+GROUT_IMG_NAME ?= grout
+GROUT_IMG ?= $(IMG_REPO)/$(GROUT_IMG_NAME):$(IMG_TAG)
+GROUT_VERSION ?= edge
+FRR_GROUT_IMG ?= $(IMG_REPO)/frr-grout:$(IMG_TAG)
+
+.PHONY: docker-build-grout
+docker-build-grout: ## Build grout sidecar image.
+	@if [ "$(CONTAINER_ENGINE)" = "podman" ]; then \
+		sudo $(CONTAINER_ENGINE) build -t $(GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.grout .; \
+	else \
+		$(CONTAINER_ENGINE) build -t $(GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.grout .; \
+	fi
+
+.PHONY: docker-build-frr-grout
+docker-build-frr-grout: ## Build FRR base image with dplane_grout plugin.
+	@if [ "$(CONTAINER_ENGINE)" = "podman" ]; then \
+		sudo $(CONTAINER_ENGINE) build -t $(FRR_GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.frr-grout .; \
+	else \
+		$(CONTAINER_ENGINE) build -t $(FRR_GROUT_IMG) --build-arg GROUT_VERSION=$(GROUT_VERSION) -f Dockerfile.frr-grout .; \
+	fi
+
+.PHONY: docker-build-router-grout
+docker-build-router-grout: docker-build-frr-grout ## Build router image with grout/dplane_grout support.
+	@if [ "$(CONTAINER_ENGINE)" = "podman" ]; then \
+		sudo $(CONTAINER_ENGINE) build -t ${IMG} --build-arg FRR_IMAGE=$(FRR_GROUT_IMG) .; \
+	else \
+		$(CONTAINER_ENGINE) build -t ${IMG} --build-arg FRR_IMAGE=$(FRR_GROUT_IMG) .; \
+	fi
+
 TLS_VERIFY ?= "true"
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
@@ -256,6 +287,20 @@ deploy-helm: helm kind deploy-cluster
 	sleep 2s # wait for daemonset to be created
 	$(KUBECTL) -n ${NAMESPACE} wait --for=condition=Ready --all pods --timeout 300s
 
+.PHONY: deploy-helm-grout
+deploy-helm-grout: helm kind deploy-cluster load-on-kind-grout ## Deploy with grout dataplane enabled (test mode, no DPDK).
+	$(KUBECTL) -n ${NAMESPACE} delete ds controller || true
+	$(KUBECTL) -n ${NAMESPACE} delete ds router || true
+	$(KUBECTL) -n ${NAMESPACE} delete deployment nodemarker || true
+	$(KUBECTL) create ns ${NAMESPACE} || true
+	$(KUBECTL) label ns ${NAMESPACE} pod-security.kubernetes.io/enforce=privileged
+	$(HELM) install openperouter charts/openperouter/ --set openperouter.image.tag=${IMG_TAG} \
+	--set openperouter.image.pullPolicy=IfNotPresent --set openperouter.logLevel=debug --namespace ${NAMESPACE} \
+	-f clab/grout-values.yaml --set openperouter.grout.image.repository=$(IMG_REPO)/$(GROUT_IMG_NAME) --set openperouter.grout.image.tag=$(IMG_TAG) \
+	$(HELM_ARGS)
+	sleep 2s # wait for daemonset to be created
+	$(KUBECTL) -n ${NAMESPACE} wait --for=condition=Ready --all pods --timeout 300s
+
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | $(KUBECTL) delete --ignore-not-found=$(ignore-not-found) -f -
@@ -315,6 +360,10 @@ $(APIDOCSGEN): $(LOCALBIN)
 e2etests: ginkgo kubectl build-validator create-export-logs
 	$(GINKGO) -v $(GINKGO_ARGS) --timeout=3h ./e2etests/suite -- --kubectl=$(KUBECTL) $(TEST_ARGS) --hostvalidator $(VALIDATOR_PATH) --reporterpath=${KIND_EXPORT_LOGS}
 
+.PHONY: e2etests-grout
+e2etests-grout: ginkgo kubectl build-validator create-export-logs ## Run L3 Passthrough e2e tests against grout dataplane.
+	$(GINKGO) -v $(GINKGO_ARGS) --timeout=3h --label-filter='passthrough' ./e2etests/suite -- --kubectl=$(KUBECTL) $(TEST_ARGS) --hostvalidator $(VALIDATOR_PATH) --reporterpath=${KIND_EXPORT_LOGS}
+
 .PHONY: e2etests-hostmode-boot
 e2etests-hostmode-boot: ginkgo kubectl build-validator create-export-logs ## Run e2e tests for hostmode boot scenario (static config first, then K8s API).
 	@echo "=== Running systemd_static_suite tests (static config only) ==="
@@ -346,6 +395,10 @@ clean: kind ## Shutdown and clean up kind cluster(s) and containerlab topology.
 .PHONY: load-on-kind
 load-on-kind: ## Load the docker image into the kind cluster.
 	KIND=$(KIND) bash -c 'source clab/common.sh && load_local_image_to_kind ${IMG} router'
+
+.PHONY: load-on-kind-grout
+load-on-kind-grout: load-on-kind ## Load router and grout images into the kind cluster.
+	KIND=$(KIND) bash -c 'source clab/common.sh && load_local_image_to_kind $(GROUT_IMG) grout'
 
 .PHONY: load-on-multi-cluster
 load-on-multi-cluster: ## Load the docker image into both kind clusters.

@@ -1,0 +1,20 @@
+# Dockerfile for building the grout DPDK dataplane sidecar container.
+#
+# Grout packages are downloaded from the DPDK/grout GitHub release.
+# By default, the "edge" (nightly) release is used.
+#
+# Usage:
+#   make docker-build-grout
+
+ARG GROUT_VERSION=edge
+ARG BASE_IMAGE=registry.access.redhat.com/ubi9-minimal
+
+FROM ${BASE_IMAGE}
+ARG GROUT_VERSION
+
+RUN microdnf -y install --nodocs --setopt=install_weak_deps=0 \
+      https://github.com/DPDK/grout/releases/download/${GROUT_VERSION}/grout.x86_64.rpm && \
+    microdnf clean all && \
+    rm -rf /var/cache/* /var/log/dnf* /var/log/yum.*
+
+CMD ["/usr/bin/grout"]
