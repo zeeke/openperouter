@@ -78,9 +78,18 @@ func UnderlayDevargs(nicName string) string {
 	return fmt.Sprintf("net_tap0,iface=gr-%s,remote=%s", nicName, nicName)
 }
 
-// PassthroughDevargs returns DPDK devargs for a TAP interface linked to a passthrough veth.
-func PassthroughDevargs(vethName string) string {
-	return fmt.Sprintf("net_tap1,iface=gr-%s,remote=%s", vethName, vethName)
+// PassthroughTAPName is the kernel interface name for the grout passthrough TAP device.
+// In grout mode, this TAP replaces the veth pair used in kernel mode.
+const PassthroughTAPName = "gr-pt"
+
+// PassthroughPortName is the grout port name for the passthrough TAP.
+const PassthroughPortName = "pt"
+
+// PassthroughDevargs returns DPDK devargs for a TAP interface used as the
+// passthrough endpoint. Unlike the underlay, no `remote` is specified because
+// the TAP itself IS the forwarding interface (there is no kernel interface to mirror).
+func PassthroughDevargs() string {
+	return fmt.Sprintf("net_tap1,iface=%s", PassthroughTAPName)
 }
 
 // run executes a grcli command and returns any error.

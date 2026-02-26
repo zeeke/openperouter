@@ -32,29 +32,16 @@ func TestUnderlayDevargs(t *testing.T) {
 }
 
 func TestPassthroughDevargs(t *testing.T) {
-	tests := []struct {
-		name     string
-		vethName string
-		want     string
-	}{
-		{
-			name:     "passthrough namespace veth",
-			vethName: "pt-ns",
-			want:     "net_tap1,iface=gr-pt-ns,remote=pt-ns",
-		},
-		{
-			name:     "custom veth name",
-			vethName: "veth0",
-			want:     "net_tap1,iface=gr-veth0,remote=veth0",
-		},
+	got := PassthroughDevargs()
+	want := "net_tap1,iface=gr-pt"
+	if got != want {
+		t.Errorf("PassthroughDevargs() = %q, want %q", got, want)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := PassthroughDevargs(tt.vethName)
-			if got != tt.want {
-				t.Errorf("PassthroughDevargs(%q) = %q, want %q", tt.vethName, got, tt.want)
-			}
-		})
+}
+
+func TestPassthroughTAPName(t *testing.T) {
+	if PassthroughTAPName != "gr-pt" {
+		t.Errorf("PassthroughTAPName = %q, want %q", PassthroughTAPName, "gr-pt")
 	}
 }
 

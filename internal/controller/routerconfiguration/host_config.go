@@ -94,18 +94,26 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 		}
 	}
 
-	slog.InfoContext(ctx, "setting up passthrough")
+	slog.InfoContext(ctx, "setting up passthrough", "groutEnabled", config.groutEnabled)
 	if hostConfig.L3Passthrough != nil {
-		if err := hostnetwork.SetupPassthrough(ctx, *hostConfig.L3Passthrough); err != nil {
-			return fmt.Errorf("failed to setup passthrough: %w", err)
+		if config.groutEnabled {
+			// In grout mode, create a TAP interface instead of a veth pair.
+			// The grout TAP is moved to the host namespace and gets the same IPs.
+			if err := setupGroutPassthrough(ctx, config, *hostConfig.L3Passthrough); err != nil {
+				return fmt.Errorf("failed to setup grout passthrough: %w", err)
+			}
+		} else {
+			if err := hostnetwork.SetupPassthrough(ctx, *hostConfig.L3Passthrough); err != nil {
+				return fmt.Errorf("failed to setup passthrough: %w", err)
+			}
 		}
 	}
 
-	// When grout is enabled, create corresponding grout port interfaces for
-	// the underlay NIC and passthrough veth so grout handles forwarding.
+	// When grout is enabled, create a port for the underlay NIC so grout
+	// handles forwarding via DPDK.
 	if config.groutEnabled {
-		if err := configureGroutInterfaces(ctx, config, hostConfig); err != nil {
-			return fmt.Errorf("failed to configure grout interfaces: %w", err)
+		if err := configureGroutUnderlay(ctx, config, hostConfig); err != nil {
+			return fmt.Errorf("failed to configure grout underlay: %w", err)
 		}
 	}
 
@@ -125,42 +133,52 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 	if len(apiConfig.L3Passthrough) == 0 {
 		if config.groutEnabled {
 			client := grout.NewClient(config.groutSocketPath)
-			ptName := hostnetwork.PassthroughNames.NamespaceSide
-			if err := client.DeletePort(ctx, "pt-"+ptName); err != nil {
+			if err := client.DeletePort(ctx, grout.PassthroughPortName); err != nil {
 				return fmt.Errorf("failed to delete grout passthrough port: %w", err)
 			}
-		}
-		if err := hostnetwork.RemovePassthrough(config.targetNamespace); err != nil {
-			return fmt.Errorf("failed to remove passthrough: %w", err)
+			if err := hostnetwork.RemoveGroutPassthrough(grout.PassthroughTAPName); err != nil {
+				return fmt.Errorf("failed to remove grout passthrough TAP: %w", err)
+			}
+		} else {
+			if err := hostnetwork.RemovePassthrough(config.targetNamespace); err != nil {
+				return fmt.Errorf("failed to remove passthrough: %w", err)
+			}
 		}
 	}
 	return nil
 }
 
-// configureGroutInterfaces creates grout port interfaces that mirror the
-// kernel interfaces, allowing grout to handle packet forwarding via DPDK.
-func configureGroutInterfaces(ctx context.Context, config interfacesConfiguration, hostConfig conversion.HostConfigData) error {
-	slog.InfoContext(ctx, "configuring grout interfaces")
+// setupGroutPassthrough creates a grout TAP port for the passthrough and moves
+// the resulting TAP interface to the host namespace with the correct IPs.
+// This replaces the veth pair used in kernel mode (acceptance criteria d1b).
+func setupGroutPassthrough(ctx context.Context, config interfacesConfiguration, pt hostnetwork.PassthroughParams) error {
+	slog.InfoContext(ctx, "setting up grout passthrough")
 	client := grout.NewClient(config.groutSocketPath)
 
-	// For each Underlay NIC, create a grout port with net_tap devargs
-	// that mirrors traffic from the kernel interface.
-	if hostConfig.Underlay.UnderlayInterface != "" {
-		nicName := hostConfig.Underlay.UnderlayInterface
-		if err := client.EnsurePort(ctx, "ul-"+nicName, grout.UnderlayDevargs(nicName)); err != nil {
-			return fmt.Errorf("failed to create grout port for underlay NIC %s: %w", nicName, err)
-		}
+	if err := client.EnsurePort(ctx, grout.PassthroughPortName, grout.PassthroughDevargs()); err != nil {
+		return fmt.Errorf("failed to create grout passthrough port: %w", err)
 	}
 
-	// For the passthrough veth pair, create a grout port linked to the
-	// namespace-side veth so grout can forward traffic through it.
-	if hostConfig.L3Passthrough != nil {
-		ptName := hostnetwork.PassthroughNames.NamespaceSide
-		if err := client.EnsurePort(ctx, "pt-"+ptName, grout.PassthroughDevargs(ptName)); err != nil {
-			return fmt.Errorf("failed to create grout port for passthrough veth %s: %w", ptName, err)
-		}
+	if err := hostnetwork.SetupGroutPassthrough(ctx, grout.PassthroughTAPName, config.targetNamespace, pt.HostVeth.HostIPv4, pt.HostVeth.HostIPv6); err != nil {
+		return fmt.Errorf("failed to setup grout passthrough TAP: %w", err)
+	}
+	return nil
+}
+
+// configureGroutUnderlay creates a grout port for the underlay NIC so that
+// grout can intercept and forward traffic via DPDK.
+func configureGroutUnderlay(ctx context.Context, config interfacesConfiguration, hostConfig conversion.HostConfigData) error {
+	if hostConfig.Underlay.UnderlayInterface == "" {
+		return nil
 	}
 
+	slog.InfoContext(ctx, "configuring grout underlay interface")
+	client := grout.NewClient(config.groutSocketPath)
+
+	nicName := hostConfig.Underlay.UnderlayInterface
+	if err := client.EnsurePort(ctx, "ul-"+nicName, grout.UnderlayDevargs(nicName)); err != nil {
+		return fmt.Errorf("failed to create grout port for underlay NIC %s: %w", nicName, err)
+	}
 	return nil
 }
 
