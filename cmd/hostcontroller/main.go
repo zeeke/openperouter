@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"runtime/debug"
 	"time"
 
 	"k8s.io/apimachinery/pkg/labels"
@@ -54,6 +53,7 @@ import (
 	"github.com/openperouter/openperouter/internal/pods"
 	"github.com/openperouter/openperouter/internal/staticconfiguration"
 	"github.com/openperouter/openperouter/internal/systemdctl"
+	"github.com/openperouter/openperouter/internal/version"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	// +kubebuilder:scaffold:imports
 )
@@ -146,8 +146,7 @@ func main() {
 		os.Exit(1)
 	}
 	ctrl.SetLogger(logr.FromSlogHandler(logger.Handler()))
-	build, _ := debug.ReadBuildInfo()
-	setupLog.Info("version", "version", build.Main.Version)
+	setupLog.Info("version", "version", version.Version())
 	setupLog.Info("arguments", "args", fmt.Sprintf("%+v", args))
 
 	// Setup signal handler once for the entire process
