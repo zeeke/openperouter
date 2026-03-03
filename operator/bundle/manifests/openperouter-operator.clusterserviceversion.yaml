@@ -41,6 +41,9 @@ spec:
       kind: OpenPERouter
       name: openperouters.openpe.openperouter.github.io
       version: v1alpha1
+    - kind: RawFRRConfig
+      name: rawfrrconfigs.openpe.openperouter.github.io
+      version: v1alpha1
     - description: Underlay is the Schema for the underlays API.
       displayName: Underlay
       kind: Underlay
@@ -125,6 +128,20 @@ spec:
           - get
           - patch
           - update
+        - apiGroups:
+          - openpe.openperouter.github.io
+          resources:
+          - rawfrrconfigs
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - openpe.openperouter.github.io
+          resources:
+          - rawfrrconfigs/status
+          verbs:
+          - get
         serviceAccountName: controller
       - rules:
         - apiGroups:
