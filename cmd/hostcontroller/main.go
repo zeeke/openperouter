@@ -249,7 +249,9 @@ func runK8sConfigReconcilerHostMode(ctx context.Context,
 	k8sConfig *rest.Config,
 	logger *slog.Logger) error {
 
-	mgr, err := createK8sManager(k8sConfig, args.nodeName, args.namespace)
+	mgr, err := createK8sManager(k8sConfig, args.nodeName, args.namespace, func(opts *ctrl.Options) {
+		opts.HealthProbeBindAddress = args.probeAddr
+	})
 	if err != nil {
 		return fmt.Errorf("unable to start manager: %w", err)
 	}
