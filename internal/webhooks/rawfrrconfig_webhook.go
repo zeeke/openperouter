@@ -54,7 +54,7 @@ func (v *RawFRRConfigValidator) Handle(_ context.Context, req admission.Request)
 			return admission.Denied(err.Error())
 		}
 	}
-	return admission.Allowed("")
+	return admission.Allowed("").WithWarnings("please note RawFRRConfig is for experimentation only and not supported")
 }
 
 func validateRawFRRConfig(rawFRRConfig *v1alpha1.RawFRRConfig) error {

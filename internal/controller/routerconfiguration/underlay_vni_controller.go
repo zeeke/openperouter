@@ -228,6 +228,10 @@ func (r *PERouterReconciler) getConfigFromAPI(ctx context.Context, logger *slog.
 		return conversion.ApiConfigData{}, err
 	}
 
+	if len(filteredRawFRRConfigs) > 0 {
+		logger.Info("RawFRRConfig is applied, but please note that this feature is for experimentation only and not supported")
+	}
+
 	logger.Debug("using config", "l3vnis", l3vnis.Items, "l2vnis", l2vnis.Items, "underlays", underlays.Items, "l3passthrough", l3passthrough.Items, "rawfrrconfigs", rawFRRConfigs.Items)
 
 	apiConfig := conversion.ApiConfigData{
