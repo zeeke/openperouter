@@ -47,4 +47,5 @@ LABEL com.redhat.component="openperouter" \
     url="https://github.com/openperouter/openperouter" \
     vendor="Red Hat, Inc."
 
+
 ENTRYPOINT ["/controller"]
