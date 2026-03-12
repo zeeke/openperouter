@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-event: "[push]"
     pipelinesascode.tekton.dev/on-target-branch: "[refs/heads/main,refs/heads/release-*]"
-    pipelinesascode.tekton.dev/on-path-change-ignore: "[operator/bundle.Dockerfile.openshift, operator/bundle/**, .konflux/**]"
+    pipelinesascode.tekton.dev/on-path-change-ignore: "[operator/bundle/overlay/pin_images.in.yaml, .konflux/catalog/bundle.builds.in.yaml]"
   creationTimestamp:
   labels:
     appstudio.openshift.io/application: openperouter-operator-4-21
