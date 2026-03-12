@@ -285,6 +285,14 @@ spec:
       permissions:
       - rules:
         - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
           - ""
           resources:
           - secrets
@@ -336,6 +344,14 @@ spec:
           - watch
         serviceAccountName: operator
       - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
         - apiGroups:
           - ""
           resources:
