@@ -16,5 +16,5 @@ entries:
     name: "4.21"
     package: openperouter-operator
     schema: olm.channel  
-  - image: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-4-21@sha256:ec3c69d5f8157dfdebdd0fa23441d031564f659c0e48946e51d6a54c50d7a6e7
+  - image: placeholder.will.be.updated.by.telco5g-konflux.scripts.catalog.update-catalog-template.sh
     schema: olm.bundle
