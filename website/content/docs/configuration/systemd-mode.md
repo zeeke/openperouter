@@ -12,20 +12,13 @@ In systemd mode, OpenPERouter is configured via static files on the host instead
 
 ## Node Configuration
 
-Each node requires a mandatory configuration file at `/etc/openperouter/node-config.yaml`. This file must contain the `nodeIndex`, a unique integer used for IPAM address allocation from the configured CIDRs:
+Each node requires a mandatory configuration file at `/var/lib/openperouter/node-config.yaml`. This file must contain the `nodeIndex`, a unique integer used for IPAM address allocation from the configured CIDRs:
 
 ```yaml
 nodeIndex: 0
 logLevel: debug
-```
 
-Each node in the deployment must have a distinct `nodeIndex` value.
-
-## Router Configuration
-
-Router configuration files follow the naming convention `openpe_*.yaml` and must be placed in `/etc/openperouter/configs/`. All files matching this pattern are read and merged together into a single configuration.
-
-Each `openpe_*.yaml` file contains the `spec` part of the corresponding Kubernetes Custom Resources. A file can contain any combination of `underlays`, `l3vnis`, `l2vnis`, `bgppassthrough`, and `rawfrrconfigs` fields, where each entry follows the same schema as the `spec` section of the equivalent CR (Underlay, L3VNI, L2VNI, L3Passthrough, RawFRRConfig):
+Each `openpe_*.yaml` file contains the `spec` part of the corresponding Kubernetes Custom Resources. A file can contain any combination of `underlay`, `l3vnis`, `l2vnis`, `bgppassthrough`, and `rawfrrconfigs` fields, where each entry follows the same schema as the `spec` section of the equivalent CR (Underlay, L3VNI, L2VNI, L3Passthrough, RawFRRConfig):
 
 ```yaml
 underlays:
