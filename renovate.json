@@ -11,5 +11,8 @@
     },
     "kubernetes": {
         "enabled": false
+    },
+    "jsonnet-bundler": {
+        "enabled": false
     }
 }
