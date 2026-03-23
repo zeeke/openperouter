@@ -14,5 +14,16 @@
     },
     "jsonnet-bundler": {
         "enabled": false
+    },
+    "tekton" {
+        "enabled": true,
+        "includePaths": [
+            ".tekton/**"
+        ],
+        "addLabels": [
+            "approved",
+            "lgtm",
+            "ok-to-test"
+        ]
     }
 }
