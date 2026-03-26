@@ -7,9 +7,12 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-event: "[push]"
-    pipelinesascode.tekton.dev/on-target-branch: "[refs/heads/main,refs/heads/release-*]"
-    pipelinesascode.tekton.dev/on-path-change: "[operator/bundle.Dockerfile.openshift,operator/bundle/**]"
+    # openshift-merge-robot is the user who aligns the release branches. Don't trigger the pipeline on branch alignments
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push" && 
+      body.sender.login != "openshift-merge-robot" && 
+      (target_branch == "main" || target_branch.startsWith("release-")) && 
+      ("operator/bundle.Dockerfile.openshift".pathChanged() || "operator/bundle/**".pathChanged())
   creationTimestamp:
   labels:
     appstudio.openshift.io/application: openperouter-operator-4-21
