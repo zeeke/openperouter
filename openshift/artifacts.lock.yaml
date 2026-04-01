@@ -1,0 +1,14 @@
+---
+metadata: 
+  version: "1.0"
+artifacts:
+  # Keep the following artifact URLs aligned to the content of the ./grout/subprojects/*.wrap files
+  - download_url: "http://fast.dpdk.org/rel/dpdk-25.11.tar.xz"
+    checksum: "sha256:52e90d2a531ef3ded0283bd91abc94980698f1f6471fa09658a0217cf6609526" 
+    filename: "dpdk-25.11.tar.xz" 
+  - download_url: https://github.com/rjarry/libecoli/archive/refs/tags/v0.10.1.tar.gz
+    checksum: sha256:ec359850f4f338b607d05200d508736b14eaa30fca8aefdfde980a283afd789d
+    filename: libecoli-0.10.1.tar.xz
+  - download_url: https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.3.tar.gz
+    checksum: sha256:ecc95009b88e66df2c91be02fbf0a3eb8e1de434fd652e0cbf46f19126f708ec
+    filename: frr-10.5.3.tar.gz
