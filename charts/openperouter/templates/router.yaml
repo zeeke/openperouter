@@ -182,6 +182,9 @@ spec:
         imagePullPolicy: {{ .Values.openperouter.image.pullPolicy }}
         {{- end }}
         command: ["/reloader"]
+        env:
+          - name: FRR_EDGE
+            value: "true"
         args:
         - "--frrconfig=/etc/perouter/frr.conf"
         - "--unixsocket=/etc/perouter/reload.sock"

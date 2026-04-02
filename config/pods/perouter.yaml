@@ -58,6 +58,9 @@ spec:
         image: router:latest
         imagePullPolicy: Always
         command: ["/reloader"]
+        env:
+          - name: FRR_EDGE
+            value: "true"
         args:
         - "--frrconfig=/etc/perouter/frr.conf"
         - "--loglevel=debug"
