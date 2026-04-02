@@ -1508,6 +1508,9 @@ spec:
         - --unixsocket=/etc/perouter/reload.sock
         command:
         - /reloader
+        env:
+        - name: FRR_EDGE
+          value: "true"
         image: quay.io/openperouter/router:main
         imagePullPolicy: Always
         livenessProbe:

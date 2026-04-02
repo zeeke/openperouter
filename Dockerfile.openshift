@@ -152,6 +152,7 @@ COPY --from=grout-builder /usr/local/bin/grout /usr/local/bin/grout
 COPY --from=grout-builder /frr-edge /frr-edge
 
 COPY openshift/frr-docker-start /usr/lib/frr/docker-start
-RUN ln -s /usr/libexec/frr/frr-reload.py /usr/lib/frr/frr-reload.py
+RUN mv /reloader /reloader-original
+COPY openshift/reloader-wrapper.sh /reloader
 
 ENTRYPOINT ["/controller"]
