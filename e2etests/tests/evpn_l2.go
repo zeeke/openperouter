@@ -90,27 +90,31 @@ var _ = Describe("Routes between bgp and the fabric", Ordered, func() {
 			_, err = exec.Exec("ovs-vsctl", "add-br", preExistingOVSBridge)
 			Expect(err).NotTo(HaveOccurred())
 		}
-	})
 
-	AfterAll(func() {
-		err := Updater.CleanAll()
-		Expect(err).NotTo(HaveOccurred())
-		By("waiting for the router pod to rollout after removing the underlay")
-		Eventually(func() error {
-			newRouters, err := openperouter.Get(cs, HostMode)
-			if err != nil {
-				return err
-			}
-			return openperouter.DaemonsetRolled(routers, newRouters)
-		}, 2*time.Minute, time.Second).ShouldNot(HaveOccurred())
-
-		// Clean up pre-existing OVS bridges
-		nodes := []string{infra.KindControlPlane, infra.KindWorker}
-		for _, nodeName := range nodes {
-			exec := executor.ForContainer(nodeName)
-			_, err = exec.Exec("ovs-vsctl", "--if-exists", "del-br", preExistingOVSBridge)
+		// DeferCleanup in BeforeAll runs at AfterAll scope but after
+		// DeferCleanup callbacks registered in specs (LIFO order),
+		// We can't use the AfterAll block, see
+		// https://github.com/onsi/ginkgo/issues/1284#issuecomment-1756314394
+		DeferCleanup(func() {
+			err := Updater.CleanAll()
 			Expect(err).NotTo(HaveOccurred())
-		}
+			By("waiting for the router pod to rollout after removing the underlay")
+			Eventually(func() error {
+				newRouters, err := openperouter.Get(cs, HostMode)
+				if err != nil {
+					return err
+				}
+				return openperouter.DaemonsetRolled(routers, newRouters)
+			}, 2*time.Minute, time.Second).ShouldNot(HaveOccurred())
+
+			// Clean up pre-existing OVS bridges
+			nodes := []string{infra.KindControlPlane, infra.KindWorker}
+			for _, nodeName := range nodes {
+				exec := executor.ForContainer(nodeName)
+				_, err = exec.Exec("ovs-vsctl", "--if-exists", "del-br", preExistingOVSBridge)
+				Expect(err).NotTo(HaveOccurred())
+			}
+		})
 	})
 
 	const testNamespace = "test-namespace"
@@ -220,7 +224,7 @@ var _ = Describe("Routes between bgp and the fabric", Ordered, func() {
 				},
 			},
 		}),
-		Entry("for dual stack", testCase{
+		FEntry("for dual stack", testCase{
 			l2GatewayIPs: []string{"192.171.24.1/24", "fd00:10:245:1::1/64"},
 			firstPodIPs:  []string{"192.171.24.2/24", "fd00:10:245:1::2/64"},
 			secondPodIPs: []string{"192.171.24.3/24", "fd00:10:245:1::3/64"},
