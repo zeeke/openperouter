@@ -57,8 +57,8 @@ openperouter:
   # frr contains configuration specific to the perouter FRR container,
   frr:
     image:
-      repository: quay.io/openperouter/openperouter
-      tag: ""
+      repository: quay.io/grout/frr
+      tag: "edge"
       pullPolicy: ""
     resources: {}
     reloader:
@@ -70,8 +70,8 @@ openperouter:
     # -- Enable grout sidecar for DPDK-accelerated L3 routing
     enabled: false
     image:
-      repository: quay.io/openperouter/openperouter
-      tag: ""
+      repository: quay.io/grout/grout
+      tag: "edge"
       pullPolicy: ""
     # -- Grout log level. Must be one of: `emerg`, `alert`, `crit`, `err`, `warning`, `notice`, `info` or `debug`.
     logLevel: info

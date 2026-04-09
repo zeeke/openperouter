@@ -184,9 +184,9 @@ spec:
           type: DirectoryOrCreate
         name: frr-sockets
       {{- if .Values.openperouter.grout.enabled }}
-      - hostPath:
+      - name: grout-socket
+        hostPath:
           path: /var/run/openperouter/grout
           type: DirectoryOrCreate
-        name: grout-socket
       {{- end }}
 {{- end }}

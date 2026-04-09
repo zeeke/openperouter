@@ -241,11 +241,11 @@ spec:
       - name: grout
         securityContext:
           privileged: true
-        image: {{ .Values.openperouter.grout.image.repository }}:{{ .Values.openperouter.grout.image.tag }}
+        image: "{{ .Values.openperouter.grout.image.repository }}:{{ .Values.openperouter.grout.image.tag }}"
         {{- if .Values.openperouter.grout.image.pullPolicy }}
         imagePullPolicy: {{ .Values.openperouter.grout.image.pullPolicy }}
         {{- end }}
-        command: grout
+        command: [ grout ]
         args:
         - --log-level 
         - {{ .Values.openperouter.grout.logLevel | default "info" }}
@@ -312,6 +312,12 @@ spec:
             type: DirectoryOrCreate
         - name: frrconfig
           emptyDir: {}
+        {{- if .Values.openperouter.grout.enabled }}
+        - name: grout-socket
+          hostPath:
+            path: /var/run/openperouter/grout
+            type: DirectoryOrCreate
+        {{- end }}
       initContainers:
         # Copies the initial config files with the right permissions to the shared volume.
         - name: cp-frr-files
