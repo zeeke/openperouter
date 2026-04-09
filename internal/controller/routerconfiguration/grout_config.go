@@ -52,6 +52,8 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 		return fmt.Errorf("failed to convert config to host configuration: %w", err)
 	}
 
+	groutClient := grout.NewClient(config.groutSocketPath)
+
 	slog.InfoContext(ctx, "ensuring sysctls")
 	if err := sysctl.Ensure(
 		config.targetNamespace,
@@ -66,7 +68,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 	}
 
 	slog.InfoContext(ctx, "setting up underlay")
-	if err := grout.SetupUnderlay(ctx, hostConfig.Underlay); err != nil {
+	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
 	for _, vni := range hostConfig.L3VNIs {
