@@ -57,8 +57,8 @@ openperouter:
   # frr contains configuration specific to the perouter FRR container,
   frr:
     image:
-      repository: quay.io/grout/frr
-      tag: "edge"
+      repository: quay.io/openperouter/openperouter
+      tag: ""
       pullPolicy: ""
     resources: {}
     reloader:
@@ -71,16 +71,16 @@ openperouter:
     enabled: false
     image:
       repository: quay.io/grout/grout
-      tag: "edge"
+      tag: "0.15.0"
       pullPolicy: ""
     # -- Grout log level. Must be one of: `emerg`, `alert`, `crit`, `err`, `warning`, `notice`, `info` or `debug`.
     logLevel: info
     resources:
       requests:
-        memory: "64Mi"
+        memory: "512Mi"
         cpu: "250m"
       limits:
-        memory: "256Mi"
+        memory: "1Gi"
         cpu: "500m"
   cri: "containerd" # cri to bind its socket, can be containerd or crio.
   # -- OVS database socket path. Defaults to standard OVS location if not specified.

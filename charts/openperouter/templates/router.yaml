@@ -247,11 +247,9 @@ spec:
         {{- end }}
         command: [ grout ]
         args:
-        - --log-level 
-        - {{ .Values.openperouter.grout.logLevel | default "info" }}
+        - --test-mode
         - --socket
         - /var/run/grout/grout.sock
-        - "--unixsocket=/etc/perouter/reload.sock"
         volumeMounts:
           - name: grout-socket
             mountPath: /var/run/grout
@@ -282,7 +280,8 @@ spec:
               - -e
               - --socket
               - /var/run/grout/grout.sock
-              - graph stats
+              - graph
+              - show
           periodSeconds: 30
       {{- end }}
       tolerations:
