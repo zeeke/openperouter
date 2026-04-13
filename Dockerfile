@@ -58,4 +58,6 @@ RUN ln -s /usr/bin/tini /sbin/tini
 ADD https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox /usr/bin/busybox
 RUN chmod +x /usr/bin/busybox
 
+COPY --from=quay.io/grout/grout /usr/bin/grcli /usr/bin/grcli
+
 ENTRYPOINT ["/controller"]
