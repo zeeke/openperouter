@@ -280,7 +280,8 @@ spec:
               - -e
               - --socket
               - /var/run/grout/grout.sock
-              - graph stats
+              - graph
+              - show
           periodSeconds: 30
       {{- end }}
       tolerations:

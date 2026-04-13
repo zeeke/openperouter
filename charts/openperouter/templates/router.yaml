@@ -250,6 +250,9 @@ spec:
         - --test-mode
         - --socket
         - /var/run/grout/grout.sock
+        - --socket-mode
+        - "0666"
+        {{- with .Values.openperouter.grout.logLevel }}
         volumeMounts:
           - name: grout-socket
             mountPath: /var/run/grout

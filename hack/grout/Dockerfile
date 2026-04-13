@@ -50,12 +50,7 @@ COPY systemdmode/frrconfig/daemons /etc/frr/daemons
 COPY systemdmode/frrconfig/vtysh.conf /etc/frr/vtysh.conf
 COPY systemdmode/frrconfig/frr.conf /etc/frr/frr.conf
 
-RUN ln -s /usr/libexec/frr /usr/lib/frr
-ADD https://raw.githubusercontent.com/FRRouting/frr/refs/tags/frr-10.5.0/docker/ubi8-minimal/docker-start /usr/lib/frr/docker-start
-RUN chmod +x /usr/lib/frr/docker-start
-RUN ln -s /usr/bin/tini /sbin/tini 
-
-ADD https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox /usr/bin/busybox
-RUN chmod +x /usr/bin/busybox
+COPY --from=grout-builder /grout/build/grcli /usr/bin/grcli
+COPY --from=grout-builder /grout/build/frr/dplane_grout.so /usr/lib/frr/modules/dplane_grout.so
 
 ENTRYPOINT ["/controller"]
