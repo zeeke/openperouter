@@ -55,9 +55,21 @@ func (c *Client) deletePort(ctx context.Context, name string) error {
 	return nil
 }
 
+// addAddress assigns an IP address (in CIDR notation) to a grout port.
+// If the address is already assigned, it is a no-op.
+func (c *Client) addAddress(ctx context.Context, ifaceName, cidr string) error {
+	slog.InfoContext(ctx, "assigning IP to grout port", "iface", ifaceName, "cidr", cidr)
+	err := c.run(ctx, "address", "add", cidr, "iface", ifaceName)
+	if err != nil && strings.Contains(err.Error(), "already") {
+		slog.DebugContext(ctx, "address already assigned", "iface", ifaceName, "cidr", cidr)
+		return nil
+	}
+	return err
+}
+
 // portExists checks whether a port with the given name exists in grout.
 func (c *Client) portExists(ctx context.Context, name string) (bool, error) {
-	out, err := c.runOutput(ctx, "interface", "show", "name", name)
+	out, err := c.RunOutput(ctx, "interface", "show", "name", name)
 	if err != nil {
 		// grcli returns an error when the interface doesn't exist
 		if strings.Contains(err.Error(), "No such") || strings.Contains(out, "No such") {
@@ -70,12 +82,28 @@ func (c *Client) portExists(ctx context.Context, name string) (bool, error) {
 
 // run executes a grcli command and returns any error.
 func (c *Client) run(ctx context.Context, args ...string) error {
-	_, err := c.runOutput(ctx, args...)
+	_, err := c.RunOutput(ctx, args...)
 	return err
 }
 
-// runOutput executes a grcli command and returns stdout and any error.
-func (c *Client) runOutput(ctx context.Context, args ...string) (string, error) {
+// DumpState logs the current grout state (interfaces, addresses, routes) for debugging.
+func (c *Client) DumpState(ctx context.Context) {
+	if out, err := c.RunOutput(ctx, "interface", "show"); err == nil {
+		slog.InfoContext(ctx, "grout interfaces", "output", out)
+	}
+	if out, err := c.RunOutput(ctx, "address", "show"); err == nil {
+		slog.InfoContext(ctx, "grout addresses", "output", out)
+	}
+	if out, err := c.RunOutput(ctx, "route", "show"); err == nil {
+		slog.InfoContext(ctx, "grout routes", "output", out)
+	}
+	if out, err := c.RunOutput(ctx, "neighbor", "show"); err == nil {
+		slog.InfoContext(ctx, "grout neighbors", "output", out)
+	}
+}
+
+// RunOutput executes a grcli command and returns stdout and any error.
+func (c *Client) RunOutput(ctx context.Context, args ...string) (string, error) {
 	cmdArgs := append([]string{"-e", "-s", c.socketPath}, args...)
 	cmd := exec.CommandContext(ctx, "grcli", cmdArgs...)
 

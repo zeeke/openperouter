@@ -71,6 +71,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
+
 	for _, vni := range hostConfig.L3VNIs {
 		slog.InfoContext(ctx, "setting up VNI", "vni", vni.VRF)
 		if err := grout.SetupL3VNI(ctx, vni); err != nil {
@@ -90,7 +91,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 
 	slog.InfoContext(ctx, "setting up passthrough")
 	if hostConfig.L3Passthrough != nil {
-		if err := grout.SetupPassthrough(ctx, *hostConfig.L3Passthrough); err != nil {
+		if err := grout.SetupPassthrough(ctx, groutClient, *hostConfig.L3Passthrough); err != nil {
 			return fmt.Errorf("failed to setup passthrough: %w", err)
 		}
 	}
@@ -109,7 +110,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 	bridgerefresh.StopForRemovedVNIs(hostConfig.L2VNIs)
 
 	if len(apiConfig.L3Passthrough) == 0 {
-		if err := grout.RemovePassthrough(config.targetNamespace); err != nil {
+		if err := grout.RemovePassthrough(ctx, groutClient, config.targetNamespace); err != nil {
 			return fmt.Errorf("failed to remove passthrough: %w", err)
 		}
 	}
