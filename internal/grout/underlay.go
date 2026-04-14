@@ -10,18 +10,15 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 )
 
-const underlayPortName = "underlay"
-const underlayLoopback = "lound"
+const (
+	underlayPortName = "underlay"
+)
 
-// HasUnderlayInterface checks whether the given namespace has an underlay interface configured.
-func HasUnderlayInterface(namespace string) (bool, error) {
-	// TODO: implement grout-based underlay check
-	return false, nil
+func HasUnderlayInterface(ctx context.Context, client *Client) (bool, error) {
+	return client.portExists(ctx, underlayPortName)
 }
 
 // SetupUnderlay configures the underlay interface via the grout dataplane.
-// It creates a grout TAP port with the `remote` devarg to connect to the underlay NIC,
-// and sets up a loopback interface in the target namespace for the VTEP IP if EVPN is configured.
 func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.UnderlayParams) error {
 	slog.DebugContext(ctx, "setup underlay", "params", params)
 	defer slog.DebugContext(ctx, "setup underlay done")
@@ -38,7 +35,7 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	}
 
 	if params.EVPN != nil && params.EVPN.VtepIP != "" {
-		// TODO: create a VRF grout port and assign the VTEP IP to it, instead of using a loopback. This will allow better isolation and more flexible routing.
+		// TODO: create a VRF grout port and assign the VTEP IP to it
 	}
 
 	return nil

@@ -4,52 +4,86 @@ package grout
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/vishvananda/netlink"
+	"github.com/vishvananda/netns"
 )
 
-func SetupPassthrough(ctx context.Context, params hostnetwork.PassthroughParams) error {
+// SetupPassthrough configures the passthrough interface via the grout dataplane.
+// It creates a grout port "pt-ns" with a kernel TAP "pt-host", moves the TAP
+// to the host namespace, and assigns IPs to both sides.
+func SetupPassthrough(ctx context.Context, client *Client, params hostnetwork.PassthroughParams) error {
 	slog.DebugContext(ctx, "setup passthrough", "params", params)
 	defer slog.DebugContext(ctx, "setup passthrough done")
 
-	// Create the host-side TAP interface (e.g. "pt-host").
-	if err := setupTAPInHostNamespace(ctx, hostnetwork.PassthroughNames); err != nil {
-		return fmt.Errorf("SetupPassthrough: failed to setup TAP interface: %w", err)
+	tapName := hostnetwork.PassthroughNames.HostSide       // "pt-host"
+	portName := hostnetwork.PassthroughNames.NamespaceSide // "pt-ns"
+
+	ns, err := netns.GetFromPath(params.TargetNS)
+	if err != nil {
+		return fmt.Errorf("SetupPassthrough: failed to find namespace %s: %w", params.TargetNS, err)
+	}
+	defer func() {
+		if err := ns.Close(); err != nil {
+			slog.Error("failed to close namespace", "namespace", params.TargetNS, "error", err)
+		}
+	}()
+
+	// Check if the grout port already exists. If it does, the TAP was already
+	// moved to the host namespace on a previous reconciliation — skip creation.
+	portExists, err := client.portExists(ctx, portName)
+	if err != nil {
+		return fmt.Errorf("failed to check grout port %s: %w", portName, err)
 	}
 
-	// Assign IPs to the host-side TAP.
-	hostTap, err := netlink.LinkByName(hostnetwork.PassthroughNames.HostSide)
+	if !portExists {
+		// Remove any stale TAP from a previous run in the host namespace.
+		_ = removeLinkByName(tapName)
+
+		// Create grout port "pt-ns" with TAP "pt-host" in the router pod's namespace.
+		devargs := fmt.Sprintf("net_tap1,iface=%s", tapName)
+		if err := client.ensurePort(ctx, portName, devargs); err != nil {
+			return fmt.Errorf("failed to create grout passthrough port: %w", err)
+		}
+
+		// Move TAP "pt-host" from the router pod's namespace to the host namespace
+		// so that FRR-K8s (running on the host) can peer with it.
+		if err := moveLinkToHostNamespace(ctx, tapName, ns); err != nil {
+			return fmt.Errorf("failed to move TAP to host namespace: %w", err)
+		}
+	} else {
+		slog.InfoContext(ctx, "grout passthrough port already exists, skipping TAP setup", "port", portName)
+	}
+
+	// Assign IPs to the host-side TAP (now in host namespace).
+	hostTap, err := netlink.LinkByName(tapName)
 	if err != nil {
-		return fmt.Errorf("SetupPassthrough: host tap %s not found: %w", hostnetwork.PassthroughNames.HostSide, err)
+		return fmt.Errorf("host TAP %s not found after move: %w", tapName, err)
 	}
 	if err := assignIPsToLink(hostTap, params.HostVeth.HostIPv4, params.HostVeth.HostIPv6); err != nil {
-		return fmt.Errorf("failed to assign IPs to host tap: %w", err)
+		return fmt.Errorf("failed to assign IPs to host TAP: %w", err)
 	}
 
-	// Assign IPs to the namespace-side grout port (e.g. "pt-ns").
-	if err := assignIPsToGroutPort(hostnetwork.PassthroughNames.NamespaceSide, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
+	// Assign IPs to the grout port "pt-ns" via grcli.
+	if err := assignIPsToGroutPort(ctx, client, portName, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
 		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
 	}
 
 	return nil
 }
 
-func RemovePassthrough(targetNS string) error {
-	// TODO: implement grout-based passthrough removal
+func RemovePassthrough(ctx context.Context, client *Client, targetNS string) error {
+	// Remove the host-side TAP if it exists.
+	if err := removeLinkByName(hostnetwork.PassthroughNames.HostSide); err != nil {
+		return fmt.Errorf("RemovePassthrough: failed to remove host TAP %s: %w", hostnetwork.PassthroughNames.HostSide, err)
+	}
+	// Delete the grout port so it can be recreated on the next setup.
+	portName := hostnetwork.PassthroughNames.NamespaceSide
+	if err := client.deletePort(ctx, portName); err != nil {
+		return fmt.Errorf("RemovePassthrough: failed to delete grout port %s: %w", portName, err)
+	}
 	return nil
-}
-
-func removeLinkByName(name string) error {
-	link, err := netlink.LinkByName(name)
-	if errors.As(err, &netlink.LinkNotFoundError{}) {
-		return nil
-	}
-	if err != nil {
-		return fmt.Errorf("remove link by name: failed to get link %s: %w", name, err)
-	}
-	return netlink.LinkDel(link)
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/openperouter/openperouter/internal/conversion"
 	"github.com/openperouter/openperouter/internal/grout"
 	"github.com/openperouter/openperouter/internal/hostnetwork/bridgerefresh"
-	"github.com/openperouter/openperouter/internal/sysctl"
 )
 
 type groutConfiguration struct {
@@ -22,7 +21,9 @@ type groutConfiguration struct {
 }
 
 func configureGroutDataPath(ctx context.Context, config groutConfiguration) error {
-	hasAlreadyUnderlay, err := grout.HasUnderlayInterface(config.targetNamespace)
+	groutClient := grout.NewClient(config.groutSocketPath)
+
+	hasAlreadyUnderlay, err := grout.HasUnderlayInterface(ctx, groutClient)
 	if err != nil {
 		return fmt.Errorf("failed to check if target namespace %s has underlay: %w", config.targetNamespace, err)
 	}
@@ -52,25 +53,11 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 		return fmt.Errorf("failed to convert config to host configuration: %w", err)
 	}
 
-	groutClient := grout.NewClient(config.groutSocketPath)
-
-	slog.InfoContext(ctx, "ensuring sysctls")
-	if err := sysctl.Ensure(
-		config.targetNamespace,
-		sysctl.IPv4Forwarding(),
-		sysctl.IPv6Forwarding(),
-		sysctl.ArpAcceptAll(),
-		sysctl.ArpAcceptDefault(),
-		sysctl.AcceptUntrackedNADefault(),
-		sysctl.AcceptUntrackedNAAll(),
-	); err != nil {
-		return fmt.Errorf("failed to ensure sysctls: %w", err)
-	}
-
 	slog.InfoContext(ctx, "setting up underlay")
 	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
+
 	for _, vni := range hostConfig.L3VNIs {
 		slog.InfoContext(ctx, "setting up VNI", "vni", vni.VRF)
 		if err := grout.SetupL3VNI(ctx, vni); err != nil {
@@ -90,7 +77,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 
 	slog.InfoContext(ctx, "setting up passthrough")
 	if hostConfig.L3Passthrough != nil {
-		if err := grout.SetupPassthrough(ctx, *hostConfig.L3Passthrough); err != nil {
+		if err := grout.SetupPassthrough(ctx, groutClient, *hostConfig.L3Passthrough); err != nil {
 			return fmt.Errorf("failed to setup passthrough: %w", err)
 		}
 	}
@@ -109,7 +96,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 	bridgerefresh.StopForRemovedVNIs(hostConfig.L2VNIs)
 
 	if len(apiConfig.L3Passthrough) == 0 {
-		if err := grout.RemovePassthrough(config.targetNamespace); err != nil {
+		if err := grout.RemovePassthrough(ctx, groutClient, config.targetNamespace); err != nil {
 			return fmt.Errorf("failed to remove passthrough: %w", err)
 		}
 	}

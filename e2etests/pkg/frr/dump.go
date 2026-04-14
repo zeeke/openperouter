@@ -64,10 +64,67 @@ func RawDump(exec executor.Executor) (string, error) {
 		allerrs = errors.Join(allerrs, fmt.Errorf("\nFailed exec to print network setup: %v", err))
 	}
 	res += out
+	out, err = exec.Exec("bash", "-c", "ip address")
+	if err != nil {
+		allerrs = errors.Join(allerrs, fmt.Errorf("\nFailed exec to print network setup: %v", err))
+	}
+	res += out
+
+	out, err = dumpGroutInfo(exec)
+	if err != nil {
+		allerrs = errors.Join(allerrs, fmt.Errorf("\nFailed exec to print grout setup: %v", err))
+	}
+	res += out
 
 	if allerrs.Error() == "" {
 		allerrs = nil
 	}
 
 	return res, allerrs
+}
+
+func dumpGroutInfo(exec executor.Executor) (string, error) {
+	out, err := exec.Exec("grcli", "--version")
+	if err != nil {
+		return "", nil
+	}
+
+	ret := "\n\nGrout info:\n"
+
+	ret = "Grout interface:\n"
+	out, err = exec.Exec("grcli", "interface", "show")
+	if err != nil {
+		return "", nil
+	}
+	ret += out + "\n"
+
+	ret += "Grout address:\n"
+	out, err = exec.Exec("grcli", "address", "show")
+	if err != nil {
+		return "", nil
+	}
+	ret += out + "\n"
+
+	ret += "Grout route:\n"
+	out, err = exec.Exec("grcli", "route", "show")
+	if err != nil {
+		return "", nil
+	}
+	ret += out + "\n"
+
+	ret += "Grout nexthop:\n"
+	out, err = exec.Exec("grcli", "nexthop", "show")
+	if err != nil {
+		return "", nil
+	}
+	ret += out + "\n"
+
+	ret += "Grout stats:\n"
+	out, err = exec.Exec("grcli", "stats", "show")
+	if err != nil {
+		return "", nil
+	}
+	ret += out + "\n"
+
+	return ret, nil
 }

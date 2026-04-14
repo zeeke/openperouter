@@ -55,6 +55,18 @@ func (c *Client) deletePort(ctx context.Context, name string) error {
 	return nil
 }
 
+// addAddress assigns an IP address (in CIDR notation) to a grout port.
+// If the address is already assigned, it is a no-op.
+func (c *Client) addAddress(ctx context.Context, ifaceName, cidr string) error {
+	slog.InfoContext(ctx, "assigning IP to grout port", "iface", ifaceName, "cidr", cidr)
+	err := c.run(ctx, "address", "add", cidr, "iface", ifaceName)
+	if err != nil && strings.Contains(err.Error(), "already") {
+		slog.DebugContext(ctx, "address already assigned", "iface", ifaceName, "cidr", cidr)
+		return nil
+	}
+	return err
+}
+
 // portExists checks whether a port with the given name exists in grout.
 func (c *Client) portExists(ctx context.Context, name string) (bool, error) {
 	out, err := c.runOutput(ctx, "interface", "show", "name", name)
