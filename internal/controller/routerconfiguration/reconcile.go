@@ -10,7 +10,7 @@ import (
 	"github.com/openperouter/openperouter/internal/frr"
 )
 
-func Reconcile(ctx context.Context, apiConfig conversion.APIConfigData, nodeIndex int, logLevel, frrConfigPath, targetNamespace string, updater frr.ConfigUpdater) error {
+func Reconcile(ctx context.Context, apiConfig conversion.APIConfigData, groutEnabled bool, groutSocketPath string, nodeIndex int, logLevel, frrConfigPath, targetNamespace string, updater frr.ConfigUpdater) error {
 	if err := conversion.ValidateUnderlays(apiConfig.Underlays); err != nil {
 		return fmt.Errorf("failed to validate underlays: %w", err)
 	}
@@ -36,6 +36,23 @@ func Reconcile(ctx context.Context, apiConfig conversion.APIConfigData, nodeInde
 	}
 
 	if err := configureInterfaces(ctx, interfacesConfiguration{
+		targetNamespace: targetNamespace,
+		APIConfigData:   apiConfig,
+		nodeIndex:       nodeIndex,
+	}); err != nil {
+		return fmt.Errorf("failed to configure the host: %w", err)
+	}
+
+	if groutEnabled {
+		if err := configureGroutDataPath(ctx, groutConfiguration{
+			targetNamespace: targetNamespace,
+			nodeIndex:       nodeIndex,
+			APIConfigData:   apiConfig,
+			groutSocketPath: groutSocketPath,
+		}); err != nil {
+			return fmt.Errorf("failed to configure grout datapath: %w", err)
+		}
+	} else if err := configureInterfaces(ctx, interfacesConfiguration{
 		targetNamespace: targetNamespace,
 		APIConfigData:   apiConfig,
 		nodeIndex:       nodeIndex,
