@@ -42,18 +42,18 @@ WORKDIR /
 RUN dnf install -y iproute iproute-tc catatonit && dnf clean all
 RUN ln -s /usr/libexec/podman/catatonit /sbin/tini
 
-COPY --from=builder /go/openperouter/reloader .
-COPY --from=builder /go/openperouter/controller .
-COPY --from=builder /go/openperouter/hostbridge .
-COPY --from=builder /go/openperouter/nodemarker .
-COPY --from=builder /go/openperouter/operatorbinary ./operator
-
 RUN mkdir /rpms
 ADD https://github.com/DPDK/grout/releases/download/v0.15.0/frr.x86_64.rpm /tmp/
 ADD https://github.com/DPDK/grout/releases/download/v0.15.0/grout-frr.x86_64.rpm /tmp/
 ADD https://github.com/DPDK/grout/releases/download/v0.15.0/grout.x86_64.rpm /tmp/
 
 RUN dnf install -y /tmp/*.rpm && dnf clean all && rm -rf /tmp/*.rpm
+
+COPY --from=builder /go/openperouter/reloader .
+COPY --from=builder /go/openperouter/controller .
+COPY --from=builder /go/openperouter/hostbridge .
+COPY --from=builder /go/openperouter/nodemarker .
+COPY --from=builder /go/openperouter/operatorbinary ./operator
 
 COPY operator/bindata bindata
 # Copy FRR startup configuration to the default location
