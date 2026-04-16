@@ -39,7 +39,7 @@ FROM quay.io/centos/centos:stream10
 
 WORKDIR /
 
-RUN dnf install -y iproute catatonit && dnf clean all
+RUN dnf install -y iproute iproute-tc catatonit && dnf clean all
 RUN ln -s /usr/libexec/podman/catatonit /sbin/tini
 
 COPY --from=builder /go/openperouter/reloader .
