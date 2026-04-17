@@ -128,7 +128,7 @@ COPY openshift/frr-docker-start /usr/lib/frr/docker-start
 RUN chmod 640 /etc/frr/* && chown -R frr:frr /etc/frr
 
 LABEL com.redhat.component="openperouter" \
-   name="openshift4-dev-preview-beta/openperouter-rhel10-operator-edge" \
+   name="openshift4-dev-preview-beta/openperouter-edge-rhel10-operator" \
    summary="openperouter" \
    io.openshift.expose-services="" \
    io.openshift.tags="openperouter" \
