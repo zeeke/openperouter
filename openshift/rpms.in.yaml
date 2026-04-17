@@ -1,0 +1,59 @@
+contentOrigin:
+  repofiles:
+    - ./redhat.repo
+
+arches:
+  - x86_64
+
+packages:
+  - name: gcc
+  - name: make
+  - name: meson
+  - name: ninja-build
+  - name: pkgconf
+  - name: python3-pyelftools
+  - name: json-c-devel
+  - name: libedit-devel
+  - name: libevent-devel
+  - name: libmnl-devel
+  - name: rdma-core-devel
+  - name: patch
+  - name: autoconf
+  - name: automake
+  - name: libtool
+  - name: bison
+  - name: elfutils-libelf-devel
+  - name: flex
+  - name: libcap-devel
+  - name: protobuf-c-compiler
+  - name: protobuf-c-devel
+  - name: python3-devel
+  - name: readline-devel
+  - name: rpm-build
+  - name: numactl-devel
+  - name: glibc-minimal-langpack
+  - name: coreutils-single
+  - name: less
+  - name: shadow-utils
+  - name: tcpdump
+  - name: libedit
+  - name: libevent
+  - name: libmnl
+  - name: rdma-core
+  - name: libibverbs
+  - name: numactl
+  - name: json-c
+  - name: libcap
+  - name: libyang
+  - name: elfutils-libelf
+  - name: protobuf-c
+  - name: python3
+  - name: readline
+  - name: pcre2-devel
+  - name: pkgconfig
+  - name: catatonit
+  - name: systemd-devel 
+  - name: openssl-devel
+  - name: groff 
+  - name: pam-devel
+  - name: libarchive-devel
