@@ -58,6 +58,14 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
 
+	for _, u := range config.Underlays {
+		for _, n := range u.Spec.Neighbors {
+			if err := grout.ResolveNeighborARP(ctx, groutClient, n.Address); err != nil {
+				slog.WarnContext(ctx, "failed to resolve neighbor ARP", "neighbor", n.Address, "error", err)
+			}
+		}
+	}
+
 	for _, vni := range hostConfig.L3VNIs {
 		slog.InfoContext(ctx, "setting up VNI", "vni", vni.VRF)
 		if err := grout.SetupL3VNI(ctx, vni); err != nil {
