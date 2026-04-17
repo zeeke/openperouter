@@ -124,6 +124,7 @@ COPY systemdmode/frrconfig/daemons /etc/frr/daemons
 COPY systemdmode/frrconfig/vtysh.conf /etc/frr/vtysh.conf
 COPY systemdmode/frrconfig/frr.conf /etc/frr/frr.conf
 COPY openshift/frr-docker-start /usr/lib/frr/docker-start
+RUN ln -s /usr/libexec/frr/frr-reload.py /usr/lib/frr/frr-reload.py
 
 RUN chmod 640 /etc/frr/* && chown -R frr:frr /etc/frr
 
