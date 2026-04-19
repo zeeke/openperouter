@@ -80,6 +80,12 @@ func (c *Client) portExists(ctx context.Context, name string) (bool, error) {
 	return true, nil
 }
 
+// ping sends a single ICMP ping via grout to trigger ARP resolution
+// for the given IP address at the DPDK level.
+func (c *Client) ping(ctx context.Context, addr string) error {
+	return c.run(ctx, "ping", addr, "count", "1")
+}
+
 // run executes a grcli command and returns any error.
 func (c *Client) run(ctx context.Context, args ...string) error {
 	_, err := c.runOutput(ctx, args...)

@@ -22,6 +22,11 @@ func HasUnderlayInterface(ctx context.Context, client *Client) (bool, error) {
 }
 
 // SetupUnderlay configures the underlay interface via the grout dataplane.
+// It moves the kernel interface into the router namespace, creates a grout
+// TAP port with remote= so TC ingress rules redirect incoming packets from
+// the physical interface to grout, and assigns the underlay IPs to the grout
+// port. Grout handles all L2 (ARP) and L3 forwarding; it also creates a
+// NOARP kernel interface for kernel TCP (used by FRR bgpd for BGP sessions).
 func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.UnderlayParams) error {
 	slog.DebugContext(ctx, "setup underlay", "params", params)
 	defer slog.DebugContext(ctx, "setup underlay done")
@@ -36,57 +41,90 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		}
 	}()
 
-	if params.UnderlayInterface != "" {
-		if err := hostnetwork.MoveUnderlayInterface(ctx, params.UnderlayInterface, ns); err != nil {
-			return err
-		}
+	if params.UnderlayInterface == "" {
+		return nil
 	}
 
-	// Create a grout TAP port connected to the underlay NIC via the `remote` devarg.
-	// This sets up tc rules to forward traffic between the TAP and the kernel NIC.
-	devargs := fmt.Sprintf("net_tap0,remote=%s", params.UnderlayInterface)
+	if err := hostnetwork.MoveUnderlayInterface(ctx, params.UnderlayInterface, ns); err != nil {
+		return err
+	}
+
+	portExists, err := client.portExists(ctx, underlayPortName)
+	if err != nil {
+		return fmt.Errorf("failed to check grout underlay port: %w", err)
+	}
+	if portExists {
+		slog.InfoContext(ctx, "grout underlay port already exists, skipping", "port", underlayPortName)
+		return nil
+	}
+
+	var underlayAddrs []netlink.Addr
+	if err := netnamespace.In(ns, func() error {
+		link, err := netlink.LinkByName(params.UnderlayInterface)
+		if err != nil {
+			return fmt.Errorf("failed to find underlay interface %s: %w", params.UnderlayInterface, err)
+		}
+		addrs, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+		if err != nil {
+			return fmt.Errorf("failed to list addresses on %s: %w", params.UnderlayInterface, err)
+		}
+		for _, addr := range addrs {
+			if addr.IPNet.String() == hostnetwork.UnderlayInterfaceSpecialAddr {
+				continue
+			}
+			if addr.IP.IsLinkLocalUnicast() || addr.IP.IsLinkLocalMulticast() {
+				continue
+			}
+			underlayAddrs = append(underlayAddrs, addr)
+		}
+		for i := range underlayAddrs {
+			if err := netlink.AddrDel(link, &underlayAddrs[i]); err != nil {
+				slog.WarnContext(ctx, "failed to remove address from underlay interface",
+					"addr", underlayAddrs[i].IPNet, "error", err)
+			}
+		}
+		return nil
+	}); err != nil {
+		return fmt.Errorf("failed to read underlay interface addresses: %w", err)
+	}
+
+	// Create grout TAP port with remote= so TC ingress rules redirect
+	// incoming packets from the physical underlay interface to grout.
+	devargs := fmt.Sprintf("net_tap0,remote=%s,iface=%s", params.UnderlayInterface, "tap_"+params.UnderlayInterface)
 	if err := client.ensurePort(ctx, underlayPortName, devargs); err != nil {
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
 
-	// Mirror the underlay NIC's IPv4 addresses to the grout port so that
-	// FRR/zebra (which only sees grout ports) can resolve BGP neighbors
-	// on the underlay network.
-	if params.UnderlayInterface != "" {
-		if err := mirrorUnderlayAddresses(ctx, client, params.UnderlayInterface, ns); err != nil {
-			return fmt.Errorf("failed to mirror underlay addresses to grout port: %w", err)
+	// Assign IPs to the grout port so FRR (with dplane_grout) discovers
+	// the interface and installs a connected route for the underlay subnet.
+	// Grout also creates a NOARP kernel interface that the kernel TCP stack
+	// uses for BGP sessions — no bridge or kernel-side ARP is needed.
+	var ipv4, ipv6 string
+	for _, addr := range underlayAddrs {
+		cidr := addr.IPNet.String()
+		if addr.IP.To4() != nil && ipv4 == "" {
+			ipv4 = cidr
+		} else if addr.IP.To4() == nil && ipv6 == "" {
+			ipv6 = cidr
+		}
+	}
+	if ipv4 != "" || ipv6 != "" {
+		if err := assignIPsToGroutPort(ctx, client, underlayPortName, ipv4, ipv6); err != nil {
+			return fmt.Errorf("failed to assign IPs to grout underlay port: %w", err)
 		}
 	}
 
 	return nil
 }
 
-// mirrorUnderlayAddresses reads IPv4 addresses from the kernel underlay
-// interface and assigns them to the grout underlay port. The special marker
-// address used for interface detection is excluded.
-func mirrorUnderlayAddresses(ctx context.Context, client *Client, ifaceName string, ns netns.NsHandle) error {
-	var addrs []netlink.Addr
-	if err := netnamespace.In(ns, func() error {
-		link, err := netlink.LinkByName(ifaceName)
-		if err != nil {
-			return fmt.Errorf("underlay interface %s not found: %w", ifaceName, err)
-		}
-		var listErr error
-		addrs, listErr = netlink.AddrList(link, netlink.FAMILY_V4)
-		return listErr
-	}); err != nil {
-		return err
-	}
-
-	for _, addr := range addrs {
-		cidr := addr.IPNet.String()
-		if cidr == hostnetwork.UnderlayInterfaceSpecialAddr {
-			continue
-		}
-		slog.DebugContext(ctx, "mirroring underlay address to grout port", "addr", cidr)
-		if err := client.addAddress(ctx, underlayPortName, cidr); err != nil {
-			return fmt.Errorf("failed to assign %s to grout underlay: %w", cidr, err)
-		}
+// ResolveNeighborARP sends a single grout-level ping to the given address
+// to trigger DPDK ARP resolution. Without this, grout cannot properly
+// encapsulate packets from the kernel control plane TAP with correct L2
+// headers, and the BGP TCP session cannot establish.
+func ResolveNeighborARP(ctx context.Context, client *Client, addr string) error {
+	slog.InfoContext(ctx, "resolving neighbor ARP via grout ping", "addr", addr)
+	if err := client.ping(ctx, addr); err != nil {
+		return fmt.Errorf("failed to resolve ARP for %s: %w", addr, err)
 	}
 	return nil
 }
