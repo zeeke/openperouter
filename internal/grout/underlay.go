@@ -72,7 +72,7 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 			if addr.IPNet.String() == hostnetwork.UnderlayInterfaceSpecialAddr {
 				continue
 			}
-			if addr.IP.IsLinkLocalUnicast() || addr.IP.IsLinkLocalMulticast() {
+			if addr.IP.IsLinkLocalMulticast() {
 				continue
 			}
 			underlayAddrs = append(underlayAddrs, addr)

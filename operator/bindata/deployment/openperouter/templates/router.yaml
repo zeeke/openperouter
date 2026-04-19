@@ -249,6 +249,7 @@ spec:
         - "0666"
         {{- if eq .Values.openperouter.logLevel "debug" }}
         - --verbose
+        - --trace-packets
         {{- end }}
         volumeMounts:
           - name: grout-socket
@@ -280,8 +281,9 @@ spec:
               - -e
               - --socket
               - /var/run/grout/grout.sock
-              - graph
-              - show
+              - trace
+              - enable
+              - all
           periodSeconds: 30
       {{- end }}
       tolerations:

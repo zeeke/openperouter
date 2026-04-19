@@ -28,6 +28,7 @@ func GroutDump(exec executor.Executor) (string, error) {
 		{"grcli route show", []string{"grcli", "route", "show"}},
 		{"grcli nexthop show", []string{"grcli", "nexthop", "show"}},
 		{"grcli stats show", []string{"grcli", "stats", "show"}},
+		{"grcli trace show", []string{"grcli", "trace", "show", "count", "50"}},
 		{"tc filter show", []string{"tc", "filter", "show"}},
 		{"tc qdisc show", []string{"tc", "qdisc", "show"}},
 	}
