@@ -611,3 +611,5 @@ deploy-olm: operator-sdk ## deploys OLM on the cluster
 
 build-and-push-bundle-images: bundle-build bundle-push catalog-build catalog-push
 
+
+include ./hack/grout/Makefile
