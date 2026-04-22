@@ -15,10 +15,10 @@ metadata:
       ("operator/bundle.Dockerfile.openshift".pathChanged() || "operator/bundle/**".pathChanged())
   creationTimestamp:
   labels:
-    appstudio.openshift.io/application: openperouter-operator-4-22
-    appstudio.openshift.io/component: openperouter-operator-bundle-4-22
+    appstudio.openshift.io/application: openperouter-operator-5-0
+    appstudio.openshift.io/component: openperouter-operator-bundle-5-0
     pipelines.appstudio.openshift.io/type: build
-  name: openperouter-operator-bundle-4-22-on-push
+  name: openperouter-operator-bundle-5-0-on-push
   namespace: telco-5g-tenant
 spec:
   params:
@@ -27,7 +27,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-4-22:{{revision}}
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-5-0:{{revision}}
   - name: build-platforms
     value:
     - linux/x86_64
@@ -204,7 +204,7 @@ spec:
         value:
         - build-date=$SOURCE_DATE
         - short-commit=$(tasks.clone-repository.results.short-commit)
-        - version=v4.22-$SOURCE_DATE_EPOCH
+        - version=v5.0-$SOURCE_DATE_EPOCH
       - name: source-date-epoch
         value: $(tasks.clone-repository.results.commit-timestamp)
       runAfter:
@@ -669,7 +669,7 @@ spec:
     - name: netrc
       optional: true
   taskRunTemplate:
-    serviceAccountName: build-pipeline-openperouter-operator-bundle-4-22
+    serviceAccountName: build-pipeline-openperouter-operator-bundle-5-0
   workspaces:
   - name: git-auth
     secret:

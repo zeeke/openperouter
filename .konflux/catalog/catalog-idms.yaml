@@ -7,7 +7,7 @@ metadata:
 spec:
   imageDigestMirrors:
   - mirrors:
-    - quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-4-22
+    - quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-5-0
     source: registry.redhat.io/openshift4-dev-preview-beta/openperouter-operator-bundle
 
 

@@ -32,7 +32,7 @@ LABEL com.redhat.component="openperouter-operator" \
     io.k8s.description="openperouter-operator" \
     description="openperouter-operator" \
     distribution-scope="public" \
-    release="4.22" \
+    release="5.0" \
     url="https://github.com/openperouter/openperouter" \
     vendor="Red Hat, Inc."
 

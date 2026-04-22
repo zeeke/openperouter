@@ -16,10 +16,10 @@ metadata:
       !".konflux/catalog/bundle.builds.in.yaml".pathChanged()
   creationTimestamp:
   labels:
-    appstudio.openshift.io/application: openperouter-operator-4-22
-    appstudio.openshift.io/component: openperouter-operator-4-22
+    appstudio.openshift.io/application: openperouter-operator-5-0
+    appstudio.openshift.io/component: openperouter-operator-5-0
     pipelines.appstudio.openshift.io/type: build
-  name: openperouter-operator-4-22-on-push
+  name: openperouter-operator-5-0-on-push
   namespace: telco-5g-tenant
 spec:
   params:
@@ -28,7 +28,7 @@ spec:
   - name: revision
     value: '{{revision}}'
   - name: output-image
-    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-4-22:{{revision}}
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-5-0:{{revision}}
   - name: build-platforms
     value:
     - linux/x86_64
@@ -201,7 +201,7 @@ spec:
         value:
         - build-date=$SOURCE_DATE
         - short-commit=$(tasks.clone-repository.results.short-commit)
-        - version=v4.22-$SOURCE_DATE_EPOCH
+        - version=v5.0-$SOURCE_DATE_EPOCH
       - name: source-date-epoch
         value: $(tasks.clone-repository.results.commit-timestamp)
       runAfter:
@@ -279,7 +279,7 @@ spec:
         value:
         - $(tasks.generate-labels.results.labels[*])
             # This is needed because the base operator image is based on frr-4.21
-        - cpe=cpe:/a:redhat:openshift:4.22::el9
+        - cpe=cpe:/a:redhat:openshift:5.0::el9
       - name: BUILDAH_FORMAT
         value: $(params.buildah-format)
       - name: HTTP_PROXY
@@ -668,7 +668,7 @@ spec:
     - name: netrc
       optional: true
   taskRunTemplate:
-    serviceAccountName: build-pipeline-openperouter-operator-4-22
+    serviceAccountName: build-pipeline-openperouter-operator-5-0
   workspaces:
   - name: git-auth
     secret:
