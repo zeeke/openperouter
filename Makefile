@@ -619,5 +619,5 @@ grout-deploy-helm: helm kind deploy-cluster load-on-kind deploy-helm
 
 .PHONY: grout-docker-build
 grout-docker-build: IMG_TAG=grout
-grout-docker-build: DOCKERFILE=Dockerfile.gorut
+grout-docker-build: DOCKERFILE=Dockerfile.grout
 grout-docker-build: docker-build
