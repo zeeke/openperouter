@@ -49,6 +49,7 @@ var _ = Describe("OpenPERouter Controller", func() {
 			routerContainers := map[string]string{
 				"frr":      controllerImage,
 				"reloader": controllerImage,
+				"tcpdump":  controllerImage,
 			}
 			routerInitContainers := map[string]string{
 				"cp-frr-files": controllerImage,

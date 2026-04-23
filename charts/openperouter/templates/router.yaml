@@ -250,6 +250,7 @@ spec:
         - "0666"
         {{- if eq .Values.openperouter.logLevel "debug" }}
         - --verbose
+        - --trace-packets
         {{- end }}
         volumeMounts:
           - name: grout-socket
@@ -281,10 +282,25 @@ spec:
               - -e
               - --socket
               - /var/run/grout/grout.sock
-              - graph
-              - show
+              - trace
+              - enable
+              - all
           periodSeconds: 30
       {{- end }}
+      - name: tcpdump
+        image: {{ .Values.openperouter.image.repository }}:{{ .Values.openperouter.image.tag | default .Chart.AppVersion }}
+        {{- if .Values.openperouter.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.openperouter.image.pullPolicy }}
+        {{- end }}
+        command:
+          - tcpdump
+          - -nn
+          - -i
+          - any
+          - tcp port 179
+        securityContext:
+          capabilities:
+            add: ["NET_RAW"]
       tolerations:
       {{- if .Values.openperouter.runOnMaster }}
       - effect: NoSchedule
