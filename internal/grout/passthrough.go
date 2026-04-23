@@ -78,6 +78,17 @@ func SetupPassthrough(ctx context.Context, client *Client, params hostnetwork.Pa
 		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
 	}
 
+	portAddresses, err := client.getAddresses(ctx, portName)
+	if err != nil {
+		return fmt.Errorf("failed to get grout %s port addresses: %w", portName, err)
+	}
+
+	for _, addr := range portAddresses {
+		if err := ensureKernelSubnetRoute(ns, "main", addr); err != nil {
+			return fmt.Errorf("failed to add kernel route for underlay subnet %s: %w", addr, err)
+		}
+	}
+
 	return nil
 }
 
