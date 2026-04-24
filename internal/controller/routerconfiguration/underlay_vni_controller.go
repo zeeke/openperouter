@@ -63,7 +63,7 @@ type PERouterReconciler struct {
 	// notStaticConfigsListOpts filters out mirrored resources (source=static) when listing CRDs.
 	// Built once in SetupWithManager since the label is const.
 	notStaticConfigsListOpts *client.ListOptions
-	hostConfigurator         HostConfigurator
+	datapathConfigurator     DatapathConfigurator
 }
 
 type requestKey string
@@ -158,7 +158,7 @@ func (r *PERouterReconciler) reconcile(ctx context.Context, logger *slog.Logger)
 		return ctrl.Result{}, err
 	}
 
-	err = Reconcile(ctx, config, nodeIndex, r.LogLevel, r.FRRConfigPath, targetNS, updater, r.hostConfigurator)
+	err = Reconcile(ctx, config, nodeIndex, r.LogLevel, r.FRRConfigPath, targetNS, updater, r.datapathConfigurator)
 	if nonRecoverableHostError(err) {
 		logger.Error("non recoverable error", "error", err)
 		if err := router.HandleNonRecoverableError(ctx); err != nil {
@@ -367,9 +367,9 @@ func (r *PERouterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		builder = builder.WatchesRawSource(source.Channel(r.TriggerChan, &handler.EnqueueRequestForObject{}))
 	}
 
-	r.hostConfigurator = configureInterfaces
+	r.datapathConfigurator = &KernelDatapathConfigurator{}
 	if r.GroutEnabled {
-		r.hostConfigurator = newGroutConfigurator(r.GroutSocketPath).configure
+		r.datapathConfigurator = newGroutConfigurator(r.GroutSocketPath)
 	}
 
 	return builder.Complete(r)
