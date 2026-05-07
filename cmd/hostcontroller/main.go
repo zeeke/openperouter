@@ -46,6 +46,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/openperouter/openperouter/api/static"
 	periov1alpha1 "github.com/openperouter/openperouter/api/v1alpha1"
+	"github.com/openperouter/openperouter/internal/buildversion"
 	"github.com/openperouter/openperouter/internal/controller/routerconfiguration"
 	"github.com/openperouter/openperouter/internal/filewatcher"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
@@ -53,7 +54,6 @@ import (
 	"github.com/openperouter/openperouter/internal/pods"
 	"github.com/openperouter/openperouter/internal/staticconfiguration"
 	"github.com/openperouter/openperouter/internal/systemdctl"
-	"github.com/openperouter/openperouter/internal/version"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	// +kubebuilder:scaffold:imports
 )
@@ -98,6 +98,8 @@ type parameters struct {
 	nodeName           string
 	namespace          string
 	logLevel           string
+	groutEnabled       bool
+	groutSocketPath    string
 }
 
 func main() {
@@ -115,6 +117,9 @@ func main() {
 		"the OVS database socket path")
 
 	flag.StringVar(&args.mode, "mode", modeK8s, "the mode to run in (k8s or host)")
+
+	flag.BoolVar(&args.groutEnabled, "grout-enabled", false, "Enable grout DPDK dataplane (disables kernel forwarding)")
+	flag.StringVar(&args.groutSocketPath, "grout-socket", "/var/run/grout/grout.sock", "Path to the grout control socket")
 
 	flag.StringVar(&args.nodeName, "nodename", "", "The name of the node the controller runs on")
 	flag.StringVar(&args.namespace, "namespace", "", "The namespace the controller runs in")
@@ -146,7 +151,7 @@ func main() {
 		os.Exit(1)
 	}
 	ctrl.SetLogger(logr.FromSlogHandler(logger.Handler()))
-	setupLog.Info("version", "version", version.Version())
+	setupLog.Info("version", "version", buildversion.Version())
 	setupLog.Info("arguments", "args", fmt.Sprintf("%+v", args))
 
 	// Setup signal handler once for the entire process
@@ -206,7 +211,9 @@ func runHostMode(
 	staticControllerCtx, stopStaticReconciler := context.WithCancel(ctx)
 	defer stopStaticReconciler()
 
+	staticDone := make(chan struct{})
 	go func() {
+		defer close(staticDone)
 		logger.Info("creating static configuration controller for host mode")
 		err := runStaticConfigReconciler(
 			staticControllerCtx, args, hostModeParams, nodeConfig, logger, args.probeAddr,
@@ -232,6 +239,10 @@ func runHostMode(
 	logger.Info("kubernetes API is now available, stopping static reconciler and starting k8s reconciler")
 
 	stopStaticReconciler()
+	// Wait for the static reconciler to fully stop and release the health probe port
+	// before starting the K8s reconciler, which binds the same port.
+	<-staticDone
+	logger.Info("static reconciler fully stopped, starting k8s reconciler")
 
 	// Start API reconciler in main thread (blocking) - keeps process alive
 	if err := runK8sConfigReconcilerHostMode(
@@ -279,6 +290,8 @@ func runK8sConfigReconcilerHostMode(ctx context.Context,
 		StaticConfigDir: hostModeParams.configurationDir,
 		NodeConfigPath:  hostModeParams.nodeConfigPath,
 		TriggerChan:     triggerChan,
+		GroutEnabled:    args.groutEnabled,
+		GroutSocketPath: args.groutSocketPath,
 	}
 
 	if err := apiReconciler.SetupWithManager(mgr); err != nil {
@@ -338,6 +351,8 @@ func runK8sConfigReconciler(ctx context.Context,
 		RouterProvider:     routerProvider,
 		MyNamespace:        args.namespace,
 		UnderlayFromMultus: args.underlayFromMultus,
+		GroutEnabled:       args.groutEnabled,
+		GroutSocketPath:    args.groutSocketPath,
 	}
 
 	if err := apiReconciler.SetupWithManager(mgr); err != nil {
@@ -386,6 +401,8 @@ func runStaticConfigReconciler(ctx context.Context,
 		FRRReloadSocket: args.reloaderSocket,
 		RouterProvider:  staticRouterProvider,
 		ConfigDir:       hostModeParams.configurationDir,
+		GroutEnabled:    args.groutEnabled,
+		GroutSocketPath: args.groutSocketPath,
 	}
 	if err = staticReconciler.SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create controller: %w", err)
