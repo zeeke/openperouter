@@ -3,6 +3,7 @@ name: CI
 on:
   merge_group:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
     paths-ignore:
       - 'DCO'
       - 'LICENSE'
@@ -174,7 +175,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build and export the image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           tags: quay.io/openperouter/router:main,localhost:5000/router:main
@@ -183,11 +184,37 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Upload openperouter artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           retention-days: 1
           name: image-tar-openperouter
           path: /tmp/openperouter.tar
+
+  build-grout-images:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export the image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: quay.io/openperouter/router:grout
+          file: Dockerfile.grout
+          outputs: type=docker,dest=/tmp/openperouter-grout.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Upload openperouter artifact
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          name: image-tar-openperouter-grout
+          path: /tmp/openperouter-grout.tar
 
   e2etests:
     runs-on: ubuntu-22.04
@@ -197,10 +224,11 @@ jobs:
       - build-kind-node-image
       - unit-tests
       - build-test-images
+      - build-grout-images
     strategy:
       fail-fast: false
       matrix:
-        deployment: [manifests, helm, operator, systemdmode, hostmode-boot]
+        deployment: [manifests, helm, operator, systemdmode, hostmode-boot, helm-grout]
     steps:
       - name: Free Disk Space
         working-directory: ${{ github.workspace }}
@@ -244,7 +272,7 @@ jobs:
         uses: ./.github/workflows/composite/load-kind-node-image
 
       - name: Download openperouter image
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: image
 
@@ -252,12 +280,14 @@ jobs:
         working-directory: image
         run: |
           docker load -i image-tar-openperouter/openperouter.tar
+          docker load -i image-tar-openperouter-grout/openperouter-grout.tar
 
       - name: Deploy the cluster
         run: |
           MAKE_RULE="deploy"
           IMG_REPO="quay.io/openperouter"
           if [ ${{ matrix.deployment }} = "helm" ]; then MAKE_RULE="deploy-helm"; fi
+          if [ ${{ matrix.deployment }} = "helm-grout" ]; then MAKE_RULE="grout-deploy-helm"; fi
           if [ ${{ matrix.deployment }} = "systemdmode" ]; then MAKE_RULE="deploy-hostmode"; fi
           if [ ${{ matrix.deployment }} = "hostmode-boot" ]; then MAKE_RULE="deploy-hostmode-boot"; fi
           if [ ${{ matrix.deployment }} = "operator" ]; then MAKE_RULE="deploy-operator-with-olm"; IMG_REPO="localhost:5000"; export USE_HTTP=--use-http; export TLS_VERIFY=false; export KUBECONFIG=bin/kubeconfig; fi
@@ -272,6 +302,8 @@ jobs:
             make e2etests
           elif [ ${{ matrix.deployment }} = "hostmode-boot" ]; then
             make e2etests-hostmode-boot
+          elif [ ${{ matrix.deployment }} = "helm-grout" ]; then
+            make e2etests GINKGO_ARGS="--label-filter=passthrough"
           else
             export GINKGO_ARGS="--label-filter='!systemdmode'"
             make e2etests
@@ -292,3 +324,113 @@ jobs:
         uses: ./.github/workflows/composite/collectlogs
         with:
           artifact-name: kind-logs-${{ matrix.deployment }}
+
+  scale-tests:
+    if: contains(github.event.pull_request.labels.*.name, 'run-scale-tests')
+    runs-on: ubuntu-22.04
+    env:
+      NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:v1.32.2
+    needs:
+      - unit-tests
+      - build-test-images
+
+    steps:
+      - name: Free Disk Space
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo apt-get clean
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Install kernel modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install linux-modules-extra-$(uname -r)
+
+      - name: Disable containerd image store
+        run: |
+          sudo bash -c 'cat > /etc/docker/daemon.json << EOF
+          {
+            "features": {
+              "containerd-snapshotter": false
+            }
+          }
+          EOF'
+          sudo systemctl restart docker
+          docker info -f '{{ .DriverStatus }}'
+
+      - name: Setup docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build kind-node-openperouter image
+        uses: docker/build-push-action@v7
+        with:
+          context: hack/kind-node-image
+          file: hack/kind-node-image/Dockerfile
+          build-args: |
+            KIND_NODE_VERSION=v1.32.2
+          tags: quay.io/openperouter/kind-node-openperouter:v1.32.2
+          load: true
+          cache-from: type=gha,scope=kind-node-openperouter
+          cache-to: type=gha,mode=max,scope=kind-node-openperouter
+
+      - name: Download openperouter image
+        uses: actions/download-artifact@v8
+        with:
+          path: image
+
+      - name: Load image
+        working-directory: image
+        run: |
+          docker load -i image-tar-openperouter/openperouter.tar
+
+      - name: Deploy the cluster
+        run: |
+          make deploy-scale
+
+      - name: Wait for metrics-server to collect initial metrics
+        run: sleep 60
+
+      - name: Run scale tests
+        run: |
+          make scale-tests
+
+      - name: Parse scale test report
+        if: ${{ always() }}
+        run: |
+          make parse-scale-report | tee /tmp/kind_logs/scale-test-summary.txt
+
+      - name: Upload scale test report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          retention-days: 30
+          name: scale-test-report
+          path: |
+            /tmp/kind_logs/e2etests_scale_suite_scale-report.json
+            /tmp/kind_logs/scale-test-summary.txt
+
+      - name: Export kind logs
+        if: ${{ failure() }}
+        run:
+          make kind-export-logs
+
+      - name: Collect Logs
+        if: ${{ failure() }}
+        uses: ./.github/workflows/composite/collectlogs
+        with:
+          artifact-name: kind-logs-scale-tests
