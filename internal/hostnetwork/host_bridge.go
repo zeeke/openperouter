@@ -14,7 +14,7 @@ import (
 
 // createHostBridge creates a bridge on the host namespace named after the
 // provided vni. If the bridge already exists, it will return the existing one.
-func createHostBridge(vni int) (netlink.Link, error) {
+func createHostBridge(vni int32) (netlink.Link, error) {
 	name := hostBridgeName(vni)
 	_, err := netlink.LinkByName(name)
 	// link does not exist, let's create it
@@ -38,19 +38,19 @@ func createHostBridge(vni int) (netlink.Link, error) {
 
 const hostBridgePrefix = "br-hs-"
 
-func hostBridgeName(vni int) string {
+func hostBridgeName(vni int32) string {
 	return fmt.Sprintf("%s%d", hostBridgePrefix, vni)
 }
 
 // vniFromHostBridgeName extracts the VNI from a host bridge name.
-func vniFromHostBridgeName(name string) (int, error) {
+func vniFromHostBridgeName(name string) (int32, error) {
 	if !strings.HasPrefix(name, hostBridgePrefix) {
 		return 0, NotRouterInterfaceError{Name: name}
 	}
 	vni := strings.TrimPrefix(name, hostBridgePrefix)
-	res, err := strconv.Atoi(vni)
+	res, err := strconv.ParseInt(vni, 10, 32)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get vni for host bridge %s: %w", name, err)
 	}
-	return res, nil
+	return int32(res), nil
 }

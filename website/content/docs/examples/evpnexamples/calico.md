@@ -65,7 +65,7 @@ metadata:
 spec:
   asn: 64514
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - toswitch
   neighbors:

@@ -36,10 +36,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Extract kind version
         id: kind-version
@@ -51,7 +51,7 @@ jobs:
           fi
 
       - name: Build image for platform
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: hack/kind-node-image
           file: hack/kind-node-image/Dockerfile
@@ -65,7 +65,7 @@ jobs:
           outputs: type=docker,dest=/tmp/kind-node-${{ strategy.job-index }}.tar
 
       - name: Upload image artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kind-node-${{ strategy.job-index }}
           path: /tmp/kind-node-${{ strategy.job-index }}.tar

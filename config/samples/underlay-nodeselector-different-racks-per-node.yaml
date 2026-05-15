@@ -11,7 +11,7 @@ spec:
       topology.kubernetes.io/rack: rack-1
   asn: 64512
   evpn:
-    vtepcidr: 100.65.1.0/24
+    vtepCIDR: 100.65.1.0/24
   nics:
     - toswitch
   neighbors:
@@ -33,7 +33,7 @@ spec:
       topology.kubernetes.io/rack: rack-2
   asn: 64512
   evpn:
-    vtepcidr: 100.65.2.0/24
+    vtepCIDR: 100.65.2.0/24
   nics:
     - toswitch
   neighbors:

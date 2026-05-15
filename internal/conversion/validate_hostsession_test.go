@@ -23,14 +23,14 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1001,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")}},
 					},
 				},
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "vni2"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1002,
-						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: 65004, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.2.0/24"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: new(int64(65004)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.2.0/24")}},
 					},
 				},
 			},
@@ -43,14 +43,14 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1001,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")}},
 					},
 				},
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "vni2"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1002,
-						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: 65004, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.128/25"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: new(int64(65004)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.128/25")}},
 					},
 				},
 			},
@@ -63,14 +63,14 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1001,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: "2001:db8::/64"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: new("2001:db8::/64")}},
 					},
 				},
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "vni2"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1002,
-						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: 65004, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: "2001:db8::/80"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: new(int64(65004)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: new("2001:db8::/80")}},
 					},
 				},
 			},
@@ -83,7 +83,7 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         100,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "not-a-cidr"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("not-a-cidr")}},
 					},
 				},
 			},
@@ -96,7 +96,7 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         100,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: "not-a-cidr"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: new("not-a-cidr")}},
 					},
 				},
 			},
@@ -109,7 +109,7 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         100,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{}},
 					},
 				},
 			},
@@ -124,8 +124,8 @@ func TestValidateHostSessions(t *testing.T) {
 						VNI: 100,
 						HostSession: &v1alpha1.HostSession{
 							ASN:       65001,
-							HostASN:   65001,
-							LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"},
+							HostASN:   new(int64(65001)),
+							LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")},
 						},
 					},
 				},
@@ -141,9 +141,9 @@ func TestValidateHostSessions(t *testing.T) {
 						VNI: 100,
 						HostSession: &v1alpha1.HostSession{
 							ASN:       65001,
-							HostASN:   0,
-							HostType:  "external",
-							LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"},
+							HostASN:   new(int64(0)),
+							HostType:  new("external"),
+							LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")},
 						},
 					},
 				},
@@ -159,9 +159,9 @@ func TestValidateHostSessions(t *testing.T) {
 						VNI: 100,
 						HostSession: &v1alpha1.HostSession{
 							ASN:       65001,
-							HostASN:   0,
-							HostType:  "internal",
-							LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"},
+							HostASN:   new(int64(0)),
+							HostType:  new("internal"),
+							LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")},
 						},
 					},
 				},
@@ -187,14 +187,14 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1001,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")}},
 					},
 				},
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "vni2"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1002,
-						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: 65004, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: "2001:db8::/64"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65003, HostASN: new(int64(65004)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv6: new("2001:db8::/64")}},
 					},
 				},
 			},
@@ -209,10 +209,10 @@ func TestValidateHostSessions(t *testing.T) {
 						VNI: 1001,
 						HostSession: &v1alpha1.HostSession{
 							ASN:     65001,
-							HostASN: 65002,
+							HostASN: new(int64(65002)),
 							LocalCIDR: v1alpha1.LocalCIDRConfig{
-								IPv4: "192.168.1.0/24",
-								IPv6: "2001:db8::/64",
+								IPv4: new("192.168.1.0/24"),
+								IPv6: new("2001:db8::/64"),
 							},
 						},
 					},
@@ -226,7 +226,7 @@ func TestValidateHostSessions(t *testing.T) {
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "passthrough1"},
 					Spec: v1alpha1.L3PassthroughSpec{
-						HostSession: v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"}},
+						HostSession: v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")}},
 					},
 				},
 			},
@@ -239,7 +239,7 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1001,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")}},
 					},
 				},
 			},
@@ -247,7 +247,7 @@ func TestValidateHostSessions(t *testing.T) {
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "passthrough1"},
 					Spec: v1alpha1.L3PassthroughSpec{
-						HostSession: v1alpha1.HostSession{ASN: 65003, HostASN: 65004, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.2.0/24"}},
+						HostSession: v1alpha1.HostSession{ASN: 65003, HostASN: new(int64(65004)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.2.0/24")}},
 					},
 				},
 			},
@@ -260,7 +260,7 @@ func TestValidateHostSessions(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{Name: "vni1"},
 					Spec: v1alpha1.L3VNISpec{
 						VNI:         1001,
-						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: 65002, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.0/24"}},
+						HostSession: &v1alpha1.HostSession{ASN: 65001, HostASN: new(int64(65002)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.0/24")}},
 					},
 				},
 			},
@@ -268,7 +268,7 @@ func TestValidateHostSessions(t *testing.T) {
 				{
 					ObjectMeta: metav1.ObjectMeta{Name: "passthrough1"},
 					Spec: v1alpha1.L3PassthroughSpec{
-						HostSession: v1alpha1.HostSession{ASN: 65003, HostASN: 65004, LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: "192.168.1.128/25"}},
+						HostSession: v1alpha1.HostSession{ASN: 65003, HostASN: new(int64(65004)), LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.168.1.128/25")}},
 					},
 				},
 			},

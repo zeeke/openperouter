@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	activeRefreshers = make(map[int]*BridgeRefresher) // VNI -> Refresher
+	activeRefreshers = make(map[int32]*BridgeRefresher) // VNI -> Refresher
 	mu               sync.Mutex
 )
 
@@ -39,7 +39,7 @@ func StartForVNI(ctx context.Context, params hostnetwork.L2VNIParams) error {
 }
 
 // StopForVNI stops and removes the bridge refresher for the given VNI.
-func StopForVNI(vni int) error {
+func StopForVNI(vni int32) error {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -77,7 +77,7 @@ func StopForRemovedVNIs(configuredVNIs []hostnetwork.L2VNIParams) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	configured := make(map[int]bool)
+	configured := make(map[int32]bool)
 	for _, params := range configuredVNIs {
 		configured[params.VNI] = true
 	}

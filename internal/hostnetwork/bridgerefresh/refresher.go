@@ -33,7 +33,7 @@ type BridgeRefresher struct {
 	bridgeName    string // e.g., "br-pe-110"
 	namespace     string // Path to network namespace
 	refreshPeriod time.Duration
-	vni           int
+	vni           int32
 	bridgeIndex   int // cached link index for filtering netlink events
 
 	cancel context.CancelFunc

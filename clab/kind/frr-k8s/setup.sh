@@ -22,11 +22,14 @@ GOBIN=$TEMP_GOBIN go install github.com/containernetworking/plugins/plugins/ipam
 
 CNI_PATH="/opt/cni/bin"
 
-KIND_NODES=$(kind get nodes --name "$KIND_CLUSTER_NAME")
+KIND_BIN=${KIND:-kind}
+KIND_NODES=$(${KIND_BIN} get nodes --name "$KIND_CLUSTER_NAME")
+
+CONTAINER_CLI=${CONTAINER_ENGINE_CLI:-docker}
 
 for NODE in $KIND_NODES; do
-  docker cp $TEMP_GOBIN/macvlan $NODE:$CNI_PATH/
-  docker cp $TEMP_GOBIN/bridge $NODE:$CNI_PATH/
-  docker cp $TEMP_GOBIN/static $NODE:$CNI_PATH/
+  ${CONTAINER_CLI} cp $TEMP_GOBIN/macvlan $NODE:$CNI_PATH/
+  ${CONTAINER_CLI} cp $TEMP_GOBIN/bridge $NODE:$CNI_PATH/
+  ${CONTAINER_CLI} cp $TEMP_GOBIN/static $NODE:$CNI_PATH/
 done
 

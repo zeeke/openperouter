@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/utils/ptr"
 
 	v1alpha1 "github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/internal/filter"
@@ -48,19 +49,21 @@ func ValidateHostSessions(l3VNIs []v1alpha1.L3VNI, l3Passthrough []v1alpha1.L3Pa
 	existingCIDRsV4 := map[string]string{}
 	existingCIDRsV6 := map[string]string{}
 	for _, s := range hostSessions {
-		if s.LocalCIDR.IPv4 != "" {
-			if err := validateCIDR(s, s.LocalCIDR.IPv4, existingCIDRsV4); err != nil {
+		localIPv4CIDR := ptr.Deref(s.LocalCIDR.IPv4, "")
+		if localIPv4CIDR != "" {
+			if err := validateCIDR(s, localIPv4CIDR, existingCIDRsV4); err != nil {
 				return err
 			}
-			existingCIDRsV4[s.LocalCIDR.IPv4] = s.name
+			existingCIDRsV4[localIPv4CIDR] = s.name
 		}
-		if s.LocalCIDR.IPv6 != "" {
-			if err := validateCIDR(s, s.LocalCIDR.IPv6, existingCIDRsV6); err != nil {
+		localIPv6CIDR := ptr.Deref(s.LocalCIDR.IPv6, "")
+		if localIPv6CIDR != "" {
+			if err := validateCIDR(s, localIPv6CIDR, existingCIDRsV6); err != nil {
 				return err
 			}
-			existingCIDRsV6[s.LocalCIDR.IPv6] = s.name
+			existingCIDRsV6[localIPv6CIDR] = s.name
 		}
-		if s.LocalCIDR.IPv4 == "" && s.LocalCIDR.IPv6 == "" {
+		if localIPv4CIDR == "" && localIPv6CIDR == "" {
 			return fmt.Errorf("at least one local CIDR (IPv4 or IPv6) must be provided for vni %s", s.name)
 		}
 	}

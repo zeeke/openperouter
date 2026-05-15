@@ -138,7 +138,7 @@ spec:
       topology.kubernetes.io/rack: rack-1
   asn: 64512
   evpn:
-    vtepcidr: 100.65.1.0/24
+    vtepCIDR: 100.65.1.0/24
   nics:
     - toswitch
   neighbors:
@@ -160,7 +160,7 @@ spec:
       topology.kubernetes.io/rack: rack-2
   asn: 64512
   evpn:
-    vtepcidr: 100.65.2.0/24
+    vtepCIDR: 100.65.2.0/24
   nics:
     - toswitch
   neighbors:
@@ -188,7 +188,7 @@ spec:
       topology.kubernetes.io/zone: us-east-1a
   asn: 64512
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - eth1
   neighbors:
@@ -207,7 +207,7 @@ spec:
       topology.kubernetes.io/zone: us-west-1a
   asn: 64513
   evpn:
-    vtepcidr: 100.66.0.0/24
+    vtepCIDR: 100.66.0.0/24
   nics:
     - eth1
   neighbors:
@@ -232,7 +232,7 @@ spec:
       hardware.vendor: dell
   asn: 64512
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - eno1
     - eno2
@@ -252,7 +252,7 @@ spec:
       hardware.vendor: hp
   asn: 64512
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - em1
     - em2

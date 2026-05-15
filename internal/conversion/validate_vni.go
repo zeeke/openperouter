@@ -13,6 +13,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/internal/filter"
@@ -180,7 +181,7 @@ func vnisFromL3VNIs(l3vnis []v1alpha1.L3VNI) []VNI {
 	for i, l3vni := range l3vnis {
 		result[i] = VNI{
 			name:      l3vni.Name,
-			vni:       l3vni.Spec.VNI,
+			vni:       uint32(l3vni.Spec.VNI),
 			vrfName:   l3vni.Spec.VRF,
 			exportRTs: l3vni.Spec.ExportRTs,
 			importRTs: l3vni.Spec.ImportRTs,
@@ -195,7 +196,7 @@ func vnisFromL2VNIs(l2vnis []v1alpha1.L2VNI) []VNI {
 	for i, l2vni := range l2vnis {
 		result[i] = VNI{
 			name:    l2vni.Name,
-			vni:     l2vni.Spec.VNI,
+			vni:     uint32(l2vni.Spec.VNI),
 			vrfName: l2vni.VRFName(),
 		}
 	}
@@ -276,11 +277,11 @@ func validateHostMaster(vniName string, hostConfig *v1alpha1.HostMaster) error {
 	switch hostConfig.Type {
 	case v1alpha1.LinuxBridge:
 		if hostConfig.LinuxBridge != nil {
-			name = hostConfig.LinuxBridge.Name
+			name = ptr.Deref(hostConfig.LinuxBridge.Name, "")
 		}
 	case v1alpha1.OVSBridge:
 		if hostConfig.OVSBridge != nil {
-			name = hostConfig.OVSBridge.Name
+			name = ptr.Deref(hostConfig.OVSBridge.Name, "")
 		}
 	default:
 		return fmt.Errorf("invalid hostmaster type %q", hostConfig.Type)
@@ -330,10 +331,11 @@ func v4SubnetForL3(l3vni v1alpha1.L3VNI) *net.IPNet {
 	if l3vni.Spec.HostSession == nil {
 		return nil
 	}
-	if l3vni.Spec.HostSession.LocalCIDR.IPv4 == "" {
+	ipv4 := ptr.Deref(l3vni.Spec.HostSession.LocalCIDR.IPv4, "")
+	if ipv4 == "" {
 		return nil
 	}
-	_, ipnet, err := net.ParseCIDR(l3vni.Spec.HostSession.LocalCIDR.IPv4)
+	_, ipnet, err := net.ParseCIDR(ipv4)
 	if err != nil {
 		return nil
 	}
@@ -345,10 +347,11 @@ func v6SubnetForL3(l3vni v1alpha1.L3VNI) *net.IPNet {
 	if l3vni.Spec.HostSession == nil {
 		return nil
 	}
-	if l3vni.Spec.HostSession.LocalCIDR.IPv6 == "" {
+	ipv6 := ptr.Deref(l3vni.Spec.HostSession.LocalCIDR.IPv6, "")
+	if ipv6 == "" {
 		return nil
 	}
-	_, ipnet, err := net.ParseCIDR(l3vni.Spec.HostSession.LocalCIDR.IPv6)
+	_, ipnet, err := net.ParseCIDR(ipv6)
 	if err != nil {
 		return nil
 	}

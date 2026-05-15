@@ -8,6 +8,7 @@ import (
 
 	gocidr "github.com/apparentlymart/go-cidr/cidr"
 	"github.com/openperouter/openperouter/internal/ipfamily"
+	"k8s.io/utils/ptr"
 )
 
 type VethIPs struct {
@@ -22,23 +23,26 @@ type VethIPsForFamily struct {
 
 // VethIPsFromPool returns the IPs for the host side and the PE side
 // for both IPv4 and IPv6 pools on the ith node.
-func VethIPsFromPool(poolIPv4, poolIPv6 string, index int) (VethIPs, error) {
-	if poolIPv4 == "" && poolIPv6 == "" {
+func VethIPsFromPool(poolIPv4, poolIPv6 *string, index int) (VethIPs, error) {
+	pIPv4 := ptr.Deref(poolIPv4, "")
+	pIPv6 := ptr.Deref(poolIPv6, "")
+
+	if pIPv4 == "" && pIPv6 == "" {
 		return VethIPs{}, fmt.Errorf("at least one pool must be provided (IPv4 or IPv6)")
 	}
 
 	veths := VethIPs{}
 
-	if poolIPv4 != "" {
-		ips, err := vethIPsForFamily(poolIPv4, index)
+	if pIPv4 != "" {
+		ips, err := vethIPsForFamily(pIPv4, index)
 		if err != nil {
 			return VethIPs{}, fmt.Errorf("failed to get IPv4 veth IPs: %w", err)
 		}
 		veths.Ipv4 = ips
 	}
 
-	if poolIPv6 != "" {
-		ips, err := vethIPsForFamily(poolIPv6, index)
+	if pIPv6 != "" {
+		ips, err := vethIPsForFamily(pIPv6, index)
 		if err != nil {
 			return VethIPs{}, fmt.Errorf("failed to get IPv6 veth IPs: %w", err)
 		}

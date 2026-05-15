@@ -11,6 +11,7 @@ import (
 
 	"github.com/openperouter/openperouter/internal/ipfamily"
 	"github.com/vishvananda/netlink"
+	"k8s.io/utils/ptr"
 )
 
 // setupVXLan sets up a vxlan interface corresponding to the provided
@@ -42,12 +43,13 @@ func checkVXLanConfigured(vxLan *netlink.Vxlan, bridgeIndex, loopbackIndex int, 
 		return fmt.Errorf("master index is not bridge index: %d, %d", vxLan.MasterIndex, bridgeIndex)
 	}
 
-	if vxLan.VxlanId != params.VNI {
+	if vxLan.VxlanId != int(params.VNI) {
 		return fmt.Errorf("vxlanid is not vni: %d, %d", vxLan.VxlanId, params.VNI)
 	}
 
-	if vxLan.Port != params.VXLanPort {
-		return fmt.Errorf("port is not one coming from params: %d, %d", vxLan.Port, params.VXLanPort)
+	paramsVXLanPort := int(ptr.Deref(params.VXLanPort, 4789))
+	if vxLan.Port != paramsVXLanPort {
+		return fmt.Errorf("port is not one coming from params: %d, %d", vxLan.Port, paramsVXLanPort)
 	}
 	if vxLan.Learning {
 		return fmt.Errorf("learning is enabled")
@@ -63,8 +65,8 @@ func checkVXLanConfigured(vxLan *netlink.Vxlan, bridgeIndex, loopbackIndex int, 
 
 func createVXLan(params VNIParams, bridge *netlink.Bridge) (*netlink.Vxlan, error) {
 	vtepInterfaceName := UnderlayLoopback
-	if params.VTEPInterface != "" {
-		vtepInterfaceName = params.VTEPInterface
+	if vtepIface := ptr.Deref(params.VTEPInterface, ""); vtepIface != "" {
+		vtepInterfaceName = vtepIface
 	}
 	vtepInterface, err := net.InterfaceByName(vtepInterfaceName)
 	if err != nil {
@@ -82,8 +84,8 @@ func createVXLan(params VNIParams, bridge *netlink.Bridge) (*netlink.Vxlan, erro
 			Name:        vxlanName,
 			MasterIndex: bridge.Index,
 		},
-		VxlanId:      params.VNI,
-		Port:         params.VXLanPort,
+		VxlanId:      int(params.VNI),
+		Port:         int(ptr.Deref(params.VXLanPort, 4789)),
 		Learning:     false,
 		VtepDevIndex: vtepInterface.Index,
 		SrcAddr:      srcAddr,
@@ -115,20 +117,20 @@ func createVXLan(params VNIParams, bridge *netlink.Bridge) (*netlink.Vxlan, erro
 
 const vniPrefix = "vni"
 
-func vxLanNameFromVNI(vni int) string {
+func vxLanNameFromVNI(vni int32) string {
 	return fmt.Sprintf("%s%d", vniPrefix, vni)
 }
 
-func vniFromVXLanName(name string) (int, error) {
+func vniFromVXLanName(name string) (int32, error) {
 	if !strings.HasPrefix(name, vniPrefix) {
 		return 0, NotRouterInterfaceError{Name: name}
 	}
 	vni := strings.TrimPrefix(name, vniPrefix)
-	res, err := strconv.Atoi(vni)
+	res, err := strconv.ParseInt(vni, 10, 32)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get vni for vxlan %s", name)
 	}
-	return res, nil
+	return int32(res), nil
 }
 
 // findFirstInterfaceIPv4Address returns the first IPv4 address assigned to the interface,
@@ -176,17 +178,18 @@ func validateVxlan(vxLan *netlink.Vxlan, params VNIParams) error {
 		return nil
 	}
 
-	if params.VTEPInterface == "" {
+	paramsVTEPIfaceName := ptr.Deref(params.VTEPInterface, "")
+	if paramsVTEPIfaceName == "" {
 		return fmt.Errorf("missing vtepip or vtepinterface")
 	}
 
-	iface, err := net.InterfaceByName(params.VTEPInterface)
+	iface, err := net.InterfaceByName(paramsVTEPIfaceName)
 	if err != nil {
-		return fmt.Errorf("failed to get vtep interface %s: %w", params.VTEPInterface, err)
+		return fmt.Errorf("failed to get vtep interface %s: %w", paramsVTEPIfaceName, err)
 	}
 	expectedIP, err := findFirstInterfaceIPv4Address(iface)
 	if err != nil {
-		return fmt.Errorf("failed to get vtep source address from interface %s: %w", params.VTEPInterface, err)
+		return fmt.Errorf("failed to get vtep source address from interface %s: %w", paramsVTEPIfaceName, err)
 	}
 	if !vxLan.SrcAddr.Equal(expectedIP) {
 		return fmt.Errorf("src addr does not match vtep interface ip: %v, expected %v", vxLan.SrcAddr, expectedIP)
@@ -206,7 +209,7 @@ func findVxlanSrcAddr(vtepInterface *net.Interface, params VNIParams) (net.IP, e
 		return vtepIP, nil
 	}
 
-	if params.VTEPInterface != "" {
+	if vtepIface := ptr.Deref(params.VTEPInterface, ""); vtepIface != "" {
 		srcAddr, err := findFirstInterfaceIPv4Address(vtepInterface)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get vtep source address from interface %s: %w", vtepInterface.Name, err)

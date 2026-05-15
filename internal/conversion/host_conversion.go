@@ -9,6 +9,7 @@ import (
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/ipam"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -68,10 +69,10 @@ func APItoHostConfig(nodeIndex int, targetNS string, underlayFromMultus bool, ap
 	}
 
 	res.Underlay.EVPN = &hostnetwork.UnderlayEVPNParams{}
-	if underlay.Spec.EVPN.VTEPCIDR != "" {
-		vtepIP, err := ipam.VTEPIp(underlay.Spec.EVPN.VTEPCIDR, nodeIndex)
+	if underlay.Spec.EVPN.VTEPCIDR != nil && *underlay.Spec.EVPN.VTEPCIDR != "" {
+		vtepIP, err := ipam.VTEPIp(*underlay.Spec.EVPN.VTEPCIDR, nodeIndex)
 		if err != nil {
-			return res, fmt.Errorf("failed to get vtep ip, cidr %s, nodeIndex %d: %w", underlay.Spec.EVPN.VTEPCIDR, nodeIndex, err)
+			return res, fmt.Errorf("failed to get vtep ip, cidr %s, nodeIndex %d: %w", *underlay.Spec.EVPN.VTEPCIDR, nodeIndex, err)
 		}
 		res.Underlay.EVPN.VtepIP = vtepIP.String()
 	}
@@ -83,8 +84,8 @@ func APItoHostConfig(nodeIndex int, targetNS string, underlayFromMultus bool, ap
 				TargetNS:      targetNS,
 				VTEPIP:        res.Underlay.EVPN.VtepIP,
 				VTEPInterface: underlay.Spec.EVPN.VTEPInterface,
-				VNI:           int(vni.Spec.VNI),
-				VXLanPort:     int(vni.Spec.VXLanPort),
+				VNI:           vni.Spec.VNI,
+				VXLanPort:     vni.Spec.VXLanPort,
 			},
 		}
 		if vni.Spec.HostSession == nil {
@@ -115,8 +116,8 @@ func APItoHostConfig(nodeIndex int, targetNS string, underlayFromMultus bool, ap
 				TargetNS:      targetNS,
 				VTEPIP:        res.Underlay.EVPN.VtepIP,
 				VTEPInterface: underlay.Spec.EVPN.VTEPInterface,
-				VNI:           int(l2vni.Spec.VNI),
-				VXLanPort:     int(l2vni.Spec.VXLanPort),
+				VNI:           l2vni.Spec.VNI,
+				VXLanPort:     l2vni.Spec.VXLanPort,
 			},
 		}
 		if len(l2vni.Spec.L2GatewayIPs) > 0 {

@@ -114,7 +114,7 @@ func mergeServiceForUpdate(current, updated *uns.Unstructured) error {
 	return nil
 }
 
-func copyNestedString(src, dst map[string]interface{}, fields ...string) error {
+func copyNestedString(src, dst map[string]any, fields ...string) error {
 	val, found, err := uns.NestedString(src, fields...)
 	if err != nil {
 		return err
@@ -125,7 +125,7 @@ func copyNestedString(src, dst map[string]interface{}, fields ...string) error {
 	return nil
 }
 
-func copyNestedStringSlice(src, dst map[string]interface{}, fields ...string) error {
+func copyNestedStringSlice(src, dst map[string]any, fields ...string) error {
 	val, found, err := uns.NestedStringSlice(src, fields...)
 	if err != nil {
 		return err

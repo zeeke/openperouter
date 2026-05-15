@@ -64,7 +64,7 @@ spec:
       hardware.vendor: dell
   asn: 64512
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - eno1
     - eno2
@@ -84,7 +84,7 @@ spec:
       hardware.vendor: hp
   asn: 64512
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - em1
     - em2

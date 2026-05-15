@@ -2,14 +2,14 @@
 set -euo pipefail
 
 
-CONTAINER_ENGINE=${CONTAINER_ENGINE:-"docker"}
+export CONTAINER_ENGINE=${CONTAINER_ENGINE:-"docker"}
 CONTAINER_ENGINE_CLI="docker"
-KUBECONFIG_PATH=${KUBECONFIG_PATH:-"$(pwd)/kubeconfig"}
-KIND=${KIND:-"kind"}
-KUBECTL=${KUBECTL:-"kubectl"}
+export KUBECONFIG_PATH=${KUBECONFIG_PATH:-"$(pwd)/kubeconfig"}
+export KIND=${KIND:-"kind"}
+export KUBECTL=${KUBECTL:-"kubectl"}
 CLAB_VERSION="0.74.1"
 
-KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-pe-kind}"
+export KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-pe-kind}"
 
 RUNTIME_OPTION=""
 KIND_COMMAND=$KIND
@@ -24,6 +24,8 @@ if [[ $CONTAINER_ENGINE == "podman" ]]; then
         sudo systemctl start podman.socket
     fi
 fi
+
+export CONTAINER_ENGINE_CLI
 
 load_image_to_podman_on_nodes() {
     local image_tag=$1

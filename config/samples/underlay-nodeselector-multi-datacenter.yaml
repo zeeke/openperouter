@@ -11,7 +11,7 @@ spec:
       topology.kubernetes.io/zone: us-east-1a
   asn: 64512
   evpn:
-    vtepcidr: 100.65.0.0/24
+    vtepCIDR: 100.65.0.0/24
   nics:
     - eth1
   neighbors:
@@ -30,7 +30,7 @@ spec:
       topology.kubernetes.io/zone: us-west-1a
   asn: 64513
   evpn:
-    vtepcidr: 100.66.0.0/24
+    vtepCIDR: 100.66.0.0/24
   nics:
     - eth1
   neighbors:

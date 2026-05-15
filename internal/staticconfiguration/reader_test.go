@@ -12,7 +12,6 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/openperouter/openperouter/api/static"
 	"github.com/openperouter/openperouter/api/v1alpha1"
-	"k8s.io/utils/ptr"
 )
 
 func TestReadNodeConfig(t *testing.T) {
@@ -208,21 +207,21 @@ func TestReadRouterConfigsFromFiles(t *testing.T) {
 		Nics: []string{"toswitch", "eth0"},
 		Neighbors: []v1alpha1.Neighbor{
 			{
-				ASN:     64512,
+				ASN:     new(int64(64512)),
 				Address: "192.168.11.2",
 			},
 			{
-				ASN:     64512,
+				ASN:     new(int64(64512)),
 				Address: "192.168.11.3",
 				BFD: &v1alpha1.BFDSettings{
-					ReceiveInterval:  ptr.To(uint32(300)),
-					TransmitInterval: ptr.To(uint32(300)),
-					DetectMultiplier: ptr.To(uint32(3)),
+					ReceiveInterval:  new(int32(300)),
+					TransmitInterval: new(int32(300)),
+					DetectMultiplier: new(int32(3)),
 				},
 			},
 		},
 		EVPN: &v1alpha1.EVPNConfig{
-			VTEPCIDR: "100.65.0.0/24",
+			VTEPCIDR: new("100.65.0.0/24"),
 		},
 	}
 
@@ -232,10 +231,10 @@ func TestReadRouterConfigsFromFiles(t *testing.T) {
 			VRF: "red",
 			HostSession: &v1alpha1.HostSession{
 				ASN:     64514,
-				HostASN: 64515,
+				HostASN: new(int64(64515)),
 				LocalCIDR: v1alpha1.LocalCIDRConfig{
-					IPv4: "192.169.10.0/24",
-					IPv6: "2001:db8:1::/64",
+					IPv4: new("192.169.10.0/24"),
+					IPv6: new("2001:db8:1::/64"),
 				},
 			},
 			VNI: 100,
@@ -244,10 +243,10 @@ func TestReadRouterConfigsFromFiles(t *testing.T) {
 			VRF: "blue",
 			HostSession: &v1alpha1.HostSession{
 				ASN:     64514,
-				HostASN: 64516,
+				HostASN: new(int64(64516)),
 				LocalCIDR: v1alpha1.LocalCIDRConfig{
-					IPv4: "192.169.11.0/24",
-					IPv6: "2001:db8:2::/64",
+					IPv4: new("192.169.11.0/24"),
+					IPv6: new("2001:db8:2::/64"),
 				},
 			},
 			VNI: 200,
@@ -257,24 +256,24 @@ func TestReadRouterConfigsFromFiles(t *testing.T) {
 	// openpe_l2vni.yaml
 	wantL2VNIs := []v1alpha1.L2VNISpec{
 		{
-			VRF:       ptr.To("storage"),
+			VRF:       new("storage"),
 			VNI:       300,
-			VXLanPort: 4789,
+			VXLanPort: new(int32(4789)),
 			HostMaster: &v1alpha1.HostMaster{
 				Type: "linux-bridge",
 				LinuxBridge: &v1alpha1.LinuxBridgeConfig{
-					Name: "br-storage",
+					Name: new("br-storage"),
 				},
 			},
 		},
 		{
-			VRF:       ptr.To("management"),
+			VRF:       new("management"),
 			VNI:       400,
-			VXLanPort: 4789,
+			VXLanPort: new(int32(4789)),
 			HostMaster: &v1alpha1.HostMaster{
 				Type: "ovs-bridge",
 				OVSBridge: &v1alpha1.OVSBridgeConfig{
-					Name: "ovsbr0",
+					Name: new("ovsbr0"),
 				},
 			},
 		},
@@ -284,10 +283,10 @@ func TestReadRouterConfigsFromFiles(t *testing.T) {
 	wantBGPPassthrough := v1alpha1.L3PassthroughSpec{
 		HostSession: v1alpha1.HostSession{
 			ASN:     64514,
-			HostASN: 64517,
+			HostASN: new(int64(64517)),
 			LocalCIDR: v1alpha1.LocalCIDRConfig{
-				IPv4: "192.169.100.0/24",
-				IPv6: "2001:db8:100::/64",
+				IPv4: new("192.169.100.0/24"),
+				IPv6: new("2001:db8:100::/64"),
 			},
 		},
 	}

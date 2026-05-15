@@ -20,6 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/utils/ptr"
 )
 
 var (
@@ -27,8 +28,8 @@ var (
 	leafAVRFBlueV4Prefixes, leafAVRFBlueV6Prefixes = infra.SeparateIPFamilies(leafAVRFBluePrefixes)
 	leafBVRFRedV4Prefixes, leafBVRFRedV6Prefixes   = infra.SeparateIPFamilies(leafBVRFRedPrefixes)
 	leafBVRFBlueV4Prefixes, leafBVRFBlueV6Prefixes = infra.SeparateIPFamilies(leafBVRFBluePrefixes)
-	redRouteTargets  = infra.RouteTargets{ImportRTs: []string{"65000:1000"}, ExportRTs: []string{"65000:1000"}}
-	blueRouteTargets = infra.RouteTargets{ImportRTs: []string{"65000:2000"}, ExportRTs: []string{"65000:2000"}}
+	redRouteTargets                                = infra.RouteTargets{ImportRTs: []string{"65000:1000"}, ExportRTs: []string{"65000:1000"}}
+	blueRouteTargets                               = infra.RouteTargets{ImportRTs: []string{"65000:2000"}, ExportRTs: []string{"65000:2000"}}
 
 	frrk8sRedPrefixes  = []string{"10.100.0.0/24"}
 	frrk8sBluePrefixes = []string{"10.200.0.0/24"}
@@ -47,10 +48,10 @@ var _ = Describe("Routes with RT between bgp and the fabric", Ordered, func() {
 			VRF: "red",
 			HostSession: &v1alpha1.HostSession{
 				ASN:     64514,
-				HostASN: 64515,
+				HostASN: ptr.To(int64(64515)),
 				LocalCIDR: v1alpha1.LocalCIDRConfig{
-					IPv4: "192.169.10.0/24",
-					IPv6: "2001:db8:1::/64",
+					IPv4: ptr.To("192.169.10.0/24"),
+					IPv6: ptr.To("2001:db8:1::/64"),
 				},
 			},
 			VNI:       100,
@@ -68,10 +69,10 @@ var _ = Describe("Routes with RT between bgp and the fabric", Ordered, func() {
 			VRF: "blue",
 			HostSession: &v1alpha1.HostSession{
 				ASN:     64514,
-				HostASN: 64515,
+				HostASN: ptr.To(int64(64515)),
 				LocalCIDR: v1alpha1.LocalCIDRConfig{
-					IPv4: "192.169.11.0/24",
-					IPv6: "2001:db8:2::/64",
+					IPv4: ptr.To("192.169.11.0/24"),
+					IPv6: ptr.To("2001:db8:2::/64"),
 				},
 			},
 			VNI:       200,

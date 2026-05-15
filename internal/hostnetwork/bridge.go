@@ -13,18 +13,19 @@ import (
 	"github.com/vishvananda/netlink"
 )
 
-// setup bridge creates the bridge if not exists, and it enslaves it to the provided
-// vrf.
-func setupBridge(params VNIParams, vrf *netlink.Vrf) (*netlink.Bridge, error) {
+// setupBridge creates the bridge if not exists, enslaves it to the provided
+// vrf, and applies any bridge options before bringing the link up.
+func setupBridge(params VNIParams, vrf *netlink.Vrf, opts ...NetlinkOption) (*netlink.Bridge, error) {
 	name := BridgeName(params.VNI)
 	bridge, err := createBridge(name, vrf.Index)
 	if err != nil {
 		return nil, err
 	}
 
-	err = setAddrGenModeNone(bridge)
-	if err != nil {
-		return nil, fmt.Errorf("failed to set addr_gen_mode to 1 for %s: %w", bridge.Name, err)
+	for _, opt := range opts {
+		if err := opt(bridge); err != nil {
+			return nil, fmt.Errorf("failed to apply bridge option for %s: %w", bridge.Name, err)
+		}
 	}
 
 	err = linkSetUp(bridge)
@@ -81,11 +82,11 @@ var macHeader = []byte{0x00, 0xF3}
 // ensureBridgeFixedMacAddress sets a deterministic MAC address on the bridge based on the VNI.
 // It is idempotent: if the MAC is already correct, it skips the update to avoid
 // unnecessary RTM_NEWLINK events that can cause FRR to flush neighbor entries.
-func ensureBridgeFixedMacAddress(bridge netlink.Link, vni int) error {
+func ensureBridgeFixedMacAddress(bridge netlink.Link, vni int32) error {
 	macAddress := make([]byte, macSize)
 
 	buf := new(bytes.Buffer)
-	err := binary.Write(buf, binary.BigEndian, int32(vni+1))
+	err := binary.Write(buf, binary.BigEndian, vni+1)
 	if err != nil {
 		return err
 	}
@@ -105,19 +106,19 @@ func ensureBridgeFixedMacAddress(bridge netlink.Link, vni int) error {
 const bridgePrefix = "br-pe-"
 
 // BridgeName returns the PE bridge name for a given VNI.
-func BridgeName(vni int) string {
+func BridgeName(vni int32) string {
 	return fmt.Sprintf("%s%d", bridgePrefix, vni)
 }
 
-func vniFromBridgeName(name string) (int, error) {
+func vniFromBridgeName(name string) (int32, error) {
 	if !strings.HasPrefix(name, bridgePrefix) {
 		return 0, NotRouterInterfaceError{Name: name}
 	}
 
 	vni := strings.TrimPrefix(name, bridgePrefix)
-	res, err := strconv.Atoi(vni)
+	res, err := strconv.ParseInt(vni, 10, 32)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get vni for bridge %s", name)
 	}
-	return res, nil
+	return int32(res), nil
 }
