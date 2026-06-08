@@ -57,7 +57,7 @@ func TestValidateGrout(t *testing.T) {
 			apiConfig: APIConfigData{
 				L3VNIs: []v1alpha1.L3VNI{{}},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name:         "grout enabled, both L2 and L3 VNIs present",

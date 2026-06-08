@@ -22,6 +22,78 @@ func NewClient(socketPath string) *Client {
 	return &Client{socketPath: socketPath}
 }
 
+func (c *Client) ensureVRF(ctx context.Context, name string) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if VRF %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout VRF already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "creating grout VRF", "name", name)
+	if err := c.run(ctx, "interface", "add", "vrf", name); err != nil {
+		return fmt.Errorf("creating grout VRF %s: %w", name, err)
+	}
+	return nil
+}
+
+func (c *Client) ensureBridge(ctx context.Context, name, vrf string) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if bridge %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout bridge already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "creating grout bridge", "name", name, "vrf", vrf)
+	if err := c.run(ctx, "interface", "add", "bridge", name, "vrf", vrf, "up"); err != nil {
+		return fmt.Errorf("creating grout bridge %s: %w", name, err)
+	}
+	return nil
+}
+
+func (c *Client) ensureVXLAN(ctx context.Context, name string, vni int32, localIP, domain string, dstPort int32) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if VXLAN %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout VXLAN already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "creating grout VXLAN", "name", name, "vni", vni, "local", localIP, "domain", domain)
+	if err := c.run(ctx, "interface", "add", "vxlan", name,
+		"vni", fmt.Sprintf("%d", vni),
+		"local", localIP,
+		"domain", domain,
+		"dst_port", fmt.Sprintf("%d", dstPort),
+		"up"); err != nil {
+		return fmt.Errorf("creating grout VXLAN %s: %w", name, err)
+	}
+	return nil
+}
+
+func (c *Client) deleteInterface(ctx context.Context, name string) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if interface %s exists: %w", name, err)
+	}
+	if !exists {
+		return nil
+	}
+
+	slog.InfoContext(ctx, "deleting grout interface", "name", name)
+	if err := c.run(ctx, "interface", "del", name); err != nil {
+		return fmt.Errorf("deleting grout interface %s: %w", name, err)
+	}
+	return nil
+}
+
 func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
 	exists, err := c.portExists(ctx, name)
 	if err != nil {
@@ -35,6 +107,23 @@ func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
 	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs)
 	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs); err != nil {
 		return fmt.Errorf("creating grout port %s: %w", name, err)
+	}
+	return nil
+}
+
+func (c *Client) ensurePortInVRF(ctx context.Context, name, devargs, vrf string) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if port %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout port already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "creating grout port in VRF", "name", name, "devargs", devargs, "vrf", vrf)
+	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs, "vrf", vrf, "up"); err != nil {
+		return fmt.Errorf("creating grout port %s in VRF %s: %w", name, vrf, err)
 	}
 	return nil
 }

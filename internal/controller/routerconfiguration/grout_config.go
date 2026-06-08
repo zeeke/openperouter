@@ -63,5 +63,17 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 			return fmt.Errorf("failed to remove passthrough: %w", err)
 		}
 	}
+
+	for _, l3vni := range hostConfig.L3VNIs {
+		slog.InfoContext(ctx, "setting up L3VNI", "vrf", l3vni.VRF, "vni", l3vni.VNI)
+		if err := grout.SetupL3VNI(ctx, groutClient, l3vni); err != nil {
+			return fmt.Errorf("failed to setup L3VNI (VRF %s, VNI %d): %w", l3vni.VRF, l3vni.VNI, err)
+		}
+	}
+
+	if err := grout.RemoveL3VNIs(ctx, groutClient, hostConfig.L3VNIs); err != nil {
+		return fmt.Errorf("failed to remove stale L3VNIs: %w", err)
+	}
+
 	return nil
 }
