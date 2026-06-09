@@ -96,7 +96,7 @@ var _ = Describe("Router Host configuration", Ordered, func() {
 		validateTORSessions()
 	})
 
-	Context("with a l3 vni", func() {
+	Context("with a l3 vni", Label("grout"), func() {
 		vni := v1alpha1.L3VNI{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "red",
@@ -141,7 +141,7 @@ var _ = Describe("Router Host configuration", Ordered, func() {
 		})
 	})
 
-	Context("with a l3 vni without HostASN and with HostType external", func() {
+	Context("with a l3 vni without HostASN and with HostType external", Label("grout"), func() {
 		vni := v1alpha1.L3VNI{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "red",
@@ -190,7 +190,7 @@ var _ = Describe("Router Host configuration", Ordered, func() {
 		})
 	})
 
-	Context("with a l3 vni without HostASN and with HostType internal", func() {
+	Context("with a l3 vni without HostASN and with HostType internal", Label("grout"), func() {
 		vni := v1alpha1.L3VNI{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "red",
@@ -239,7 +239,7 @@ var _ = Describe("Router Host configuration", Ordered, func() {
 		})
 	})
 
-	Context("with a l3 vni with HostASN the same as FRR ASN (iBGP)", func() {
+	Context("with a l3 vni with HostASN the same as FRR ASN (iBGP)", Label("grout"), func() {
 		vni := v1alpha1.L3VNI{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "red",
@@ -288,7 +288,7 @@ var _ = Describe("Router Host configuration", Ordered, func() {
 		})
 	})
 
-	Context("with a l3 vni without HostASN and without HostType", func() {
+	Context("with a l3 vni without HostASN and without HostType", Label("grout"), func() {
 		It("fails", func() {
 			vni := v1alpha1.L3VNI{
 				ObjectMeta: metav1.ObjectMeta{
@@ -315,7 +315,7 @@ var _ = Describe("Router Host configuration", Ordered, func() {
 		})
 	})
 
-	Context("with a l3 vni with both HostASN and HostType", func() {
+	Context("with a l3 vni with both HostASN and HostType", Label("grout"), func() {
 		It("fails", func() {
 			vni := v1alpha1.L3VNI{
 				ObjectMeta: metav1.ObjectMeta{
