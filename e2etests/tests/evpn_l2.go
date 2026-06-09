@@ -216,6 +216,8 @@ var _ = Describe("Routes between bgp and the fabric with Underlay in ipv4", Orde
 				checkPodIsReachable(test.exec, from, to)
 			}
 		}
+
+		Expect(true).To(BeFalse())
 	},
 		Entry("for single stack ipv4", testCase{
 			l2GatewayIPs: []string{"192.171.24.1/24"},
