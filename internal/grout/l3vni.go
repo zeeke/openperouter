@@ -113,48 +113,14 @@ func setupL3VNIHostSession(ctx context.Context, client *Client, params hostnetwo
 		return fmt.Errorf("failed to check grout port %s: %w", portName, err)
 	}
 
-	if portExists {
-		// Port exists but TAP might not be in host NS (previous setup
-		// failed partway). Delete the port so it gets fully recreated.
-		if _, tapErr := netlink.LinkByName(tapName); tapErr != nil {
-			slog.InfoContext(ctx, "grout port exists but TAP not in host NS, recreating",
-				"port", portName, "tap", tapName)
-			if err := client.deletePort(ctx, portName); err != nil {
-				return fmt.Errorf("failed to delete stale grout port %s: %w", portName, err)
-			}
-			_ = netnamespace.In(ns, func() error {
-				return removeLinkByName(tapName)
-			})
-			portExists = false
-		}
+	portExists, err = recoverStalePort(ctx, client, ns, portName, tapName, portExists)
+	if err != nil {
+		return err
 	}
 
 	if !portExists {
-		_ = removeLinkByName(tapName)
-
-		devargs := fmt.Sprintf("net_tap%d,iface=%s", params.VNI, tapName)
-		if err := client.ensurePortInVRF(ctx, portName, devargs, params.VRF); err != nil {
-			return fmt.Errorf("failed to create host session port: %w", err)
-		}
-
-		if err := assignIPsWithRetry(ctx, client, portName, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
-			return fmt.Errorf("failed to assign IPs to grout port: %w", err)
-		}
-
-		// Grout creates a kernel VRF device and a TUN (gr-loop) when the
-		// first port joins a custom VRF. Assign the PE-side IPs to the
-		// TUN so FRR's kernel TCP stack can bind to them in this VRF.
-		if err := assignIPsToVRFLoopback(ctx, ns, params.VRF,
-			params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
-			return fmt.Errorf("failed to assign IPs to VRF loopback: %w", err)
-		}
-
-		if err := moveLinkToHostNamespace(ctx, tapName, ns); err != nil {
-			return fmt.Errorf("failed to move TAP to host namespace: %w", err)
-		}
-
-		if err := setUniqueMAC(tapName); err != nil {
-			return fmt.Errorf("failed to set unique MAC on host TAP: %w", err)
+		if err := createL3VNITap(ctx, client, ns, params, portName, tapName); err != nil {
+			return err
 		}
 	} else {
 		slog.InfoContext(ctx, "grout L3VNI host session port already exists, skipping TAP setup", "port", portName)
@@ -169,6 +135,54 @@ func setupL3VNIHostSession(ctx context.Context, client *Client, params hostnetwo
 	}
 
 	return nil
+}
+
+// recoverStalePort checks whether a grout port exists but its TAP device is
+// missing from the host namespace (partial setup from a previous run).
+// If so, it deletes the stale port so it can be fully recreated.
+func recoverStalePort(ctx context.Context, client *Client, ns netns.NsHandle, portName, tapName string, portExists bool) (bool, error) {
+	if !portExists {
+		return false, nil
+	}
+	if _, tapErr := netlink.LinkByName(tapName); tapErr == nil {
+		return true, nil
+	}
+	slog.InfoContext(ctx, "grout port exists but TAP not in host NS, recreating",
+		"port", portName, "tap", tapName)
+	if err := client.deletePort(ctx, portName); err != nil {
+		return false, fmt.Errorf("failed to delete stale grout port %s: %w", portName, err)
+	}
+	_ = netnamespace.In(ns, func() error {
+		return removeLinkByName(tapName)
+	})
+	return false, nil
+}
+
+func createL3VNITap(ctx context.Context, client *Client, ns netns.NsHandle, params hostnetwork.L3VNIParams, portName, tapName string) error {
+	_ = removeLinkByName(tapName)
+
+	devargs := fmt.Sprintf("net_tap%d,iface=%s", params.VNI, tapName)
+	if err := client.ensurePortInVRF(ctx, portName, devargs, params.VRF); err != nil {
+		return fmt.Errorf("failed to create host session port: %w", err)
+	}
+
+	if err := assignIPsWithRetry(ctx, client, portName, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
+		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
+	}
+
+	// Grout creates a kernel VRF device and a TUN (gr-loop) when the
+	// first port joins a custom VRF. Assign the PE-side IPs to the
+	// TUN so FRR's kernel TCP stack can bind to them in this VRF.
+	if err := assignIPsToVRFLoopback(ctx, ns, params.VRF,
+		params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
+		return fmt.Errorf("failed to assign IPs to VRF loopback: %w", err)
+	}
+
+	if err := moveLinkToHostNamespace(ctx, tapName, ns); err != nil {
+		return fmt.Errorf("failed to move TAP to host namespace: %w", err)
+	}
+
+	return setUniqueMAC(tapName)
 }
 
 func RemoveL3VNIs(ctx context.Context, client *Client, configured []hostnetwork.L3VNIParams) error {

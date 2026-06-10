@@ -27,16 +27,7 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 		return fmt.Errorf("failed to check if target namespace %s has underlay: %w", config.targetNamespace, err)
 	}
 	if hasAlreadyUnderlay && len(config.Underlays) == 0 {
-		slog.InfoContext(ctx, "underlay removed, cleaning up grout state")
-		if err := grout.RemoveL3VNIs(ctx, groutClient, nil); err != nil {
-			slog.Warn("failed to remove L3VNIs after underlay removal", "err", err)
-		}
-		if err := grout.RemovePassthrough(ctx, groutClient, config.targetNamespace); err != nil {
-			slog.Warn("failed to remove passthrough after underlay removal", "err", err)
-		}
-		if err := hostnetwork.RemoveUnderlay(config.targetNamespace); err != nil {
-			slog.Warn("failed to remove underlay interfaces after underlay removal", "err", err)
-		}
+		cleanupGroutState(ctx, groutClient, config.targetNamespace)
 		return nil
 	}
 
@@ -103,4 +94,17 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 	}
 
 	return nil
+}
+
+func cleanupGroutState(ctx context.Context, client *grout.Client, targetNamespace string) {
+	slog.InfoContext(ctx, "underlay removed, cleaning up grout state")
+	if err := grout.RemoveL3VNIs(ctx, client, nil); err != nil {
+		slog.Warn("failed to remove L3VNIs after underlay removal", "err", err)
+	}
+	if err := grout.RemovePassthrough(ctx, client, targetNamespace); err != nil {
+		slog.Warn("failed to remove passthrough after underlay removal", "err", err)
+	}
+	if err := hostnetwork.RemoveUnderlay(targetNamespace); err != nil {
+		slog.Warn("failed to remove underlay interfaces after underlay removal", "err", err)
+	}
 }

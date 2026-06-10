@@ -68,24 +68,28 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	}
 
 	if params.TunnelEndpoint != nil {
-		if err := assignIPsToGroutPort(ctx, client, underlayPortName(0),
-			params.TunnelEndpoint.IPv4CIDR, params.TunnelEndpoint.IPv6CIDR); err != nil {
-			return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
-		}
-
-		vtepIPs := make([]string, 0, 2)
-		if ip := params.TunnelEndpoint.IPv4CIDR; ip != "" {
-			vtepIPs = append(vtepIPs, ip)
-		}
-		if ip := params.TunnelEndpoint.IPv6CIDR; ip != "" {
-			vtepIPs = append(vtepIPs, ip)
-		}
-		if err := hostnetwork.EnsureLoopback(ctx, ns, vtepIPs...); err != nil {
-			return fmt.Errorf("failed to setup loopback with tunnel endpoint IPs: %w", err)
+		if err := setupTunnelEndpoint(ctx, client, ns, *params.TunnelEndpoint); err != nil {
+			return err
 		}
 	}
 
 	return nil
+}
+
+func setupTunnelEndpoint(ctx context.Context, client *Client, ns netns.NsHandle, ep hostnetwork.UnderlayTunnelEndpointParams) error {
+	if err := assignIPsToGroutPort(ctx, client, underlayPortName(0),
+		ep.IPv4CIDR, ep.IPv6CIDR); err != nil {
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+	}
+
+	vtepIPs := make([]string, 0, 2)
+	if ip := ep.IPv4CIDR; ip != "" {
+		vtepIPs = append(vtepIPs, ip)
+	}
+	if ip := ep.IPv6CIDR; ip != "" {
+		vtepIPs = append(vtepIPs, ip)
+	}
+	return hostnetwork.EnsureLoopback(ctx, ns, vtepIPs...)
 }
 
 func validateNoStaleUnderlays(ns netns.NsHandle, wanted []string) error {
