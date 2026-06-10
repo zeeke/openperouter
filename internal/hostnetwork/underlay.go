@@ -96,7 +96,7 @@ func SetupUnderlay(ctx context.Context, params UnderlayParams) error {
 	if ip := params.TunnelEndpoint.IPv6CIDR; ip != "" {
 		vtepIPs = append(vtepIPs, ip)
 	}
-	if err := ensureLoopback(ctx, ns, vtepIPs...); err != nil {
+	if err := EnsureLoopback(ctx, ns, vtepIPs...); err != nil {
 		return err
 	}
 
@@ -109,7 +109,7 @@ func (e UnderlayExistsError) Error() string {
 	return string(e)
 }
 
-func ensureLoopback(ctx context.Context, ns netns.NsHandle, vtepIPs ...string) error {
+func EnsureLoopback(ctx context.Context, ns netns.NsHandle, vtepIPs ...string) error {
 	slog.DebugContext(ctx, "setup underlay", "step", "setting up loopback interface")
 	defer slog.DebugContext(ctx, "setup underlay", "step", "loopback interface set up")
 

@@ -3,6 +3,7 @@
 package tests
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -85,6 +86,9 @@ var _ = Describe("Routes with RT between bgp and the fabric", Label("grout"), Or
 		Expect(err).NotTo(HaveOccurred())
 
 		cs = k8sclient.New()
+		nodesItems, err := cs.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+		Expect(err).NotTo(HaveOccurred())
+
 		routers, err = openperouter.Get(cs, HostMode)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -97,6 +101,9 @@ var _ = Describe("Routes with RT between bgp and the fabric", Label("grout"), Or
 		})
 
 		Expect(err).NotTo(HaveOccurred())
+
+		Expect(infra.LeafKind1Config.UpdateConfig(nodesItems.Items, infra.LeafKindConfiguration{})).To(Succeed())
+		Expect(infra.LeafKind2Config.UpdateConfig(nodesItems.Items, infra.LeafKindConfiguration{})).To(Succeed())
 	})
 
 	AfterAll(func() {

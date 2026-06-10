@@ -44,6 +44,7 @@ var (
 var _ = Describe("Routes between bgp and the fabric with Underlay in ipv4", Label("grout"), Ordered, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
+	var nodes []corev1.Node
 
 	vniRed := v1alpha1.L3VNI{
 		ObjectMeta: metav1.ObjectMeta{
@@ -88,6 +89,10 @@ var _ = Describe("Routes between bgp and the fabric with Underlay in ipv4", Labe
 		Expect(err).NotTo(HaveOccurred())
 
 		cs = k8sclient.New()
+		nodesItems, err := cs.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+		Expect(err).NotTo(HaveOccurred())
+		nodes = nodesItems.Items
+
 		Eventually(func() error {
 			routers, err = openperouter.Get(cs, HostMode)
 			if err != nil {
@@ -104,6 +109,9 @@ var _ = Describe("Routes between bgp and the fabric with Underlay in ipv4", Labe
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
+
+		Expect(infra.LeafKind1Config.UpdateConfig(nodes, infra.LeafKindConfiguration{})).To(Succeed())
+		Expect(infra.LeafKind2Config.UpdateConfig(nodes, infra.LeafKindConfiguration{})).To(Succeed())
 	})
 
 	AfterAll(func() {

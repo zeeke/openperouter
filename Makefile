@@ -338,8 +338,17 @@ $(APIDOCSGEN): $(LOCALBIN)
 	test -s $(LOCALBIN)/crd-ref-docs || \
 	GOBIN=$(LOCALBIN) go install github.com/elastic/crd-ref-docs@$(APIDOCSGEN_VERSION)
 
+.PHONY: reset-clab-leaves
+reset-clab-leaves: ## Restart bgpd on clab leaves to clear stale EVPN state (FRR 10.6.0 workaround).
+	@for leaf in $$(docker ps --format '{{.Names}}' --filter name=clab- 2>/dev/null | grep leaf); do \
+		echo "Restarting bgpd on $$leaf..."; \
+		docker exec $$leaf pkill -9 bgpd 2>/dev/null || true; \
+	done
+	@echo "Waiting for watchfrr to restart bgpd..."
+	@sleep 5
+
 .PHONY: e2etests
-e2etests: ginkgo kubectl build-validator create-export-logs
+e2etests: ginkgo kubectl build-validator create-export-logs reset-clab-leaves
 	$(GINKGO) -v $(GINKGO_ARGS) --timeout=3h ./e2etests/suite -- --kubectl=$(KUBECTL) $(TEST_ARGS) --hostvalidator $(VALIDATOR_PATH) --reporterpath=${KIND_EXPORT_LOGS}
 
 .PHONY: e2etests-hostmode-boot

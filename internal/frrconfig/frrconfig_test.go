@@ -3,6 +3,7 @@
 package frrconfig
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -31,7 +32,7 @@ var tests = map[string]struct {
 
 func TestReload(t *testing.T) {
 	execCommand = fakeExecCommand
-	defer func() { execCommand = exec.Command }()
+	defer func() { execCommand = exec.CommandContext }()
 
 	for tc, params := range tests {
 		t.Run(fmt.Sprintf("reload %s", tc), func(t *testing.T) {
@@ -54,7 +55,7 @@ func TestReload(t *testing.T) {
 
 // helper function that redirects the execution to a mock process implemented by
 // TestHelperProcess
-func fakeExecCommand(name string, args ...string) *exec.Cmd {
+func fakeExecCommand(_ context.Context, name string, args ...string) *exec.Cmd {
 	//nolint:prealloc
 	cs := []string{"-test.run=TestFakeReloadHelper", "--"}
 	cs = append(cs, args...)

@@ -39,14 +39,6 @@ func Reconcile(ctx context.Context, apiConfig conversion.APIConfigData, groutEna
 		return fmt.Errorf("failed to validate host sessions: %w", err)
 	}
 
-	if err := configureInterfaces(ctx, interfacesConfiguration{
-		targetNamespace: targetNamespace,
-		APIConfigData:   apiConfig,
-		nodeIndex:       nodeIndex,
-	}); err != nil {
-		return fmt.Errorf("failed to configure the host: %w", err)
-	}
-
 	if groutEnabled {
 		if err := configureGroutDataPath(ctx, groutConfiguration{
 			targetNamespace: targetNamespace,
@@ -56,12 +48,14 @@ func Reconcile(ctx context.Context, apiConfig conversion.APIConfigData, groutEna
 		}); err != nil {
 			return fmt.Errorf("failed to configure grout datapath: %w", err)
 		}
-	} else if err := configureInterfaces(ctx, interfacesConfiguration{
-		targetNamespace: targetNamespace,
-		APIConfigData:   apiConfig,
-		nodeIndex:       nodeIndex,
-	}); err != nil {
-		return fmt.Errorf("failed to configure the host: %w", err)
+	} else {
+		if err := configureInterfaces(ctx, interfacesConfiguration{
+			targetNamespace: targetNamespace,
+			APIConfigData:   apiConfig,
+			nodeIndex:       nodeIndex,
+		}); err != nil {
+			return fmt.Errorf("failed to configure the host: %w", err)
+		}
 	}
 
 	if err := configureFRR(ctx, frrConfigData{

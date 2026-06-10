@@ -9,6 +9,7 @@ import (
 
 	"github.com/openperouter/openperouter/internal/conversion"
 	"github.com/openperouter/openperouter/internal/grout"
+	"github.com/openperouter/openperouter/internal/hostnetwork"
 )
 
 type groutConfiguration struct {
@@ -26,11 +27,37 @@ func configureGroutDataPath(ctx context.Context, config groutConfiguration) erro
 		return fmt.Errorf("failed to check if target namespace %s has underlay: %w", config.targetNamespace, err)
 	}
 	if hasAlreadyUnderlay && len(config.Underlays) == 0 {
+		slog.InfoContext(ctx, "underlay removed, cleaning up grout state")
+		if err := grout.RemoveL3VNIs(ctx, groutClient, nil); err != nil {
+			slog.Warn("failed to remove L3VNIs after underlay removal", "err", err)
+		}
+		if err := grout.RemovePassthrough(ctx, groutClient, config.targetNamespace); err != nil {
+			slog.Warn("failed to remove passthrough after underlay removal", "err", err)
+		}
+		if err := hostnetwork.RemoveUnderlay(config.targetNamespace); err != nil {
+			slog.Warn("failed to remove underlay interfaces after underlay removal", "err", err)
+		}
 		return nil
 	}
 
 	if len(config.Underlays) == 0 {
 		return nil // nothing to do
+	}
+
+	// When grout has no state (fresh start or after crash), clean up any
+	// stale kernel VRFs left behind by FRR's zebra. These VRFs persist in
+	// the perouter named namespace across pod restarts and prevent grout
+	// from creating and managing its own VRFs. This MUST happen before
+	// the underlay is set up — deleting kernel VRFs while grout is active
+	// crashes grout's dplane_frr module via netlink events.
+	if !hasAlreadyUnderlay {
+		vrfNames := make([]string, 0, len(config.L3VNIs))
+		for _, l3vni := range config.L3VNIs {
+			vrfNames = append(vrfNames, l3vni.Spec.VRF)
+		}
+		if err := grout.RemoveConflictingKernelVRFs(ctx, config.targetNamespace, vrfNames); err != nil {
+			return fmt.Errorf("failed to remove conflicting kernel VRFs: %w", err)
+		}
 	}
 
 	slog.InfoContext(ctx, "configure interface start", "namespace", config.targetNamespace)

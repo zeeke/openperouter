@@ -90,11 +90,11 @@ func serveReload(args Args) error {
 		[]handlerConfig{{pattern: "/", handler: reloadHandler(args.frrConfigPath)}},
 	)
 
-	healthHandler := health(vtysh.NewCLIWithTimeout(args.vtyshTimeout))
+	readyHandler := health(vtysh.NewCLIWithTimeout(args.vtyshTimeout))
 	healthServer := newServer(
 		[]handlerConfig{
-			{pattern: "/healthz", handler: healthHandler},
-			{pattern: "/readyz", handler: healthHandler},
+			{pattern: "/healthz", handler: livenessHandler},
+			{pattern: "/readyz", handler: readyHandler},
 		},
 		withEndpoint(args.bindAddress),
 	)
@@ -161,6 +161,15 @@ func reloadHandler(frrConfigPath string) func(w http.ResponseWriter, req *http.R
 	}
 }
 
+func livenessHandler(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		http.Error(w, "invalid method", http.StatusMethodNotAllowed)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte("ok"))
+}
+
 func health(frrCli vtysh.Cli) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodGet {
@@ -169,7 +178,7 @@ func health(frrCli vtysh.Cli) func(w http.ResponseWriter, req *http.Request) {
 		}
 
 		if err := liveness.PingFrr(frrCli); err != nil {
-			slog.Error("health check ping frr", "error", err)
+			slog.Error("readiness check ping frr", "error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

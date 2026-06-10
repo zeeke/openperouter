@@ -1,0 +1,21 @@
+diff --git a/frr/rt_grout.c b/frr/rt_grout.c
+index 431667c..bc24dd2 100644
+--- a/frr/rt_grout.c
++++ b/frr/rt_grout.c
+@@ -712,12 +712,16 @@ grout_add_nexthop(uint32_t nh_id, gr_nh_origin_t origin, const struct nexthop *n
+ 			l3 = (struct gr_nexthop_info_l3 *)req->nh.info;
+ 			l3->af = GR_AF_IP4;
+ 			memcpy(&l3->ipv4, &nh->gate.ipv4, sizeof(l3->ipv4));
++			if (!is_zero_mac(&nh->rmac))
++				memcpy(&l3->mac, &nh->rmac, sizeof(l3->mac));
+ 			break;
+ 		case NEXTHOP_TYPE_IPV6:
+ 		case NEXTHOP_TYPE_IPV6_IFINDEX:
+ 			l3 = (struct gr_nexthop_info_l3 *)req->nh.info;
+ 			l3->af = GR_AF_IP6;
+ 			memcpy(&l3->ipv6, &nh->gate.ipv6, sizeof(l3->ipv6));
++			if (!is_zero_mac(&nh->rmac))
++				memcpy(&l3->mac, &nh->rmac, sizeof(l3->mac));
+ 			break;
+ 		case NEXTHOP_TYPE_IFINDEX:
+ 			l3 = (struct gr_nexthop_info_l3 *)req->nh.info;

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/openperouter/openperouter/internal/hostnetwork"
+	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 )
@@ -33,6 +34,19 @@ func SetupL3VNI(ctx context.Context, client *Client, params hostnetwork.L3VNIPar
 	vxlanPort := defaultVXLanPort
 	if params.VXLanPort != nil {
 		vxlanPort = *params.VXLanPort
+	}
+
+	vrfExistsInGrout, err := client.portExists(ctx, params.VRF)
+	if err != nil {
+		return fmt.Errorf("SetupL3VNI: checking VRF %s: %w", params.VRF, err)
+	}
+	if !vrfExistsInGrout {
+		// FRR's zebra auto-creates kernel VRFs from its cached config.
+		// These can reappear after RemoveConflictingKernelVRFs ran,
+		// blocking grout VRF creation with EEXIST.
+		if err := RemoveConflictingKernelVRFs(ctx, params.TargetNS, []string{params.VRF}); err != nil {
+			return fmt.Errorf("SetupL3VNI: failed to remove conflicting kernel VRF %s: %w", params.VRF, err)
+		}
 	}
 
 	if err := client.ensureVRF(ctx, params.VRF); err != nil {
@@ -74,9 +88,45 @@ func setupL3VNIHostSession(ctx context.Context, client *Client, params hostnetwo
 		}
 	}()
 
+	// Remove old kernel interfaces from the non-grout L3VNI path.
+	// The veths have the same IPs as the grout TAP and loopback,
+	// causing routing conflicts that prevent BGP sessions.
+	oldHostVeth := fmt.Sprintf("host-%d", params.VNI)
+	if err := removeLinkByName(oldHostVeth); err != nil {
+		slog.WarnContext(ctx, "failed to remove old host veth", "name", oldHostVeth, "error", err)
+	}
+	_ = netnamespace.In(ns, func() error {
+		for _, name := range []string{
+			fmt.Sprintf("pe-%d", params.VNI),
+			fmt.Sprintf("vni%d", params.VNI),
+			fmt.Sprintf("br-pe-%d", params.VNI),
+		} {
+			if err := removeLinkByName(name); err != nil {
+				slog.WarnContext(ctx, "failed to remove old kernel interface", "name", name, "error", err)
+			}
+		}
+		return nil
+	})
+
 	portExists, err := client.portExists(ctx, portName)
 	if err != nil {
 		return fmt.Errorf("failed to check grout port %s: %w", portName, err)
+	}
+
+	if portExists {
+		// Port exists but TAP might not be in host NS (previous setup
+		// failed partway). Delete the port so it gets fully recreated.
+		if _, tapErr := netlink.LinkByName(tapName); tapErr != nil {
+			slog.InfoContext(ctx, "grout port exists but TAP not in host NS, recreating",
+				"port", portName, "tap", tapName)
+			if err := client.deletePort(ctx, portName); err != nil {
+				return fmt.Errorf("failed to delete stale grout port %s: %w", portName, err)
+			}
+			_ = netnamespace.In(ns, func() error {
+				return removeLinkByName(tapName)
+			})
+			portExists = false
+		}
 	}
 
 	if !portExists {
@@ -85,6 +135,18 @@ func setupL3VNIHostSession(ctx context.Context, client *Client, params hostnetwo
 		devargs := fmt.Sprintf("net_tap%d,iface=%s", params.VNI, tapName)
 		if err := client.ensurePortInVRF(ctx, portName, devargs, params.VRF); err != nil {
 			return fmt.Errorf("failed to create host session port: %w", err)
+		}
+
+		if err := assignIPsWithRetry(ctx, client, portName, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
+			return fmt.Errorf("failed to assign IPs to grout port: %w", err)
+		}
+
+		// Grout creates a kernel VRF device and a TUN (gr-loop) when the
+		// first port joins a custom VRF. Assign the PE-side IPs to the
+		// TUN so FRR's kernel TCP stack can bind to them in this VRF.
+		if err := assignIPsToVRFLoopback(ctx, ns, params.VRF,
+			params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
+			return fmt.Errorf("failed to assign IPs to VRF loopback: %w", err)
 		}
 
 		if err := moveLinkToHostNamespace(ctx, tapName, ns); err != nil {
@@ -104,21 +166,6 @@ func setupL3VNIHostSession(ctx context.Context, client *Client, params hostnetwo
 	}
 	if err := assignIPsToLink(hostTap, params.HostVeth.HostIPv4, params.HostVeth.HostIPv6); err != nil {
 		return fmt.Errorf("failed to assign IPs to host TAP: %w", err)
-	}
-
-	if err := assignIPsToGroutPort(ctx, client, portName, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
-		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
-	}
-
-	portAddresses, err := client.getAddresses(ctx, portName)
-	if err != nil {
-		return fmt.Errorf("failed to get grout %s port addresses: %w", portName, err)
-	}
-
-	for _, addr := range portAddresses {
-		if err := ensureKernelSubnetRoute(ns, "main", addr); err != nil {
-			return fmt.Errorf("failed to add kernel route for subnet %s: %w", addr, err)
-		}
 	}
 
 	return nil

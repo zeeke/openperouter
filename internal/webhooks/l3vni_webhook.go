@@ -65,10 +65,6 @@ func (v *L3VNIValidator) Handle(ctx context.Context, req admission.Request) (res
 		}
 	}
 
-	if v.groutEnabled && (req.Operation == v1.Create || req.Operation == v1.Update) {
-		return admission.Denied("L3VNI resources are not supported when grout datapath is enabled")
-	}
-
 	switch req.Operation {
 	case v1.Create:
 		if err := validateL3VNICreate(&l3vni); err != nil {

@@ -12,14 +12,22 @@ import (
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
+	"golang.org/x/sys/unix"
 )
 
 const (
-	underlayPortName = "underlay"
+	underlayPortPrefix = "underlay"
 )
 
+func underlayPortName(index int) string {
+	if index == 0 {
+		return underlayPortPrefix
+	}
+	return fmt.Sprintf("%s-%d", underlayPortPrefix, index)
+}
+
 func HasUnderlayInterface(ctx context.Context, client *Client) (bool, error) {
-	return client.portExists(ctx, underlayPortName)
+	return client.portExists(ctx, underlayPortName(0))
 }
 
 // SetupUnderlay configures the underlay interface via the grout dataplane.
@@ -46,14 +54,34 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		return err
 	}
 
-	for _, underlayInterface := range params.UnderlayInterfaces {
+	for i, underlayInterface := range params.UnderlayInterfaces {
 		if err := hostnetwork.MoveInterfaceToNamespace(ctx, underlayInterface, ns); err != nil {
 			return err
 		}
+		portName := underlayPortName(i)
+		nicIndex := i
 		if err := netnamespace.In(ns, func() error {
-			return configureUnderlayInterface(ctx, client, ns, underlayInterface)
+			return configureUnderlayInterface(ctx, client, ns, underlayInterface, portName, nicIndex)
 		}); err != nil {
 			return err
+		}
+	}
+
+	if params.TunnelEndpoint != nil {
+		if err := assignIPsToGroutPort(ctx, client, underlayPortName(0),
+			params.TunnelEndpoint.IPv4CIDR, params.TunnelEndpoint.IPv6CIDR); err != nil {
+			return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+		}
+
+		vtepIPs := make([]string, 0, 2)
+		if ip := params.TunnelEndpoint.IPv4CIDR; ip != "" {
+			vtepIPs = append(vtepIPs, ip)
+		}
+		if ip := params.TunnelEndpoint.IPv6CIDR; ip != "" {
+			vtepIPs = append(vtepIPs, ip)
+		}
+		if err := hostnetwork.EnsureLoopback(ctx, ns, vtepIPs...); err != nil {
+			return fmt.Errorf("failed to setup loopback with tunnel endpoint IPs: %w", err)
 		}
 	}
 
@@ -74,7 +102,7 @@ func validateNoStaleUnderlays(ns netns.NsHandle, wanted []string) error {
 	return nil
 }
 
-func configureUnderlayInterface(ctx context.Context, client *Client, ns netns.NsHandle, underlayInterface string) error {
+func configureUnderlayInterface(ctx context.Context, client *Client, ns netns.NsHandle, underlayInterface, portName string, nicIndex int) error {
 	underlay, err := netlink.LinkByName(underlayInterface)
 	if err != nil {
 		return fmt.Errorf("failed to get underlay nic by name %s: %w", underlayInterface, err)
@@ -93,21 +121,30 @@ func configureUnderlayInterface(ctx context.Context, client *Client, ns netns.Ns
 		return fmt.Errorf("failed to read underlay interface addresses: %w", err)
 	}
 
-	devargs := fmt.Sprintf("net_tap0,remote=%s,iface=%s", underlayInterface, "tap_"+underlayInterface)
-	if err := client.ensurePort(ctx, underlayPortName, devargs); err != nil {
-		return fmt.Errorf("failed to create grout underlay port: %w", err)
+	tapName := "tap_" + underlayInterface
+	dpdkDev := fmt.Sprintf("net_tap_ul%d", nicIndex)
+	devargs := fmt.Sprintf("%s,remote=%s,iface=%s", dpdkDev, underlayInterface, tapName)
+	portExists, err := client.portExists(ctx, portName)
+	if err != nil {
+		return fmt.Errorf("failed to check grout underlay port %s: %w", portName, err)
+	}
+	if !portExists {
+		_ = removeLinkByName(tapName)
+	}
+	if err := client.ensurePort(ctx, portName, devargs); err != nil {
+		return fmt.Errorf("failed to create grout underlay port %s: %w", portName, err)
 	}
 
-	if err := migrateAddressesToGrout(ctx, client, underlayInterface, underlayAddrs); err != nil {
+	if err := migrateAddressesToGrout(ctx, client, portName, underlayInterface, underlayAddrs); err != nil {
 		return err
 	}
 
-	portAddresses, err := client.getAddresses(ctx, underlayPortName)
+	portAddresses, err := client.getAddresses(ctx, portName)
 	if err != nil {
 		return fmt.Errorf("failed to get grout underlay port addresses: %w", err)
 	}
 	for _, addr := range portAddresses {
-		if err := ensureKernelSubnetRoute(ns, "main", addr); err != nil {
+		if err := ensureKernelSubnetRoute(ns, portName, addr); err != nil {
 			return fmt.Errorf("failed to add kernel route for underlay subnet %s: %w", addr, err)
 		}
 	}
@@ -115,19 +152,31 @@ func configureUnderlayInterface(ctx context.Context, client *Client, ns netns.Ns
 	return nil
 }
 
-func migrateAddressesToGrout(ctx context.Context, client *Client, underlayInterface string, addrs []netlink.Addr) error {
+func migrateAddressesToGrout(ctx context.Context, client *Client, portName, underlayInterface string, addrs []netlink.Addr) error {
+	link, err := netlink.LinkByName(underlayInterface)
+	if err != nil {
+		return fmt.Errorf("failed to get underlay link %s: %w", underlayInterface, err)
+	}
+
 	for _, addr := range addrs {
 		cidr := addr.IPNet.String()
 
-		if err := client.ensureAddress(ctx, underlayPortName, cidr); err != nil {
-			return fmt.Errorf("failed to assign address %s to grout underlay port: %w", cidr, err)
+		if err := client.ensureAddress(ctx, portName, cidr); err != nil {
+			return fmt.Errorf("failed to assign address %s to grout port %s: %w", cidr, portName, err)
 		}
 
-		if err := deleteAddressFromKernelInterface(underlayInterface, addr); err != nil {
-			return fmt.Errorf("failed to remove address %s from underlay interface: %w", cidr, err)
+		// Keep the address on the kernel interface so it survives pod
+		// restarts (grout state is ephemeral). Set IFA_F_NOPREFIXROUTE
+		// to suppress the kernel connected route — traffic must go
+		// through grout's NOARP interface, not the kernel interface.
+		noPfx := addr
+		noPfx.Flags |= unix.IFA_F_NOPREFIXROUTE
+		noPfx.LinkIndex = link.Attrs().Index
+		if err := netlink.AddrReplace(link, &noPfx); err != nil {
+			return fmt.Errorf("failed to set noprefixroute on %s for %s: %w", underlayInterface, cidr, err)
 		}
 
-		slog.InfoContext(ctx, "migrated underlay address to grout", "cidr", cidr, "iface", underlayPortName)
+		slog.InfoContext(ctx, "migrated underlay address to grout", "cidr", cidr, "port", portName)
 	}
 	return nil
 }

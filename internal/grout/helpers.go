@@ -9,10 +9,13 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"strings"
+	"time"
 
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 // assignIPsToLink assigns IPv4 and/or IPv6 addresses to a netlink interface.
@@ -99,14 +102,6 @@ func moveLinkToHostNamespace(ctx context.Context, name string, srcNS netns.NsHan
 	return nil
 }
 
-func deleteAddressFromKernelInterface(ifaceName string, addr netlink.Addr) error {
-	link, err := netlink.LinkByName(ifaceName)
-	if err != nil {
-		return fmt.Errorf("failed to find underlay interface %s: %w", ifaceName, err)
-	}
-	return netlink.AddrDel(link, &addr)
-}
-
 // setUniqueMAC assigns a random locally-administered unicast MAC to the named
 // link. TAP devices share the same MAC on both ends, which causes IPv6
 // DAD failures on the link-local address and prevents NDP from working.
@@ -176,7 +171,7 @@ func ensureKernelSubnetRoute(ns netns.NsHandle, ifaceName, addr string) error {
 			return nil
 		}
 
-		if err := netlink.RouteAdd(&netlink.Route{
+		if err := netlink.RouteReplace(&netlink.Route{
 			Dst:       ipNet,
 			LinkIndex: link.Attrs().Index,
 			Src:       srcAddr,
@@ -186,6 +181,113 @@ func ensureKernelSubnetRoute(ns netns.NsHandle, ifaceName, addr string) error {
 
 		slog.Info("added kernel route for subnet", "cidr", addr, "src", srcAddr, "ipnet", ipNet, "iface", ifaceName)
 		return nil
+	})
+}
+
+// RemoveConflictingKernelVRFs deletes kernel VRFs that grout doesn't manage.
+// FRR's zebra daemon auto-creates kernel VRFs from its running configuration.
+// These kernel VRFs prevent grout from creating and managing its own VRFs
+// (grout returns EEXIST), and grout cannot attach bridges to VRFs it didn't
+// create (returns EINVAL).
+//
+// This MUST be called before grout has any configured interfaces (before
+// underlay setup). Deleting kernel VRFs while grout is active triggers
+// netlink events that crash grout's dplane_frr module.
+func RemoveConflictingKernelVRFs(ctx context.Context, targetNS string, vrfNames []string) error {
+	if len(vrfNames) == 0 {
+		return nil
+	}
+
+	ns, err := netns.GetFromPath(targetNS)
+	if err != nil {
+		return fmt.Errorf("failed to get namespace %s: %w", targetNS, err)
+	}
+	defer func() {
+		if err := ns.Close(); err != nil {
+			slog.Error("failed to close namespace", "namespace", targetNS, "error", err)
+		}
+	}()
+
+	return netnamespace.In(ns, func() error {
+		for _, vrfName := range vrfNames {
+			link, err := netlink.LinkByName(vrfName)
+			if err != nil {
+				continue // doesn't exist in kernel, nothing to clean
+			}
+			if _, ok := link.(*netlink.Vrf); !ok {
+				continue // exists but not a VRF, don't touch
+			}
+			slog.InfoContext(ctx, "removing conflicting kernel VRF", "name", vrfName)
+			if err := netlink.LinkDel(link); err != nil {
+				return fmt.Errorf("failed to delete kernel VRF %s: %w", vrfName, err)
+			}
+		}
+		return nil
+	})
+}
+
+// assignIPsToVRFLoopback assigns IP addresses to grout's TUN loopback
+// device for a custom VRF. Grout creates a kernel VRF and a TUN device
+// (gr-loopN, enslaved to the kernel VRF) when the first port joins a
+// custom VRF. FRR's kernel TCP stack needs an address on a VRF-enslaved
+// interface to bind BGP sockets in that VRF. The TUN also has a default
+// route so all VRF-bound traffic flows back through grout for forwarding.
+func assignIPsToVRFLoopback(ctx context.Context, ns netns.NsHandle, vrfName, ipv4, ipv6 string) error {
+	return netnamespace.In(ns, func() error {
+		vrfLink, err := netlink.LinkByName(vrfName)
+		if err != nil {
+			return fmt.Errorf("kernel VRF %s not found (grout should have created it): %w", vrfName, err)
+		}
+
+		// Find the TUN device enslaved to this VRF.
+		links, err := netlink.LinkList()
+		if err != nil {
+			return fmt.Errorf("failed to list links: %w", err)
+		}
+		var loopback netlink.Link
+		for _, l := range links {
+			if l.Attrs().MasterIndex == vrfLink.Attrs().Index {
+				loopback = l
+				break
+			}
+		}
+		if loopback == nil {
+			return fmt.Errorf("no loopback device found enslaved to VRF %s", vrfName)
+		}
+
+		slog.InfoContext(ctx, "assigning IPs to VRF loopback", "vrf", vrfName, "loopback", loopback.Attrs().Name)
+
+		for _, addr := range []string{ipv4, ipv6} {
+			if addr == "" {
+				continue
+			}
+			parsed, err := netlink.ParseAddr(addr)
+			if err != nil {
+				return fmt.Errorf("failed to parse address %s: %w", addr, err)
+			}
+			if err := netlink.AddrReplace(loopback, parsed); err != nil {
+				return fmt.Errorf("failed to assign %s to %s: %w", addr, loopback.Attrs().Name, err)
+			}
+		}
+		return nil
+	})
+}
+
+func assignIPsWithRetry(ctx context.Context, client *Client, portName, ipv4, ipv6 string) error {
+	return wait.ExponentialBackoff(wait.Backoff{
+		Duration: 500 * time.Millisecond,
+		Factor:   1.0,
+		Steps:    5,
+	}, func() (bool, error) {
+		err := assignIPsToGroutPort(ctx, client, portName, ipv4, ipv6)
+		if err == nil {
+			return true, nil
+		}
+		if !strings.Contains(err.Error(), "ENONET") {
+			return false, err
+		}
+		slog.InfoContext(ctx, "retrying IP assignment to grout port", "port", portName)
+		return false, nil
 	})
 }
 

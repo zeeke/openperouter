@@ -38,6 +38,69 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
   && \
   CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -v -o operatorbinary ./operator
 
+FROM quay.io/centos/centos:stream10 AS dplane-builder
+
+RUN dnf install -y epel-release && \
+    dnf --enablerepo=crb install -y --nodocs --setopt=install_weak_deps=0 \
+    gcc make autoconf automake libtool pkgconf perl-core \
+    libyang-devel protobuf-c-devel json-c-devel libcap-devel \
+    python3 bison flex readline-devel pam-devel \
+    elfutils-libelf-devel python3-devel git && \
+    dnf clean all
+
+WORKDIR /build
+
+ARG FRR_VERSION=10.5.3
+ARG GROUT_VERSION=0.15.0
+
+RUN curl -sL https://github.com/FRRouting/frr/archive/refs/tags/frr-${FRR_VERSION}.tar.gz | tar xz && \
+    cd frr-frr-${FRR_VERSION} && \
+    ./bootstrap.sh && \
+    ./configure --prefix=/usr --disable-doc \
+        --enable-multipath=256 \
+        --disable-ripd --disable-ripngd --disable-ldpd \
+        --disable-nhrpd --disable-eigrpd --disable-babeld \
+        --disable-pimd --disable-pim6d --disable-pbrd \
+        --disable-fabricd --disable-vrrpd --disable-pathd \
+        --disable-ospfapi --disable-ospfclient \
+        --disable-python-runtime \
+        --enable-user=root --enable-group=root && \
+    make -C lib route_types.h
+
+RUN git clone --depth=1 --branch v${GROUT_VERSION} https://github.com/DPDK/grout.git
+
+COPY hack/grout-patches/*.patch /build/patches/
+RUN cd grout && for p in /build/patches/*.patch; do git apply "$p"; done
+
+RUN cd grout && \
+    echo '#pragma once' > api/gr_version.h && \
+    echo "#define GROUT_VERSION \"${GROUT_VERSION}-patched\"" >> api/gr_version.h && \
+    sh devtools/gen_api_header.sh \
+        api/gr_api.h api/gr_bitops.h api/gr_clock.h api/gr_errno.h \
+        api/gr_macro.h api/gr_net_compat.h api/gr_net_types.h \
+        api/gr_version.h > api/grout.h && \
+    FRR_MAJ=$(echo ${FRR_VERSION} | cut -d. -f1) && \
+    FRR_MIN=$(echo ${FRR_VERSION} | cut -d. -f2) && \
+    FRR_SUB=$(echo ${FRR_VERSION} | cut -d. -f3) && \
+    FRR_VER_NUM=$((FRR_MAJ * 16777216 + FRR_MIN * 256 + FRR_SUB)) && \
+    gcc -shared -fPIC -std=gnu2x \
+        -DHAVE_CONFIG_H \
+        -DALLOW_EXPERIMENTAL_API -D_GNU_SOURCE \
+        -fms-extensions \
+        -DCURRENT_FRR_VERSION=$FRR_VER_NUM \
+        -DMULTIPATH_NUM=256 \
+        -Wno-missing-field-initializers \
+        -Wno-unused-parameter \
+        "-DGROUT_VERSION=\"${GROUT_VERSION}-patched\"" \
+        -I/build/frr-frr-${FRR_VERSION} \
+        -I/build/frr-frr-${FRR_VERSION}/lib \
+        -Iapi -Ifrr \
+        -Imodules/infra/api -Imodules/ip/api \
+        -Imodules/ip6/api -Imodules/l2/api \
+        -Imodules/srv6/api \
+        frr/if_grout.c frr/if_map.c frr/rt_grout.c frr/zebra_dplane_grout.c \
+        -o /build/dplane_grout.so
+
 FROM quay.io/centos/centos:stream10
 
 WORKDIR /
@@ -52,6 +115,8 @@ ADD https://github.com/DPDK/grout/releases/download/v0.15.0/grout.x86_64.rpm /tm
 
 RUN dnf install -y /tmp/*.rpm && dnf clean all && rm -rf /tmp/*.rpm
 
+COPY --from=dplane-builder /build/dplane_grout.so /usr/lib64/frr/modules/dplane_grout.so
+
 COPY --from=builder /go/openperouter/reloader .
 COPY --from=builder /go/openperouter/controller .
 COPY --from=builder /go/openperouter/hostbridge .
@@ -65,7 +130,7 @@ COPY systemdmode/frrconfig/vtysh.conf /etc/frr/vtysh.conf
 COPY systemdmode/frrconfig/frr.conf /etc/frr/frr.conf
 
 RUN ln -s /usr/libexec/frr /usr/lib/frr
-ADD https://raw.githubusercontent.com/FRRouting/frr/refs/tags/frr-10.5.0/docker/ubi8-minimal/docker-start /usr/lib/frr/docker-start
+COPY systemdmode/frrconfig/docker-start /usr/lib/frr/docker-start
 RUN chmod +x /usr/lib/frr/docker-start
 
 

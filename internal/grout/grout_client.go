@@ -51,6 +51,10 @@ func (c *Client) ensureBridge(ctx context.Context, name, vrf string) error {
 
 	slog.InfoContext(ctx, "creating grout bridge", "name", name, "vrf", vrf)
 	if err := c.run(ctx, "interface", "add", "bridge", name, "vrf", vrf, "up"); err != nil {
+		if strings.Contains(err.Error(), "EEXIST") {
+			slog.InfoContext(ctx, "grout bridge already exists (kernel)", "name", name)
+			return nil
+		}
 		return fmt.Errorf("creating grout bridge %s: %w", name, err)
 	}
 	return nil
@@ -73,6 +77,10 @@ func (c *Client) ensureVXLAN(ctx context.Context, name string, vni int32, localI
 		"domain", domain,
 		"dst_port", fmt.Sprintf("%d", dstPort),
 		"up"); err != nil {
+		if strings.Contains(err.Error(), "EEXIST") {
+			slog.InfoContext(ctx, "grout VXLAN already exists (kernel)", "name", name)
+			return nil
+		}
 		return fmt.Errorf("creating grout VXLAN %s: %w", name, err)
 	}
 	return nil
