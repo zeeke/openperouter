@@ -289,6 +289,7 @@ spec:
             GROUT_ARGS="--test-mode --socket-mode 0666"
             {{- if eq .Values.openperouter.logLevel "debug" }}
             GROUT_ARGS="${GROUT_ARGS} --verbose"
+            GROUT_ARGS="${GROUT_ARGS} --trace-packets"
             {{- end }}
             exec nsenter --net=/var/run/netns/perouter grout ${GROUT_ARGS}
 
@@ -307,7 +308,7 @@ spec:
         {{- end }}
         startupProbe:
           exec:
-            command: ["/bin/sh", "-c", "grcli -e"]
+            command: ["/bin/sh", "-c", "grcli -e trace enable all"]
           initialDelaySeconds: 2
           periodSeconds: 5
           timeoutSeconds: 5
@@ -323,6 +324,32 @@ spec:
           periodSeconds: 30
           timeoutSeconds: 5
       {{- end }}
+      - name: tcpdump
+        image: quay.io/centos/centos:stream10
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -xc
+          - |
+            yum install -y tcpdump
+            nsenter --net=/var/run/netns/perouter tcpdump -e -nn -i any tcp port 179 or udp port 4789 or tcp port 8090
+        volumeMounts:
+          - name: netns
+            mountPath: /var/run/netns
+            mountPropagation: HostToContainer
+        securityContext:
+          privileged: true
+      - name: tcpdump-host
+        image: quay.io/centos/centos:stream10
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - |
+            yum install -y tcpdump
+            tcpdump -e -nn -i any udp port 4789 or tcp port 8090
+        securityContext:
+          privileged: true
       tolerations:
       {{- if .Values.openperouter.runOnMaster }}
       - effect: NoSchedule
