@@ -55,6 +55,53 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
   && \
   CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -v -o operatorbinary ./operator
 
+FROM quay.io/centos/centos:stream10 as grout-builder
+
+RUN dnf install -y epel-release && \
+          dnf --enablerepo=crb install -y --nodocs --setopt=install_weak_deps=0 \
+            autoconf \
+            automake \
+            bison \
+            ccache \
+            elfutils-libelf-devel \
+            flex \
+            gcc \
+            git \
+            groff \
+            json-c-devel \
+            libarchive-devel \
+            libcap-devel \
+            libcmocka-devel \
+            libedit-devel \
+            libevent-devel \
+            libmnl-devel \
+            libtool \
+            libyang-devel \
+            make \
+            meson \
+            ninja-build \
+            numactl-devel \
+            pam-devel \
+            pkgconf \
+            protobuf-c-compiler \
+            protobuf-c-devel \
+            python3-devel \
+            python3-pyelftools \
+            rdma-core-devel \
+            readline-devel \
+            rpm-build \
+            scdoc \
+            systemd \
+            systemd-devel
+
+RUN git clone -b main --depth 1 http://github.com/DPDK/grout /src
+WORKDIR /src
+
+RUN make frr-rpm FRR=10.6
+RUN dnf install -y --nodocs --setopt=install_weak_deps=0 ./frr-headers.noarch.rpm
+RUN make rpm FRR=10.6 WITH=download
+
+
 FROM quay.io/centos/centos:stream10
 
 ARG TARGETARCH
@@ -74,11 +121,16 @@ RUN groupadd -r -g 92 frr && \
     groupadd -r -g 102 frrvty && \
     usermod -a -G frrvty frr
 
-RUN RPMARCH=$(case ${TARGETARCH} in amd64) echo x86_64;; arm64) echo aarch64;; *) echo ${TARGETARCH};; esac) && \
-    curl -fsSL -o /tmp/frr.rpm https://github.com/DPDK/grout/releases/download/v0.17.1/frr.${RPMARCH}.rpm && \
-    curl -fsSL -o /tmp/grout-frr.rpm https://github.com/DPDK/grout/releases/download/v0.17.1/grout-frr.${RPMARCH}.rpm && \
-    curl -fsSL -o /tmp/grout.rpm https://github.com/DPDK/grout/releases/download/v0.17.1/grout.${RPMARCH}.rpm && \
-    dnf install -y /tmp/*.rpm && dnf clean all && rm -rf /tmp/*.rpm
+#RUN RPMARCH=$(case ${TARGETARCH} in amd64) echo x86_64;; arm64) echo aarch64;; *) echo ${TARGETARCH};; esac) && \
+#    curl -fsSL -o /tmp/frr.rpm https://github.com/DPDK/grout/releases/download/v0.17.1/frr.${RPMARCH}.rpm && \
+#    curl -fsSL -o /tmp/grout-frr.rpm https://github.com/DPDK/grout/releases/download/v0.17.1/grout-frr.${RPMARCH}.rpm && \
+#    curl -fsSL -o /tmp/grout.rpm https://github.com/DPDK/grout/releases/download/v0.17.1/grout.${RPMARCH}.rpm && \
+#    dnf install -y /tmp/*.rpm && dnf clean all && rm -rf /tmp/*.rpm
+
+COPY --from=grout-builder /src/frr.x86_64.rpm /tmp/
+COPY --from=grout-builder /src/grout-frr.x86_64.rpm /tmp/
+COPY --from=grout-builder /src/grout.x86_64.rpm /tmp/
+RUN dnf install -y /tmp/*.rpm && dnf clean all && rm -rf /tmp/*.rpm
 
 COPY --from=builder /go/openperouter/reloader .
 COPY --from=builder /go/openperouter/controller .
