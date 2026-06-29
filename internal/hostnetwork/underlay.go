@@ -262,9 +262,9 @@ func FindInterfacesInGroup(ns netns.NsHandle, groupID uint32) ([]string, error) 
 	return result, err
 }
 
-// findUnderlayMTU retrieves the lowest MTU among all underlay interfaces.
+// FindUnderlayMTU retrieves the lowest MTU among all underlay interfaces.
 // This ensures that packets can traverse all underlay paths.
-func findUnderlayMTU(ns netns.NsHandle) (int, error) {
+func FindUnderlayMTU(ns netns.NsHandle) (int, error) {
 	minMTU := 0
 	err := netnamespace.In(ns, func() error {
 		links, err := netlink.LinkList()
