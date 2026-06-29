@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/openshift-kni/openperouter?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    # openshift-merge-robot is the user who aligns the release branches. Don't trigger the pipeline on branch alignments
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push" &&
+      body.sender.login != "openshift-merge-robot" &&
+      (target_branch == "main" || target_branch.startsWith("release-"))
+  creationTimestamp:
+  labels:
+    appstudio.openshift.io/application: openperouter-operator-5-0
+    appstudio.openshift.io/component: openperouter-operator-bundle-5-0
+    pipelines.appstudio.openshift.io/type: build
+  name: openperouter-operator-bundle-dev-push
+  namespace: telco-5g-tenant
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: output-image
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-5-0:test-{{revision}}
+  - name: output-image-edge
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-5-0:edge-{{revision}}
+  - name: image-expires-after
+    value: 20d
+  - name: build-platforms
+    value:
+    - linux/x86_64
+  - name: dockerfile
+    value: operator/bundle.Dockerfile.openshift
+  - name: hermetic
+    value: "true"
+  - name: prefetch-input
+    value: '[{"type": "gomod", "path": "."}]'
+  - name: build-source-image
+    value: 'false'
+  - name: image-append-platform
+    value: 'false'
+  - name: skip-checks
+    value: 'true'
+  - name: operator-image-test
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-5-0:{{revision}}
+  - name: operator-image-edge
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-edge-5-0:{{revision}}
+  - name: additional-tags-test
+    value:
+    - test-latest
+  - name: additional-tags-edge
+    value:
+    - edge-latest
+  pipelineRef:
+    name: dev-pipeline
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-openperouter-operator-bundle-5-0
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+status: {}
