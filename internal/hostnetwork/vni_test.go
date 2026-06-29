@@ -290,7 +290,7 @@ var _ = Describe("L3 VNI configuration", func() {
 
 	It("should leave veth MTU at default when no underlay interface is configured", func() {
 		// No fake underlay is set up here, so findUnderlayMTU returns 0
-		// and setVethMTUForTunnelOverhead must leave the veth MTU untouched. The
+		// and SetVethMTUForTunnelOverhead must leave the veth MTU untouched. The
 		// host-side veth is not enslaved to any bridge in the L3 path
 		// (it is only attached to a VRF in the target ns), so the host
 		// leg's MTU reflects only what the code under test set.
@@ -580,7 +580,7 @@ var _ = Describe("L2 VNI configuration", func() {
 
 	It("should leave veth MTU at default when no underlay interface is configured", func() {
 		// No fake underlay is set up here, so findUnderlayMTU returns 0
-		// and setVethMTUForTunnelOverhead must leave the veth MTU untouched.
+		// and SetVethMTUForTunnelOverhead must leave the veth MTU untouched.
 		// HostMaster is intentionally omitted so the host veth is not
 		// enslaved to a bridge — Linux bridges auto-clamp their MTU to
 		// the smallest member, which would couple this assertion to

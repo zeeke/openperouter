@@ -79,6 +79,21 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		}
 	}
 
+	if params.TunnelEndpoint != nil {
+		if err := setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
+	if err := assignIPsToGroutPort(ctx, client, "main",
+		ep.IPv4CIDR, ep.IPv6CIDR); err != nil {
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+	}
+
 	return nil
 }
 
@@ -285,6 +300,24 @@ func removeKernelSubnetRoute(ifaceName, addr string) error {
 	}
 
 	slog.Info("removed kernel route for subnet", "cidr", addr, "src", route.Src, "ipnet", route.Dst, "iface", ifaceName)
+	return nil
+}
+
+// assignIPsToGroutPort assigns IPv4 and IPv6 addresses to a grout port via grcli.
+func assignIPsToGroutPort(ctx context.Context, client *Client, portName string, ipv4, ipv6 string) error {
+	if ipv4 == "" && ipv6 == "" {
+		return fmt.Errorf("at least one IP address must be provided (IPv4 or IPv6)")
+	}
+
+	for _, addr := range []string{ipv4, ipv6} {
+		if addr == "" {
+			continue
+		}
+		slog.DebugContext(ctx, "assigning IP to grout port", "port", portName, "addr", addr)
+		if err := client.ensureAddress(ctx, portName, addr); err != nil {
+			return fmt.Errorf("failed to assign address %s to grout port %s: %w", addr, portName, err)
+		}
+	}
 	return nil
 }
 
