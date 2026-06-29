@@ -126,12 +126,12 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 		return fmt.Errorf("failed to assign IPs to host veth: %w", err)
 	}
 
-	underlayMTU, err := findUnderlayMTU(ns)
+	underlayMTU, err := FindUnderlayMTU(ns)
 	if err != nil {
 		return fmt.Errorf("could not find underlay MTU: %w", err)
 	}
 
-	if err := setVethMTUForVXLAN(hostVeth, underlayMTU); err != nil {
+	if err := SetLinkMTUForVXLAN(hostVeth, underlayMTU); err != nil {
 		return fmt.Errorf("SetupL3VNI: failed to set MTU on host veth %s: %w", vethNames.HostSide, err)
 	}
 
@@ -141,7 +141,7 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 			return fmt.Errorf("could not find peer veth %s in namespace %s: %w", vethNames.NamespaceSide, params.TargetNS, err)
 		}
 
-		if err := setVethMTUForVXLAN(peVeth, underlayMTU); err != nil {
+		if err := SetLinkMTUForVXLAN(peVeth, underlayMTU); err != nil {
 			return fmt.Errorf("failed to set MTU on pe veth %s: %w", vethNames.NamespaceSide, err)
 		}
 
@@ -203,12 +203,12 @@ func SetupL2VNI(ctx context.Context, params L2VNIParams) error {
 	}
 	slog.Info("SetupL2VNI: found host veth", "name", vethNames.HostSide, "index", hostVeth.Attrs().Index)
 
-	underlayMTU, err := findUnderlayMTU(ns)
+	underlayMTU, err := FindUnderlayMTU(ns)
 	if err != nil {
 		return fmt.Errorf("could not find underlay MTU: %w", err)
 	}
 
-	if err := setVethMTUForVXLAN(hostVeth, underlayMTU); err != nil {
+	if err := SetLinkMTUForVXLAN(hostVeth, underlayMTU); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to set MTU on host veth %s: %w", vethNames.HostSide, err)
 	}
 
@@ -233,7 +233,7 @@ func setupL2VNIRouterSide(params L2VNIParams, vethName string, underlayMTU int) 
 		return fmt.Errorf("could not find peer veth %s in namespace %s: %w", vethName, params.TargetNS, err)
 	}
 
-	if err := setVethMTUForVXLAN(peVeth, underlayMTU); err != nil {
+	if err := SetLinkMTUForVXLAN(peVeth, underlayMTU); err != nil {
 		return fmt.Errorf("failed to set MTU on pe veth %s: %w", vethName, err)
 	}
 
@@ -676,17 +676,17 @@ func hostMaster(vni int32, m HostMaster) (netlink.Link, error) {
 	return bridge, nil
 }
 
-// setVethMTUForVXLAN sets the MTU on a veth interface to account for VXLan overhead.
+// SetLinkMTUForVXLAN sets the MTU on an interface to account for VXLan overhead.
 // If the underlay MTU is not found, or if the resulting MTU would be too small,
 // the MTU is left unchanged.
-func setVethMTUForVXLAN(link netlink.Link, underlayMTU int) error {
+func SetLinkMTUForVXLAN(link netlink.Link, underlayMTU int) error {
 	if underlayMTU == 0 {
-		slog.Debug("No underlay MTU found, leaving veth MTU at default", "veth", link.Attrs().Name)
+		slog.Debug("No underlay MTU found, leaving link MTU at default", "link", link.Attrs().Name)
 		return nil
 	}
 	targetMTU := underlayMTU - VXLanOverhead
 	if targetMTU <= MinVethMTU {
-		slog.Warn("Calculated veth MTU is too low, leaving at default",
+		slog.Warn("Calculated link MTU is too low, leaving at default",
 			"veth", link.Attrs().Name,
 			"underlayMTU", underlayMTU,
 			"calculatedMTU", targetMTU)
