@@ -14,18 +14,6 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-// CTODO: refactor with internal/hostnetwork/veth.go
-const HostVethPrefix = "host-"
-const PEVethPrefix = "pe-"
-
-// vethNamesFromVNI returns the names of the veth legs
-// corresponding to the default namespace and the target namespace, based on VNI.
-func vethNamesFromVNI(vni int32) hostnetwork.VethNames {
-	hostSide := fmt.Sprintf("%s%d", HostVethPrefix, vni)
-	peSide := fmt.Sprintf("%s%d", PEVethPrefix, vni)
-	return hostnetwork.VethNames{HostSide: hostSide, NamespaceSide: peSide}
-}
-
 func SetupL3VNI(ctx context.Context, client *Client, params hostnetwork.L3VNIParams) error {
 	slog.DebugContext(ctx, "setup L3VNI", "vrf", params.VRF, "vni", params.VNI)
 	defer slog.DebugContext(ctx, "setup L3VNI done", "vrf", params.VRF, "vni", params.VNI)
@@ -39,7 +27,7 @@ func SetupL3VNI(ctx context.Context, client *Client, params hostnetwork.L3VNIPar
 		return nil
 	}
 
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := hostnetwork.VethNamesFromVNI(params.VNI)
 
 	ns, err := netns.GetFromPath(params.TargetNS)
 	if err != nil {
@@ -62,8 +50,6 @@ func SetupL3VNI(ctx context.Context, client *Client, params hostnetwork.L3VNIPar
 	if err := hostnetwork.AssignIPsToInterface(hostTap, params.HostVeth.HostIPv4, params.HostVeth.HostIPv6); err != nil {
 		return fmt.Errorf("failed to assign IPs to host TAP: %w", err)
 	}
-
-	// CTODO: handle MTU fix for the vxlan
 
 	if err := ensurePortAddresses(ctx, client, vethNames.NamespaceSide, params.HostVeth.NSIPv4, params.HostVeth.NSIPv6); err != nil {
 		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
@@ -168,7 +154,7 @@ func RemoveNonConfiguredVNIs(ctx context.Context, client *Client, configured []h
 }
 
 func removeL3VNI(ctx context.Context, client *Client, vni int32) error {
-	vethNames := vethNamesFromVNI(vni)
+	vethNames := hostnetwork.VethNamesFromVNI(vni)
 
 	if err := client.deletePort(ctx, vethNames.NamespaceSide); err != nil {
 		return fmt.Errorf("failed to delete grout port %s: %w", vethNames.NamespaceSide, err)

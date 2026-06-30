@@ -98,7 +98,7 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 		slog.DebugContext(ctx, "no host veth configured, skipping setup")
 		return nil
 	}
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	if err := setupNamespacedVeth(ctx, vethNames, params.TargetNS); err != nil {
 		return fmt.Errorf("SetupL3VNI: failed to setup VNI veth: %w", err)
 	}
@@ -176,7 +176,7 @@ func SetupL2VNI(ctx context.Context, params L2VNIParams) error {
 	if err := setupVNI(ctx, params.VNIParams); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to setup VNI: %w", err)
 	}
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	if err := setupNamespacedVeth(ctx, vethNames, params.TargetNS); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to setup VNI veth: %w", err)
 	}

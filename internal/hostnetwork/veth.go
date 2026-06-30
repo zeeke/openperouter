@@ -139,9 +139,9 @@ func createVeth(ctx context.Context, logger *slog.Logger, vethNames VethNames) (
 const HostVethPrefix = "host-"
 const PEVethPrefix = "pe-"
 
-// vethNamesFromVNI returns the names of the veth legs
+// VethNamesFromVNI returns the names of the veth legs
 // corresponding to the default namespace and the target namespace, based on VNI.
-func vethNamesFromVNI(vni int32) VethNames {
+func VethNamesFromVNI(vni int32) VethNames {
 	hostSide := fmt.Sprintf("%s%d", HostVethPrefix, vni)
 	peSide := fmt.Sprintf("%s%d", PEVethPrefix, vni)
 	return VethNames{HostSide: hostSide, NamespaceSide: peSide}
