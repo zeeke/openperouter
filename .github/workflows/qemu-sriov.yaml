@@ -51,10 +51,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-system-x86 qemu-utils cloud-image-utils
 
-      - name: Download Ubuntu 24.04 cloud image
-        run: |
-          curl -fSL -o base.img https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
-
       - name: Build cloud-init seed
         run: ./build-cloud-init-seed.sh
 
@@ -106,7 +102,7 @@ jobs:
 
       - name: Dump console log on failure
         if: ${{ failure() }}
-        run: cat console.log
+        run: cat "$GITHUB_WORKSPACE/bin/qemu/console.log"
 
       - name: Tear down VM
         if: ${{ always() }}

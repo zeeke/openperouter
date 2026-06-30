@@ -709,10 +709,10 @@ qemu-sriov-verify: ## Verify the SR-IOV VF + hugepages substrate is correctly se
 qemu-sriov-deploy-grout: grout-docker-build ## Build the grout image, import it into the VM's k3s, and deploy openperouter with grout
 	$(QEMU_SRIOV_DIR)/import-image-to-k3s.sh quay.io/openperouter/router:main-grout
 	$(QEMU_SRIOV_DIR)/prepare-perouter-host.sh
-	$(MAKE) deploy-grout-helm KUBECONFIG=$(QEMU_SRIOV_DIR)/kubeconfig
+	$(MAKE) deploy-grout-helm KUBECONFIG=bin/qemu/kubeconfig
 
 qemu-sriov-smoke: ## Verify the deployed openperouter (grout) cluster is stable
-	KUBECONFIG=$(QEMU_SRIOV_DIR)/kubeconfig KUBECTL=$(KUBECTL) $(QEMU_SRIOV_DIR)/smoke-test.sh
+	KUBECONFIG=bin/qemu/kubeconfig KUBECTL=$(KUBECTL) $(QEMU_SRIOV_DIR)/smoke-test.sh
 
 qemu-sriov-underlay-test: ## Create an Underlay targeting the first VF and check the controller moves it into the perouter netns
 	$(QEMU_SRIOV_DIR)/underlay-test.sh

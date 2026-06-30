@@ -3,4 +3,4 @@ source "$(dirname "$0")/lib.sh"
 
 ssh_cmd sudo poweroff || true
 sleep 5
-[ -f qemu.pid ] && kill "$(cat qemu.pid)" 2>/dev/null || true
+[ -f "$QEMU_WORKDIR/qemu.pid" ] && kill "$(cat "$QEMU_WORKDIR/qemu.pid")" 2>/dev/null || true

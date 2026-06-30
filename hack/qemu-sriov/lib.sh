@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Shared SSH helpers for the QEMU k8s smoke test scripts.
+# Shared helpers for the QEMU k8s smoke test scripts.
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+QEMU_WORKDIR="${QEMU_WORKDIR:-$REPO_ROOT/bin/qemu}"
+mkdir -p "$QEMU_WORKDIR"
 
-SSH_KEY="${SSH_KEY:-id_ed25519}"
+SSH_KEY="${SSH_KEY:-$QEMU_WORKDIR/id_ed25519}"
 SSH_PORT="${SSH_PORT:-2222}"
 SSH_HOST="${SSH_HOST:-127.0.0.1}"
 SSH_USER="${SSH_USER:-ubuntu}"

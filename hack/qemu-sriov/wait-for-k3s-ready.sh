@@ -10,9 +10,9 @@ for i in $(seq 1 60); do
     # directly over the port-forwarded API server (its "server:" entry is
     # already https://127.0.0.1:6443), instead of through ssh.
     ssh_cmd sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-    scp_cmd "$SSH_USER@$SSH_HOST:/etc/rancher/k3s/k3s.yaml" kubeconfig
-    chmod 600 kubeconfig
-    [ -n "${GITHUB_ENV:-}" ] && echo "KUBECONFIG=$(pwd)/kubeconfig" >> "$GITHUB_ENV"
+    scp_cmd "$SSH_USER@$SSH_HOST:/etc/rancher/k3s/k3s.yaml" "$QEMU_WORKDIR/kubeconfig"
+    chmod 600 "$QEMU_WORKDIR/kubeconfig"
+    [ -n "${GITHUB_ENV:-}" ] && echo "KUBECONFIG=$QEMU_WORKDIR/kubeconfig" >> "$GITHUB_ENV"
     exit 0
   fi
   sleep 10
