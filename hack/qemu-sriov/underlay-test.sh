@@ -98,6 +98,21 @@ ssh_cmd "sudo k3s kubectl -n $NS get underlay -o yaml" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS get pods -o wide" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS logs -l app.kubernetes.io/component=controller --all-containers --prefix --tail=150" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- grcli -s /var/run/grout/grout.sock interface show" >&2 || true
-ssh_cmd "echo '--- host links ---'; ip -br link show" >&2 || true
+
+echo "--- host namespace ip link ---" >&2
+ssh_cmd "ip -br link show" >&2 || true
+
+echo "--- perouter namespace ip link ---" >&2
+ssh_cmd "sudo ip -n perouter -br link show" >&2 || true
+
+echo "--- VF sysfs from host ---" >&2
+ssh_cmd "ls -la /sys/class/net/$VF_IFACE/device/physfn 2>&1 || echo 'physfn symlink not found on host'" >&2
+ssh_cmd "ls -la /sys/class/net/$VF_IFACE/device/driver 2>&1 || echo 'no driver bound on host'" >&2
+
+echo "--- VF sysfs from controller pod ---" >&2
+ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- ls -la /sys/class/net/ 2>&1 || echo 'cannot list /sys/class/net from pod'" >&2
+ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- ls -la /sys/class/net/$VF_IFACE/device/physfn 2>&1 || echo 'physfn not visible from pod'" >&2
+ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- cat /proc/mounts 2>&1 | grep sys" >&2 || true
+
 echo "::endgroup::" >&2
 exit 1
