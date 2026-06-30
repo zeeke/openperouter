@@ -11,6 +11,7 @@ on:
       - 'RELEASE_NOTES.md'
     branches:
       - "main"
+      - "*-dev"
       - "v**"
   merge_group:
   workflow_dispatch:

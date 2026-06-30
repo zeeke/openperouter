@@ -12,6 +12,7 @@ on:
       - 'RELEASE_NOTES.md'
     branches:
       - "main"
+      #- "*-dev"
       - "v**"
   workflow_dispatch:
   workflow_call:
