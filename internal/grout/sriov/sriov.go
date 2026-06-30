@@ -4,6 +4,7 @@ package sriov
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,6 +20,15 @@ var sysfsNetDir = "/sys/class/net"
 func IsVF(ifaceName string) bool {
 	physfnPath := filepath.Join(sysfsNetDir, ifaceName, "device", "physfn")
 	_, err := os.Lstat(physfnPath)
+	if err != nil {
+		devicePath := filepath.Join(sysfsNetDir, ifaceName, "device")
+		_, devErr := os.Lstat(devicePath)
+		slog.Debug("sriov.IsVF check failed",
+			"iface", ifaceName,
+			"physfnPath", physfnPath,
+			"physfnErr", err,
+			"deviceExists", devErr == nil)
+	}
 	return err == nil
 }
 

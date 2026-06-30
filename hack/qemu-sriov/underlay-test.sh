@@ -64,7 +64,7 @@ echo "Waiting up to ${TIMEOUT}s for grout port with PCI devargs $VF_PCI..."
 deadline=$((SECONDS + TIMEOUT))
 while [ "$SECONDS" -lt "$deadline" ]; do
   # Look for a grout port whose devargs contain the VF's PCI address.
-  port_json=$(ssh_cmd "sudo k3s kubectl -n $NS exec deploy/controller -- grcli -s /run/grout.sock interface show 2>/dev/null" || true)
+  port_json=$(ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- grcli -s /var/run/grout/grout.sock interface show 2>/dev/null" || true)
   if echo "$port_json" | grep -q "$VF_PCI"; then
     echo "OK: found grout port with PCI devargs $VF_PCI"
 
@@ -77,7 +77,7 @@ while [ "$SECONDS" -lt "$deadline" ]; do
 
     # Check that the grout port has the VF's IP.
     vf_ip_bare="${VF_IP%/*}"
-    addr_json=$(ssh_cmd "sudo k3s kubectl -n $NS exec deploy/controller -- grcli -s /run/grout.sock ip address show 2>/dev/null" || true)
+    addr_json=$(ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- grcli -s /var/run/grout/grout.sock ip address show 2>/dev/null" || true)
     if echo "$addr_json" | grep -q "$vf_ip_bare"; then
       echo "OK: grout port has IP $vf_ip_bare"
     else
@@ -97,7 +97,7 @@ echo "::group::underlay test diagnostics" >&2
 ssh_cmd "sudo k3s kubectl -n $NS get underlay -o yaml" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS get pods -o wide" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS logs -l app.kubernetes.io/component=controller --all-containers --prefix --tail=150" >&2 || true
-ssh_cmd "sudo k3s kubectl -n $NS exec deploy/controller -- grcli -s /run/grout.sock interface show" >&2 || true
+ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- grcli -s /var/run/grout/grout.sock interface show" >&2 || true
 ssh_cmd "echo '--- host links ---'; ip -br link show" >&2 || true
 echo "::endgroup::" >&2
 exit 1

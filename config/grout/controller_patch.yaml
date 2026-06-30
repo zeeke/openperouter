@@ -19,8 +19,14 @@ spec:
           volumeMounts:
           - mountPath: /var/run/grout
             name: grout-socket
+          - mountPath: /sys
+            name: host-sys
       volumes:
       - name: grout-socket
         hostPath:
           path: /var/run/openperouter/grout
           type: DirectoryOrCreate
+      - name: host-sys
+        hostPath:
+          path: /sys
+          type: Directory
