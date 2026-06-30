@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
 ssh-keygen -t ed25519 -N "" -f id_ed25519
 
 cat > meta-data <<'EOF'

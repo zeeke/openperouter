@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Shared SSH helpers for the QEMU k8s smoke test scripts.
 
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
 SSH_KEY="${SSH_KEY:-id_ed25519}"
 SSH_PORT="${SSH_PORT:-2222}"
 SSH_HOST="${SSH_HOST:-127.0.0.1}"
