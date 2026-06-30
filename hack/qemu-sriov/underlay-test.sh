@@ -96,7 +96,7 @@ echo "Timed out waiting for grout port with PCI devargs $VF_PCI" >&2
 echo "::group::underlay test diagnostics" >&2
 ssh_cmd "sudo k3s kubectl -n $NS get underlay -o yaml" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS get pods -o wide" >&2 || true
-ssh_cmd "sudo k3s kubectl -n $NS logs -l app.kubernetes.io/component=controller --all-containers --prefix --tail=150" >&2 || true
+ssh_cmd "sudo k3s kubectl -n $NS logs -l app.kubernetes.io/component=controller --all-containers --prefix" >&2 || true
 ssh_cmd "sudo k3s kubectl -n $NS exec ds/openperouter-controller -c controller -- grcli -s /var/run/grout/grout.sock interface show" >&2 || true
 
 echo "--- host namespace ip link ---" >&2
