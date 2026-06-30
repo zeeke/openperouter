@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
+if [ ! -f base.img ]; then
+  echo "Downloading Ubuntu 24.04 cloud image…"
+  curl -fSL -o base.img https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+fi
+
 qemu-img create -f qcow2 -F qcow2 -b "$(pwd)/base.img" disk.qcow2
 qemu-img resize disk.qcow2 +6G
 
