@@ -182,7 +182,7 @@ var _ = Describe("L3 VNI configuration", func() {
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
 
 		By("checking non needed L3VNIs are removed")
-		vethNames := vethNamesFromVNI(toDelete.VNI)
+		vethNames := VethNamesFromVNI(toDelete.VNI)
 		Eventually(func(g Gomega) {
 			checkLinkdeleted(g, vethNames.HostSide)
 			_ = netnamespace.In(testNS, func() error {
@@ -246,7 +246,7 @@ var _ = Describe("L3 VNI configuration", func() {
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
 
 		// Verify that no host veth was created
-		vethNames := vethNamesFromVNI(params.VNI)
+		vethNames := VethNamesFromVNI(params.VNI)
 		_, err = netlink.LinkByName(vethNames.HostSide)
 		Expect(errors.As(err, &netlink.LinkNotFoundError{})).To(BeTrue(), "host veth should not exist when HostVeth is nil")
 	})
@@ -362,7 +362,7 @@ var _ = Describe("L2 VNI configuration", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("checking the VNI is removed")
-		vethNames := vethNamesFromVNI(params.VNI)
+		vethNames := VethNamesFromVNI(params.VNI)
 		Eventually(func(g Gomega) {
 			checkLinkdeleted(g, vethNames.HostSide)
 			checkLinkExists(g, bridgeName)
@@ -436,7 +436,7 @@ var _ = Describe("L2 VNI configuration", func() {
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
 
 		By("checking non needed L2VNIs are removed")
-		vethNames := vethNamesFromVNI(toDelete.VNI)
+		vethNames := VethNamesFromVNI(toDelete.VNI)
 		Eventually(func(g Gomega) {
 			checkLinkdeleted(g, vethNames.HostSide)
 			checkHostBridgedeleted(g, toDelete)
@@ -586,7 +586,7 @@ var _ = Describe("L2 VNI configuration", func() {
 })
 
 func validateL3HostLeg(g Gomega, params L3VNIParams) {
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	hostLegLink, err := netlink.LinkByName(vethNames.HostSide)
 	g.Expect(err).NotTo(HaveOccurred(), "host side not found", vethNames.HostSide)
 
@@ -608,7 +608,7 @@ func validateL3HostLeg(g Gomega, params L3VNIParams) {
 }
 
 func validateL2HostLeg(g Gomega, params L2VNIParams) {
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	hostLegLink, err := netlink.LinkByName(vethNames.HostSide)
 	g.Expect(err).NotTo(HaveOccurred(), "host side not found", vethNames.HostSide)
 
@@ -652,7 +652,7 @@ func validateL3VNI(g Gomega, params L3VNIParams) {
 	g.Expect(err).NotTo(HaveOccurred(), "bridge not found for addr_gen_mode check", BridgeName(params.VNI))
 	g.Expect(checkAddrGenModeNone(bridgeLink)).To(BeTrue(), "L3VNI bridge must have addr_gen_mode=1")
 
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	peLegLink, err := netlink.LinkByName(vethNames.NamespaceSide)
 	g.Expect(err).NotTo(HaveOccurred(), "veth pe side not found", vethNames.NamespaceSide)
 	g.Expect(peLegLink.Attrs().OperState).To(BeEquivalentTo(netlink.OperUp))
@@ -684,7 +684,7 @@ func validateL2VNI(g Gomega, params L2VNIParams) {
 	g.Expect(err).NotTo(HaveOccurred(), "bridge not found for addr_gen_mode check", BridgeName(params.VNI))
 	g.Expect(checkAddrGenModeNone(bridgeLinkForMode)).To(BeFalse(), "L2VNI bridge must NOT have addr_gen_mode=1")
 
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	peLegLink, err := netlink.LinkByName(vethNames.NamespaceSide)
 	g.Expect(err).NotTo(HaveOccurred(), "veth pe side not found", vethNames.NamespaceSide)
 	g.Expect(peLegLink.Attrs().OperState).To(BeEquivalentTo(netlink.OperUp))
@@ -762,7 +762,7 @@ func validateVNI(g Gomega, params VNIParams) {
 }
 
 func validateVethForVNI(g Gomega, params VNIParams) {
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	peLegLink, err := netlink.LinkByName(vethNames.NamespaceSide)
 	g.Expect(err).NotTo(HaveOccurred(), "veth pe side not found", vethNames.NamespaceSide)
 	g.Expect(peLegLink.Attrs().OperState).To(BeEquivalentTo(netlink.OperUp))
@@ -811,7 +811,7 @@ func validateVNIIsNotConfigured(g Gomega, params VNIParams) {
 	}
 	checkLinkdeleted(g, BridgeName(params.VNI))
 
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	checkLinkdeleted(g, vethNames.NamespaceSide)
 }
 
@@ -861,7 +861,7 @@ func validateBridgeMacAddress(g Gomega, bridge netlink.Link, vni int32) {
 }
 
 func validateVethMTU(g Gomega, params VNIParams, expectedMTU int) {
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	hostLeg, err := netlink.LinkByName(vethNames.HostSide)
 	g.Expect(err).NotTo(HaveOccurred(), "host veth not found %q", vethNames.HostSide)
 	g.Expect(hostLeg.Attrs().MTU).To(Equal(expectedMTU),
@@ -869,7 +869,7 @@ func validateVethMTU(g Gomega, params VNIParams, expectedMTU int) {
 }
 
 func validateNSVethMTU(g Gomega, params VNIParams, expectedMTU int) {
-	vethNames := vethNamesFromVNI(params.VNI)
+	vethNames := VethNamesFromVNI(params.VNI)
 	peLeg, err := netlink.LinkByName(vethNames.NamespaceSide)
 	g.Expect(err).NotTo(HaveOccurred(), "pe veth not found %q", vethNames.NamespaceSide)
 	g.Expect(peLeg.Attrs().MTU).To(Equal(expectedMTU),

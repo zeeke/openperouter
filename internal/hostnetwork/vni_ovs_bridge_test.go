@@ -58,7 +58,7 @@ var _ = Describe("L2 VNI configuration with OVS bridges", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("checking the VNI and OVS bridge are removed")
-		vethNames := vethNamesFromVNI(params.VNI)
+		vethNames := VethNamesFromVNI(params.VNI)
 		Eventually(func(g Gomega) {
 			checkLinkdeleted(g, vethNames.HostSide)
 			checkOVSHostBridgeDeleted(g, params)
@@ -87,7 +87,7 @@ var _ = Describe("L2 VNI configuration with OVS bridges", func() {
 		Eventually(func(g Gomega) {
 			validateL2HostLeg(g, params)
 			checkOVSBridgeExists(g, bridgeName)
-			checkVethAttachedToOVSBridge(g, bridgeName, vethNamesFromVNI(params.VNI).HostSide)
+			checkVethAttachedToOVSBridge(g, bridgeName, VethNamesFromVNI(params.VNI).HostSide)
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
 
 		By("removing the VNI")
@@ -95,7 +95,7 @@ var _ = Describe("L2 VNI configuration with OVS bridges", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("checking the bridge persists but veth is cleaned up")
-		vethNames := vethNamesFromVNI(params.VNI)
+		vethNames := VethNamesFromVNI(params.VNI)
 		Eventually(func(g Gomega) {
 			checkOVSBridgeExists(g, bridgeName) // Bridge should still exist
 			checkLinkdeleted(g, vethNames.HostSide)
