@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"log/slog"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/internal/conversion"
 	openpeerrors "github.com/openperouter/openperouter/internal/errors"
 	"github.com/openperouter/openperouter/internal/grout"
+	"github.com/openperouter/openperouter/internal/hostnetwork"
 )
 
 // GroutDatapathConfigurator configures the host via the grout DPDK daemon.
@@ -65,8 +68,10 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	}
 
 	var resourceErrors []error
+	failedL3Domains := sets.New[string]()
 	reason := v1alpha1.FailedResourceReasonOverlayAttachmentFailed
 
+	var configuredL3VNIs []hostnetwork.L3VNIParams
 	for _, l3vni := range hostConfig.L3VNIs {
 		slog.InfoContext(ctx, "setting up L3VNI", "vrf", l3vni.VRF, "vni", l3vni.VNI)
 		if err := grout.SetupL3VNI(ctx, groutClient, l3vni); err != nil {
@@ -75,7 +80,33 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 					Kind: openpeerrors.KindL3VNI, Name: l3vni.Name, Reason: reason, Message: err.Error(),
 				},
 			})
+			failedL3Domains.Insert(l3vni.VRF)
+			continue
 		}
+		configuredL3VNIs = append(configuredL3VNIs, l3vni)
+	}
+
+	var configuredL2VNIs []hostnetwork.L2VNIParams
+	for _, l2vni := range hostConfig.L2VNIs {
+		if failedL3Domains.Has(l2vni.VRF) {
+			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
+				Obj: v1alpha1.FailedResource{
+					Kind: openpeerrors.KindL2VNI, Name: l2vni.Name, Reason: reason,
+					Message: fmt.Sprintf("L3 domain %q failed grout provisioning", l2vni.VRF),
+				},
+			})
+			continue
+		}
+		slog.InfoContext(ctx, "setting up L2VNI", "vni", l2vni.VNI)
+		if err := grout.SetupL2VNI(ctx, groutClient, l2vni); err != nil {
+			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
+				Obj: v1alpha1.FailedResource{
+					Kind: openpeerrors.KindL2VNI, Name: l2vni.Name, Reason: reason, Message: err.Error(),
+				},
+			})
+			continue
+		}
+		configuredL2VNIs = append(configuredL2VNIs, l2vni)
 	}
 
 	slog.InfoContext(ctx, "setting up passthrough")
@@ -95,8 +126,15 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		}
 	}
 
-	if err := grout.RemoveNonConfiguredVNIs(ctx, groutClient, hostConfig.L3VNIs); err != nil {
-		return fmt.Errorf("failed to remove stale L3VNIs: %w", err)
+	configuredVNIs := make([]hostnetwork.VNIParams, 0, len(configuredL3VNIs)+len(configuredL2VNIs))
+	for _, vni := range configuredL3VNIs {
+		configuredVNIs = append(configuredVNIs, vni.VNIParams)
+	}
+	for _, vni := range configuredL2VNIs {
+		configuredVNIs = append(configuredVNIs, vni.VNIParams)
+	}
+	if err := grout.RemoveNonConfiguredVNIs(ctx, groutClient, configuredVNIs); err != nil {
+		return fmt.Errorf("failed to remove stale VNIs: %w", err)
 	}
 
 	return errors.Join(resourceErrors...)
