@@ -13,6 +13,7 @@ import (
 	openpeerrors "github.com/openperouter/openperouter/internal/errors"
 	"github.com/openperouter/openperouter/internal/grout"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
+	"github.com/openperouter/openperouter/internal/hostnetwork/bridgerefresh"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
@@ -82,6 +83,37 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		configuredL3VNIs = append(configuredL3VNIs, vni)
 	}
 
+	var configuredL2VNIs []hostnetwork.L2VNIParams
+	for _, vni := range hostConfig.L2VNIs {
+		if failedL3Domains.Has(vni.VRF) {
+			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
+				Obj: v1alpha1.FailedResource{
+					Kind: openpeerrors.KindL2VNI, Name: vni.Name, Reason: reason,
+					Message: fmt.Sprintf("L3 domain %q failed netlink provisioning", vni.VRF),
+				},
+			})
+			continue
+		}
+		slog.InfoContext(ctx, "setting up L2VNI", "vni", vni.VNI)
+		if err := grout.SetupL2VNI(ctx, groutClient, vni); err != nil {
+			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
+				Obj: v1alpha1.FailedResource{
+					Kind: openpeerrors.KindL2VNI, Name: vni.Name, Reason: reason, Message: err.Error(),
+				},
+			})
+			continue
+		}
+		if err := bridgerefresh.StartForVNI(ctx, vni); err != nil {
+			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
+				Obj: v1alpha1.FailedResource{
+					Kind: openpeerrors.KindL2VNI, Name: vni.Name, Reason: reason, Message: err.Error(),
+				},
+			})
+			continue
+		}
+		configuredL2VNIs = append(configuredL2VNIs, vni)
+	}
+
 	slog.InfoContext(ctx, "setting up passthrough")
 	if hostConfig.L3Passthrough != nil {
 		if err := grout.SetupPassthrough(ctx, groutClient, *hostConfig.L3Passthrough); err != nil {
@@ -93,17 +125,22 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		}
 	}
 
-	configuredVNIs := make([]hostnetwork.VNIParams, 0, len(configuredL3VNIs))
+	configuredVNIs := make([]hostnetwork.VNIParams, 0, len(configuredL3VNIs)+len(configuredL2VNIs))
 	configuredVRFs := map[string]bool{}
 	for _, vni := range configuredL3VNIs {
 		configuredVNIs = append(configuredVNIs, vni.VNIParams)
 		configuredVRFs[vni.VRF] = true
+	}
+	for _, l2vni := range configuredL2VNIs {
+		configuredVNIs = append(configuredVNIs, l2vni.VNIParams)
+		configuredVRFs[l2vni.VRF] = true
 	}
 
 	slog.InfoContext(ctx, "removing deleted vnis")
 	if err := grout.RemoveNonConfiguredVNIs(ctx, groutClient, config.targetNamespace, configuredVNIs); err != nil {
 		return fmt.Errorf("failed to remove deleted vnis: %w", err)
 	}
+	bridgerefresh.StopForRemovedVNIs(configuredL2VNIs)
 
 	slog.InfoContext(ctx, "removing deleted vrfs")
 	if err := grout.RemoveNonConfiguredVRFs(ctx, groutClient, config.targetNamespace, configuredVRFs); err != nil {
