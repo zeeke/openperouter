@@ -77,7 +77,7 @@ RUN dnf install -y epel-release && \
             systemd \
             systemd-devel
 
-RUN git clone -b main --depth 1 http://github.com/DPDK/grout /src
+RUN git clone -b evpn-many-vni --depth 1 http://github.com/rjarry/grout /src
 WORKDIR /src
 
 RUN make frr-rpm FRR=10.6
