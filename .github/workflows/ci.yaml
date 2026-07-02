@@ -224,7 +224,6 @@ jobs:
       NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:${{ needs.build-kind-node-image.outputs.kind-node-version }}
     needs:
       - build-kind-node-image
-      - unit-tests
       - build-test-images
       - build-grout-images
     strategy:
