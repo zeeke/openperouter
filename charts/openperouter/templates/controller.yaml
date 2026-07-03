@@ -139,6 +139,10 @@ spec:
         {{- if .Values.openperouter.grout.enabled }}
         - mountPath: /var/run/grout
           name: grout-socket
+        - mountPath: /var/run/openperouter/sriov
+          name: sriov-state
+        - mountPath: /host/sys
+          name: host-sys
         {{- end }}
       hostNetwork: true
       hostPID: true
@@ -188,5 +192,12 @@ spec:
         hostPath:
           path: /var/run/openperouter/grout
           type: DirectoryOrCreate
+      - name: sriov-state
+        hostPath:
+          path: /var/run/openperouter/sriov
+          type: DirectoryOrCreate
+      - name: host-sys
+        hostPath:
+          path: /sys
       {{- end }}
 {{- end }}

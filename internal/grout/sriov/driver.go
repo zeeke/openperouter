@@ -16,7 +16,7 @@ const (
 
 // sysfsPCIDir is the base path for PCI device sysfs entries.
 // Override in tests to point at a fake tree.
-var sysfsPCIDir = "/sys/bus/pci"
+var sysfsPCIDir = "/host/sys/bus/pci"
 
 // DriverForVendor returns the DPDK driver to use for a given PCI vendor ID.
 func DriverForVendor(vendorID string) (string, error) {

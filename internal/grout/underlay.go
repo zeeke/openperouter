@@ -159,10 +159,14 @@ func RemoveUnderlay(ctx context.Context, client *Client, targetNS string) error 
 		}
 
 		if isVF {
+			vfName := strings.TrimPrefix(iface.Name, UnderlayPortNamePrefix)
 			slog.InfoContext(ctx, "restoring VF default kernel driver",
 				"port", iface.Name, "pci", pciAddr)
 			if err := sriov.RestoreDefaultDriver(pciAddr); err != nil {
 				return fmt.Errorf("RemoveUnderlay: failed to restore default driver for %s: %w", pciAddr, err)
+			}
+			if err := sriov.RemoveVFState(sriov.StateDir, vfName); err != nil {
+				return fmt.Errorf("RemoveUnderlay: failed to remove VF state for %s: %w", vfName, err)
 			}
 		}
 	}
@@ -210,32 +214,91 @@ func configureTAPUnderlayPort(ctx context.Context, client *Client, underlayInter
 // Grout using the PCI BDF address as devargs. The kernel netdev disappears
 // after driver binding, so addresses are read beforehand and assigned directly
 // to the grout port.
+//
+// If a state file already exists from a previous run, the saved PCI address
+// and driver information are reused (since the kernel netdev is gone after
+// binding). The VF is only re-bound if its current driver differs from the
+// target.
 func configureVFUnderlayPort(ctx context.Context, client *Client, underlayInterface string) error {
-	pciAddr, err := sriov.PCIAddress(underlayInterface)
+	saved, err := sriov.LoadVFState(sriov.StateDir, underlayInterface)
 	if err != nil {
-		return fmt.Errorf("failed to get PCI address for VF %s: %w", underlayInterface, err)
+		return fmt.Errorf("failed to load VF state for %s: %w", underlayInterface, err)
 	}
 
-	vendorID, err := sriov.Vendor(underlayInterface)
-	if err != nil {
-		return fmt.Errorf("failed to get vendor for VF %s: %w", underlayInterface, err)
-	}
+	var pciAddr, targetDriver string
+	var underlayAddrs []netlink.Addr
 
-	targetDriver, err := sriov.DriverForVendor(vendorID)
-	if err != nil {
-		return fmt.Errorf("unsupported VF vendor for %s: %w", underlayInterface, err)
-	}
+	if saved != nil {
+		pciAddr = saved.PCIAddress
 
-	underlayAddrs, err := readUnderlayAddresses(underlayInterface)
-	if err != nil {
-		return fmt.Errorf("failed to read underlay interface addresses: %w", err)
-	}
+		currentDriver, err := sriov.CurrentDriver(pciAddr)
+		if err != nil {
+			return fmt.Errorf("failed to read current driver for saved VF %s: %w", pciAddr, err)
+		}
 
-	slog.InfoContext(ctx, "binding VF to DPDK driver",
-		"iface", underlayInterface, "pci", pciAddr, "driver", targetDriver)
+		vendorID, err := sriov.Vendor(underlayInterface)
+		if err != nil {
+			// The kernel netdev is gone, fall back to the saved driver info.
+			// We can determine the target from the saved initial driver's vendor.
+			targetDriver = sriov.DriverVfioPCI
+		} else {
+			targetDriver, err = sriov.DriverForVendor(vendorID)
+			if err != nil {
+				return fmt.Errorf("unsupported VF vendor for %s: %w", underlayInterface, err)
+			}
+		}
 
-	if err := sriov.BindDriver(pciAddr, targetDriver); err != nil {
-		return fmt.Errorf("failed to bind VF %s to %s: %w", underlayInterface, targetDriver, err)
+		if currentDriver == targetDriver {
+			slog.InfoContext(ctx, "VF already bound to target driver, skipping bind",
+				"iface", underlayInterface, "pci", pciAddr, "driver", currentDriver)
+		} else {
+			slog.InfoContext(ctx, "re-binding VF to DPDK driver",
+				"iface", underlayInterface, "pci", pciAddr,
+				"current", currentDriver, "target", targetDriver)
+			if err := sriov.BindDriver(pciAddr, targetDriver); err != nil {
+				return fmt.Errorf("failed to bind VF %s to %s: %w", underlayInterface, targetDriver, err)
+			}
+		}
+	} else {
+		pciAddr, err = sriov.PCIAddress(underlayInterface)
+		if err != nil {
+			return fmt.Errorf("failed to get PCI address for VF %s: %w", underlayInterface, err)
+		}
+
+		vendorID, err := sriov.Vendor(underlayInterface)
+		if err != nil {
+			return fmt.Errorf("failed to get vendor for VF %s: %w", underlayInterface, err)
+		}
+
+		targetDriver, err = sriov.DriverForVendor(vendorID)
+		if err != nil {
+			return fmt.Errorf("unsupported VF vendor for %s: %w", underlayInterface, err)
+		}
+
+		initialDriver, err := sriov.CurrentDriver(pciAddr)
+		if err != nil {
+			return fmt.Errorf("failed to read initial driver for VF %s: %w", pciAddr, err)
+		}
+
+		underlayAddrs, err = readUnderlayAddresses(underlayInterface)
+		if err != nil {
+			return fmt.Errorf("failed to read underlay interface addresses: %w", err)
+		}
+
+		if err := sriov.SaveVFState(sriov.StateDir, underlayInterface, sriov.VFState{
+			InitialLinkName: underlayInterface,
+			PCIAddress:      pciAddr,
+			InitialDriver:   initialDriver,
+		}); err != nil {
+			return fmt.Errorf("failed to save VF state for %s: %w", underlayInterface, err)
+		}
+
+		slog.InfoContext(ctx, "binding VF to DPDK driver",
+			"iface", underlayInterface, "pci", pciAddr, "driver", targetDriver)
+
+		if err := sriov.BindDriver(pciAddr, targetDriver); err != nil {
+			return fmt.Errorf("failed to bind VF %s to %s: %w", underlayInterface, targetDriver, err)
+		}
 	}
 
 	portName := UnderlayPortNamePrefix + underlayInterface

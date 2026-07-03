@@ -13,7 +13,7 @@ import (
 
 // sysfsNetDir is the base path for network device sysfs entries.
 // Override in tests to point at a fake tree.
-var sysfsNetDir = "/sys/class/net"
+var sysfsNetDir = "/host/sys/class/net"
 
 // IsVF reports whether the given network interface is an SR-IOV Virtual Function.
 // A VF has a "physfn" symlink under its sysfs device directory.
