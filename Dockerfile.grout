@@ -108,7 +108,7 @@ ARG TARGETARCH
 
 WORKDIR /
 
-RUN dnf install -y iproute iproute-tc catatonit curl tcpdump && dnf clean all
+RUN dnf install -y iproute iproute-tc catatonit curl tcpdump procps-ng&& dnf clean all
 RUN ln -s /usr/libexec/podman/catatonit /sbin/tini
 
 # Pin FRR GIDs before RPM install so they match the supplementalGroups
