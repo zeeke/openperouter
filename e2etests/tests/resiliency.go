@@ -31,7 +31,7 @@ import (
 
 const resiliencyNetnsPath = "/var/run/netns/perouter"
 
-var _ = Describe("Alpha: Named netns and kernel objects survive FRR crash", Ordered, func() {
+var _ = Describe("Alpha: Named netns and kernel objects survive FRR crash", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 
@@ -220,7 +220,7 @@ func killFRREntrypoint(frrExec executor.Executor) {
 	Expect(err).NotTo(HaveOccurred(), "failed to kill FRR process %q: %v", frrPID, output)
 }
 
-var _ = Describe("Beta: Named netns auto-rebuilds after deletion", Ordered, func() {
+var _ = Describe("Beta: Named netns auto-rebuilds after deletion", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 
 	vniRed := v1alpha1.L3VNI{
@@ -785,7 +785,7 @@ func dumpPreTrafficState(cs clientset.Interface, nodeName string) {
 	}
 }
 
-var _ = Describe("Configuration Resiliency", Ordered, func() {
+var _ = Describe("Configuration Resiliency", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 
 	goodL3VNI := v1alpha1.L3VNI{
