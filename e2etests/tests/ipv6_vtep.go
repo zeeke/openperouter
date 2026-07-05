@@ -23,7 +23,7 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-var _ = Describe("IPv6 VTEP", Ordered, func() {
+var _ = Describe("IPv6 VTEP", Ordered, GroutSupport, func() {
 	const (
 		testNamespace             = "test-ipv6-vtep"
 		linuxBridgeHostAttachment = "linux-bridge"
