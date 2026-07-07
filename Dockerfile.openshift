@@ -20,6 +20,8 @@ RUN GOEXPERIMENT=strictfipsruntime CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=
   && \
   GOEXPERIMENT=strictfipsruntime CGO_ENABLED=1 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -v -mod=vendor -tags strictfipsruntime  -o operatorbinary ./operator
 
+FROM registry.redhat.io/openshift4/ose-container-networking-plugins-rhel9:v4.22.0-202606220442.p2.g659bc0a.assembly.stream.el9 as openshift-cni-binaries
+
 FROM registry.redhat.io/openshift4/frr-rhel9:v4.21
 WORKDIR /
 COPY --from=builder /go/openperouter/reloader .
@@ -28,6 +30,11 @@ COPY --from=builder /go/openperouter/hostbridge .
 COPY --from=builder /go/openperouter/nodemarker .
 COPY --from=builder /go/openperouter/operatorbinary ./operator
 COPY operator/bindata bindata
+
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/macvlan /opt/openperouter/cni/bin/
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/ipvlan /opt/openperouter/cni/bin/
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/static /opt/openperouter/cni/bin/
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/dhcp /opt/openperouter/cni/bin/
 
 # Copy FRR startup configuration to the default location
 COPY systemdmode/frrconfig/daemons /etc/frr/daemons

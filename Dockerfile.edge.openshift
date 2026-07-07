@@ -84,6 +84,8 @@ RUN make rpm FRR=10.6 WITHOUT="tests docs systemd"
 
 ENTRYPOINT ["/bin/bash"]
 
+FROM registry.redhat.io/openshift4/ose-container-networking-plugins-rhel9:v4.22.0-202606220442.p2.g659bc0a.assembly.stream.el9 as openshift-cni-binaries
+
 FROM ${BASE_IMAGE}
 
 WORKDIR /
@@ -94,6 +96,11 @@ COPY --from=builder /go/openperouter/hostbridge /hostbridge
 COPY --from=builder /go/openperouter/nodemarker /nodemarker
 COPY --from=builder /go/openperouter/operatorbinary /operator
 COPY operator/bindata /bindata
+
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/macvlan /opt/openperouter/cni/bin/
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/ipvlan /opt/openperouter/cni/bin/
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/static /opt/openperouter/cni/bin/
+COPY --from=openshift-cni-binaries usr/src/plugins/bin/dhcp /opt/openperouter/cni/bin/
 
 RUN dnf --nogpgcheck install --setopt=install_weak_deps=0 --nodocs -y \
 	--releasever 10 \
