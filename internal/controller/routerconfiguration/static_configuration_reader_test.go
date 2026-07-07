@@ -24,8 +24,10 @@ func TestReadStaticConfigs_L2VNI_DefaultVXLanPort(t *testing.T) {
 underlays:
   - asn: 64515
     routeridcidr: "10.0.0.0/24"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -59,8 +61,10 @@ func TestReadStaticConfigs_L3VNI_DefaultVXLanPort(t *testing.T) {
 underlays:
   - asn: 64515
     routeridcidr: "10.0.0.0/24"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -90,8 +94,10 @@ func TestReadStaticConfigs_Underlay_DefaultRouterIDCIDR(t *testing.T) {
 	writeYAMLFile(t, dir, "openpe_underlay.yaml", `
 underlays:
   - asn: 64515
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -118,8 +124,10 @@ func TestReadStaticConfigs_AllDefaults(t *testing.T) {
 	writeYAMLFile(t, dir, "openpe_all.yaml", `
 underlays:
   - asn: 64515
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -159,8 +167,10 @@ func TestReadStaticConfigs_ExplicitVXLanPort(t *testing.T) {
 underlays:
   - asn: 64515
     routeridcidr: "10.0.0.0/24"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -192,8 +202,10 @@ func TestReadStaticConfigs_ExplicitRouterIDCIDR(t *testing.T) {
 underlays:
   - asn: 64515
     routeridcidr: "172.16.0.0/16"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -218,8 +230,10 @@ func TestReadStaticConfigs_MultiFileDefaults(t *testing.T) {
 	writeYAMLFile(t, dir, "openpe_underlay.yaml", `
 underlays:
   - asn: 64515
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -280,7 +294,16 @@ func TestReadStaticConfigs_ExistingTestdata(t *testing.T) {
 				Spec: v1alpha1.UnderlaySpec{
 					ASN:          64514,
 					RouterIDCIDR: new(defaultRouterIDCIDR),
-					Nics:         []string{"toswitch1", "eth0"},
+					Interfaces: []v1alpha1.UnderlayInterface{
+						{
+							Type:          "NetworkDevice",
+							NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "toswitch1"},
+						},
+						{
+							Type:          "NetworkDevice",
+							NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "eth0"},
+						},
+					},
 					Neighbors: []v1alpha1.Neighbor{
 						{ASN: new(int64(64512)), Address: new("192.168.11.2")},
 						{
@@ -378,6 +401,27 @@ func TestReadStaticConfigs_ExistingTestdata(t *testing.T) {
 				},
 			},
 		},
+		L3VPNs: []v1alpha1.L3VPN{
+			{
+				TypeMeta:   metav1.TypeMeta{Kind: "L3VPN", APIVersion: "openpe.openperouter.github.io/v1alpha1"},
+				ObjectMeta: metav1.ObjectMeta{Name: "static-l3vpn-0"},
+				Spec: v1alpha1.L3VPNSpec{
+					VRF:              "red",
+					RDAssignedNumber: 100,
+					ExportRTs: []v1alpha1.RouteTarget{
+						"64514:100",
+					},
+					ImportRTs: []v1alpha1.RouteTarget{
+						"64520:100",
+					},
+					HostSession: &v1alpha1.HostSession{
+						ASN:       64514,
+						HostASN:   new(int64(64515)),
+						LocalCIDR: v1alpha1.LocalCIDRConfig{IPv4: new("192.169.10.0/24")},
+					},
+				},
+			},
+		},
 		L3Passthrough: []v1alpha1.L3Passthrough{
 			{
 				TypeMeta: metav1.TypeMeta{Kind: "L3Passthrough", APIVersion: "openpe.openperouter.github.io/v1alpha1"},
@@ -411,8 +455,10 @@ func TestReadStaticConfigs_CELValidation_L2VNIBridgeNameAndAutoCreate(t *testing
 underlays:
   - asn: 64515
     routeridcidr: "10.0.0.0/24"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -448,8 +494,10 @@ func TestReadStaticConfigs_ErrorMessageQuality(t *testing.T) {
 			yaml: `
 underlays:
   - asn: 64515
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -489,8 +537,10 @@ func TestReadStaticConfigs_MultipleErrors(t *testing.T) {
 	writeYAMLFile(t, dir, "openpe_multi_invalid.yaml", `
 underlays:
   - routeridcidr: "10.0.0.0/24"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -527,8 +577,10 @@ func TestReadStaticConfigs_AtomicRejection(t *testing.T) {
 underlays:
   - asn: 64515
     routeridcidr: "10.0.0.0/24"
-    nics:
-      - eth0
+    interfaces:
+      - type: NetworkDevice
+        networkDevice:
+          interfaceName: eth0
     neighbors:
       - asn: 64512
         address: "192.168.11.2"
@@ -567,15 +619,25 @@ func TestStaticConfigToAPIConfig_WithNodeName(t *testing.T) {
 	cfg := &static.PERouterConfig{
 		Underlays: []v1alpha1.UnderlaySpec{
 			{
-				ASN:  64514,
-				Nics: []string{"eth0"},
+				ASN: 64514,
+				Interfaces: []v1alpha1.UnderlayInterface{
+					{
+						Type:          "NetworkDevice",
+						NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "eth0"},
+					},
+				},
 				Neighbors: []v1alpha1.Neighbor{
 					{ASN: new(int64(64512)), Address: new("192.168.11.2")},
 				},
 			},
 			{
-				ASN:  64515,
-				Nics: []string{"eth1"},
+				ASN: 64515,
+				Interfaces: []v1alpha1.UnderlayInterface{
+					{
+						Type:          "NetworkDevice",
+						NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "eth1"},
+					},
+				},
 				Neighbors: []v1alpha1.Neighbor{
 					{ASN: new(int64(64513)), Address: new("192.168.11.3")},
 				},
@@ -713,7 +775,12 @@ func TestStaticConfigToAPIConfig_PreservesSpecFields(t *testing.T) {
 			{
 				ASN:          64514,
 				RouterIDCIDR: new("10.0.0.0/24"),
-				Nics:         []string{"eth0"},
+				Interfaces: []v1alpha1.UnderlayInterface{
+					{
+						Type:          "NetworkDevice",
+						NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "eth0"},
+					},
+				},
 				Neighbors: []v1alpha1.Neighbor{
 					{ASN: new(int64(64512)), Address: new("192.168.11.2")},
 				},
