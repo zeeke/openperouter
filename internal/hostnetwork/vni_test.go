@@ -171,6 +171,8 @@ var _ = Describe("L3 VNI configuration", func() {
 		By("removing non configured L3VNIs")
 		err := RemoveNonConfiguredVNIs(testNSPath(), []VNIParams{remaining.VNIParams})
 		Expect(err).NotTo(HaveOccurred())
+		err = RemoveNonConfiguredVRFs(testNSPath(), map[string]bool{remaining.VRF: true})
+		Expect(err).NotTo(HaveOccurred())
 
 		By("checking remaining L3VNIs")
 		Eventually(func(g Gomega) {
@@ -187,6 +189,9 @@ var _ = Describe("L3 VNI configuration", func() {
 			checkLinkdeleted(g, vethNames.HostSide)
 			_ = netnamespace.In(testNS, func() error {
 				validateVNIIsNotConfigured(g, toDelete.VNIParams)
+				if toDelete.VRF != "" {
+					checkLinkdeleted(g, toDelete.VRF)
+				}
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -274,9 +279,10 @@ var _ = Describe("L3 VNI configuration", func() {
 
 		expectedMTU := underlayMTU - VXLanOverhead
 		Eventually(func(g Gomega) {
-			validateVethMTU(g, params.VNIParams, expectedMTU)
+			vethNames := vethNamesFromVNI(params.VNI)
+			validateVethMTU(g, vethNames, expectedMTU)
 			_ = netnamespace.In(testNS, func() error {
-				validateNSVethMTU(g, params.VNIParams, expectedMTU)
+				validateNSVethMTU(g, vethNames, expectedMTU)
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -284,7 +290,7 @@ var _ = Describe("L3 VNI configuration", func() {
 
 	It("should leave veth MTU at default when no underlay interface is configured", func() {
 		// No fake underlay is set up here, so findUnderlayMTU returns 0
-		// and setVethMTUForVXLAN must leave the veth MTU untouched. The
+		// and setVethMTUForTunnelOverhead must leave the veth MTU untouched. The
 		// host-side veth is not enslaved to any bridge in the L3 path
 		// (it is only attached to a VRF in the target ns), so the host
 		// leg's MTU reflects only what the code under test set.
@@ -306,9 +312,10 @@ var _ = Describe("L3 VNI configuration", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(func(g Gomega) {
-			validateVethMTU(g, params.VNIParams, defaultVethMTU)
+			vethNames := vethNamesFromVNI(params.VNI)
+			validateVethMTU(g, vethNames, defaultVethMTU)
 			_ = netnamespace.In(testNS, func() error {
-				validateNSVethMTU(g, params.VNIParams, defaultVethMTU)
+				validateNSVethMTU(g, vethNames, defaultVethMTU)
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -360,6 +367,8 @@ var _ = Describe("L2 VNI configuration", func() {
 		By("removing the VNI")
 		err = RemoveNonConfiguredVNIs(testNSPath(), []VNIParams{})
 		Expect(err).NotTo(HaveOccurred())
+		err = RemoveNonConfiguredVRFs(testNSPath(), map[string]bool{})
+		Expect(err).NotTo(HaveOccurred())
 
 		By("checking the VNI is removed")
 		vethNames := vethNamesFromVNI(params.VNI)
@@ -369,6 +378,9 @@ var _ = Describe("L2 VNI configuration", func() {
 
 			_ = netnamespace.In(testNS, func() error {
 				validateVNIIsNotConfigured(g, params.VNIParams)
+				if params.VRF != "" {
+					checkLinkdeleted(g, params.VRF)
+				}
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -424,6 +436,8 @@ var _ = Describe("L2 VNI configuration", func() {
 		By("removing non configured L2VNIs")
 		err := RemoveNonConfiguredVNIs(testNSPath(), []VNIParams{remaining.VNIParams})
 		Expect(err).NotTo(HaveOccurred())
+		err = RemoveNonConfiguredVRFs(testNSPath(), map[string]bool{remaining.VRF: true})
+		Expect(err).NotTo(HaveOccurred())
 
 		By("checking remaining L2VNIs")
 
@@ -442,6 +456,9 @@ var _ = Describe("L2 VNI configuration", func() {
 			checkHostBridgedeleted(g, toDelete)
 			_ = netnamespace.In(testNS, func() error {
 				validateVNIIsNotConfigured(g, toDelete.VNIParams)
+				if toDelete.VRF != "" {
+					checkLinkdeleted(g, toDelete.VRF)
+				}
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -507,6 +524,19 @@ var _ = Describe("L2 VNI configuration", func() {
 				Type: BridgeLinkType,
 			},
 		}),
+		Entry("disconnected L2VNI (no VRF)", L2VNIParams{
+			VNIParams: VNIParams{
+				VRF:       "",
+				TargetNS:  testNSPath(),
+				VTEPIP:    "192.170.0.13/32",
+				VNI:       500,
+				VXLanPort: new(int32(4789)),
+			},
+			HostMaster: &HostMaster{
+				Name: new(bridgeName),
+				Type: BridgeLinkType,
+			},
+		}),
 	)
 
 	It("should set veth MTU to underlay MTU minus VXLan overhead when an underlay interface is configured", func() {
@@ -533,9 +563,10 @@ var _ = Describe("L2 VNI configuration", func() {
 
 		expectedMTU := underlayMTU - VXLanOverhead
 		Eventually(func(g Gomega) {
-			validateVethMTU(g, params.VNIParams, expectedMTU)
+			vethNames := vethNamesFromVNI(params.VNI)
+			validateVethMTU(g, vethNames, expectedMTU)
 			_ = netnamespace.In(testNS, func() error {
-				validateNSVethMTU(g, params.VNIParams, expectedMTU)
+				validateNSVethMTU(g, vethNames, expectedMTU)
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -543,7 +574,7 @@ var _ = Describe("L2 VNI configuration", func() {
 
 	It("should leave veth MTU at default when no underlay interface is configured", func() {
 		// No fake underlay is set up here, so findUnderlayMTU returns 0
-		// and setVethMTUForVXLAN must leave the veth MTU untouched.
+		// and setVethMTUForTunnelOverhead must leave the veth MTU untouched.
 		// HostMaster is intentionally omitted so the host veth is not
 		// enslaved to a bridge — Linux bridges auto-clamp their MTU to
 		// the smallest member, which would couple this assertion to
@@ -563,9 +594,10 @@ var _ = Describe("L2 VNI configuration", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(func(g Gomega) {
-			validateVethMTU(g, params.VNIParams, defaultVethMTU)
+			vethNames := vethNamesFromVNI(params.VNI)
+			validateVethMTU(g, vethNames, defaultVethMTU)
 			_ = netnamespace.In(testNS, func() error {
-				validateNSVethMTU(g, params.VNIParams, defaultVethMTU)
+				validateNSVethMTU(g, vethNames, defaultVethMTU)
 				return nil
 			})
 		}, 30*time.Second, 1*time.Second).Should(Succeed())
@@ -700,8 +732,8 @@ func validateL2VNI(g Gomega, params L2VNIParams) {
 }
 
 func validateVNI(g Gomega, params VNIParams) {
-	vtepDev, err := netlink.LinkByName(UnderlayLoopback)
-	g.Expect(err).NotTo(HaveOccurred(), "vtep device not found %q", UnderlayLoopback)
+	vtepDev, err := netlink.LinkByName(loopbackName)
+	g.Expect(err).NotTo(HaveOccurred(), "vtep device not found %q", loopbackName)
 
 	vxlanLink, err := netlink.LinkByName(vxLanNameFromVNI(params.VNI))
 	g.Expect(err).NotTo(HaveOccurred(), "vxlan link not found %q", vxLanNameFromVNI(params.VNI))
@@ -712,22 +744,35 @@ func validateVNI(g Gomega, params VNIParams) {
 	addrGenModeNone := checkAddrGenModeNone(vxlan)
 	g.Expect(addrGenModeNone).To(BeTrue())
 
-	vrfLink, err := netlink.LinkByName(params.VRF)
-	g.Expect(err).NotTo(HaveOccurred(), "vrf not found", params.VRF)
-
-	vrf := vrfLink.(*netlink.Vrf)
-	g.Expect(vrf.OperState).To(BeEquivalentTo(netlink.OperUp))
-
 	bridgeLink, err := netlink.LinkByName(BridgeName(params.VNI))
 	g.Expect(err).NotTo(HaveOccurred(), "bridge not found", BridgeName(params.VNI))
 
 	bridge := bridgeLink.(*netlink.Bridge)
 	g.Expect(bridge.OperState).To(BeEquivalentTo(netlink.OperUp))
 
+	if params.VRF == "" {
+		g.Expect(bridge.MasterIndex).To(BeZero(), "disconnected bridge should not be enslaved to a VRF")
+
+		err = checkVXLanConfigured(vxlan, bridge.Index, vtepDev.Attrs().Index, params)
+		g.Expect(err).NotTo(HaveOccurred())
+		return
+	}
+
+	_, vrf := validateVRF(g, params.VRF)
+
 	g.Expect(bridge.MasterIndex).To(Equal(vrf.Index))
 
 	err = checkVXLanConfigured(vxlan, bridge.Index, vtepDev.Attrs().Index, params)
 	g.Expect(err).NotTo(HaveOccurred())
+}
+
+func validateVRF(g Gomega, vrfName string) (netlink.Link, *netlink.Vrf) {
+	vrfLink, err := netlink.LinkByName(vrfName)
+	g.Expect(err).NotTo(HaveOccurred(), "vrf not found", vrfName)
+	vrf, isVrf := vrfLink.(*netlink.Vrf)
+	g.Expect(isVrf).To(BeTrue(), "link %s is not a VRF", vrfName)
+	g.Expect(vrf.OperState).To(BeEquivalentTo(netlink.OperUp))
+	return vrfLink, vrf
 }
 
 func validateVethForVNI(g Gomega, params VNIParams) {
@@ -751,6 +796,23 @@ func checkLinkdeleted(g Gomega, name string) {
 	g.Expect(errors.As(err, &netlink.LinkNotFoundError{})).To(BeTrue(), "link not deleted", name, err)
 }
 
+func checkInterfaceHasNoNonLoopbackIPs(g Gomega, intf string) {
+	lo, err := netlink.LinkByName(intf)
+	g.Expect(err).NotTo(HaveOccurred())
+
+	addresses, err := netlink.AddrList(lo, netlink.FAMILY_ALL)
+	g.Expect(err).NotTo(HaveOccurred())
+
+	numAddresses := 0
+	for _, address := range addresses {
+		if address.IP.IsLoopback() {
+			continue
+		}
+		numAddresses++
+	}
+	g.Expect(numAddresses).To(Equal(0))
+}
+
 func checkLinkExists(g Gomega, name string) {
 	_, err := netlink.LinkByName(name)
 	g.Expect(err).NotTo(HaveOccurred(), "link not found %q", name)
@@ -758,7 +820,6 @@ func checkLinkExists(g Gomega, name string) {
 
 func validateVNIIsNotConfigured(g Gomega, params VNIParams) {
 	checkLinkdeleted(g, vxLanNameFromVNI(params.VNI))
-	checkLinkdeleted(g, params.VRF)
 	checkLinkdeleted(g, BridgeName(params.VNI))
 
 	vethNames := vethNamesFromVNI(params.VNI)
@@ -774,15 +835,13 @@ func checkAddrGenModeNone(l netlink.Link) bool {
 }
 
 func setupLoopback(ns netns.NsHandle) {
-	_ = netnamespace.In(ns, func() error {
-		_, err := netlink.LinkByName(UnderlayLoopback)
-		if errors.As(err, &netlink.LinkNotFoundError{}) {
-			loopback := &netlink.Dummy{LinkAttrs: netlink.LinkAttrs{Name: UnderlayLoopback}}
-			err = netlink.LinkAdd(loopback)
-			Expect(err).NotTo(HaveOccurred(), "failed to create loopback", UnderlayLoopback)
-		}
-		return nil
-	})
+	handle, err := netlink.NewHandleAt(ns)
+	Expect(err).NotTo(HaveOccurred())
+	defer handle.Close()
+
+	lo, err := handle.LinkByName(loopbackName)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(handle.LinkSetUp(lo)).To(Succeed())
 }
 
 func createLinuxBridge(name string) {
@@ -812,16 +871,14 @@ func validateBridgeMacAddress(g Gomega, bridge netlink.Link, vni int32) {
 	g.Expect(actualMac).To(Equal(expectedMac), "bridge MAC address should be %v for VNI %d", expectedMac, vni)
 }
 
-func validateVethMTU(g Gomega, params VNIParams, expectedMTU int) {
-	vethNames := vethNamesFromVNI(params.VNI)
+func validateVethMTU(g Gomega, vethNames VethNames, expectedMTU int) {
 	hostLeg, err := netlink.LinkByName(vethNames.HostSide)
 	g.Expect(err).NotTo(HaveOccurred(), "host veth not found %q", vethNames.HostSide)
 	g.Expect(hostLeg.Attrs().MTU).To(Equal(expectedMTU),
 		"host veth MTU should be %d, got %d", expectedMTU, hostLeg.Attrs().MTU)
 }
 
-func validateNSVethMTU(g Gomega, params VNIParams, expectedMTU int) {
-	vethNames := vethNamesFromVNI(params.VNI)
+func validateNSVethMTU(g Gomega, vethNames VethNames, expectedMTU int) {
 	peLeg, err := netlink.LinkByName(vethNames.NamespaceSide)
 	g.Expect(err).NotTo(HaveOccurred(), "pe veth not found %q", vethNames.NamespaceSide)
 	g.Expect(peLeg.Attrs().MTU).To(Equal(expectedMTU),

@@ -602,16 +602,16 @@ var _ = Describe("Webhooks", func() {
 					Namespace: openperouter.Namespace,
 				},
 				Spec: v1alpha1.UnderlaySpec{
-					ASN:  65000,
-					Nics: []string{"nic1"},
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("notacidr"),
+					ASN:        65000,
+					Interfaces: []v1alpha1.UnderlayInterface{{Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "nic1"}}},
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"notacidr"},
 					},
 					Neighbors: []v1alpha1.Neighbor{
 						{ASN: new(int64(65001)), Address: new("192.168.1.1")},
 					},
 				},
-			}, "invalid vtep CIDR"),
+			}, "all entries must be valid CIDRs"),
 		)
 
 		It("should allow creating an underlay with multiple NICs and neighbors", func() {
@@ -621,10 +621,10 @@ var _ = Describe("Webhooks", func() {
 					Namespace: openperouter.Namespace,
 				},
 				Spec: v1alpha1.UnderlaySpec{
-					ASN:  65000,
-					Nics: []string{"nic1", "nic2"},
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("192.168.1.0/24"),
+					ASN:        65000,
+					Interfaces: []v1alpha1.UnderlayInterface{{Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "nic1"}}, {Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "nic2"}}},
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"192.168.1.0/24"},
 					},
 					Neighbors: []v1alpha1.Neighbor{
 						{
@@ -661,10 +661,10 @@ var _ = Describe("Webhooks", func() {
 					Namespace: openperouter.Namespace,
 				},
 				Spec: v1alpha1.UnderlaySpec{
-					ASN:  65000,
-					Nics: []string{"nic1"},
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("192.168.1.0/24"),
+					ASN:        65000,
+					Interfaces: []v1alpha1.UnderlayInterface{{Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "nic1"}}},
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"192.168.1.0/24"},
 					},
 					Neighbors: []v1alpha1.Neighbor{
 						{ASN: new(int64(65001)), Address: new("192.168.1.1")},
@@ -693,10 +693,10 @@ var _ = Describe("Webhooks", func() {
 							Namespace: openperouter.Namespace,
 						},
 						Spec: v1alpha1.UnderlaySpec{
-							ASN:  65001,
-							Nics: []string{"nic2"},
-							EVPN: &v1alpha1.EVPNConfig{
-								VTEPCIDR: new("192.168.2.0/24"),
+							ASN:        65001,
+							Interfaces: []v1alpha1.UnderlayInterface{{Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "nic2"}}},
+							TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+								CIDRs: []string{"192.168.2.0/24"},
 							},
 							Neighbors: []v1alpha1.Neighbor{
 								{ASN: new(int64(65002)), Address: new("192.168.2.1")},
@@ -714,10 +714,10 @@ var _ = Describe("Webhooks", func() {
 							Namespace: openperouter.Namespace,
 						},
 						Spec: v1alpha1.UnderlaySpec{
-							ASN:  65000,
-							Nics: []string{"nic1"},
-							EVPN: &v1alpha1.EVPNConfig{
-								VTEPCIDR: new("notacidr"),
+							ASN:        65000,
+							Interfaces: []v1alpha1.UnderlayInterface{{Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "nic1"}}},
+							TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+								CIDRs: []string{"notacidr"},
 							},
 							Neighbors: []v1alpha1.Neighbor{
 								{ASN: new(int64(65001)), Address: new("192.168.1.1")},
@@ -725,7 +725,7 @@ var _ = Describe("Webhooks", func() {
 						},
 					},
 				},
-				"invalid vtep CIDR",
+				"all entries must be valid CIDRs",
 			),
 		)
 	})

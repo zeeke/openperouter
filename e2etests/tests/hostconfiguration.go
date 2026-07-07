@@ -28,6 +28,18 @@ import (
 
 var ValidatorPath string
 
+var cniBinaries = []string{"macvlan", "ipvlan", "static", "dhcp"}
+
+const (
+	cniBinDir   = "/opt/openperouter/cni/bin"
+	cniCacheDir = "/var/lib/openperouter/cni/cache"
+)
+
+type cniTarget struct {
+	exec  executor.Executor
+	label string
+}
+
 const (
 	underlayConfiguredTestSelector      = "EXTERNAL.*underlay.* is configured.*"
 	underlayNotConfiguredTestSelector   = "EXTERNAL.*underlay.* is not configured.*"
@@ -46,16 +58,16 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			Namespace: openperouter.Namespace,
 		},
 		Spec: v1alpha1.UnderlaySpec{
-			ASN:  64514,
-			Nics: []string{"toswitch1"},
+			ASN:        64514,
+			Interfaces: []v1alpha1.UnderlayInterface{{Type: "NetworkDevice", NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "toswitch1"}}},
 			Neighbors: []v1alpha1.Neighbor{
 				{
 					ASN:     new(int64(64517)),
 					Address: new("192.168.11.2"),
 				},
 			},
-			EVPN: &v1alpha1.EVPNConfig{
-				VTEPCIDR: new("100.65.0.0/24"),
+			TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+				CIDRs: []string{"100.65.0.0/24"},
 			},
 		},
 	}
@@ -187,7 +199,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				validateConfig(l3vniParams{
 					VRF: l3vni100.Name,
@@ -204,8 +216,8 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -226,7 +238,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l3vniParams{
 					VRF: l3vni100.Name,
 					HostVeth: &veth{
@@ -257,7 +269,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l3vniParams{
 					VRF: l3vni200.Name,
 					HostVeth: &veth{
@@ -283,14 +295,14 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			}
 
 			for _, p := range routerPods {
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -312,7 +324,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l3vniParams{
 					VRF: l3vni100.Name,
 					HostVeth: &veth{
@@ -336,7 +348,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				changedVni := resources.L3VNIs[0]
 				validateConfig(l3vniParams{
 					VRF: changedVni.Name,
@@ -351,14 +363,14 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			}
 
 			for _, p := range routerPods {
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -377,11 +389,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			err := Updater.Update(resources)
 			Expect(err).NotTo(HaveOccurred())
 
-			validate := func(vtepCidr *string) {
+			validate := func(tunnelEndpoint *v1alpha1.TunnelEndpointConfig) {
 				for _, p := range routerPods {
 					ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-					vtepIP := vtepIPForPod(cs, vtepCidr, p)
+					vtepIP := vtepIPv4ForPod(cs, tunnelEndpoint, p)
 					validateConfig(l3vniParams{
 						VRF: l3vni100.Name,
 						HostVeth: &veth{
@@ -396,26 +408,26 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 					ginkgo.By(fmt.Sprintf("validating underlay for pod %s", p.Name))
 					validateConfig(underlayParams{
 						UnderlayInterfaces: []string{"toswitch1"},
-						EVPN: &evpnParams{
-							VtepIP: vtepIP,
+						TunnelEndpoint: &tunnelEndpointParams{
+							IPv4: vtepIP,
 						},
 					}, underlayConfiguredTestSelector, p)
 				}
 			}
 
-			validate(underlay.Spec.EVPN.VTEPCIDR)
+			validate(underlay.Spec.TunnelEndpoint)
 
 			ginkgo.By("editing the vtep cidr vni")
 
-			newCidr := "100.64.0.0/24"
-			resources.Underlays[0].Spec.EVPN.VTEPCIDR = new(newCidr)
+			newCIDRs := []string{"100.64.0.0/24"}
+			resources.Underlays[0].Spec.TunnelEndpoint.CIDRs = newCIDRs
 			err = Updater.Update(resources)
 			Expect(err).NotTo(HaveOccurred())
 
-			validate(&newCidr)
+			validate(resources.Underlays[0].Spec.TunnelEndpoint)
 
 			ginkgo.By("editing the underlay nic (to non existent one)")
-			resources.Underlays[0].Spec.Nics[0] = "foo"
+			resources.Underlays[0].Spec.Interfaces[0].NetworkDevice.InterfaceName = "foo"
 			err = Updater.Update(resources)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -443,7 +455,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating IPv6-only VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l3vniParams{
 					VRF: l3vni300.Name,
 					HostVeth: &veth{
@@ -459,8 +471,8 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -480,7 +492,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating dual-stack VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l3vniParams{
 					VRF: l3vni400.Name,
 					HostVeth: &veth{
@@ -496,8 +508,8 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -519,7 +531,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating mixed VNIs for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				validateConfig(l3vniParams{
 					VRF: l3vni100.Name,
@@ -625,7 +637,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 			validate := func(p *corev1.Pod, params l3vniParams, test string) {
 				ginkgo.GinkgoHelper()
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				checkMsg := "configured"
 				if test == l3VNIDeletedTestSelector {
 					checkMsg = "not configured"
@@ -651,11 +663,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -678,11 +690,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -709,11 +721,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -736,9 +748,7 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 				Namespace: openperouter.Namespace,
 			},
 			Spec: v1alpha1.L2VNISpec{
-				VNI:          400,
-				VRF:          new("second"),
-				L2GatewayIPs: []string{"192.168.1.4/24"},
+				VNI: 400,
 			},
 		}
 
@@ -756,9 +766,9 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l2vniParams{
-					VRF:       l2vni300.Name,
+					VRF:       "",
 					VNI:       300,
 					VXLanPort: 4789,
 					VTEPIP:    vtepIP,
@@ -768,8 +778,8 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -790,20 +800,19 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l2vniParams{
-					VRF:       l2vni300.Name,
+					VRF:       "",
 					VNI:       300,
 					VXLanPort: 4789,
 					VTEPIP:    vtepIP,
 				}, l2VNIConfiguredTestSelector, p)
 
 				validateConfig(l2vniParams{
-					VRF:          l2vni400.Name,
-					VNI:          400,
-					VXLanPort:    4789,
-					VTEPIP:       vtepIP,
-					L2GatewayIPs: l2vni400.Spec.L2GatewayIPs,
+					VRF:       "",
+					VNI:       400,
+					VXLanPort: 4789,
+					VTEPIP:    vtepIP,
 				}, l2VNIConfiguredTestSelector, p)
 			}
 
@@ -814,18 +823,17 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l2vniParams{
-					VRF:          l2vni400.Name,
-					VNI:          400,
-					VXLanPort:    4789,
-					VTEPIP:       vtepIP,
-					L2GatewayIPs: l2vni400.Spec.L2GatewayIPs,
+					VRF:       "",
+					VNI:       400,
+					VXLanPort: 4789,
+					VTEPIP:    vtepIP,
 				}, l2VNIConfiguredTestSelector, p)
 
 				ginkgo.By(fmt.Sprintf("validating VNI is deleted for pod %s", p.Name))
 				validateConfig(l2vniParams{
-					VRF:       l2vni300.Name,
+					VRF:       "",
 					VNI:       300,
 					VXLanPort: 4789,
 					VTEPIP:    vtepIP,
@@ -834,14 +842,14 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			}
 
 			for _, p := range routerPods {
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -863,9 +871,9 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(l2vniParams{
-					VRF:       l2vni300.Name,
+					VRF:       "",
 					VNI:       300,
 					VXLanPort: 4789,
 					VTEPIP:    vtepIP,
@@ -881,10 +889,10 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating VNI for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				validateConfig(l2vniParams{
-					VRF:       l2vni300.Name,
+					VRF:       "",
 					VNI:       600,
 					VXLanPort: 4789,
 					VTEPIP:    vtepIP,
@@ -892,14 +900,14 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			}
 
 			for _, p := range routerPods {
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -951,20 +959,19 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 				},
 			})).To(Succeed())
 			l2VNI300Params := l2vniParams{
-				VRF:       l2vni300.Name,
+				VRF:       "",
 				VNI:       300,
 				VXLanPort: 4789,
 			}
 			l2VNI400Params := l2vniParams{
-				VRF:          l2vni400.Name,
-				VNI:          400,
-				VXLanPort:    4789,
-				L2GatewayIPs: l2vni400.Spec.L2GatewayIPs,
+				VRF:       "",
+				VNI:       400,
+				VXLanPort: 4789,
 			}
 
 			validate := func(p *corev1.Pod, params l2vniParams, test string) {
 				ginkgo.GinkgoHelper()
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				checkMsg := "configured"
 				if test == l2VNIDeletedTestSelector {
 					checkMsg = "not configured"
@@ -990,11 +997,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -1019,11 +1026,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -1050,11 +1057,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 
 				ginkgo.By(fmt.Sprintf("validating Underlay for pod %s", p.Name))
 
-				vtepIP := vtepIPForPod(cs, underlay.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
 			}
@@ -1093,12 +1100,12 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			underlay1WithNodeSelector := underlay.DeepCopy()
 			underlay1WithNodeSelector.Name = "underlay1"
 			underlay1WithNodeSelector.Spec.NodeSelector = nodeSelectorUnderlay1
-			underlay1WithNodeSelector.Spec.EVPN.VTEPCIDR = new("100.65.0.0/24")
+			underlay1WithNodeSelector.Spec.TunnelEndpoint.CIDRs = []string{"100.65.0.0/24"}
 
 			underlay2WithNodeSelector := underlay.DeepCopy()
 			underlay2WithNodeSelector.Name = "underlay2"
 			underlay2WithNodeSelector.Spec.NodeSelector = nodeSelectorUnderlay2
-			underlay2WithNodeSelector.Spec.EVPN.VTEPCIDR = new("100.66.0.0/24")
+			underlay2WithNodeSelector.Spec.TunnelEndpoint.CIDRs = []string{"100.66.0.0/24"}
 
 			Expect(Updater.Update(config.Resources{
 				Underlays: []v1alpha1.Underlay{
@@ -1112,20 +1119,20 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 				switch p.Spec.NodeName {
 				case nodes[0].Name:
 					ginkgo.By(fmt.Sprintf("validating underlay1 configured on node %s", p.Spec.NodeName))
-					vtepIP := vtepIPForPod(cs, underlay1WithNodeSelector.Spec.EVPN.VTEPCIDR, p)
+					vtepIP := vtepIPv4ForPod(cs, underlay1WithNodeSelector.Spec.TunnelEndpoint, p)
 					validateConfig(underlayParams{
 						UnderlayInterfaces: []string{"toswitch1"},
-						EVPN: &evpnParams{
-							VtepIP: vtepIP,
+						TunnelEndpoint: &tunnelEndpointParams{
+							IPv4: vtepIP,
 						},
 					}, underlayConfiguredTestSelector, p)
 				case nodes[1].Name:
 					ginkgo.By(fmt.Sprintf("validating underlay2 configured on node %s", p.Spec.NodeName))
-					vtepIP := vtepIPForPod(cs, underlay2WithNodeSelector.Spec.EVPN.VTEPCIDR, p)
+					vtepIP := vtepIPv4ForPod(cs, underlay2WithNodeSelector.Spec.TunnelEndpoint, p)
 					validateConfig(underlayParams{
 						UnderlayInterfaces: []string{"toswitch1"},
-						EVPN: &evpnParams{
-							VtepIP: vtepIP,
+						TunnelEndpoint: &tunnelEndpointParams{
+							IPv4: vtepIP,
 						},
 					}, underlayConfiguredTestSelector, p)
 				default:
@@ -1154,11 +1161,11 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			for _, p := range routerPods {
 				if p.Spec.NodeName == nodes[0].Name {
 					ginkgo.By(fmt.Sprintf("validating underlay1 configured on node %s", p.Spec.NodeName))
-					vtepIP := vtepIPForPod(cs, underlay1WithNodeSelector.Spec.EVPN.VTEPCIDR, p)
+					vtepIP := vtepIPv4ForPod(cs, underlay1WithNodeSelector.Spec.TunnelEndpoint, p)
 					validateConfig(underlayParams{
 						UnderlayInterfaces: []string{"toswitch1"},
-						EVPN: &evpnParams{
-							VtepIP: vtepIP,
+						TunnelEndpoint: &tunnelEndpointParams{
+							IPv4: vtepIP,
 						},
 					}, underlayConfiguredTestSelector, p)
 				} else {
@@ -1180,13 +1187,82 @@ var _ = ginkgo.Describe("Router Host configuration", func() {
 			ginkgo.By("Check that all nodes now have underlay1 configured")
 			for _, p := range routerPods {
 				ginkgo.By(fmt.Sprintf("validating underlay1 configured on node %q", p.Spec.NodeName))
-				vtepIP := vtepIPForPod(cs, underlay1WithNodeSelector.Spec.EVPN.VTEPCIDR, p)
+				vtepIP := vtepIPv4ForPod(cs, underlay1WithNodeSelector.Spec.TunnelEndpoint, p)
 				validateConfig(underlayParams{
 					UnderlayInterfaces: []string{"toswitch1"},
-					EVPN: &evpnParams{
-						VtepIP: vtepIP,
+					TunnelEndpoint: &tunnelEndpointParams{
+						IPv4: vtepIP,
 					},
 				}, underlayConfiguredTestSelector, p)
+			}
+		})
+
+		ginkgo.It("moves the underlay interface back to the default netns on deletion", func() {
+			nodes, err := k8s.GetNodes(cs)
+			Expect(err).NotTo(HaveOccurred())
+
+			underlayNIC := "toswitch1"
+
+			ginkgo.By(fmt.Sprintf("verifying %s exists in the default netns before creating the underlay", underlayNIC))
+			for _, node := range nodes {
+				Eventually(func() bool {
+					return openperouter.IsInterfaceInDefaultNetns(node.Name, underlayNIC)
+				}).WithTimeout(30 * time.Second).WithPolling(time.Second).Should(
+					BeTrueBecause("%s should be in the default netns on %s before underlay creation", underlayNIC, node.Name))
+			}
+
+			ginkgo.By(fmt.Sprintf("recording the %s IP addresses before creating the underlay", underlayNIC))
+			addrsBefore := map[string]string{}
+			for _, node := range nodes {
+				addrs, err := openperouter.InterfaceIPAddresses(node.Name, underlayNIC)
+				Expect(err).NotTo(HaveOccurred(), "failed to get %s addresses on %s", underlayNIC, node.Name)
+				addrsBefore[node.Name] = addrs
+			}
+
+			ginkgo.By("creating the underlay")
+			err = Updater.Update(config.Resources{
+				Underlays: []v1alpha1.Underlay{underlay},
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			ginkgo.By(fmt.Sprintf("verifying %s moved into the perouter netns", underlayNIC))
+			for _, node := range nodes {
+				Eventually(func() bool {
+					return openperouter.IsInterfaceInNS(node.Name, underlayNIC, openperouter.NamedNetns)
+				}).WithTimeout(2 * time.Minute).WithPolling(time.Second).Should(BeTrueBecause(
+					"%s should be inside the perouter netns on %s after underlay creation", underlayNIC, node.Name))
+			}
+
+			ginkgo.By("deleting the underlay")
+			Expect(Updater.CleanAll()).To(Succeed())
+
+			ginkgo.By("waiting for all router pods to be ready after underlay deletion")
+			Eventually(func(g Gomega) {
+				pods, err := openperouter.RouterPods(cs)
+				g.Expect(err).NotTo(HaveOccurred())
+				for _, p := range pods {
+					g.Expect(k8s.PodIsReady(p)).To(BeTrueBecause("pod %s must be ready", p.Name))
+				}
+			}).WithTimeout(2 * time.Minute).WithPolling(time.Second).Should(Succeed())
+
+			ginkgo.By(fmt.Sprintf("verifying %s is back in the default netns after underlay deletion", underlayNIC))
+			for _, node := range nodes {
+				Eventually(func() bool {
+					return openperouter.IsInterfaceInDefaultNetns(node.Name, underlayNIC)
+				}).WithTimeout(2 * time.Minute).WithPolling(time.Second).Should(BeTrueBecause(
+					"%s should be back in the default netns on %s after underlay deletion", underlayNIC, node.Name))
+			}
+
+			ginkgo.By(fmt.Sprintf("verifying %s is UP and has the same IP addresses as before", underlayNIC))
+			for _, node := range nodes {
+				Expect(openperouter.InterfaceIsUp(node.Name, underlayNIC)).To(BeTrueBecause(
+					"%s should be UP on %s after underlay deletion", underlayNIC, node.Name))
+
+				addrsAfter, err := openperouter.InterfaceIPAddresses(node.Name, underlayNIC)
+				Expect(err).NotTo(HaveOccurred(), "failed to get %s addresses on %s after deletion", underlayNIC, node.Name)
+				Expect(addrsAfter).To(Equal(addrsBefore[node.Name]),
+					"%s IP addresses on %s should be preserved after underlay deletion; was: %q, is: %q",
+					underlayNIC, node.Name, addrsBefore[node.Name], addrsAfter)
 			}
 		})
 	})
@@ -1321,12 +1397,12 @@ type l2vniParams struct {
 }
 
 type underlayParams struct {
-	UnderlayInterfaces []string    `json:"underlay_interfaces"`
-	EVPN               *evpnParams `json:"evpn"`
+	UnderlayInterfaces []string              `json:"underlay_interfaces"`
+	TunnelEndpoint     *tunnelEndpointParams `json:"tunnel_endpoint"`
 }
 
-type evpnParams struct {
-	VtepIP string `json:"vtep_ip"`
+type tunnelEndpointParams struct {
+	IPv4 string `json:"ipv4"`
 }
 
 func validateConfig[T any](config T, test string, pod *corev1.Pod) {
@@ -1358,10 +1434,10 @@ func ensureValidator(cs clientset.Interface, pod *corev1.Pod) {
 	Expect(err).NotTo(HaveOccurred())
 }
 
-func vtepIPForPod(cs clientset.Interface, vtepCIDR *string, pod *corev1.Pod) string {
+func vtepIPv4ForPod(cs clientset.Interface, tunnelEndpoint *v1alpha1.TunnelEndpointConfig, pod *corev1.Pod) string {
 	node, err := k8s.NodeObjectForPod(cs, pod)
 	Expect(err).NotTo(HaveOccurred())
-	vtepIP, err := openperouter.VtepIPForNode(vtepCIDR, node)
+	vtepIP, err := openperouter.GetVtepIPv4ForNode(tunnelEndpoint, node)
 	Expect(err).NotTo(HaveOccurred())
 	return vtepIP
 }
@@ -1428,4 +1504,50 @@ func routerPodsWithValidator(cs clientset.Interface) ([]*corev1.Pod, error) {
 		ensureValidator(cs, pod)
 	}
 	return routerPods, nil
+}
+
+func ValidateCNIBinaries(g Gomega, cs clientset.Interface) {
+	cniTargets := k8sModeCNITarget
+	if HostMode {
+		cniTargets = hostModeCNITarget
+	}
+	for _, t := range cniTargets(g, cs) {
+		for _, bin := range cniBinaries {
+			path := cniBinDir + "/" + bin
+			out, err := t.exec.Exec("test", "-x", path)
+			g.Expect(err).NotTo(HaveOccurred(), "CNI binary %s missing or not executable on %s: %s", path, t.label, out)
+		}
+
+		out, err := t.exec.Exec("test", "-d", cniCacheDir)
+		g.Expect(err).NotTo(HaveOccurred(), "CNI cache directory %s missing on %s: %s", cniCacheDir, t.label, out)
+		out, err = t.exec.Exec("test", "-w", cniCacheDir)
+		g.Expect(err).NotTo(HaveOccurred(), "CNI cache directory %s not writable on %s: %s", cniCacheDir, t.label, out)
+	}
+}
+
+func k8sModeCNITarget(g Gomega, cs clientset.Interface) []cniTarget {
+	pods, err := openperouter.ControllerPods(cs)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(pods).NotTo(BeEmpty(), "no controller pods found")
+	targets := make([]cniTarget, 0, len(pods))
+	for _, pod := range pods {
+		targets = append(targets, cniTarget{
+			exec:  executor.ForPod(pod.Namespace, pod.Name, "controller"),
+			label: pod.Name,
+		})
+	}
+	return targets
+}
+
+func hostModeCNITarget(g Gomega, cs clientset.Interface) []cniTarget {
+	nodes, err := k8s.GetNodes(cs)
+	g.Expect(err).NotTo(HaveOccurred())
+	targets := make([]cniTarget, 0, len(nodes))
+	for _, node := range nodes {
+		targets = append(targets, cniTarget{
+			exec:  executor.ForPodmanInContainer(node.Name, "controller"),
+			label: node.Name,
+		})
+	}
+	return targets
 }

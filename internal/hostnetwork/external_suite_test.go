@@ -42,7 +42,7 @@ var _ = Describe("EXTERNAL", func() {
 
 		It("should be configured", func() {
 			Eventually(func(g Gomega) {
-				validateUnderlay(g, params)
+				validateUnderlay(g, params, nil)
 			}, 30*time.Second, 1*time.Second).Should(Succeed())
 		})
 		It("should not be configured", func() {
@@ -136,7 +136,7 @@ func readParamsFromFile[T any](filePath string) (T, error) {
 }
 
 func validateUnderlayIsNotConfigured(g Gomega, params UnderlayParams) {
-	checkLinkdeleted(g, UnderlayLoopback)
+	checkInterfaceHasNoNonLoopbackIPs(g, loopbackName)
 	for _, iface := range params.UnderlayInterfaces {
 		checkLinkdeleted(g, iface)
 	}

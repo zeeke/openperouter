@@ -10,11 +10,16 @@ spec:
     matchLabels:
       hardware.vendor: dell
   asn: 64512
-  evpn:
-    vtepCIDR: 100.65.0.0/24
-  nics:
-    - eno1
-    - eno2
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
+  interfaces:
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: eno1
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: eno2
   neighbors:
     - asn: 64500
       address: 192.168.10.1
@@ -30,11 +35,16 @@ spec:
     matchLabels:
       hardware.vendor: hp
   asn: 64512
-  evpn:
-    vtepCIDR: 100.65.0.0/24
-  nics:
-    - em1
-    - em2
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
+  interfaces:
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: em1
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: em2
   neighbors:
     - asn: 64500
       address: 192.168.10.1

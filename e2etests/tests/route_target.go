@@ -27,8 +27,8 @@ var (
 	leafAVRFBlueV4Prefixes, leafAVRFBlueV6Prefixes = infra.SeparateIPFamilies(leafAVRFBluePrefixes)
 	leafBVRFRedV4Prefixes, leafBVRFRedV6Prefixes   = infra.SeparateIPFamilies(leafBVRFRedPrefixes)
 	leafBVRFBlueV4Prefixes, leafBVRFBlueV6Prefixes = infra.SeparateIPFamilies(leafBVRFBluePrefixes)
-	redRouteTargets                                = infra.RouteTargets{ImportRTs: []string{"65000:1000"}, ExportRTs: []string{"65000:1000"}}
-	blueRouteTargets                               = infra.RouteTargets{ImportRTs: []string{"65000:2000"}, ExportRTs: []string{"65000:2000"}}
+	redRouteTargets                                = infra.RouteTargets{ImportRTs: []v1alpha1.RouteTarget{"65000:1000"}, ExportRTs: []v1alpha1.RouteTarget{"65000:1000"}}
+	blueRouteTargets                               = infra.RouteTargets{ImportRTs: []v1alpha1.RouteTarget{"65000:2000"}, ExportRTs: []v1alpha1.RouteTarget{"65000:2000"}}
 
 	frrk8sRedPrefixes  = []string{"10.100.0.0/24"}
 	frrk8sBluePrefixes = []string{"10.200.0.0/24"}
@@ -156,7 +156,7 @@ var _ = Describe("Routes with RT between bgp and the fabric", Ordered, func() {
 		It("translates EVPN incoming routes as BGP routes", func() {
 			By("advertising routes from the leaves for VRF Red - VNI 100")
 			Contains := true
-			checkRouteAndRTsFromLeaf := func(leaf infra.Leaf, vni v1alpha1.L3VNI, mustContain bool, prefixes []string, routeTargets []string) {
+			checkRouteAndRTsFromLeaf := func(leaf infra.Leaf, vni v1alpha1.L3VNI, mustContain bool, prefixes []string, routeTargets []v1alpha1.RouteTarget) {
 				By(fmt.Sprintf("checking routes from leaf %s on vni %s, mustContain %v %v", leaf.Name, vni.Name, mustContain, prefixes))
 				Eventually(func() error {
 					freshRouters, err := openperouter.Get(cs, HostMode)
@@ -244,7 +244,7 @@ var _ = Describe("Routes with RT between bgp and the fabric", Ordered, func() {
 			}
 
 			By("checking routes advertised by frrk8s are visible on leaves with correct ExportRTs")
-			checkPrefixWithRTOnLeaf := func(leaf infra.Leaf, prefixes []string, exportRTs []string) {
+			checkPrefixWithRTOnLeaf := func(leaf infra.Leaf, prefixes []string, exportRTs []v1alpha1.RouteTarget) {
 				By(fmt.Sprintf("checking frrk8s-originated prefixes on leaf %s %v", leaf.Name, prefixes))
 				exec := executor.ForContainer(leaf.Name)
 				Eventually(func() error {

@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2026-03-12T09:39:00Z"
+    createdAt: "2026-06-30T21:07:04Z"
     features.operators.openshift.io/csi: "false"
     features.operators.openshift.io/disconnected: "true"
     features.operators.openshift.io/fips-compliant: "true"
@@ -35,6 +35,9 @@ spec:
       displayName: L3VNI
       kind: L3VNI
       name: l3vnis.openpe.openperouter.github.io
+      version: v1alpha1
+    - kind: L3VPN
+      name: l3vpns.openpe.openperouter.github.io
       version: v1alpha1
     - description: OpenPERouter is the Schema for the openperouters API
       displayName: Open PERouter
@@ -102,6 +105,8 @@ spec:
           - l2vnis
           - l3passthroughs
           - l3vnis
+          - l3vpns
+          - rawfrrconfigs
           - routernodeconfigurationstatuses
           - underlays
           verbs:
@@ -118,6 +123,8 @@ spec:
           - l2vnis/finalizers
           - l3passthroughs/finalizers
           - l3vnis/finalizers
+          - l3vpns/finalizers
+          - rawfrrconfigs/finalizers
           - underlays/finalizers
           verbs:
           - update
@@ -127,26 +134,14 @@ spec:
           - l2vnis/status
           - l3passthroughs/status
           - l3vnis/status
+          - l3vpns/status
+          - rawfrrconfigs/status
           - routernodeconfigurationstatuses/status
           - underlays/status
           verbs:
           - get
           - patch
           - update
-        - apiGroups:
-          - openpe.openperouter.github.io
-          resources:
-          - rawfrrconfigs
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - openpe.openperouter.github.io
-          resources:
-          - rawfrrconfigs/status
-          verbs:
-          - get
         serviceAccountName: controller
       - rules:
         - apiGroups:
@@ -448,6 +443,26 @@ spec:
     targetPort: 9443
     type: ValidatingAdmissionWebhook
     webhookPath: /validate-openperouter-io-v1alpha1-l3vni
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: webhook
+    failurePolicy: Fail
+    generateName: l3vpnsvalidationwebhook.openperouter.io
+    rules:
+    - apiGroups:
+      - openpe.openperouter.github.io
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - l3vpns
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-openperouter-io-v1alpha1-l3vpn
   - admissionReviewVersions:
     - v1
     containerPort: 443

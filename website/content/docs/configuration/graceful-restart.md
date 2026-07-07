@@ -24,8 +24,10 @@ metadata:
   namespace: openperouter-system
 spec:
   asn: 64514
-  nics:
-    - toswitch
+  interfaces:
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: toswitch
   neighbors:
     - asn: 64512
       address: 192.168.11.2
@@ -52,10 +54,13 @@ metadata:
   namespace: openperouter-system
 spec:
   asn: 64514
-  evpn:
-    vtepCIDR: 100.65.0.0/24
-  nics:
-    - toswitch
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
+  interfaces:
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: toswitch
   neighbors:
     - asn: 64512
       address: 192.168.11.2

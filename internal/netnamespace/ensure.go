@@ -15,6 +15,7 @@ import (
 
 const NamedNSName = "perouter"
 const NamedNSPath = "/var/run/netns/" + NamedNSName
+const loopbackName = "lo"
 
 // EnsureNamespace ensures the named network namespace "perouter" exists at
 // /var/run/netns/perouter. It is idempotent: if the namespace already exists
@@ -40,11 +41,28 @@ func EnsureNamespace() error {
 	if err != nil {
 		return fmt.Errorf("named netns created but failed to verify: %w", err)
 	}
-	if closeErr := ns.Close(); closeErr != nil {
-		slog.Error("failed to close namespace handle", "error", closeErr)
+	defer func() {
+		if closeErr := ns.Close(); closeErr != nil {
+			slog.Error("failed to close namespace handle", "error", closeErr)
+		}
+	}()
+
+	slog.Info("setting named netns loopback to up", "path", NamedNSPath, "loopback", loopbackName)
+	handle, err := netlink.NewHandleAt(ns)
+	if err != nil {
+		return fmt.Errorf("failed to get handle for netns %s, err: %w", NamedNSPath, err)
+	}
+	defer handle.Close()
+
+	loopback, err := handle.LinkByName(loopbackName)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve %s in %s, err: %w", loopbackName, NamedNSPath, err)
+	}
+	if err := handle.LinkSetUp(loopback); err != nil {
+		return fmt.Errorf("failed to bring up %s in %s: %w", loopbackName, NamedNSPath, err)
 	}
 
-	slog.Info("named netns created successfully", "path", NamedNSPath)
+	slog.Info("named netns set up successfully", "path", NamedNSPath)
 	return nil
 }
 

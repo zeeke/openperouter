@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/vishvananda/netlink"
-	"k8s.io/utils/ptr"
 )
 
 // setupVXLan sets up a vxlan interface corresponding to the provided
@@ -46,7 +45,11 @@ func checkVXLanConfigured(vxLan *netlink.Vxlan, bridgeIndex, loopbackIndex int, 
 		return fmt.Errorf("vxlanid is not vni: %d, %d", vxLan.VxlanId, params.VNI)
 	}
 
-	paramsVXLanPort := int(ptr.Deref(params.VXLanPort, 4789))
+	if params.VXLanPort == nil {
+		return errors.New("failed to parse VXLAN information, VXLAN port is nil")
+	}
+
+	paramsVXLanPort := int(*params.VXLanPort)
 	if vxLan.Port != paramsVXLanPort {
 		return fmt.Errorf("port is not one coming from params: %d, %d", vxLan.Port, paramsVXLanPort)
 	}
@@ -63,14 +66,18 @@ func checkVXLanConfigured(vxLan *netlink.Vxlan, bridgeIndex, loopbackIndex int, 
 }
 
 func createVXLan(params VNIParams, bridge *netlink.Bridge) (*netlink.Vxlan, error) {
-	loopback, err := net.InterfaceByName(UnderlayLoopback)
+	loopback, err := net.InterfaceByName(loopbackName)
 	if err != nil {
-		return nil, fmt.Errorf("failed looking for vtep loopback interface %s: %w", UnderlayLoopback, err)
+		return nil, fmt.Errorf("failed looking for vtep loopback interface %s: %w", loopbackName, err)
 	}
 
 	vtepIP, _, err := net.ParseCIDR(params.VTEPIP)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse vtep ip %v: %w", params.VTEPIP, err)
+	}
+
+	if params.VXLanPort == nil {
+		return nil, errors.New("failed to parse VXLAN information, VXLAN port is nil")
 	}
 
 	vxlanName := vxLanNameFromVNI(params.VNI)
@@ -80,7 +87,7 @@ func createVXLan(params VNIParams, bridge *netlink.Bridge) (*netlink.Vxlan, erro
 			MasterIndex: bridge.Index,
 		},
 		VxlanId:      int(params.VNI),
-		Port:         int(ptr.Deref(params.VXLanPort, 4789)),
+		Port:         int(*params.VXLanPort),
 		Learning:     false,
 		VtepDevIndex: loopback.Index,
 		SrcAddr:      vtepIP,

@@ -28,10 +28,13 @@ metadata:
   namespace: openperouter-system
 spec:
   asn: 64514
-  evpn:
-    vtepCIDR:  100.65.0.0/24
-  nics:
-    - toswitch1
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
+  interfaces:
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: toswitch1
   neighbors:
     - asn: 64512
       address: 192.168.11.2

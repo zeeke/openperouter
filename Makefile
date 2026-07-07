@@ -90,7 +90,7 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: test
-test: fmt vet envtest $(LOCALBIN) ## Run tests.
+test: fmt vet envtest $(LOCALBIN) kind-node-image-build ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test $$(go list ./... | grep -v e2etest) -coverprofile cover.out
 	@RUNASROOT_TESTS=""; \
 	for pkg in $$(grep -rl "//go:build runasroot" --include="*_test.go" $$(go list -f '{{.Dir}}' ./...) | xargs -I{} dirname {} | sort -u); do \
@@ -365,8 +365,13 @@ parse-scale-report: ## Parse scale test JSON report and print summary tables.
 
 .PHONY: clab-cluster
 clab-cluster: kind-node-image-build kubectl
-	KUBECONFIG_PATH=$(KUBECONFIG_PATH) KIND=$(KIND) KUBECTL=$(KUBECTL) CLAB_TOPOLOGY=$(CLAB_TOPOLOGY_FILE) \
-	  KIND_EXPORT_LOGS=$(KIND_EXPORT_LOGS) COREDUMP=$(COREDUMP) clab/setup.sh
+	KUBECONFIG_PATH=$(KUBECONFIG_PATH) \
+	  KIND=$(KIND) \
+	  KUBECTL=$(KUBECTL) \
+	  CLAB_TOPOLOGY=$(CLAB_TOPOLOGY_FILE) \
+	  KIND_EXPORT_LOGS=$(KIND_EXPORT_LOGS) \
+	  COREDUMP=$(COREDUMP) \
+	  clab/setup.sh
 	@echo 'kind cluster created, to use it please'
 	@echo 'export KUBECONFIG=${KUBECONFIG_PATH}'
 
@@ -426,8 +431,7 @@ bumplicense:
 .PHONY: checkuncommitted
 CSV_FILE = operator/bundle/manifests/openperouter-operator.clusterserviceversion.yaml
 checkuncommitted:
-	git diff --exit-code -I'^    createdAt: ' -- $(CSV_FILE)
-	git diff --exit-code -- ':!$(CSV_FILE)'
+	git diff --exit-code
 
 .PHONY: bumpall
 bumpall: bumplicense manifests
@@ -461,7 +465,7 @@ generate-all-in-one: manifests kustomize ## Create manifests
 
 .PHONY: helm-docs
 helm-docs:
-	docker run --rm -v $$(pwd):/app -w /app jnorwood/helm-docs:$(HELM_DOCS_VERSION) helm-docs
+	$(CONTAINER_ENGINE) run --rm -v $$(pwd):/app -w /app jnorwood/helm-docs:$(HELM_DOCS_VERSION) helm-docs
 
 .PHONY: api-docs
 api-docs: crd-ref-docs
@@ -515,6 +519,14 @@ demo-metallb:
 .PHONY: demo-l2-evpn
 demo-l2:
 	examples/evpn/layer2/prepare.sh
+
+.PHONY: demo-metallb-l3vpn
+demo-metallb-l3vpn:
+	examples/l3vpn/metallb/prepare.sh
+
+.PHONY: demo-metallb-l3vpn-l2vni
+demo-metallb-l3vpn-l2vni:
+	examples/l3vpn/layer2/prepare.sh
 
 .PHONY: demo-calico-evpn
 demo-calico:
@@ -591,6 +603,7 @@ bundle: manifests kustomize operator-sdk ## Generate bundle manifests and metada
 	cd operator/config/pods && $(KUSTOMIZE) edit set image controller=$(IMG)
 	cd operator/config/webhook/backend && $(KUSTOMIZE) edit set image controller=$(IMG)
 	cd operator && $(KUSTOMIZE) build config/default | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS) --extra-service-accounts "controller,perouter" --package openperouter-operator
+	hack/restore-csv-timestamp.sh $(CSV_FILE)
 	cd operator && $(OPERATOR_SDK) bundle validate ./bundle
 
 .PHONY: bundle-build

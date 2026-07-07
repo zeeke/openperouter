@@ -6,15 +6,33 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"slices"
 
+	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/vishvananda/netlink"
 )
 
+const (
+	srv6VRF = "srv6VRF"
+)
+
 // setupVRF creates a new VRF and sets it up.
-func setupVRF(name string) (*netlink.Vrf, error) {
+func setupVRF(name string, opts ...string) (*netlink.Vrf, error) {
 	vrf, err := createVRF(name)
 	if err != nil {
 		return nil, err
+	}
+
+	if slices.Contains(opts, srv6VRF) {
+		// VRF strict mode is needed when using SRV6 and we need to do this as close
+		// to VRF creation as possible to minimize the risk of rejected "B>r"
+		// routes in BGP. Likewise, we must disable the RPFilter for SRv6 setups.
+		if err := sysctl.Ensure(sysctl.EnableVRFStrictMode()); err != nil {
+			return nil, fmt.Errorf("failed to ensure VRF strict mode after adding VRF %s: %w", name, err)
+		}
+		if err := sysctl.Ensure(sysctl.DisableRPFilter(vrf.Name)); err != nil {
+			return nil, fmt.Errorf("failed to disable rp_filter after adding VRF %s: %w", name, err)
+		}
 	}
 
 	err = linkSetUp(vrf)
