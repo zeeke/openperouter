@@ -1,0 +1,65 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/openshift-kni/openperouter?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-target-branch: "[refs/heads/main,refs/heads/release-*]"
+  creationTimestamp:
+  labels:
+    appstudio.openshift.io/application: openperouter-operator-5-0
+    appstudio.openshift.io/component: openperouter-operator-bundle-5-0
+    pipelines.appstudio.openshift.io/type: build
+  name: openperouter-operator-bundle-dev-pull-request
+  namespace: telco-5g-tenant
+spec:
+  params:
+  - name: git-url
+    value: '{{source_url}}'
+  - name: revision
+    value: '{{revision}}'
+  - name: output-image
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-5-0:test-{{revision}}
+  - name: output-image-edge
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-bundle-5-0:edge-{{revision}}
+  - name: image-expires-after
+    value: 5d
+  - name: build-platforms
+    value:
+    - linux/x86_64
+  - name: dockerfile
+    value: operator/bundle.Dockerfile.openshift
+  - name: hermetic
+    value: "true"
+  - name: prefetch-input
+    value: '[{"type": "gomod", "path": "."}]'
+  - name: build-source-image
+    value: 'false'
+  - name: image-append-platform
+    value: 'false'
+  - name: skip-checks
+    value: 'true'
+  - name: operator-image-test
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-5-0:on-pr-{{revision}}
+  - name: operator-image-edge
+    value: quay.io/redhat-user-workloads/telco-5g-tenant/openperouter-operator-edge-5-0:on-pr-{{revision}}
+  - name: additional-tags-test
+    value:
+    - test-pr-{{pull_request_number}}
+  - name: additional-tags-edge
+    value:
+    - edge-pr-{{pull_request_number}}
+  pipelineRef:
+    name: dev-pipeline
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-openperouter-operator-bundle-5-0
+  workspaces:
+  - name: git-auth
+    secret:
+      secretName: '{{ git_auth_secret }}'
+status: {}
