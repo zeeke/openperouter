@@ -12,5 +12,6 @@ underlays:
           receiveInterval: 300
           transmitInterval: 300
           detectMultiplier: 3
-    evpn:
-      vtepCIDR: "100.65.0.0/24"
+    tunnelEndpoint:
+      cidrs:
+      - "100.65.0.0/24"

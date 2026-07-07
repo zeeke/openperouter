@@ -169,8 +169,8 @@ func TestParityDefaults(t *testing.T) {
 						{ASN: new(int64(65200)), Address: new("10.0.0.1")},
 					},
 					Nics: []string{"eth0"},
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("10.100.0.0/24"),
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"10.100.0.0/24"},
 					},
 				},
 			},
@@ -290,8 +290,8 @@ func TestParityRoundTrip(t *testing.T) {
 						},
 					},
 					Nics: []string{"eth0", "eth1"},
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("10.100.0.0/24"),
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"10.100.0.0/24"},
 					},
 				},
 			},

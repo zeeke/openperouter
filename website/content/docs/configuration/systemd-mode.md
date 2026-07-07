@@ -23,8 +23,9 @@ Each `openpe_*.yaml` file contains the `spec` part of the corresponding Kubernet
 ```yaml
 underlays:
   - asn: 64514
-    evpn:
-      vtepCIDR: 100.65.0.0/24
+    tunnelEndpoint:
+      cidrs:
+      - 100.65.0.0/24
     nics:
       - eth0
     neighbors:
@@ -64,8 +65,9 @@ l3vnis:
 # openpe_underlay.yaml - node-specific
 underlays:
   - asn: 64514
-    evpn:
-      vtepCIDR: 100.65.0.0/24
+    tunnelEndpoint:
+      cidrs:
+      - 100.65.0.0/24
     nics:
       - eth0
     neighbors:
@@ -73,9 +75,28 @@ underlays:
         address: 192.168.111.1
 ```
 
+### Deferring Startup
+
+If the controller should wait for external dependencies before starting, place an executable script at `/var/lib/openperouter/can_start.sh`. When present, it runs as an `ExecStartPre` step and the controller will not start until the script exits successfully.
+
+Depending on the CNI, the network configuration might need to be complete before the controller starts. For example, DNS resolution might need to be working, or specific network interfaces might need to be available. The script can poll for these conditions and exit with success (code 0) when ready, or exit with failure (non-zero) to prevent startup.
+
 ### Dynamic Reload
 
 Configuration files are watched for changes and dynamically reloaded at runtime. Updating a file triggers a reconciliation cycle without restarting the service.
+
+### Kubernetes Visibility
+
+When a kubeconfig is available, the controller mirrors the static configuration to Kubernetes Custom Resources. Each statically-configured resource (underlay, L3VNI, L2VNI, L3Passthrough, RawFRRConfig) is created as a corresponding CR with a `openperouter.io/static-source` label. This makes the full cluster configuration visible via `kubectl`:
+
+```bash
+kubectl get underlays -n openperouter-system -l openperouter.io/static-source=true
+kubectl get l3vnis -n openperouter-system -l openperouter.io/static-source=true
+```
+
+The mirrored resources also go through webhook validation, ensuring that the static configuration is validated against the same rules as API-managed resources.
+
+The static files remain the source of truth: any external modification to the mirrored CRs is reverted on the next reconciliation cycle, and deleting a mirrored CR causes it to be recreated.
 
 ### Merging with API Server Configuration
 

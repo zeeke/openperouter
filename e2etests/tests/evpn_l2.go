@@ -179,11 +179,13 @@ var _ = Describe("Routes between bgp and the fabric with Underlay in ipv4", Orde
 			neighborIP, err := infra.NeighborIP(infra.KindLeaf, node.Name)
 			Expect(err).NotTo(HaveOccurred())
 			validateSessionWithNeighbor(
-				infra.KindLeaf,
-				node.Name,
 				leafExec,
-				neighborIP,
-				Established,
+				validationParameters{
+					fromName:    infra.KindLeaf,
+					toName:      node.Name,
+					neighborIP:  neighborIP,
+					established: Established,
+				},
 			)
 		}
 
@@ -348,6 +350,105 @@ var _ = Describe("Routes between bgp and the fabric with Underlay in ipv4", Orde
 		}),
 	)
 
+})
+
+var _ = Describe("Disconnected L2VNI east/west traffic", Ordered, func() {
+	const (
+		testNamespace             = "test-disconnected-l2"
+		linuxBridgeHostAttachment = "linux-bridge"
+		firstPodIP                = "192.171.30.2"
+		secondPodIP               = "192.171.30.3"
+	)
+
+	var cs clientset.Interface
+
+	l2vniDisconnected := v1alpha1.L2VNI{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "disconnected",
+			Namespace: openperouter.Namespace,
+		},
+		Spec: v1alpha1.L2VNISpec{
+			VNI: 300,
+			HostMaster: &v1alpha1.HostMaster{
+				Type: linuxBridgeHostAttachment,
+				LinuxBridge: &v1alpha1.LinuxBridgeConfig{
+					AutoCreate: new(true),
+				},
+			},
+		},
+	}
+
+	BeforeAll(func() {
+		err := Updater.CleanAll()
+		Expect(err).NotTo(HaveOccurred())
+
+		cs = k8sclient.New()
+
+		err = Updater.Update(config.Resources{
+			Underlays: []v1alpha1.Underlay{
+				infra.Underlay,
+			},
+		})
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	AfterAll(func() {
+		err := Updater.CleanAll()
+		Expect(err).NotTo(HaveOccurred())
+		By("waiting for all router pods to be ready after removing the underlay")
+		Eventually(func() error {
+			routers, err := openperouter.Get(cs, HostMode)
+			if err != nil {
+				return err
+			}
+			return openperouter.AreReady(routers)
+		}, 2*time.Minute, time.Second).ShouldNot(HaveOccurred())
+	})
+
+	AfterEach(func() {
+		dumpIfFails(cs)
+		err := Updater.CleanButUnderlay()
+		Expect(err).NotTo(HaveOccurred())
+		err = k8s.DeleteNamespace(cs, testNamespace)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("should allow pod-to-pod L2 connectivity without a VRF", func() {
+		nodes, err := k8s.GetNodes(cs)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(len(nodes)).To(BeNumerically(">=", 2))
+
+		err = Updater.Update(config.Resources{
+			L2VNIs: []v1alpha1.L2VNI{
+				l2vniDisconnected,
+			},
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		_, err = k8s.CreateNamespace(cs, testNamespace)
+		Expect(err).NotTo(HaveOccurred())
+
+		nadObj, err := k8s.CreateMacvlanNad("300", testNamespace, "br-hs-300", []string{})
+		Expect(err).NotTo(HaveOccurred())
+
+		By("creating two pods on different nodes")
+		firstPod, err := k8s.CreateAgnhostPod(cs, "pod1", testNamespace,
+			k8s.WithNad(nadObj.Name, testNamespace, []string{firstPodIP + "/24"}),
+			k8s.OnNode(nodes[0].Name))
+		Expect(err).NotTo(HaveOccurred())
+		secondPod, err := k8s.CreateAgnhostPod(cs, "pod2", testNamespace,
+			k8s.WithNad(nadObj.Name, testNamespace, []string{secondPodIP + "/24"}),
+			k8s.OnNode(nodes[1].Name))
+		Expect(err).NotTo(HaveOccurred())
+
+		By("removing the default gateway via the primary interface")
+		Expect(removeGatewayFromPod(firstPod)).To(Succeed())
+		Expect(removeGatewayFromPod(secondPod)).To(Succeed())
+
+		By("checking bidirectional L2 reachability")
+		canPingFromPod(executor.ForPod(firstPod.Namespace, firstPod.Name, "agnhost"), secondPodIP)
+		canPingFromPod(executor.ForPod(secondPod.Namespace, secondPod.Name, "agnhost"), firstPodIP)
+	})
 })
 
 func removeGatewayFromPod(pod *corev1.Pod) error {

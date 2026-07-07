@@ -63,8 +63,9 @@ spec:
     matchLabels:
       hardware.vendor: dell
   asn: 64512
-  evpn:
-    vtepCIDR: 100.65.0.0/24
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
   nics:
     - eno1
     - eno2
@@ -83,8 +84,9 @@ spec:
     matchLabels:
       hardware.vendor: hp
   asn: 64512
-  evpn:
-    vtepCIDR: 100.65.0.0/24
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
   nics:
     - em1
     - em2

@@ -9,6 +9,7 @@ import (
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/ipam"
+	"github.com/openperouter/openperouter/internal/ipfamily"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -59,32 +60,34 @@ func APItoHostConfig(nodeIndex int, targetNS string, apiConfig APIConfigData) (H
 
 	// EVPN is required when VNIs are defined, but EVPN without VNIs is allowed
 	// (e.g., for preparation or advanced BGP EVPN use cases)
-	if underlay.Spec.EVPN == nil && (len(apiConfig.L3VNIs) > 0 || len(apiConfig.L2VNIs) > 0) {
-		return res, fmt.Errorf("underlay EVPN configuration is required when L3 or L2 VNIs are defined")
+	if underlay.Spec.TunnelEndpoint == nil && (len(apiConfig.L3VNIs) > 0 || len(apiConfig.L2VNIs) > 0) {
+		return res, fmt.Errorf("underlay tunnel endpoint configuration is required when L3 or L2 VNIs are defined")
 	}
 
-	if underlay.Spec.EVPN == nil {
+	if underlay.Spec.TunnelEndpoint == nil {
 		return res, nil
 	}
 
-	res.Underlay.EVPN = &hostnetwork.UnderlayEVPNParams{}
-	if underlay.Spec.EVPN.VTEPCIDR != nil && *underlay.Spec.EVPN.VTEPCIDR != "" {
-		vtepIP, err := ipam.VTEPIp(*underlay.Spec.EVPN.VTEPCIDR, nodeIndex)
-		if err != nil {
-			return res, fmt.Errorf("failed to get vtep ip, cidr %s, nodeIndex %d: %w", *underlay.Spec.EVPN.VTEPCIDR, nodeIndex, err)
-		}
-		res.Underlay.EVPN.VtepIP = vtepIP.String()
+	underlayConfigTunnelEndpoint, err := tunnelEndpointToHost(underlay, nodeIndex)
+	if err != nil {
+		return HostConfigData{}, err
 	}
+	res.Underlay.TunnelEndpoint = &underlayConfigTunnelEndpoint
 
 	for _, vni := range apiConfig.L3VNIs {
+		vtepIP, err := resolveVTEPIP(vni.Spec.UnderlayAddressFamily, res.Underlay.TunnelEndpoint)
+		if err != nil {
+			return HostConfigData{}, fmt.Errorf("L3VNI %s: %w", vni.Name, err)
+		}
 		v := hostnetwork.L3VNIParams{
 			VNIParams: hostnetwork.VNIParams{
 				VRF:       vni.Spec.VRF,
 				TargetNS:  targetNS,
-				VTEPIP:    res.Underlay.EVPN.VtepIP,
+				VTEPIP:    vtepIP,
 				VNI:       vni.Spec.VNI,
 				VXLanPort: vni.Spec.VXLanPort,
 			},
+			Name: vni.Name,
 		}
 		if vni.Spec.HostSession == nil {
 			res.L3VNIs = append(res.L3VNIs, v)
@@ -108,31 +111,74 @@ func APItoHostConfig(nodeIndex int, targetNS string, apiConfig APIConfigData) (H
 
 	res.L2VNIs = []hostnetwork.L2VNIParams{}
 	for _, l2vni := range apiConfig.L2VNIs {
-		vni := hostnetwork.L2VNIParams{
-			VNIParams: hostnetwork.VNIParams{
-				VRF:       l2vni.VRFName(),
-				TargetNS:  targetNS,
-				VTEPIP:    res.Underlay.EVPN.VtepIP,
-				VNI:       l2vni.Spec.VNI,
-				VXLanPort: l2vni.Spec.VXLanPort,
-			},
+		vni, err := convertL2VNI(l2vni, targetNS, res.Underlay.TunnelEndpoint)
+		if err != nil {
+			return HostConfigData{}, err
 		}
-		if len(l2vni.Spec.L2GatewayIPs) > 0 {
-			vni.L2GatewayIPs = make([]string, len(l2vni.Spec.L2GatewayIPs))
-			copy(vni.L2GatewayIPs, l2vni.Spec.L2GatewayIPs)
-		}
-		if l2vni.Spec.HostMaster != nil {
-			hm, err := convertHostMaster(&l2vni)
-			if err != nil {
-				return HostConfigData{}, err
-			}
-			vni.HostMaster = hm
-		}
-
 		res.L2VNIs = append(res.L2VNIs, vni)
 	}
 
 	return res, nil
+}
+
+func tunnelEndpointToHost(underlay v1alpha1.Underlay, nodeIndex int) (hostnetwork.UnderlayTunnelEndpointParams, error) {
+	tunnelEndpoint := hostnetwork.UnderlayTunnelEndpointParams{}
+	for _, cidr := range underlay.Spec.TunnelEndpoint.CIDRs {
+		af := ipfamily.ForCIDRString(cidr)
+		if af == ipfamily.Unknown {
+			return hostnetwork.UnderlayTunnelEndpointParams{},
+				fmt.Errorf("failed to determine address family for CIDR %q", cidr)
+		}
+
+		ip, err := ipam.VTEPIp(cidr, nodeIndex)
+		if err != nil {
+			return hostnetwork.UnderlayTunnelEndpointParams{},
+				fmt.Errorf("failed to get vtep ip, cidr %s, nodeIndex %d: %w", cidr, nodeIndex, err)
+		}
+
+		if af == ipfamily.IPv4 {
+			tunnelEndpoint.IPv4CIDR = ip.String()
+			continue
+		}
+		tunnelEndpoint.IPv6CIDR = ip.String()
+	}
+	if tunnelEndpoint.IPv4CIDR == "" && tunnelEndpoint.IPv6CIDR == "" {
+		return hostnetwork.UnderlayTunnelEndpointParams{},
+			fmt.Errorf("no VTEP IP available after conversion from tunnel endpoint CIDRs: %v",
+				underlay.Spec.TunnelEndpoint.CIDRs)
+	}
+	return tunnelEndpoint, nil
+}
+
+func convertL2VNI(l2vni v1alpha1.L2VNI, targetNS string, tunnelEndpoint *hostnetwork.UnderlayTunnelEndpointParams) (hostnetwork.L2VNIParams, error) {
+	vtepIP, err := resolveVTEPIP(l2vni.Spec.UnderlayAddressFamily, tunnelEndpoint)
+	if err != nil {
+		return hostnetwork.L2VNIParams{}, fmt.Errorf("L2VNI %s: %w", l2vni.Name, err)
+	}
+	vni := hostnetwork.L2VNIParams{
+		Name: l2vni.Name,
+		VNIParams: hostnetwork.VNIParams{
+			TargetNS:  targetNS,
+			VTEPIP:    vtepIP,
+			VNI:       l2vni.Spec.VNI,
+			VXLanPort: l2vni.Spec.VXLanPort,
+		},
+	}
+	if hasVRF(l2vni) {
+		vni.VRF = *l2vni.Spec.VRF
+	}
+	if len(l2vni.Spec.L2GatewayIPs) > 0 {
+		vni.L2GatewayIPs = make([]string, len(l2vni.Spec.L2GatewayIPs))
+		copy(vni.L2GatewayIPs, l2vni.Spec.L2GatewayIPs)
+	}
+	if l2vni.Spec.HostMaster != nil {
+		hm, err := convertHostMaster(&l2vni)
+		if err != nil {
+			return hostnetwork.L2VNIParams{}, err
+		}
+		vni.HostMaster = hm
+	}
+	return vni, nil
 }
 
 func convertHostMaster(l2vni *v1alpha1.L2VNI) (*hostnetwork.HostMaster, error) {
@@ -168,7 +214,39 @@ func convertHostMaster(l2vni *v1alpha1.L2VNI) (*hostnetwork.HostMaster, error) {
 	)
 }
 
-// ipNetToString returns the string representation of the IPNet, or empty string if IP is nil
+func resolveVTEPIP(
+	underlayAddressFamily *string,
+	tunnelEndpoint *hostnetwork.UnderlayTunnelEndpointParams,
+) (string, error) {
+	af := ""
+	if underlayAddressFamily != nil {
+		af = *underlayAddressFamily
+	}
+
+	switch af {
+	case "":
+		if tunnelEndpoint.IPv4CIDR != "" {
+			return tunnelEndpoint.IPv4CIDR, nil
+		}
+		if tunnelEndpoint.IPv6CIDR != "" {
+			return tunnelEndpoint.IPv6CIDR, nil
+		}
+		return "", fmt.Errorf("no VTEP IP available")
+	case "ipv4":
+		if tunnelEndpoint.IPv4CIDR != "" {
+			return tunnelEndpoint.IPv4CIDR, nil
+		}
+		return "", fmt.Errorf("ipv4 address family requested but no IPv4 VTEP IP available")
+	case "ipv6":
+		if tunnelEndpoint.IPv6CIDR != "" {
+			return tunnelEndpoint.IPv6CIDR, nil
+		}
+		return "", fmt.Errorf("ipv6 address family requested but no IPv6 VTEP IP available")
+	default:
+		return "", fmt.Errorf("unsupported address family %q", af)
+	}
+}
+
 func ipNetToString(ipNet net.IPNet) string {
 	if ipNet.IP == nil {
 		return ""

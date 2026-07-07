@@ -61,9 +61,9 @@ type UnderlaySpec struct {
 	// +listType=atomic
 	Nics []string `json:"nics,omitempty"`
 
-	// evpn contains EVPN-VXLAN configuration for the underlay.
+	// tunnelEndpoint contains tunnel endpoint configuration for the underlay.
 	// +optional
-	EVPN *EVPNConfig `json:"evpn,omitempty"`
+	TunnelEndpoint *TunnelEndpointConfig `json:"tunnelEndpoint,omitempty"`
 
 	// gracefulRestart configures BGP Graceful Restart behaviour.
 	// When set, FRR advertises GR capability and preserves forwarding
@@ -94,12 +94,19 @@ type GracefulRestartConfig struct {
 	StalePathTimeSeconds *int64 `json:"stalePathTimeSeconds,omitempty"`
 }
 
-// EVPNConfig contains EVPN-VXLAN configuration for the underlay.
-type EVPNConfig struct {
-	// vtepCIDR is the CIDR to be used to assign IPs to the local VTEP on each node.
-	// A loopback interface will be created with an IP derived from this CIDR.
-	// +optional
-	VTEPCIDR *string `json:"vtepCIDR,omitempty"`
+// TunnelEndpointConfig contains tunnel endpoint configuration for the underlay.
+type TunnelEndpointConfig struct {
+	// cidrs is a list of CIDRs to be used to assign IPs to the local tunnel endpoint on
+	// each node. A loopback interface will be created with IPs derived from
+	// these CIDRs. At least one IPv4 or IPv6 CIDR is required. At most one of each family may be specified.
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=2
+	// +kubebuilder:validation:XValidation:rule="self.all(c, isCIDR(c))",message="all entries must be valid CIDRs"
+	// +kubebuilder:validation:XValidation:rule="self.filter(c, isCIDR(c) && cidr(c).ip().family() == 4).size() <= 1",message="at most one IPv4 CIDR is allowed"
+	// +kubebuilder:validation:XValidation:rule="self.filter(c, isCIDR(c) && cidr(c).ip().family() == 6).size() <= 1",message="at most one IPv6 CIDR is allowed"
+	// +listType=atomic
+	// +required
+	CIDRs []string `json:"cidrs,omitempty"`
 }
 
 // UnderlayStatus defines the observed state of Underlay.

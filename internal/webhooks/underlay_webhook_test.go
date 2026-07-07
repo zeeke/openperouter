@@ -42,8 +42,8 @@ func TestValidateUnderlay(t *testing.T) {
 				},
 				Spec: v1alpha1.UnderlaySpec{
 					ASN: 65000,
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("10.0.0.0/24"),
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"10.0.0.0/24"},
 					},
 					NodeSelector: &metav1.LabelSelector{
 						MatchLabels: map[string]string{
@@ -74,8 +74,8 @@ func TestValidateUnderlay(t *testing.T) {
 					},
 					Spec: v1alpha1.UnderlaySpec{
 						ASN: 65000,
-						EVPN: &v1alpha1.EVPNConfig{
-							VTEPCIDR: new("10.0.0.0/24"),
+						TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+							CIDRs: []string{"10.0.0.0/24"},
 						},
 						NodeSelector: &metav1.LabelSelector{
 							MatchLabels: map[string]string{
@@ -93,8 +93,8 @@ func TestValidateUnderlay(t *testing.T) {
 				},
 				Spec: v1alpha1.UnderlaySpec{
 					ASN: 65001,
-					EVPN: &v1alpha1.EVPNConfig{
-						VTEPCIDR: new("10.0.1.0/24"),
+					TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+						CIDRs: []string{"10.0.1.0/24"},
 					},
 					NodeSelector: &metav1.LabelSelector{
 						MatchLabels: map[string]string{

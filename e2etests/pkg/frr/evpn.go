@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/e2etests/pkg/executor"
 )
 
@@ -47,7 +48,7 @@ func (e *EVPNData) ContainsType5RouteForVNI(prefix string, vtep string, vni int)
 	return false
 }
 
-func (e *EVPNData) ContainsType5RouteWithRT(prefix string, vtep string, vni int, communities []string) bool {
+func (e *EVPNData) ContainsType5RouteWithRT(prefix string, vtep string, vni int, communities []v1alpha1.RouteTarget) bool {
 	for _, path := range e.allPaths() {
 		routePrefix := fmt.Sprintf("%s/%d", path.IP, path.IPLen)
 		if routePrefix == prefix && pathHasVTEPAndRouteTarget(path, vtep, communities) {
@@ -67,7 +68,7 @@ func (e *EVPNData) ContainsType5Prefix(prefix string) bool {
 	return false
 }
 
-func (e *EVPNData) ContainsType5PrefixWithRT(prefix string, communities []string) bool {
+func (e *EVPNData) ContainsType5PrefixWithRT(prefix string, communities []v1alpha1.RouteTarget) bool {
 	for _, path := range e.allPaths() {
 		routePrefix := fmt.Sprintf("%s/%d", path.IP, path.IPLen)
 		if routePrefix == prefix && pathHasRouteTarget(path, communities) {
@@ -121,7 +122,7 @@ func (e *EVPNData) matchingPaths(predicate func(Path) bool) []Path {
 	return paths
 }
 
-func pathHasRouteTarget(path Path, routeTargets []string) bool {
+func pathHasRouteTarget(path Path, routeTargets []v1alpha1.RouteTarget) bool {
 	for _, rt := range routeTargets {
 		routeTarget := fmt.Sprintf("RT:%s", rt)
 		if strings.Contains(path.ExtendedCommunity.String, routeTarget) {
@@ -131,7 +132,7 @@ func pathHasRouteTarget(path Path, routeTargets []string) bool {
 	return false
 }
 
-func pathHasVTEPAndRouteTarget(path Path, vtep string, routeTargets []string) bool {
+func pathHasVTEPAndRouteTarget(path Path, vtep string, routeTargets []v1alpha1.RouteTarget) bool {
 	for _, rt := range routeTargets {
 		routeTarget := fmt.Sprintf("RT:%s", rt)
 		for _, n := range path.Nexthops {

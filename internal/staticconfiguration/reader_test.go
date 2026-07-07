@@ -221,8 +221,8 @@ func TestReadRouterConfigsFromFiles(t *testing.T) {
 				},
 			},
 		},
-		EVPN: &v1alpha1.EVPNConfig{
-			VTEPCIDR: new("100.65.0.0/24"),
+		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+			CIDRs: []string{"100.65.0.0/24"},
 		},
 	}
 

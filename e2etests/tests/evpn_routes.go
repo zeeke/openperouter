@@ -436,8 +436,8 @@ var _ = Describe("Routes between bgp and the fabric with iBGP testing e2e integr
 					Address: new("192.168.12.2"),
 				},
 			},
-			EVPN: &v1alpha1.EVPNConfig{
-				VTEPCIDR: new("100.65.0.0/24"),
+			TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+				CIDRs: []string{"100.65.0.0/24"},
 			},
 		},
 	}

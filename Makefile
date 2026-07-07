@@ -90,7 +90,7 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 .PHONY: test
-test: fmt vet envtest $(LOCALBIN) ## Run tests.
+test: fmt vet envtest $(LOCALBIN) kind-node-image-build ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test $$(go list ./... | grep -v e2etest) -coverprofile cover.out
 	@RUNASROOT_TESTS=""; \
 	for pkg in $$(grep -rl "//go:build runasroot" --include="*_test.go" $$(go list -f '{{.Dir}}' ./...) | xargs -I{} dirname {} | sort -u); do \
@@ -426,8 +426,7 @@ bumplicense:
 .PHONY: checkuncommitted
 CSV_FILE = operator/bundle/manifests/openperouter-operator.clusterserviceversion.yaml
 checkuncommitted:
-	git diff --exit-code -I'^    createdAt: ' -- $(CSV_FILE)
-	git diff --exit-code -- ':!$(CSV_FILE)'
+	git diff --exit-code
 
 .PHONY: bumpall
 bumpall: bumplicense manifests
@@ -461,7 +460,7 @@ generate-all-in-one: manifests kustomize ## Create manifests
 
 .PHONY: helm-docs
 helm-docs:
-	docker run --rm -v $$(pwd):/app -w /app jnorwood/helm-docs:$(HELM_DOCS_VERSION) helm-docs
+	$(CONTAINER_ENGINE) run --rm -v $$(pwd):/app -w /app jnorwood/helm-docs:$(HELM_DOCS_VERSION) helm-docs
 
 .PHONY: api-docs
 api-docs: crd-ref-docs
@@ -591,6 +590,7 @@ bundle: manifests kustomize operator-sdk ## Generate bundle manifests and metada
 	cd operator/config/pods && $(KUSTOMIZE) edit set image controller=$(IMG)
 	cd operator/config/webhook/backend && $(KUSTOMIZE) edit set image controller=$(IMG)
 	cd operator && $(KUSTOMIZE) build config/default | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS) --extra-service-accounts "controller,perouter" --package openperouter-operator
+	hack/restore-csv-timestamp.sh $(CSV_FILE)
 	cd operator && $(OPERATOR_SDK) bundle validate ./bundle
 
 .PHONY: bundle-build

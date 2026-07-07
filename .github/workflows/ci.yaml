@@ -26,7 +26,7 @@ jobs:
     if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'kind/feature')
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Check for website changes
@@ -47,7 +47,7 @@ jobs:
       GO111MODULE: on
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       #- name: Run Gosec Security Scanner
       #  uses: securego/gosec@v2.21.2
       #   with:
@@ -57,13 +57,14 @@ jobs:
         uses: golang/govulncheck-action@v1
         with:
           go-version-file: go.mod
+          repo-checkout: false
 
   check-generated:
     runs-on: ubuntu-22.04
     if: github.actor != 'dependabot[bot]'
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v5
@@ -86,16 +87,16 @@ jobs:
   commitlint:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v5
+      - uses: wagoid/commitlint-github-action@v6
 
   verify-release:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: actions/setup-go@v5
@@ -113,7 +114,7 @@ jobs:
       kind-node-version: ${{ steps.build.outputs.kind-node-version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Build kind-node-openperouter image
         id: build
         uses: ./.github/workflows/composite/build-kind-node-image
@@ -123,7 +124,7 @@ jobs:
     needs: build-kind-node-image
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - uses: actions/setup-go@v5
         with:
@@ -163,7 +164,7 @@ jobs:
       - name: Verify bundle manifests
         run: |
           make bundle
-          git diff --exit-code -I'^    createdAt: ' operator/bundle
+          git diff --exit-code operator/bundle
 
   build-test-images:
     runs-on: ubuntu-22.04
@@ -171,7 +172,7 @@ jobs:
       fail-fast: true
     steps:
       - name: Code checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup docker buildx
         uses: docker/setup-buildx-action@v4
 
@@ -218,7 +219,7 @@ jobs:
           df -h
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - uses: actions/setup-go@v5
         with:
@@ -319,7 +320,7 @@ jobs:
           df -h
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - uses: actions/setup-go@v5
         with:

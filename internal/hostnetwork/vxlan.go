@@ -63,9 +63,9 @@ func checkVXLanConfigured(vxLan *netlink.Vxlan, bridgeIndex, loopbackIndex int, 
 }
 
 func createVXLan(params VNIParams, bridge *netlink.Bridge) (*netlink.Vxlan, error) {
-	loopback, err := net.InterfaceByName(UnderlayLoopback)
+	loopback, err := net.InterfaceByName(loopbackName)
 	if err != nil {
-		return nil, fmt.Errorf("failed looking for vtep loopback interface %s: %w", UnderlayLoopback, err)
+		return nil, fmt.Errorf("failed looking for vtep loopback interface %s: %w", loopbackName, err)
 	}
 
 	vtepIP, _, err := net.ParseCIDR(params.VTEPIP)

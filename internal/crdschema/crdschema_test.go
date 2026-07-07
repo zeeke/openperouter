@@ -268,12 +268,12 @@ func TestValidateSuccessful(t *testing.T) {
 		obj  *unstructured.Unstructured
 	}{
 		{
-			name: "Underlay EVPN with only vtepCIDR",
+			name: "Underlay with tunnel endpoint",
 			gvk:  underlayGVK,
 			obj: newUnstructured("Underlay", map[string]any{
-				"asn":  int64(65000),
-				"nics": []any{"eth0"},
-				"evpn": map[string]any{"vtepCIDR": "10.10.0.0/24"},
+				"asn":            int64(65000),
+				"nics":           []any{"eth0"},
+				"tunnelEndpoint": map[string]any{"cidrs": []any{"10.10.0.0/24"}},
 				"neighbors": []any{
 					map[string]any{
 						"address": "192.168.1.1",

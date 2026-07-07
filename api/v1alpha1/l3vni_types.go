@@ -47,6 +47,13 @@ type L3VNISpec struct {
 	// +optional
 	VXLanPort *int32 `json:"vxlanport,omitempty"`
 
+	// underlayAddressFamily selects which VTEP address family to use for this VNI's
+	// VXLAN interface. When omitted, defaults to the available family in the underlay
+	// (IPv4 preferred in dual-stack).
+	// +kubebuilder:validation:Enum=ipv4;ipv6
+	// +optional
+	UnderlayAddressFamily *string `json:"underlayAddressFamily,omitempty"`
+
 	// hostsession is the configuration for the host session.
 	// +optional
 	HostSession *HostSession `json:"hostsession,omitempty"`
@@ -54,15 +61,21 @@ type L3VNISpec struct {
 	// exportRTs are the Route Targets to be used for exporting routes.
 	// RouteTarget defines a BGP Extended Community for route filtering.
 	// +optional
+	// +kubebuilder:validation:MaxItems:=100
 	// +listType=atomic
-	ExportRTs []string `json:"exportRTs,omitempty"`
+	ExportRTs []RouteTarget `json:"exportRTs,omitempty"`
 
 	// importRTs are the Route Targets to be used for importing routes.
 	// RouteTarget defines a BGP Extended Community for route filtering.
 	// +optional
+	// +kubebuilder:validation:MaxItems:=100
 	// +listType=atomic
-	ImportRTs []string `json:"importRTs,omitempty"`
+	ImportRTs []RouteTarget `json:"importRTs,omitempty"`
 }
+
+// RouteTarget defines a BGP Extended Community for route filtering.
+// +kubebuilder:validation:MaxLength:=21
+type RouteTarget string
 
 // L3VNIStatus defines the observed state of L3VNI.
 type L3VNIStatus struct {

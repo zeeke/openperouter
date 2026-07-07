@@ -77,7 +77,7 @@ The named network namespace (`/var/run/netns/perouter`) is held open by a bind m
 | VRFs, bridges, VXLAN interfaces | Yes | Kernel objects tied to the namespace |
 | Veth pairs (pe/host) | Yes | Kernel objects tied to the namespace |
 | Underlay physical NIC | Yes | Stays inside the namespace |
-| VTEP loopback (lound) | Yes | Kernel dummy interface |
+| VTEP loopback (lo) | Yes | Kernel loopback interface |
 | Kernel routing tables | Yes | Installed by zebra, persist in the namespace |
 | Bridge FDB entries | Yes | Kernel bridge state |
 | ARP / neighbor entries | Yes | Kernel neighbor table |

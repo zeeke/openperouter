@@ -51,6 +51,13 @@ type L2VNISpec struct {
 	// +optional
 	VXLanPort *int32 `json:"vxlanport,omitempty"`
 
+	// underlayAddressFamily selects which VTEP address family to use for this VNI's
+	// VXLAN interface. When omitted, defaults to the available family in the underlay
+	// (IPv4 preferred in dual-stack).
+	// +kubebuilder:validation:Enum=ipv4;ipv6
+	// +optional
+	UnderlayAddressFamily *string `json:"underlayAddressFamily,omitempty"`
+
 	// hostmaster is the interface on the host the veth should be enslaved to.
 	// If not set, the host veth will not be enslaved to any interface and it must be
 	// enslaved manually (or by some other means). This is useful if another controller
@@ -141,15 +148,6 @@ type L2VNI struct {
 	// status defines the observed state of L2VNI.
 	// +optional
 	Status *L2VNIStatus `json:"status,omitempty"`
-}
-
-// VRFName returns the name to be used for the
-// vrf corresponding to the object.
-func (v L2VNI) VRFName() string {
-	if v.Spec.VRF != nil && *v.Spec.VRF != "" {
-		return *v.Spec.VRF
-	}
-	return v.Name
 }
 
 // +kubebuilder:object:root=true

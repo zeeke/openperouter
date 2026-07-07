@@ -20,8 +20,9 @@ metadata:
   namespace: openperouter-system
 spec:
   asn: 64514
-  evpn:
-    vtepCIDR: 100.65.0.0/24
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
   nics:
     - toswitch
   neighbors:
@@ -29,7 +30,7 @@ spec:
       address: 192.168.11.2
 ```
 
-The `evpn.vtepCIDR` field defines the IP range used for VTEP addresses. OpenPERouter automatically assigns a unique VTEP IP to each node from this range. For example, with `100.65.0.0/24`:
+The `tunnelEndpoint.cidrs` field defines the IP range used for VTEP addresses. OpenPERouter automatically assigns a unique VTEP IP to each node from this range. At least one CIDR (IPv4 or IPv6) is required, and both may be specified for dual-stack operation. For example, with `100.65.0.0/24`:
 
 - Node 1: `100.65.0.1`
 - Node 2: `100.65.0.2`
@@ -37,6 +38,19 @@ The `evpn.vtepCIDR` field defines the IP range used for VTEP addresses. OpenPERo
 - etc.
 
 A loopback interface is created inside the router namespace with the allocated IP, and OpenPERouter advertises the VTEP IP to the fabric over the BGP underlay session.
+
+#### IPv6 and Dual-Stack VTEP
+
+IPv6-only or dual-stack (IPv4 + IPv6) VTEP configurations are supported:
+
+```yaml
+  tunnelEndpoint:
+    cidrs:
+    - 100.65.0.0/24
+    - fd00:64::/120
+```
+
+When both IPv4 and IPv6 CIDRs are specified, individual VNIs can select which address family to use via the `underlayAddressFamily` field on the L3VNI or L2VNI resource. When omitted, it defaults to the available family (IPv4 preferred in dual-stack).
 
 ### Configuration Fields
 
@@ -78,6 +92,7 @@ spec:
 |-------|------|-------------|----------|
 | `vrf` | string | Name of the VRF (Virtual Routing and Forwarding) instance | Yes |
 | `vni` | integer | Virtual Network Identifier (1-16777215) | Yes |
+| `underlayAddressFamily` | string | VTEP address family for this VNI (`ipv4` or `ipv6`). Defaults to available family (IPv4 preferred in dual-stack). | No |
 | `hostsession.asn` | integer | Router ASN for BGP session with host | Yes |
 | `hostsession.hostasn` | integer | Host ASN for BGP session | Yes |
 | `hostsession.localcidr` | string | CIDR for veth pair IP allocation | Yes |
@@ -141,6 +156,7 @@ L2VNIs provide Layer 2 connectivity across nodes using EVPN tunnels. Unlike L3VN
 |-------|------|-------------|----------|
 | `vni` | integer | Virtual Network Identifier for the EVPN tunnel | Yes |
 | `vrf` | string | Name of the VRF to associate with this L2VNI | Yes |
+| `underlayAddressFamily` | string | VTEP address family for this VNI (`ipv4` or `ipv6`). Defaults to available family (IPv4 preferred in dual-stack). | No |
 | `hostmaster.type` | string | Type of host interface management (`linux-bridge` or `ovs-bridge`) | Yes |
 | `hostmaster.linuxBridge.autoCreate` | boolean | Whether to automatically create a Linux bridge | No |
 | `hostmaster.linuxBridge.name` | string | Name of the Linux bridge to attach to (if not auto-creating) | No |

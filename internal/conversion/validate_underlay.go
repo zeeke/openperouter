@@ -4,12 +4,13 @@ package conversion
 
 import (
 	"fmt"
-	"net"
 
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openperouter/openperouter/api/v1alpha1"
+	openpeerrors "github.com/openperouter/openperouter/internal/errors"
 	"github.com/openperouter/openperouter/internal/filter"
+	"github.com/openperouter/openperouter/internal/ipfamily"
 )
 
 func ValidateUnderlaysForNodes(nodes []corev1.Node, underlays []v1alpha1.Underlay) error {
@@ -30,9 +31,26 @@ func ValidateUnderlays(underlays []v1alpha1.Underlay) error {
 		return nil
 	}
 	if len(underlays) > 1 {
-		return fmt.Errorf("can't have more than one underlay per node")
+		return &openpeerrors.ResourceError{
+			Obj: v1alpha1.FailedResource{
+				Kind:    v1alpha1.FailedResourceKind("Underlay"),
+				Name:    underlays[0].Name,
+				Reason:  v1alpha1.FailedResourceReasonValidationFailed,
+				Message: "can't have more than one underlay per node",
+			},
+		}
 	}
-	return validateUnderlay(underlays[0])
+	if err := validateUnderlay(underlays[0]); err != nil {
+		return &openpeerrors.ResourceError{
+			Obj: v1alpha1.FailedResource{
+				Kind:    v1alpha1.FailedResourceKind("Underlay"),
+				Name:    underlays[0].Name,
+				Reason:  v1alpha1.FailedResourceReasonValidationFailed,
+				Message: err.Error(),
+			},
+		}
+	}
+	return nil
 }
 
 func validateUnderlay(underlay v1alpha1.Underlay) error {
@@ -53,8 +71,8 @@ func validateUnderlay(underlay v1alpha1.Underlay) error {
 		return fmt.Errorf("underlay %s has duplicate nic name: %w", underlay.Name, err)
 	}
 
-	if underlay.Spec.EVPN != nil {
-		if err := validateUnderlayEVPN(&underlay); err != nil {
+	if underlay.Spec.TunnelEndpoint != nil {
+		if err := validateUnderlayTunnelEndpoint(&underlay); err != nil {
 			return err
 		}
 	}
@@ -68,15 +86,21 @@ func validateUnderlay(underlay v1alpha1.Underlay) error {
 	return nil
 }
 
-func validateUnderlayEVPN(underlay *v1alpha1.Underlay) error {
-	if underlay.Spec.EVPN.VTEPCIDR == nil || *underlay.Spec.EVPN.VTEPCIDR == "" {
-		return fmt.Errorf("underlay %s: vtepCIDR must be specified", underlay.Name)
+func validateUnderlayTunnelEndpoint(underlay *v1alpha1.Underlay) error {
+	if underlay.Spec.TunnelEndpoint == nil {
+		return fmt.Errorf("underlay %s: tunnel endpoint must be specified", underlay.Name)
 	}
 
-	if _, _, err := net.ParseCIDR(*underlay.Spec.EVPN.VTEPCIDR); err != nil {
-		return fmt.Errorf("invalid vtep CIDR format for underlay %s: %s - %w", underlay.Name, *underlay.Spec.EVPN.VTEPCIDR, err)
+	cidrs := underlay.Spec.TunnelEndpoint.CIDRs
+	if len(cidrs) == 0 {
+		return fmt.Errorf("underlay %s: tunnel endpoint CIDRs must be specified", underlay.Name)
 	}
 
+	_, err := ipfamily.ForCIDRStrings(cidrs...)
+	if err != nil {
+		return fmt.Errorf("invalid tunnel endpoint CIDRs for underlay %s: %v - %w",
+			underlay.Name, cidrs, err)
+	}
 	return nil
 }
 

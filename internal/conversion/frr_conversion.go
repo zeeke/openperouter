@@ -13,6 +13,7 @@ import (
 	"github.com/openperouter/openperouter/internal/frr"
 	"github.com/openperouter/openperouter/internal/ipam"
 	"github.com/openperouter/openperouter/internal/ipfamily"
+	"github.com/openperouter/openperouter/internal/networklayerprotocol"
 	"k8s.io/utils/ptr"
 )
 
@@ -76,7 +77,13 @@ func APItoFRR(config APIConfigData, nodeIndex int, logLevel string) (frr.Config,
 		RouterID: routerID,
 	}
 
-	neighbors, err := neighborsToFRR(underlay.Spec.Neighbors)
+	neighbors, err := neighborsToFRR(
+		underlay.Spec.Neighbors,
+		config.L2VNIs,
+		config.L3VNIs,
+		config.L3Passthrough,
+		underlay.Spec.TunnelEndpoint,
+	)
 	if err != nil {
 		return frr.Config{}, err
 	}
@@ -84,11 +91,11 @@ func APItoFRR(config APIConfigData, nodeIndex int, logLevel string) (frr.Config,
 
 	applyGracefulRestart(&underlayConfig, underlay.Spec.GracefulRestart)
 
-	evpn, err := evpnToFRR(underlay, nodeIndex)
+	tunnelEndpoint, err := tunnelEndpointToFRR(underlay, nodeIndex)
 	if err != nil {
 		return frr.Config{}, err
 	}
-	underlayConfig.EVPN = evpn
+	underlayConfig.TunnelEndpoint = tunnelEndpoint
 
 	vniConfigs, err := vniConfigsToFRR(config.L3VNIs, config.L2VNIs, routerID, underlay.Spec.ASN, nodeIndex)
 	if err != nil {
@@ -113,10 +120,13 @@ func APItoFRR(config APIConfigData, nodeIndex int, logLevel string) (frr.Config,
 	}, nil
 }
 
-func neighborsToFRR(apiNeighbors []v1alpha1.Neighbor) ([]frr.NeighborConfig, error) {
+func neighborsToFRR(apiNeighbors []v1alpha1.Neighbor,
+	l2vnis []v1alpha1.L2VNI, l3vnis []v1alpha1.L3VNI, l3passthroughs []v1alpha1.L3Passthrough,
+	tunnelEndpoint *v1alpha1.TunnelEndpointConfig,
+) ([]frr.NeighborConfig, error) {
 	neighbors := make([]frr.NeighborConfig, 0, len(apiNeighbors))
 	for _, n := range apiNeighbors {
-		frrNeigh, err := neighborToFRR(n)
+		frrNeigh, err := neighborToFRR(n, l2vnis, l3vnis, l3passthroughs, tunnelEndpoint)
 		if err != nil {
 			return nil, fmt.Errorf("failed to translate underlay neighbor to frr, err: %w", err)
 		}
@@ -151,22 +161,42 @@ func applyGracefulRestart(config *frr.UnderlayConfig, gr *v1alpha1.GracefulResta
 	}
 }
 
-func evpnToFRR(underlay v1alpha1.Underlay, nodeIndex int) (*frr.UnderlayEvpn, error) {
-	if underlay.Spec.EVPN == nil {
+func tunnelEndpointToFRR(underlay v1alpha1.Underlay, nodeIndex int) (*frr.TunnelEndpoint, error) {
+	if underlay.Spec.TunnelEndpoint == nil {
 		return nil, nil
 	}
-	evpn := &frr.UnderlayEvpn{}
-	if vtepCIDR := ptr.Deref(underlay.Spec.EVPN.VTEPCIDR, ""); vtepCIDR != "" {
-		vtepIP, err := ipam.VTEPIp(vtepCIDR, nodeIndex)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get vtep ip, cidr %s, nodeIndex %d: %w", vtepCIDR, nodeIndex, err)
+	tunnelEndpoint := &frr.TunnelEndpoint{}
+	for _, cidr := range underlay.Spec.TunnelEndpoint.CIDRs {
+		af := ipfamily.ForCIDRString(cidr)
+		if af == ipfamily.Unknown {
+			return nil, fmt.Errorf("failed to determine address family for CIDR %q", cidr)
 		}
-		evpn.VTEP = vtepIP.String()
+
+		ip, err := ipam.VTEPIp(cidr, nodeIndex)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get vtep ip, cidr %s, nodeIndex %d: %w", cidr, nodeIndex, err)
+		}
+
+		if af == ipfamily.IPv4 {
+			tunnelEndpoint.IPv4CIDR = ip.String()
+			continue
+		}
+		tunnelEndpoint.IPv6CIDR = ip.String()
 	}
-	return evpn, nil
+	if tunnelEndpoint.IPv4CIDR == "" && tunnelEndpoint.IPv6CIDR == "" {
+		return nil, fmt.Errorf("no VTEP IP available after conversion from tunnel endpoint CIDRs: %v",
+			underlay.Spec.TunnelEndpoint.CIDRs)
+	}
+	return tunnelEndpoint, nil
 }
 
-func vniConfigsToFRR(l3vnis []v1alpha1.L3VNI, l2vnis []v1alpha1.L2VNI, routerID string, underlayASN int64, nodeIndex int) ([]frr.L3VNIConfig, error) {
+func vniConfigsToFRR(
+	l3vnis []v1alpha1.L3VNI,
+	l2vnis []v1alpha1.L2VNI,
+	routerID string,
+	underlayASN int64,
+	nodeIndex int,
+) ([]frr.L3VNIConfig, error) {
 	vrfsWithL2Gateway := vrfsWithL2Gateways(l2vnis)
 	configs := []frr.L3VNIConfig{}
 	for _, vni := range l3vnis {
@@ -253,14 +283,17 @@ func passthroughToFRR(passthrough v1alpha1.L3Passthrough, nodeIndex int) (*frr.P
 // Otherwise, it derives veth IPs from the HostSession's local CIDR pool for the given node index
 // and creates a config per IP family (IPv4/IPv6), each with a local neighbor and the corresponding prefixes to advertise.
 func l3vniToFRR(vni v1alpha1.L3VNI, routerID string, underlayASN int64, nodeIndex int, opts ...L3VNIOption) ([]frr.L3VNIConfig, error) {
+	exportRTs := convertRTsToSliceOfStrings(vni.Spec.ExportRTs)
+	importRTs := convertRTsToSliceOfStrings(vni.Spec.ImportRTs)
+
 	if vni.Spec.HostSession == nil { // no neighbor, just the vni / vrf
 		cfg := frr.L3VNIConfig{
 			VNI:       vni.Spec.VNI,
 			VRF:       vni.Spec.VRF,
 			ASN:       underlayASN, // Since there is no session, the ASN is arbitrary
 			RouterID:  routerID,
-			ExportRTs: vni.Spec.ExportRTs,
-			ImportRTs: vni.Spec.ImportRTs,
+			ExportRTs: exportRTs,
+			ImportRTs: importRTs,
 		}
 		for _, opt := range opts {
 			if err := opt(&cfg); err != nil {
@@ -310,8 +343,8 @@ func l3vniToFRR(vni v1alpha1.L3VNI, routerID string, underlayASN int64, nodeInde
 				ID:   ipnet.IP.String(),
 				ASN:  hostASN,
 			},
-			ExportRTs:       vni.Spec.ExportRTs,
-			ImportRTs:       vni.Spec.ImportRTs,
+			ExportRTs:       exportRTs,
+			ImportRTs:       importRTs,
 			ToAdvertiseIPv4: toAdvertiseIPv4,
 			ToAdvertiseIPv6: toAdvertiseIPv6,
 		})
@@ -326,7 +359,22 @@ func l3vniToFRR(vni v1alpha1.L3VNI, routerID string, underlayASN int64, nodeInde
 	return configs, nil
 }
 
-func neighborToFRR(n v1alpha1.Neighbor) (*frr.NeighborConfig, error) {
+// convertRTsToSliceOfStrings converts the provided routeTarget []v1alpha1.RouteTarget to slice of strings.
+// convertRTsToSliceOfStrings does not validate the provided routeTargets:
+// - for APItoFRR,  FilterValidL3VNIs -> validateL3VNI already did the validation
+// - in validate_vni.go, validation is done separately.
+func convertRTsToSliceOfStrings(routeTargets []v1alpha1.RouteTarget) []string {
+	strTargets := make([]string, len(routeTargets))
+	for i, rt := range routeTargets {
+		strTargets[i] = string(rt)
+	}
+	return strTargets
+}
+
+func neighborToFRR(n v1alpha1.Neighbor,
+	l2vnis []v1alpha1.L2VNI, l3vnis []v1alpha1.L3VNI, l3passthroughs []v1alpha1.L3Passthrough,
+	tunnelEndpoint *v1alpha1.TunnelEndpointConfig,
+) (*frr.NeighborConfig, error) {
 	asn, err := frr.NewPeerASN(n.ASN, n.Type)
 	if err != nil {
 		return nil, fmt.Errorf("neighbor %s: could not parse ASN configuration, err: %w", neighborID(n), err)
@@ -334,14 +382,25 @@ func neighborToFRR(n v1alpha1.Neighbor) (*frr.NeighborConfig, error) {
 
 	neighName := neighborName(asn, neighborID(n))
 
+	var nlps []networklayerprotocol.NLP
+	if len(n.AddressFamilies) == 0 {
+		nlps, err = defaultNLPsForNeighbor(n, l2vnis, l3vnis, l3passthroughs, tunnelEndpoint)
+	} else {
+		nlps, err = nlpsForNeighbor(n)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("neighbor %s: could not get network layer protocols, err: %w", neighName, err)
+	}
+
 	res := &frr.NeighborConfig{
-		Name:         neighName,
-		ASN:          asn,
-		Addr:         ptr.Deref(n.Address, ""),
-		Interface:    ptr.Deref(n.Interface, ""),
-		Port:         n.Port,
-		EBGPMultiHop: ptr.Deref(n.EBGPMultiHop, false),
-		Password:     ptr.Deref(n.Password, ""),
+		Name:                  neighName,
+		ASN:                   asn,
+		Addr:                  ptr.Deref(n.Address, ""),
+		Interface:             ptr.Deref(n.Interface, ""),
+		Port:                  n.Port,
+		EBGPMultiHop:          ptr.Deref(n.EBGPMultiHop, false),
+		Password:              ptr.Deref(n.Password, ""),
+		NetworkLayerProtocols: nlps,
 	}
 
 	if err := validateNeighborConfig(res); err != nil {
@@ -351,10 +410,6 @@ func neighborToFRR(n v1alpha1.Neighbor) (*frr.NeighborConfig, error) {
 	setIDForNeighbor(res)
 
 	if err := setExtendedNexthopForNeighbor(res); err != nil {
-		return nil, err
-	}
-
-	if err := setIPFamilyForNeighbor(res); err != nil {
 		return nil, err
 	}
 
@@ -393,6 +448,8 @@ func setIDForNeighbor(res *frr.NeighborConfig) {
 	res.ID = res.Interface
 }
 
+// setExtendedNexthopForNeighbor sets extended nexthop to true if the neighbor peers via an interface or if the neighbor
+// peers via IPv6 and the exchanged network layer protocol is IPv4 unicast.
 func setExtendedNexthopForNeighbor(res *frr.NeighborConfig) error {
 	if res.Interface != "" {
 		res.ExtendedNexthop = true
@@ -403,37 +460,125 @@ func setExtendedNexthopForNeighbor(res *frr.NeighborConfig) error {
 	if err != nil {
 		return fmt.Errorf("failed to find ipfamily for %s, %w", res.Addr, err)
 	}
-	if neighborFamily != ipfamily.IPv4 {
+	if neighborFamily == ipfamily.IPv4 {
+		return nil
+	}
+
+	if networklayerprotocol.HasUnicastFamily(res.NetworkLayerProtocols, networklayerprotocol.IPv4) {
 		res.ExtendedNexthop = true
 	}
 	return nil
 }
 
-// setIPFamilyForNeighbor sets the IP family for the neighbor. This follows
-// a simple heuristic:
-// We always want to announce at least IPv4 due to EVPN requirements.
-// But we also have to announce IPv6 when the underlay is IPv6, e.g. for passthrough.
-// Therefore announce as follows:
-// Unnumbered: IPv4.
-// IPv4 underlay: IPv4.
-// IPv6 underlay: Dualstack.
-func setIPFamilyForNeighbor(res *frr.NeighborConfig) error {
-	if res.Interface != "" {
-		res.IPFamily = ipfamily.IPv4
-		return nil
+// nlpsForNeighbor converts a neighbor's API neighbor IP families to internal representations.
+func nlpsForNeighbor(n v1alpha1.Neighbor) ([]networklayerprotocol.NLP, error) {
+	nlps := make([]networklayerprotocol.NLP, 0, len(n.AddressFamilies))
+	for _, af := range n.AddressFamilies {
+		switch af.Type {
+		case "ipv4unicast":
+			nlps = append(nlps, networklayerprotocol.NLP{
+				AFI:  networklayerprotocol.IPv4,
+				SAFI: networklayerprotocol.Unicast,
+			})
+		case "ipv6unicast":
+			nlps = append(nlps, networklayerprotocol.NLP{
+				AFI:  networklayerprotocol.IPv6,
+				SAFI: networklayerprotocol.Unicast,
+			})
+		case "evpn":
+			nlps = append(nlps, networklayerprotocol.NLP{
+				AFI:  networklayerprotocol.L2VPN,
+				SAFI: networklayerprotocol.EVPN,
+			})
+		default:
+			return nil, fmt.Errorf("unsupported address family type %q", af.Type)
+		}
+	}
+	return nlps, nil
+}
+
+// defaultNLPsForNeighbor parses a neighbor, l2vnis, l3vnis and l3passthroughs and chooses sane defaults.
+// Defaults are chosen as follows:
+// For unnumbered neighbors:
+// - ipv4unicast
+// - ipv6unicast if passthrough is configured with IPv6 local CIDR
+// - evpn if L2VNIs or L3VNIs are present.
+// For IPv4 neighbors:
+// - ipv4unicast
+// - ipv6unicast if passthrough is configured with IPv6 local CIDR
+// - evpn if L2VNIs or L3VNIs are present.
+// For IPv6 neighbors:
+// - ipv4unicast if L2VNIs or L3VNIs are present, or if passthrough is configured with IPv4 local CIDR
+// - ipv6unicast
+// - evpn if L2VNIs or L3VNIs are present
+func defaultNLPsForNeighbor(n v1alpha1.Neighbor,
+	l2vnis []v1alpha1.L2VNI, l3vnis []v1alpha1.L3VNI, l3passthroughs []v1alpha1.L3Passthrough,
+	tunnelEndpoint *v1alpha1.TunnelEndpointConfig,
+) ([]networklayerprotocol.NLP, error) {
+	addIPv4Unicast := false
+	addIPv6Unicast := false
+	addEVPN := false
+
+	intf := ptr.Deref(n.Interface, "")
+	addr := ptr.Deref(n.Address, "")
+	address := net.ParseIP(addr)
+	if intf == "" && address == nil {
+		return nil, fmt.Errorf("either Interface or valid IP Address must be set to determine default, "+
+			"interface: %s, address: %s", intf, addr)
+	}
+	isIPv6Neighbor := intf == "" && ipfamily.ForAddress(address) == ipfamily.IPv6
+
+	if isIPv6Neighbor {
+		addIPv6Unicast = true
+	} else {
+		addIPv4Unicast = true
 	}
 
-	neighborFamily, err := ipfamily.ForAddresses(res.Addr)
-	if err != nil {
-		return fmt.Errorf("failed to find ipfamily for %s, %w", res.Addr, err)
-	}
-	if neighborFamily == ipfamily.IPv4 {
-		res.IPFamily = ipfamily.IPv4
-		return nil
+	for _, l3passthrough := range l3passthroughs {
+		if ptr.Deref(l3passthrough.Spec.HostSession.LocalCIDR.IPv4, "") != "" {
+			addIPv4Unicast = true
+		}
+		if ptr.Deref(l3passthrough.Spec.HostSession.LocalCIDR.IPv6, "") != "" {
+			addIPv6Unicast = true
+		}
 	}
 
-	res.IPFamily = ipfamily.DualStack
-	return nil
+	if len(l2vnis) > 0 || len(l3vnis) > 0 {
+		addIPv4Unicast = true
+		addEVPN = true
+	}
+
+	if tunnelEndpoint != nil {
+		for _, cidr := range tunnelEndpoint.CIDRs {
+			switch ipfamily.ForCIDRString(cidr) {
+			case ipfamily.IPv4:
+				addIPv4Unicast = true
+			case ipfamily.IPv6:
+				addIPv6Unicast = true
+			}
+		}
+	}
+
+	defaultNLPs := []networklayerprotocol.NLP{}
+	if addIPv4Unicast {
+		defaultNLPs = append(defaultNLPs, networklayerprotocol.NLP{
+			AFI:  networklayerprotocol.IPv4,
+			SAFI: networklayerprotocol.Unicast,
+		})
+	}
+	if addIPv6Unicast {
+		defaultNLPs = append(defaultNLPs, networklayerprotocol.NLP{
+			AFI:  networklayerprotocol.IPv6,
+			SAFI: networklayerprotocol.Unicast,
+		})
+	}
+	if addEVPN {
+		defaultNLPs = append(defaultNLPs, networklayerprotocol.NLP{
+			AFI:  networklayerprotocol.L2VPN,
+			SAFI: networklayerprotocol.EVPN,
+		})
+	}
+	return defaultNLPs, nil
 }
 
 func bfdProfileForNeighbor(n v1alpha1.Neighbor) *frr.BFDProfile {
@@ -489,7 +634,11 @@ func vrfsWithL2Gateways(l2vnis []v1alpha1.L2VNI) map[string][]string {
 	res := make(map[string][]string)
 	for _, l2vni := range l2vnis {
 		if len(l2vni.Spec.L2GatewayIPs) > 0 {
-			res[l2vni.VRFName()] = l2vni.Spec.L2GatewayIPs
+			vrf := l2vni.Name
+			if l2vni.Spec.VRF != nil {
+				vrf = *l2vni.Spec.VRF
+			}
+			res[vrf] = l2vni.Spec.L2GatewayIPs
 		}
 	}
 	return res

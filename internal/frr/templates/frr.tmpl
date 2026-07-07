@@ -61,7 +61,7 @@ router bgp {{ .Underlay.MyASN }}
 {{- template "localpassthrough" . -}}
 {{- end }}
 
-{{- if .Underlay.EVPN }}
+{{- if .Underlay.TunnelEndpoint }}
 {{- template "underlayevpn" . -}}
 {{- end }}
 exit

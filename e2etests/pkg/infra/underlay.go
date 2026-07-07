@@ -27,8 +27,8 @@ var Underlay = v1alpha1.Underlay{
 				Address: new("192.168.12.2"),
 			},
 		},
-		EVPN: &v1alpha1.EVPNConfig{
-			VTEPCIDR: new("100.65.0.0/24"),
+		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+			CIDRs: []string{"100.65.0.0/24"},
 		},
 	},
 }
@@ -51,8 +51,8 @@ var UnderlayIPv6 = v1alpha1.Underlay{
 				Address: new("2001:db8:12::2"),
 			},
 		},
-		EVPN: &v1alpha1.EVPNConfig{
-			VTEPCIDR: new("100.65.0.0/24"),
+		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+			CIDRs: []string{"100.65.0.0/24"},
 		},
 	},
 }
@@ -71,8 +71,8 @@ var UnderlayUnnumbered = v1alpha1.Underlay{
 				Interface: new("toleafkind1"),
 			},
 		},
-		EVPN: &v1alpha1.EVPNConfig{
-			VTEPCIDR: new("100.65.0.0/24"),
+		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+			CIDRs: []string{"100.65.0.0/24"},
 		},
 	},
 }

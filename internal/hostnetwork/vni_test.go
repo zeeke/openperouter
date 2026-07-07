@@ -507,6 +507,19 @@ var _ = Describe("L2 VNI configuration", func() {
 				Type: BridgeLinkType,
 			},
 		}),
+		Entry("disconnected L2VNI (no VRF)", L2VNIParams{
+			VNIParams: VNIParams{
+				VRF:       "",
+				TargetNS:  testNSPath(),
+				VTEPIP:    "192.170.0.13/32",
+				VNI:       500,
+				VXLanPort: new(int32(4789)),
+			},
+			HostMaster: &HostMaster{
+				Name: new(bridgeName),
+				Type: BridgeLinkType,
+			},
+		}),
 	)
 
 	It("should set veth MTU to underlay MTU minus VXLan overhead when an underlay interface is configured", func() {
@@ -700,8 +713,8 @@ func validateL2VNI(g Gomega, params L2VNIParams) {
 }
 
 func validateVNI(g Gomega, params VNIParams) {
-	vtepDev, err := netlink.LinkByName(UnderlayLoopback)
-	g.Expect(err).NotTo(HaveOccurred(), "vtep device not found %q", UnderlayLoopback)
+	vtepDev, err := netlink.LinkByName(loopbackName)
+	g.Expect(err).NotTo(HaveOccurred(), "vtep device not found %q", loopbackName)
 
 	vxlanLink, err := netlink.LinkByName(vxLanNameFromVNI(params.VNI))
 	g.Expect(err).NotTo(HaveOccurred(), "vxlan link not found %q", vxLanNameFromVNI(params.VNI))
@@ -712,22 +725,40 @@ func validateVNI(g Gomega, params VNIParams) {
 	addrGenModeNone := checkAddrGenModeNone(vxlan)
 	g.Expect(addrGenModeNone).To(BeTrue())
 
-	vrfLink, err := netlink.LinkByName(params.VRF)
-	g.Expect(err).NotTo(HaveOccurred(), "vrf not found", params.VRF)
-
-	vrf := vrfLink.(*netlink.Vrf)
-	g.Expect(vrf.OperState).To(BeEquivalentTo(netlink.OperUp))
-
 	bridgeLink, err := netlink.LinkByName(BridgeName(params.VNI))
 	g.Expect(err).NotTo(HaveOccurred(), "bridge not found", BridgeName(params.VNI))
 
 	bridge := bridgeLink.(*netlink.Bridge)
 	g.Expect(bridge.OperState).To(BeEquivalentTo(netlink.OperUp))
 
+	if params.VRF == "" {
+		g.Expect(bridge.MasterIndex).To(BeZero(), "disconnected bridge should not be enslaved to a VRF")
+
+		err = checkVXLanConfigured(vxlan, bridge.Index, vtepDev.Attrs().Index, params)
+		g.Expect(err).NotTo(HaveOccurred())
+		return
+	}
+
+	vrfLink, err := netlink.LinkByName(params.VRF)
+	g.Expect(err).NotTo(HaveOccurred(), "vrf not found", params.VRF)
+
+	vrf, isVrf := vrfLink.(*netlink.Vrf)
+	g.Expect(isVrf).To(BeTrue(), "link %s is not a VRF", params.VRF)
+	g.Expect(vrf.OperState).To(BeEquivalentTo(netlink.OperUp))
+
 	g.Expect(bridge.MasterIndex).To(Equal(vrf.Index))
 
 	err = checkVXLanConfigured(vxlan, bridge.Index, vtepDev.Attrs().Index, params)
 	g.Expect(err).NotTo(HaveOccurred())
+
+	ok, err := hasUnreachableDefaultRoute(int(vrf.Table), netlink.FAMILY_V4)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(ok).To(BeTrue())
+
+	ok, err = hasUnreachableDefaultRoute(int(vrf.Table), netlink.FAMILY_V6)
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(ok).To(BeTrue())
+
 }
 
 func validateVethForVNI(g Gomega, params VNIParams) {
@@ -751,6 +782,23 @@ func checkLinkdeleted(g Gomega, name string) {
 	g.Expect(errors.As(err, &netlink.LinkNotFoundError{})).To(BeTrue(), "link not deleted", name, err)
 }
 
+func checkInterfaceHasNoNonLoopbackIPs(g Gomega, intf string) {
+	lo, err := netlink.LinkByName(intf)
+	g.Expect(err).NotTo(HaveOccurred())
+
+	addresses, err := netlink.AddrList(lo, netlink.FAMILY_ALL)
+	g.Expect(err).NotTo(HaveOccurred())
+
+	numAddresses := 0
+	for _, address := range addresses {
+		if address.IP.IsLoopback() {
+			continue
+		}
+		numAddresses++
+	}
+	g.Expect(numAddresses).To(Equal(0))
+}
+
 func checkLinkExists(g Gomega, name string) {
 	_, err := netlink.LinkByName(name)
 	g.Expect(err).NotTo(HaveOccurred(), "link not found %q", name)
@@ -758,7 +806,9 @@ func checkLinkExists(g Gomega, name string) {
 
 func validateVNIIsNotConfigured(g Gomega, params VNIParams) {
 	checkLinkdeleted(g, vxLanNameFromVNI(params.VNI))
-	checkLinkdeleted(g, params.VRF)
+	if params.VRF != "" {
+		checkLinkdeleted(g, params.VRF)
+	}
 	checkLinkdeleted(g, BridgeName(params.VNI))
 
 	vethNames := vethNamesFromVNI(params.VNI)
@@ -774,15 +824,13 @@ func checkAddrGenModeNone(l netlink.Link) bool {
 }
 
 func setupLoopback(ns netns.NsHandle) {
-	_ = netnamespace.In(ns, func() error {
-		_, err := netlink.LinkByName(UnderlayLoopback)
-		if errors.As(err, &netlink.LinkNotFoundError{}) {
-			loopback := &netlink.Dummy{LinkAttrs: netlink.LinkAttrs{Name: UnderlayLoopback}}
-			err = netlink.LinkAdd(loopback)
-			Expect(err).NotTo(HaveOccurred(), "failed to create loopback", UnderlayLoopback)
-		}
-		return nil
-	})
+	handle, err := netlink.NewHandleAt(ns)
+	Expect(err).NotTo(HaveOccurred())
+	defer handle.Close()
+
+	lo, err := handle.LinkByName(loopbackName)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(handle.LinkSetUp(lo)).To(Succeed())
 }
 
 func createLinuxBridge(name string) {

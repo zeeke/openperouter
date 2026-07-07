@@ -1,7 +1,7 @@
 ARG FRR_IMAGE=quay.io/frrouting/frr:10.6.0
 
 # Build the manager binary
-FROM golang:1.26.3 AS builder
+FROM golang:1.26.4 AS builder
 
 ARG GIT_COMMIT=dev
 ARG GIT_BRANCH=dev
