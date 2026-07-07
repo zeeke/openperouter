@@ -131,6 +131,10 @@ RUN ln -s /usr/libexec/frr/frr-reload.py /usr/lib/frr/frr-reload.py
 
 RUN chmod 640 /etc/frr/* && chown -R frr:frr /etc/frr
 
+# Hack for https://github.com/FRRouting/frr/issues/20355
+#          https://github.com/FRRouting/frr/pull/20378 
+COPY openshift/frr-reload.py.patched /usr/lib/frr/frr-reload.py
+
 LABEL com.redhat.component="openperouter" \
    name="openshift4-dev-preview-beta/openperouter-edge-rhel10-operator" \
    summary="openperouter" \
