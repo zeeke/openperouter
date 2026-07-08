@@ -34,16 +34,16 @@ type VNIParams struct {
 
 type L3VNIParams struct {
 	VNIParams `json:",inline"`
-	Name      string `json:"name"`
-	HostVeth  *Veth  `json:"veth"`
+	Name      string   `json:"name"`
+	LinkIPs   *LinkIPs `json:"link_ips"`
 }
 
 type L3PassthroughParams struct {
-	TargetNS string `json:"targetns"`
-	HostVeth Veth   `json:"veth"`
+	TargetNS string  `json:"targetns"`
+	LinkIPs  LinkIPs `json:"link_ips"`
 }
 
-type Veth struct {
+type LinkIPs struct {
 	HostIPv4 string `json:"hostipv4"`
 	NSIPv4   string `json:"nsipv4"`
 	HostIPv6 string `json:"hostipv6"`
@@ -89,7 +89,7 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 	slog.DebugContext(ctx, "setting up l3 VNI", "params", params)
 	defer slog.DebugContext(ctx, "end setting up l3 VNI", "params", params)
 
-	if params.HostVeth == nil {
+	if params.LinkIPs == nil {
 		slog.DebugContext(ctx, "no host veth configured, skipping setup")
 		return nil
 	}
@@ -98,7 +98,7 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 		ctx,
 		vethNamesFromVNI(params.VNI),
 		params.TargetNS,
-		params.HostVeth,
+		params.LinkIPs,
 		params.VRF,
 		VXLanOverhead); err != nil {
 		return fmt.Errorf("SetupL3VNI: failed to setup host veth pair: %w", err)
@@ -141,17 +141,17 @@ func SetupL2VNI(ctx context.Context, params L2VNIParams) error {
 	}
 	slog.Info("SetupL2VNI: found host veth", "name", vethNames.HostSide, "index", hostVeth.Attrs().Index)
 
-	underlayMTU, err := findUnderlayMTU(ns)
+	underlayMTU, err := FindUnderlayMTU(ns)
 	if err != nil {
 		return fmt.Errorf("could not find underlay MTU: %w", err)
 	}
 
-	if err := setVethMTUForTunnelOverhead(hostVeth, underlayMTU, VXLanOverhead); err != nil {
+	if err := SetVethMTUForTunnelOverhead(hostVeth, underlayMTU, VXLanOverhead); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to set MTU on host veth %s: %w", vethNames.HostSide, err)
 	}
 
 	if params.HostMaster != nil {
-		if err := setupHostMaster(ctx, params, hostVeth); err != nil {
+		if err := SetupHostMaster(ctx, params, hostVeth); err != nil {
 			return err
 		}
 	}
@@ -171,7 +171,7 @@ func setupL2VNIRouterSide(params L2VNIParams, vethName string, underlayMTU int) 
 		return fmt.Errorf("could not find peer veth %s in namespace %s: %w", vethName, params.TargetNS, err)
 	}
 
-	if err := setVethMTUForTunnelOverhead(peVeth, underlayMTU, VXLanOverhead); err != nil {
+	if err := SetVethMTUForTunnelOverhead(peVeth, underlayMTU, VXLanOverhead); err != nil {
 		return fmt.Errorf("failed to set MTU on pe veth %s: %w", vethName, err)
 	}
 
@@ -185,20 +185,20 @@ func setupL2VNIRouterSide(params L2VNIParams, vethName string, underlayMTU int) 
 	}
 	if len(params.L2GatewayIPs) > 0 {
 		for _, ip := range params.L2GatewayIPs {
-			if err := assignIPToInterface(bridge, ip); err != nil {
+			if err := AssignIPToInterface(bridge, ip); err != nil {
 				return fmt.Errorf("failed to assign L2 gateway IP %s to bridge %s: %w", ip, name, err)
 			}
 		}
 
 		// setting up the same mac address for all the nodes for distributed gateway
-		if err := ensureBridgeFixedMacAddress(bridge, params.VNI); err != nil {
+		if err := EnsureBridgeFixedMacAddress(bridge, params.VNI); err != nil {
 			return fmt.Errorf("failed to set bridge mac address %s: %v", name, err)
 		}
 	}
 	return nil
 }
 
-func setupHostMaster(ctx context.Context, params L2VNIParams, hostVeth netlink.Link) error {
+func SetupHostMaster(ctx context.Context, params L2VNIParams, hostVeth netlink.Link) error {
 	bridgeConfig := *params.HostMaster
 	switch bridgeConfig.Type {
 	case OVSBridgeLinkType:
@@ -277,7 +277,7 @@ func RemoveNonConfiguredVNIs(targetNS string, params []VNIParams) error {
 		vnis[p.VNI] = true
 	}
 
-	failedDeletes := removeHostSideVNIs(vnis)
+	failedDeletes := RemoveHostSideVNIs(vnis)
 
 	ns, err := netns.GetFromPath(targetNS)
 	if err != nil {
@@ -300,7 +300,9 @@ func RemoveNonConfiguredVNIs(targetNS string, params []VNIParams) error {
 	return errors.Join(failedDeletes...)
 }
 
-func removeHostSideVNIs(vnis map[int32]bool) []error {
+// RemoveHostSideVNIs removes host-side bridges (linux and OVS) and veths
+// for VNIs not present in the provided set.
+func RemoveHostSideVNIs(vnis map[int32]bool) []error {
 	var failedDeletes []error
 
 	hostLinks, err := netlink.LinkList()

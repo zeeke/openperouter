@@ -45,3 +45,5 @@ if ! $csv_succeeded; then
     echo "Timed out waiting for csv to be in Succeeded phase"
     exit 1
 fi
+
+kubectl get csv -n $NAMESPACE $CSV_NAME -o yaml
