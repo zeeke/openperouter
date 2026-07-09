@@ -9,7 +9,7 @@
 	url = https://github.com/openshift-kni/telco5g-konflux
 [submodule "openshift/grout"]
 	path = openshift/grout
-	url = https://github.com/DPDK/grout.git
+	url = https://github.com/zeeke/grout.git
 [submodule "openshift/deps/dpdk"]
 	path = openshift/deps/dpdk
 	url = https://github.com/DPDK/dpdk.git
