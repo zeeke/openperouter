@@ -302,6 +302,8 @@ spec:
           - name: host-nsenter
             mountPath: /usr/bin/nsenter
             readOnly: true
+          - name: vfio
+            mountPath: /dev/vfio
         {{- with .Values.openperouter.grout.resources }}
         resources:
           {{- toYaml . | nindent 12 }}
@@ -395,6 +397,10 @@ spec:
           hostPath:
             path: /usr/bin/nsenter
             type: File
+        - name: vfio
+          hostPath:
+            path: /dev/vfio
+            type: Directory
         {{- end }}
       initContainers:
         # Copies the initial config files with the right permissions to the shared volume.
