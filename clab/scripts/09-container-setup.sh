@@ -14,6 +14,37 @@ if [[ ${#CLUSTER_NAMES[@]} -eq 0 ]]; then
     exit 1
 fi
 
+set_rp_filter() {
+    # Some k8s vendors set net.ipv4.conf.default.rp_filter=1 (strict mode) on all
+    # nodes. New network namespaces (including "perouter") inherit their sysctl
+    # defaults from the host's init_net, so we must set it here.
+    #
+    # The kernel computes the effective rp_filter as
+    #   max(conf/all/rp_filter, conf/<iface>/rp_filter)
+    # so conf/all must be 0; otherwise the per-interface DisableRPFilter(0)
+    # that the controller applies to grout ports would have no effect.
+    echo "Setting rp_filter to strict mode"
+    sudo sysctl -w net.ipv4.conf.default.rp_filter=1
+    sudo sysctl -w net.ipv4.conf.all.rp_filter=0
+
+    sudo sysctl -w net.ipv4.conf.default.log_martians=1
+    sudo sysctl -w net.ipv4.conf.all.log_martians=1
+
+    for cluster_name in "${CLUSTER_NAMES[@]}"; do
+        local nodes
+        nodes=$(${KIND_COMMAND} get nodes --name "${cluster_name}" 2>/dev/null) || continue
+        for node in $nodes; do
+            ${CONTAINER_ENGINE_CLI} exec "${node}" sysctl -w \
+                net.ipv4.conf.default.rp_filter=1 \
+                net.ipv4.conf.all.rp_filter=0
+        done
+    done
+}
+
+# Set rp_filter before container setup so any namespace created later
+# inherits strict-mode defaults.
+set_rp_filter
+
 setup_containers() {
     echo "Executing setup scripts in containers for clusters: ${CLUSTER_NAMES[*]}"
 
