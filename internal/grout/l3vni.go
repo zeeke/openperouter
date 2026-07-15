@@ -4,7 +4,6 @@ package grout
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -90,20 +89,18 @@ func setupVNI(ctx context.Context, client *Client, params hostnetwork.VNIParams)
 	return nil
 }
 
-func RemoveAllVNIs(ctx context.Context, client *Client) error {
-	return RemoveNonConfiguredVNIs(ctx, client, []hostnetwork.VNIParams{})
+func RemoveAllVNIs(ctx context.Context, client *Client, targetNS string) error {
+	return RemoveNonConfiguredVNIs(ctx, client, targetNS, []hostnetwork.VNIParams{})
 }
 
-func RemoveNonConfiguredVNIs(ctx context.Context, client *Client, configured []hostnetwork.VNIParams) error {
+func RemoveNonConfiguredVNIs(ctx context.Context, client *Client, targetNamespace string, configured []hostnetwork.VNIParams) error {
 	slog.DebugContext(ctx, "removing stale VNIs")
 	defer slog.DebugContext(ctx, "removing stale VNIs done")
 
 	configuredVNIs := make(map[int32]bool)
-	configuredVRFs := make(map[string]bool)
 
 	for _, p := range configured {
 		configuredVNIs[p.VNI] = true
-		configuredVRFs[p.VRF] = true
 	}
 
 	ifaces, err := client.listInterfaces(ctx)
@@ -119,6 +116,20 @@ func RemoveNonConfiguredVNIs(ctx context.Context, client *Client, configured []h
 		}
 	}
 
+	return hostnetwork.RemoveNonConfiguredVNIs(targetNamespace, configured)
+}
+
+// RemoveAllVRFs removes all VRFs from the target namespace.
+func RemoveAllVRFs(ctx context.Context, client *Client, targetNS string) error {
+	return RemoveNonConfiguredVRFs(ctx, client, targetNS, map[string]bool{})
+}
+
+func RemoveNonConfiguredVRFs(ctx context.Context, client *Client, targetNamespace string, configuredVRFs map[string]bool) error {
+	ifaces, err := client.listInterfaces(ctx)
+	if err != nil {
+		return fmt.Errorf("RemoveNonConfiguredVRFs: failed to list interfaces: %w", err)
+	}
+
 	staleVRFs := findStaleVRFs(ifaces, configuredVRFs)
 	for _, vrf := range staleVRFs {
 		if vrf == "main" {
@@ -130,8 +141,7 @@ func RemoveNonConfiguredVNIs(ctx context.Context, client *Client, configured []h
 		}
 	}
 
-	failedDeletes := hostnetwork.RemoveHostSideVNIs(configuredVNIs)
-	return errors.Join(failedDeletes...)
+	return nil
 }
 
 func removeVNI(ctx context.Context, client *Client, vni int32) error {
