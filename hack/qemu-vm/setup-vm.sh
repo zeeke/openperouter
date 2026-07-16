@@ -165,7 +165,11 @@ for i in $(seq 1 $RETRIES); do
     sleep 5
 done
 
-echo "Waiting for openperouter pods to be ready..."
-${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready --all pods --timeout=300s
+echo "Waiting for controller and nodemarker pods to be ready..."
+${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready pods -l app=controller --timeout=300s
+${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready pods -l app=nodemarker --timeout=300s
+
+echo "Checking router pod status (grout may not be ready in emulated env)..."
+${KUBECTL} -n "${NAMESPACE}" get pods -l app=router -o wide || true
 
 echo "=== QEMU VM setup complete ==="
