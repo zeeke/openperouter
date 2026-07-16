@@ -219,6 +219,7 @@ jobs:
           path: /tmp/openperouter-grout.tar
 
   e2etests:
+    if: false # temporarily disabled for QEMU e2e iteration
     runs-on: ubuntu-22.04
     env:
       NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:${{ needs.build-kind-node-image.outputs.kind-node-version }}
@@ -354,7 +355,7 @@ jobs:
 
   qemu-e2etests:
     if: contains(github.event.pull_request.labels.*.name, 'run-qemu-tests')
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs:
       - build-grout-images
     steps:

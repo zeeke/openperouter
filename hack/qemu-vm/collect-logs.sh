@@ -19,9 +19,9 @@ mkdir -p "${LOG_DIR}/qemu-vm"
 
 echo "Collecting QEMU VM logs..."
 
-# VM serial console log.
+# VM serial console log (created by QEMU running as root).
 if [[ -f "${SCRIPT_DIR}/serial.log" ]]; then
-    cp "${SCRIPT_DIR}/serial.log" "${LOG_DIR}/qemu-vm/serial.log"
+    sudo cp "${SCRIPT_DIR}/serial.log" "${LOG_DIR}/qemu-vm/serial.log" || true
 fi
 
 # In-VM logs (best effort — VM may be unreachable).
