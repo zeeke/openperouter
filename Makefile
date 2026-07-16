@@ -419,7 +419,7 @@ qemu-deploy: kustomize kubectl ## Deploy openperouter with grout inside the VM (
 
 .PHONY: qemu-e2etests
 qemu-e2etests: ginkgo kubectl create-export-logs ## Run QEMU e2e tests (VM must be running)
-	KUBECONFIG=hack/qemu-vm/kubeconfig \
+	KUBECONFIG=$(CURDIR)/hack/qemu-vm/kubeconfig \
 	  $(GINKGO) -v $(GINKGO_ARGS) --timeout=1h \
 	  ./e2etests/suite -- \
 	  --kubectl=$(KUBECTL) --groutmode --qemu-mode \
