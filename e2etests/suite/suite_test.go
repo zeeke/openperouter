@@ -80,7 +80,7 @@ var _ = ginkgo.BeforeSuite(func() {
 })
 
 var _ = ginkgo.AfterSuite(func() {
-	if updater == nil {
+	if updater == nil || tests.QEMUMode {
 		return
 	}
 	err := updater.CleanAll()
