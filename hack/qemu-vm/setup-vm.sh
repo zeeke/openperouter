@@ -95,6 +95,7 @@ for dev in /sys/class/net/*/device/sriov_numvfs; do
         break
     fi
 done
+nmcli device set $PF managed no 2>/dev/null || true
 ip addr add 192.168.100.10/24 dev $PF 2>/dev/null || true
 ip link set $PF up
 '
