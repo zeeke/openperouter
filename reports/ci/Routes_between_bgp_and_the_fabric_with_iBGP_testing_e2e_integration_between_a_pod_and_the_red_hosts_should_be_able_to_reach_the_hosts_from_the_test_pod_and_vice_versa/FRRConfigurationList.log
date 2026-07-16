@@ -1,0 +1,145 @@
+{
+    "metadata": {
+        "resourceVersion": "3414"
+    },
+    "items": [
+        {
+            "kind": "FRRConfiguration",
+            "apiVersion": "frrk8s.metallb.io/v1beta1",
+            "metadata": {
+                "name": "redipv4",
+                "namespace": "openperouter-system",
+                "uid": "9626bc6b-33a6-4180-9822-052519356d94",
+                "resourceVersion": "2299",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:13:31Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "frrk8s.metallb.io/v1beta1",
+                        "time": "2026-07-16T11:13:31Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:bgp": {
+                                    ".": {},
+                                    "f:routers": {}
+                                },
+                                "f:nodeSelector": {},
+                                "f:raw": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "bgp": {
+                    "routers": [
+                        {
+                            "asn": 64515,
+                            "neighbors": [
+                                {
+                                    "asn": 64514,
+                                    "address": "192.169.10.1",
+                                    "passwordSecret": {},
+                                    "connectTime": "1s",
+                                    "toAdvertise": {
+                                        "allowed": {
+                                            "mode": "all"
+                                        }
+                                    },
+                                    "toReceive": {
+                                        "allowed": {
+                                            "mode": "all"
+                                        }
+                                    }
+                                }
+                            ],
+                            "prefixes": [
+                                "10.244.1.4/32"
+                            ]
+                        }
+                    ]
+                },
+                "raw": {},
+                "nodeSelector": {
+                    "matchLabels": {
+                        "kubernetes.io/hostname": "pe-kind-worker"
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "FRRConfiguration",
+            "apiVersion": "frrk8s.metallb.io/v1beta1",
+            "metadata": {
+                "name": "redipv6",
+                "namespace": "openperouter-system",
+                "uid": "42ddebd0-cec3-4ca4-9919-0f7102691230",
+                "resourceVersion": "2300",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:13:31Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "frrk8s.metallb.io/v1beta1",
+                        "time": "2026-07-16T11:13:31Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:bgp": {
+                                    ".": {},
+                                    "f:routers": {}
+                                },
+                                "f:nodeSelector": {},
+                                "f:raw": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "bgp": {
+                    "routers": [
+                        {
+                            "asn": 64515,
+                            "neighbors": [
+                                {
+                                    "asn": 64514,
+                                    "address": "2001:db8:1::1",
+                                    "passwordSecret": {},
+                                    "connectTime": "1s",
+                                    "toAdvertise": {
+                                        "allowed": {
+                                            "mode": "all"
+                                        }
+                                    },
+                                    "toReceive": {
+                                        "allowed": {
+                                            "mode": "all"
+                                        }
+                                    }
+                                }
+                            ],
+                            "prefixes": [
+                                "fd00:10:244:1::4/128"
+                            ]
+                        }
+                    ]
+                },
+                "raw": {},
+                "nodeSelector": {
+                    "matchLabels": {
+                        "kubernetes.io/hostname": "pe-kind-worker"
+                    }
+                }
+            },
+            "status": {}
+        }
+    ]
+}

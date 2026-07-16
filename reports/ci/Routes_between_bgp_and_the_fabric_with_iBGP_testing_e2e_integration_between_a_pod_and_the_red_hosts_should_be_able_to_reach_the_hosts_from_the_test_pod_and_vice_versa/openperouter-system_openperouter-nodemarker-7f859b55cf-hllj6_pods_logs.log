@@ -1,0 +1,21 @@
+-----------------------------------
+Dumping logs for pod openperouter-system-openperouter-nodemarker-7f859b55cf-hllj6-nodemarker
+{"time":"2026-07-16T11:11:25.402616167Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.L3VPN","totalItems":7}
+{"time":"2026-07-16T11:11:25.403065326Z","level":"DEBUG","msg":"Checking CA file content","caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","logger":"controller-runtime/cache"}
+{"time":"2026-07-16T11:11:25.403767056Z","level":"DEBUG","msg":"CA file unchanged, skipping transport rotation","caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","logger":"controller-runtime/cache"}
+{"time":"2026-07-16T11:11:37.602324133Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.L3Passthrough","totalItems":7}
+{"time":"2026-07-16T11:11:54.847731036Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","totalItems":9}
+{"time":"2026-07-16T11:12:39.199386416Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.L3VNI","totalItems":8}
+{"time":"2026-07-16T11:13:03.20007466Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1.Node","totalItems":15}
+{"time":"2026-07-16T11:13:18.501629552Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.Underlay","totalItems":9}
+{"time":"2026-07-16T11:13:22.404312094Z","level":"DEBUG","msg":"webhook underlay","action":"create","name":"underlay","namespace":"openperouter-system"}
+{"time":"2026-07-16T11:13:22.417320137Z","level":"DEBUG","msg":"webhook underlay","action":"end create","name":"underlay","namespace":"openperouter-system"}
+{"time":"2026-07-16T11:13:28.308640374Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.L2VNI","totalItems":8}
+{"time":"2026-07-16T11:13:31.719699298Z","level":"DEBUG","msg":"webhook l3vni","action":"create","name":"red","namespace":"openperouter-system"}
+{"time":"2026-07-16T11:13:31.737427517Z","level":"DEBUG","msg":"webhook l3vni","action":"end create","name":"red","namespace":"openperouter-system"}
+{"time":"2026-07-16T11:14:12.84756578Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1.Secret","totalItems":10}
+{"time":"2026-07-16T11:14:43.706854298Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.RawFRRConfig","totalItems":10}
+{"time":"2026-07-16T11:18:29.20557188Z","level":"DEBUG","msg":"Watch close","logger":"controller-runtime/cache","reflector":"pkg/mod/k8s.io/client-go@v0.36.2/tools/cache/reflector.go:343","type":"*v1alpha1.L3VNI","totalItems":8}
+{"time":"2026-07-16T11:18:29.207961206Z","level":"DEBUG","msg":"Checking CA file content","caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","logger":"controller-runtime/cache"}
+{"time":"2026-07-16T11:18:29.210195271Z","level":"DEBUG","msg":"CA file unchanged, skipping transport rotation","caFile":"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt","logger":"controller-runtime/cache"}
+

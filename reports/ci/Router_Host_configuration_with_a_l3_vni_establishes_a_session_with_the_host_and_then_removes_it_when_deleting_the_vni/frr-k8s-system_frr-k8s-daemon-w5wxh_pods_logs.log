@@ -1,0 +1,1007 @@
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-frr-k8s
+{"level":"info","ts":"2026-07-16T11:03:38Z","logger":"setup","msg":"starting frr-k8s","version":"version v0.0.1 (no build information)"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","logger":"controller-runtime.metrics","msg":"Starting metrics server"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","logger":"controller-runtime.metrics","msg":"Serving metrics server","bindAddress":"127.0.0.1:7572","secure":false}
+{"level":"info","ts":"2026-07-16T11:03:38Z","logger":"setup","msg":"Starting controllers"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting EventSource","controller":"node","controllerGroup":"","controllerKind":"Node","source":"kind source: *v1.Secret"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting EventSource","controller":"frrnodestate","controllerGroup":"frrk8s.metallb.io","controllerKind":"FRRNodeState","source":"channel source: 0xc00020c150"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting EventSource","controller":"node","controllerGroup":"","controllerKind":"Node","source":"kind source: *v1.Node"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting EventSource","controller":"node","controllerGroup":"","controllerKind":"Node","source":"kind source: *v1beta1.FRRConfiguration"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting EventSource","controller":"frrnodestate","controllerGroup":"frrk8s.metallb.io","controllerKind":"FRRNodeState","source":"kind source: *v1beta1.FRRNodeState"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting Controller","controller":"node","controllerGroup":"","controllerKind":"Node"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting workers","controller":"node","controllerGroup":"","controllerKind":"Node","worker count":1}
+{"caller":"frrconfiguration_controller.go:76","controller":"FRRConfigurationReconciler","level":"info","start reconcile":"frr-k8s-system/frr-k8s-webhook-server-cert","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:103","controller":"FRRConfigurationReconciler","k8s config":"","level":"debug","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:112","controller":"FRRConfigurationReconciler","end reconcile":"frr-k8s-system/frr-k8s-webhook-server-cert","level":"info","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:76","controller":"FRRConfigurationReconciler","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:03:38Z"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting Controller","controller":"frrnodestate","controllerGroup":"frrk8s.metallb.io","controllerKind":"FRRNodeState"}
+{"level":"info","ts":"2026-07-16T11:03:38Z","msg":"Starting workers","controller":"frrnodestate","controllerGroup":"frrk8s.metallb.io","controllerKind":"FRRNodeState","worker count":1}
+{"caller":"frrconfiguration_controller.go:103","controller":"FRRConfigurationReconciler","k8s config":"","level":"debug","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:112","controller":"FRRConfigurationReconciler","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:76","controller":"FRRConfigurationReconciler","level":"info","start reconcile":"/pe-kind-worker","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:103","controller":"FRRConfigurationReconciler","k8s config":"","level":"debug","ts":"2026-07-16T11:03:38Z"}
+{"action":"ignore config","caller":"config.go:337","level":"debug","op":"reload","reason":"same config","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrstate_controller.go:85","controller":"FRRStateReconciler","level":"info","start reconcile":"metallbreload/stateUpdate","ts":"2026-07-16T11:03:38Z"}
+{"action":"ignore config","caller":"config.go:337","level":"debug","op":"reload","reason":"same config","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrconfiguration_controller.go:112","controller":"FRRConfigurationReconciler","end reconcile":"/pe-kind-worker","level":"info","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrstate_controller.go:116","controller":"FRRStateReconciler","level":"debug","ts":"2026-07-16T11:03:38Z","updated nodestate":"{\"metadata\":{\"name\":\"pe-kind-control-plane\",\"uid\":\"6684a7a5-5c0d-43b0-9b1c-1de221efd993\",\"resourceVersion\":\"778\",\"generation\":1,\"creationTimestamp\":\"2026-07-16T11:03:38Z\",\"managedFields\":[{\"manager\":\"frr-k8s\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:03:38Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:spec\":{}}},{\"manager\":\"frr-k8s\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:03:38Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:status\":{\".\":{},\"f:lastConversionResult\":{}}},\"subresource\":\"status\"}]},\"spec\":{},\"status\":{\"lastConversionResult\":\"success\"}}"}
+{"caller":"frrstate_controller.go:118","controller":"FRRStateReconciler","end reconcile":"metallbreload/stateUpdate","level":"info","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrstate_controller.go:85","controller":"FRRStateReconciler","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrstate_controller.go:107","controller":"FRRStateReconciler","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:03:38Z"}
+{"caller":"frrstate_controller.go:85","controller":"FRRStateReconciler","level":"info","start reconcile":"metallbreload/stateUpdate","ts":"2026-07-16T11:04:08Z"}
+{"caller":"frrstate_controller.go:116","controller":"FRRStateReconciler","level":"debug","ts":"2026-07-16T11:04:08Z","updated nodestate":"{\"kind\":\"FRRNodeState\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"metadata\":{\"name\":\"pe-kind-control-plane\",\"uid\":\"6684a7a5-5c0d-43b0-9b1c-1de221efd993\",\"resourceVersion\":\"843\",\"generation\":1,\"creationTimestamp\":\"2026-07-16T11:03:38Z\",\"managedFields\":[{\"manager\":\"frr-k8s\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:03:38Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:spec\":{}}},{\"manager\":\"frr-k8s\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:04:08Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:status\":{\".\":{},\"f:lastConversionResult\":{},\"f:lastReloadResult\":{},\"f:runningConfig\":{}}},\"subresource\":\"status\"}]},\"spec\":{},\"status\":{\"runningConfig\":\"Building configuration...\\n\\nCurrent configuration:\\n!\\nfrr version 9.1_git\\nfrr defaults traditional\\nhostname pe-kind-control-plane\\nlog file /etc/frr/frr.log\\nlog timestamp precision 3\\nservice integrated-vtysh-config\\n!\\ndebug zebra events\\ndebug zebra kernel\\ndebug zebra rib\\ndebug zebra nht\\ndebug zebra nexthop\\ndebug bgp keepalives\\ndebug bgp neighbor-events\\ndebug bgp nht\\ndebug bgp updates in\\ndebug bgp updates out\\ndebug bgp zebra\\ndebug bfd peer\\ndebug bfd zebra\\ndebug bfd network\\n!\\nend\\n\",\"lastConversionResult\":\"success\",\"lastReloadResult\":\"success\"}}"}
+{"caller":"frrstate_controller.go:118","controller":"FRRStateReconciler","end reconcile":"metallbreload/stateUpdate","level":"info","ts":"2026-07-16T11:04:08Z"}
+{"caller":"frrstate_controller.go:85","controller":"FRRStateReconciler","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:04:08Z"}
+{"caller":"frrstate_controller.go:107","controller":"FRRStateReconciler","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:04:08Z"}
+{"caller":"frrconfiguration_controller.go:76","controller":"FRRConfigurationReconciler","level":"info","start reconcile":"openperouter-system/frrconfig","ts":"2026-07-16T11:07:43Z"}
+{"caller":"frrconfiguration_controller.go:103","controller":"FRRConfigurationReconciler","k8s config":"\n{\"kind\":\"FRRConfiguration\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"metadata\":{\"name\":\"redipv4\",\"namespace\":\"openperouter-system\",\"uid\":\"de15595b-cd3b-4892-82ef-e5edd690622e\",\"resourceVersion\":\"1348\",\"generation\":1,\"creationTimestamp\":\"2026-07-16T11:07:43Z\",\"managedFields\":[{\"manager\":\"suite.test\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:07:43Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:spec\":{\".\":{},\"f:bgp\":{\".\":{},\"f:routers\":{}},\"f:nodeSelector\":{},\"f:raw\":{}}}}]},\"spec\":{\"bgp\":{\"routers\":[{\"asn\":64515,\"neighbors\":[{\"asn\":64514,\"address\":\"192.169.10.1\",\"password\":\"\\u003cretracted\\u003e\",\"passwordSecret\":{},\"connectTime\":\"1s\",\"toAdvertise\":{\"allowed\":{\"mode\":\"filtered\"}},\"toReceive\":{\"allowed\":{\"mode\":\"all\"}}}]}]},\"raw\":{},\"nodeSelector\":{}},\"status\":{}}","level":"debug","ts":"2026-07-16T11:07:43Z"}
+{"caller":"frrconfiguration_controller.go:153","controller":"FRRConfigurationReconciler","frr config":"{\"Loglevel\":\"\",\"Hostname\":\"\",\"Routers\":[{\"MyASN\":64515,\"RouterID\":\"\",\"Neighbors\":[{\"IPFamily\":\"ipv4\",\"Name\":\"64514@192.169.10.1\",\"ASN\":\"64514\",\"SrcAddr\":\"\",\"Addr\":\"192.169.10.1\",\"Iface\":\"\",\"Port\":null,\"HoldTime\":null,\"KeepaliveTime\":null,\"ConnectTime\":1,\"Password\":\"\\u003cretracted\\u003e\",\"BFDProfile\":\"\",\"GracefulRestart\":false,\"EBGPMultiHop\":false,\"VRFName\":\"\",\"Incoming\":{\"All\":true,\"PrefixesV4\":[],\"PrefixesV6\":[]},\"Outgoing\":{\"PrefixesV4\":[],\"PrefixesV6\":[]},\"AlwaysBlock\":[],\"DisableMP\":false}],\"VRF\":\"\",\"IPV4Prefixes\":[],\"IPV6Prefixes\":[],\"ImportVRFs\":[]}],\"BFDProfiles\":[],\"ExtraConfig\":\"\"}","level":"debug","ts":"2026-07-16T11:07:43Z"}
+{"caller":"frrconfiguration_controller.go:166","controller":"FRRConfigurationReconciler","end reconcile":"openperouter-system/frrconfig","level":"info","ts":"2026-07-16T11:07:43Z"}
+{"caller":"frrstate_controller.go:85","controller":"FRRStateReconciler","level":"info","start reconcile":"metallbreload/stateUpdate","ts":"2026-07-16T11:08:08Z"}
+{"caller":"frrstate_controller.go:116","controller":"FRRStateReconciler","level":"debug","ts":"2026-07-16T11:08:08Z","updated nodestate":"{\"kind\":\"FRRNodeState\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"metadata\":{\"name\":\"pe-kind-control-plane\",\"uid\":\"6684a7a5-5c0d-43b0-9b1c-1de221efd993\",\"resourceVersion\":\"1426\",\"generation\":1,\"creationTimestamp\":\"2026-07-16T11:03:38Z\",\"managedFields\":[{\"manager\":\"frr-k8s\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:03:38Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:spec\":{}}},{\"manager\":\"frr-k8s\",\"operation\":\"Update\",\"apiVersion\":\"frrk8s.metallb.io/v1beta1\",\"time\":\"2026-07-16T11:08:08Z\",\"fieldsType\":\"FieldsV1\",\"fieldsV1\":{\"f:status\":{\".\":{},\"f:lastConversionResult\":{},\"f:lastReloadResult\":{},\"f:runningConfig\":{}}},\"subresource\":\"status\"}]},\"spec\":{},\"status\":{\"runningConfig\":\"Building configuration...\\n\\nCurrent configuration:\\n!\\nfrr version 9.1_git\\nfrr defaults traditional\\nhostname pe-kind-control-plane\\nlog file /etc/frr/frr.log\\nlog timestamp precision 3\\nservice integrated-vtysh-config\\n!\\ndebug zebra events\\ndebug zebra kernel\\ndebug zebra rib\\ndebug zebra nht\\ndebug zebra nexthop\\ndebug bgp keepalives\\ndebug bgp neighbor-events\\ndebug bgp nht\\ndebug bgp updates in\\ndebug bgp updates out\\ndebug bgp zebra\\ndebug bfd peer\\ndebug bfd zebra\\ndebug bfd network\\n!\\nrouter bgp 64515\\n no bgp ebgp-requires-policy\\n no bgp hard-administrative-reset\\n no bgp default ipv4-unicast\\n no bgp graceful-restart notification\\n bgp graceful-restart preserve-fw-state\\n no bgp network import-check\\n neighbor 192.169.10.1 remote-as 64514\\n neighbor 192.169.10.1 timers connect 1\\n !\\n address-family ipv4 unicast\\n  neighbor 192.169.10.1 activate\\n  neighbor 192.169.10.1 route-map 192.169.10.1-in in\\n  neighbor 192.169.10.1 route-map 192.169.10.1-out out\\n exit-address-family\\n !\\n address-family ipv6 unicast\\n  neighbor 192.169.10.1 activate\\n  neighbor 192.169.10.1 route-map 192.169.10.1-in in\\n  neighbor 192.169.10.1 route-map 192.169.10.1-out out\\n exit-address-family\\nexit\\n!\\nip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\\nip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\\n!\\nipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\\nipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\\n!\\nroute-map 192.169.10.1-out permit 1\\n match ip address prefix-list 192.169.10.1-pl-ipv4\\nexit\\n!\\nroute-map 192.169.10.1-out permit 2\\n match ipv6 address prefix-list 192.169.10.1-pl-ipv4\\nexit\\n!\\nroute-map 192.169.10.1-in permit 3\\n match ip address prefix-list 192.169.10.1-inpl-ipv4\\nexit\\n!\\nroute-map 192.169.10.1-in permit 4\\n match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\\nexit\\n!\\nend\\n\",\"lastConversionResult\":\"success\",\"lastReloadResult\":\"success\"}}"}
+{"caller":"frrstate_controller.go:118","controller":"FRRStateReconciler","end reconcile":"metallbreload/stateUpdate","level":"info","ts":"2026-07-16T11:08:08Z"}
+{"caller":"frrstate_controller.go:85","controller":"FRRStateReconciler","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:08:08Z"}
+{"caller":"frrstate_controller.go:107","controller":"FRRStateReconciler","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:08:08Z"}
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-kube-rbac-proxy
+W0716 11:03:38.544334      78 main.go:165] 
+==== Deprecation Warning ======================
+
+Insecure listen address will be removed.
+Using --insecure-listen-address won't be possible!
+
+The ability to run kube-rbac-proxy without TLS certificates will be removed.
+Not using --tls-cert-file and --tls-private-key-file won't be possible!
+
+For more information, please go to https://github.com/brancz/kube-rbac-proxy/issues/187
+
+===============================================
+
+		
+I0716 11:03:38.544889      78 main.go:218] Valid token audiences: 
+I0716 11:03:38.545088      78 main.go:344] Generating self signed cert as no cert is provided
+I0716 11:03:39.154993      78 main.go:394] Starting TCP socket on 0.0.0.0:9140
+I0716 11:03:39.155313      78 main.go:401] Listening securely on 0.0.0.0:9140
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-kube-rbac-proxy-frr
+W0716 11:03:38.670788     100 main.go:165] 
+==== Deprecation Warning ======================
+
+Insecure listen address will be removed.
+Using --insecure-listen-address won't be possible!
+
+The ability to run kube-rbac-proxy without TLS certificates will be removed.
+Not using --tls-cert-file and --tls-private-key-file won't be possible!
+
+For more information, please go to https://github.com/brancz/kube-rbac-proxy/issues/187
+
+===============================================
+
+		
+I0716 11:03:38.671072     100 main.go:218] Valid token audiences: 
+I0716 11:03:38.671190     100 main.go:344] Generating self signed cert as no cert is provided
+I0716 11:03:38.976394     100 main.go:394] Starting TCP socket on 0.0.0.0:9141
+I0716 11:03:38.976880     100 main.go:401] Listening securely on 0.0.0.0:9141
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-frr
+2026/07/16 11:12:15.749 BGP: [ZQTB5-H8522] 192.169.10.1 [FSM] Timer (start timer expire).
+2026/07/16 11:12:15.749 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] BGP_Start (Idle->Connect), fd -1
+2026/07/16 11:12:15.749 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:15.749 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:15.749 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:15.749 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Idle to Connect
+2026/07/16 11:12:15.749 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:15.749 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:15.749 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:16.749 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:16.749 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:16.749 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:16.749 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:16.749 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:16.749 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:16.749 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:16.750 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:16.750 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:17.750 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:17.750 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:17.750 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:17.750 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:17.750 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:17.750 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:17.750 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:17.750 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:17.750 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:18.750 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:18.750 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:18.750 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:18.750 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:18.750 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:18.750 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:18.750 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:18.750 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:18.750 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:19.750 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:19.750 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:19.750 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:19.750 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:19.750 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:19.750 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:19.750 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:19.751 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:19.751 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:20.751 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:20.751 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:20.751 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:20.751 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:20.751 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:20.751 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:20.751 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:20.751 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:20.751 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:21.751 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:21.751 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:21.751 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:21.751 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:21.751 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:21.751 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:21.751 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:21.752 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:21.752 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:22.752 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:22.752 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:22.752 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:22.752 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:22.752 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:22.752 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:22.752 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:22.752 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:22.752 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:23.752 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:23.752 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:23.752 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:23.752 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:23.752 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:23.752 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:23.752 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:23.752 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:23.752 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:24.752 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:24.752 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:24.752 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:24.752 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:24.752 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:24.752 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:24.753 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:24.753 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:24.753 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:25.753 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:25.753 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:25.753 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:25.753 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:25.753 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:25.753 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:25.753 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:25.753 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:25.753 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:26.753 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:26.753 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:26.753 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:26.753 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:26.753 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:26.753 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:26.753 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:26.753 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:26.753 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:27.754 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:27.754 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:27.754 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:27.754 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:27.754 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:27.754 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:27.754 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:27.754 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:27.754 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:28.754 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:28.754 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:28.754 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:28.754 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:28.754 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:28.754 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:28.754 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:28.754 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:28.754 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:29.755 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:29.755 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:29.755 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:29.755 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:29.755 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:29.755 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:29.755 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:29.755 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:29.755 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:30.756 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:30.756 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:30.756 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:30.756 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:30.756 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:30.756 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:30.756 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:30.756 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:30.756 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:31.756 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:31.756 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:31.756 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:31.756 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:31.756 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:31.756 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:31.756 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:31.757 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:31.757 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:32.757 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:32.757 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:32.757 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:32.757 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:32.757 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:32.757 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:32.757 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:32.757 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:32.757 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:33.757 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:33.757 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:33.757 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:33.757 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:33.757 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:33.757 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:33.757 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:33.757 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:33.757 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:34.758 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:34.758 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:34.758 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:34.758 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:34.758 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:34.758 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:34.758 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:34.758 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:34.758 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:35.759 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:35.759 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:35.759 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:35.759 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:35.759 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:35.759 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:35.759 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:35.759 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:35.759 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:36.759 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:36.759 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:36.759 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:36.759 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:36.759 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:36.759 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:36.759 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:36.759 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:36.759 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:37.760 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:37.760 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:37.760 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:37.760 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:37.760 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:37.760 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:37.760 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:37.760 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:37.760 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:38.760 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:38.760 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:38.760 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:38.760 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:38.760 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:38.760 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:38.760 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:38.760 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:38.760 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:39.760 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:39.760 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:39.760 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:39.760 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:39.760 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:39.760 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:39.760 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:39.761 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:39.761 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:40.761 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:40.761 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:40.761 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:40.761 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:40.761 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:40.761 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:40.761 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:40.761 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:40.761 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:41.761 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:41.761 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:41.761 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:41.761 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:41.761 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:41.761 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:41.761 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:41.762 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:41.762 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:42.762 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:42.762 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:42.762 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:42.762 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:42.762 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:42.762 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:42.762 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:42.762 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:42.762 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:43.762 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:43.762 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:43.762 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:43.762 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:43.762 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:43.762 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:43.762 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:43.762 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:43.762 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:44.763 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:44.763 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:44.763 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:44.763 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:44.763 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:44.763 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:44.763 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:44.763 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:44.763 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:45.764 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:45.764 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:45.764 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:45.764 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:45.764 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:45.764 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:45.764 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:45.764 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:45.764 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:46.765 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:46.765 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:46.765 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:46.765 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:46.765 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:46.765 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:46.765 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:46.765 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:46.765 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:47.765 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:47.765 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:47.765 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:47.765 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:47.765 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:47.765 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:47.765 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:47.765 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:47.765 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:48.765 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:48.765 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:48.765 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:48.765 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:48.765 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:48.765 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:48.765 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:48.766 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:48.766 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:49.766 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:49.766 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:49.766 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:49.766 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:49.766 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:49.766 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:49.766 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:49.766 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:49.766 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:50.767 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:50.767 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:50.767 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:50.767 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:50.767 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:50.767 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:50.767 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:50.767 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:50.767 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:51.767 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:51.767 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:51.767 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:51.767 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:51.767 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:51.767 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:51.767 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:51.767 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:51.767 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:52.768 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:52.768 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:52.768 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:52.768 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:52.768 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:52.768 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:52.768 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:52.768 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:52.768 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:53.768 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:53.768 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:53.768 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:53.768 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:53.768 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:53.768 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:53.768 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:53.768 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:53.768 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:54.768 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:54.768 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:54.768 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:54.768 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:54.768 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:54.768 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:54.768 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:54.768 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:54.768 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:55.424 ZEBRA: [KMXEB-K771Y] netlink_parse_info: netlink-listen (NS 0) type RTM_NEWNEIGH(28), len=88, seq=0, pid=0
+2026/07/16 11:12:55.424 ZEBRA: [TDS34-MNEJW]     Neighbor Entry received is not on a VLAN or a BRIDGE, ignoring
+2026/07/16 11:12:55.424 ZEBRA: [KKAC1-JMWTB] Rx RTM_NEWNEIGH family ipv6 IF veth87fe9e45(5) vrf default(0) IP fe80::f00a:46ff:fec8:3ca7 MAC f2:0a:46:c8:3c:a7 state 0x4 flags 0x0 ext_flags 0x0
+2026/07/16 11:12:55.768 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:55.769 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:55.769 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:55.769 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:55.769 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:55.769 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:55.769 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:55.769 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:55.769 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:56.769 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:56.769 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:56.769 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:56.769 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:56.769 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:56.769 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:56.769 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:56.769 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:56.769 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:57.770 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:57.770 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:57.770 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:57.770 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:57.770 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:57.770 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:57.770 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:57.770 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:57.770 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:58.770 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:58.770 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:58.770 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:58.770 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:58.770 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:58.770 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:58.770 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:58.770 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:58.770 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:58.863 BGP: [MY9SR-DJGDC][EC 100663303] sockopt_tcp_mss_get failed: getsockopt(-1): Bad file descriptor
+2026/07/16 11:12:59.075 BGP: [MY9SR-DJGDC][EC 100663303] sockopt_tcp_mss_get failed: getsockopt(-1): Bad file descriptor
+2026/07/16 11:12:59.770 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:12:59.770 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:12:59.770 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:12:59.770 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:12:59.770 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:12:59.770 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:12:59.770 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:12:59.771 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:12:59.771 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:12:59.867 BGP: [MY9SR-DJGDC][EC 100663303] sockopt_tcp_mss_get failed: getsockopt(-1): Bad file descriptor
+2026/07/16 11:13:00.771 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:00.771 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:00.771 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:00.771 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:00.771 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:00.771 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:00.771 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:00.771 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:00.771 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:01.771 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:01.771 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:01.771 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:01.771 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:01.771 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:01.771 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:01.771 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:01.772 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:01.772 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:02.772 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:02.772 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:02.772 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:02.772 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:02.772 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:02.772 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:02.772 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:02.772 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:02.772 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:03.772 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:03.772 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:03.772 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:03.772 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:03.772 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:03.772 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:03.772 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:03.773 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:03.773 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:04.773 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:04.773 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:04.773 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:04.773 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:04.773 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:04.773 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:04.773 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:04.773 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:04.773 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:05.774 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:05.774 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:05.774 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:05.774 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:05.774 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:05.774 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:05.774 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:05.774 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:05.774 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:06.774 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:06.774 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:06.774 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:06.774 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:06.774 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:06.774 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:06.774 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:06.774 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:06.774 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:07.774 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:07.774 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:07.774 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:07.774 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:07.775 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:07.775 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:07.775 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:07.775 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:07.775 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+2026/07/16 11:13:08.775 BGP: [JFMSW-YMBC7] 192.169.10.1 [FSM] Timer (connect timer expire)
+2026/07/16 11:13:08.775 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] ConnectRetry_timer_expired (Active->Connect), fd -1
+2026/07/16 11:13:08.775 BGP: [WNKP5-SN018] Found existing bnc 192.169.10.1/32(0)(VRF default) flags 0xe ifindex 0 #paths 0 peer 0x7f2769f97070
+2026/07/16 11:13:08.775 BGP: [S7AHN-X0695] 192.169.10.1 [FSM] Waiting for NHT, no path to neighbor present
+2026/07/16 11:13:08.775 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Connect established_peers 0
+2026/07/16 11:13:08.775 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Active to Connect
+2026/07/16 11:13:08.775 BGP: [ZWCSR-M7FG9] 192.169.10.1 [FSM] TCP_connection_open_failed (Connect->Active), fd -1
+2026/07/16 11:13:08.775 BGP: [T91AW-FGMHW] bgp_fsm_change_status : vrf default(0), Status: Active established_peers 0
+2026/07/16 11:13:08.775 BGP: [HKWM3-ZC5QP] 192.169.10.1 fd -1 went from Connect to Active
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-frr-metrics
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-frr-status
+{"level":"info","ts":"2026-07-16T11:03:39Z","logger":"setup","msg":"starting status exporter","version":"version v0.0.1 (no build information)"}
+{"level":"info","ts":"2026-07-16T11:03:39Z","msg":"Starting EventSource","controller":"bgpsessionstate","controllerGroup":"frrk8s.metallb.io","controllerKind":"BGPSessionState","source":"kind source: *v1beta1.FRRNodeState"}
+{"level":"info","ts":"2026-07-16T11:03:39Z","msg":"Starting EventSource","controller":"bgpsessionstate","controllerGroup":"frrk8s.metallb.io","controllerKind":"BGPSessionState","source":"kind source: *v1beta1.BGPSessionState"}
+{"level":"info","ts":"2026-07-16T11:03:39Z","msg":"Starting Controller","controller":"bgpsessionstate","controllerGroup":"frrk8s.metallb.io","controllerKind":"BGPSessionState"}
+{"level":"info","ts":"2026-07-16T11:03:39Z","msg":"Starting workers","controller":"bgpsessionstate","controllerGroup":"frrk8s.metallb.io","controllerKind":"BGPSessionState","worker count":1}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:03:39Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:03:39Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:04:08Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:04:08Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:05:39Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:05:39Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:07:39Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:07:39Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:08:08Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:08:08Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","ts":"2026-07-16T11:08:08Z"}
+{"caller":"bgpsessionstate_controller.go:141","controller":"BGPSessionState","end reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","level":"info","ts":"2026-07-16T11:08:09Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","ts":"2026-07-16T11:08:09Z"}
+{"caller":"bgpsessionstate_controller.go:141","controller":"BGPSessionState","end reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","level":"info","ts":"2026-07-16T11:08:09Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:09:39Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:09:39Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"/pe-kind-control-plane","ts":"2026-07-16T11:11:39Z"}
+{"caller":"bgpsessionstate_controller.go:138","controller":"BGPSessionState","end reconcile":"/pe-kind-control-plane","level":"info","ts":"2026-07-16T11:11:40Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","ts":"2026-07-16T11:11:40Z"}
+{"caller":"bgpsessionstate_controller.go:141","controller":"BGPSessionState","end reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","level":"info","ts":"2026-07-16T11:11:40Z"}
+{"caller":"bgpsessionstate_controller.go:83","controller":"BGPSessionState","level":"info","start reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","ts":"2026-07-16T11:11:40Z"}
+{"caller":"bgpsessionstate_controller.go:141","controller":"BGPSessionState","end reconcile":"frr-k8s-system/pe-kind-control-plane-8ttfg","level":"info","ts":"2026-07-16T11:11:40Z"}
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-reloader
+PID is: 203, writing to /etc/frr_reloader/reloader.pid
+Caught SIGHUP and acquired lock! Reloading FRR..
+Checking the configuration file syntax
+
+Lines To Delete
+===============
+no log file /etc/frr/frr.log informational
+
+Lines To Add
+============
+log file /etc/frr/frr.log debugging
+log timestamp precision 3
+debug zebra events
+debug zebra nht
+debug zebra kernel
+debug zebra rib
+debug zebra nexthop
+debug bgp neighbor-events
+debug bgp updates
+debug bgp keepalives
+debug bgp nht
+debug bgp zebra
+debug bfd network
+debug bfd peer
+debug bfd zebra
+ip nht resolve-via-default
+ipv6 nht resolve-via-default
+Applying the configuration file
+2026-07-16 11:03:41,807  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16 11:03:41,807  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16 11:03:41,908  INFO: Loading Config object from vtysh show running
+2026-07-16 11:03:41,962  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16 11:03:41,962  INFO: "frr defaults traditional" cannot be removed
+2026-07-16 11:03:41,962  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16 11:03:42,015  INFO: Executed "no log file /etc/frr/frr.log informational"
+2026-07-16 11:03:42,015  INFO: /var/run/frr/reload-HK8XBF.txt content
+['log file /etc/frr/frr.log debugging\n',
+ 'log timestamp precision 3\n',
+ 'debug zebra events\n',
+ 'debug zebra nht\n',
+ 'debug zebra kernel\n',
+ 'debug zebra rib\n',
+ 'debug zebra nexthop\n',
+ 'debug bgp neighbor-events\n',
+ 'debug bgp updates\n',
+ 'debug bgp keepalives\n',
+ 'debug bgp nht\n',
+ 'debug bgp zebra\n',
+ 'debug bfd network\n',
+ 'debug bfd peer\n',
+ 'debug bfd zebra\n',
+ 'ip nht resolve-via-default\n',
+ 'ipv6 nht resolve-via-default\n']
+[272|mgmtd] sending configuration
+[273|zebra] sending configuration
+[279|bgpd] sending configuration
+[272|mgmtd] done
+[287|watchfrr] sending configuration
+[289|staticd] sending configuration
+[290|bfdd] sending configuration
+Waiting for children to finish applying config...
+[273|zebra] done
+[289|staticd] done
+[279|bgpd] done
+[287|watchfrr] done
+[290|bfdd] done
+2026-07-16 11:03:42,075  INFO: Loading Config object from vtysh show running
+2026-07-16 11:03:42,127  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16 11:03:42,127  INFO: "frr defaults traditional" cannot be removed
+2026-07-16 11:03:42,127  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16 11:03:42,128  INFO: /var/run/frr/reload-VK6QLL.txt content
+['log file /etc/frr/frr.log debugging\n',
+ 'debug bgp updates\n',
+ 'ip nht resolve-via-default\n',
+ 'ipv6 nht resolve-via-default\n',
+ 'log file /etc/frr/frr.log debugging\n',
+ 'log timestamp precision 3\n',
+ 'debug zebra events\n',
+ 'debug zebra nht\n',
+ 'debug zebra kernel\n',
+ 'debug zebra rib\n',
+ 'debug zebra nexthop\n',
+ 'debug bgp neighbor-events\n',
+ 'debug bgp updates\n',
+ 'debug bgp keepalives\n',
+ 'debug bgp nht\n',
+ 'debug bgp zebra\n',
+ 'debug bfd network\n',
+ 'debug bfd peer\n',
+ 'debug bfd zebra\n',
+ 'ip nht resolve-via-default\n',
+ 'ipv6 nht resolve-via-default\n']
+[297|mgmtd] sending configuration
+[298|zebra] sending configuration
+[304|bgpd] sending configuration
+[297|mgmtd] done
+[312|watchfrr] sending configuration
+[314|staticd] sending configuration
+[315|bfdd] sending configuration
+Waiting for children to finish applying config...
+[298|zebra] done
+[304|bgpd] done
+[312|watchfrr] done
+[314|staticd] done
+[315|bfdd] done
+FRR reloaded successfully! 1 seconds
+Caught SIGHUP and acquired lock! Reloading FRR..
+Checking the configuration file syntax
+
+Lines To Delete
+===============
+no log file /etc/frr/frr.log
+no debug bgp updates in
+no debug bgp updates out
+
+Lines To Add
+============
+log file /etc/frr/frr.log debugging
+debug bgp updates
+ip nht resolve-via-default
+ipv6 nht resolve-via-default
+ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any
+ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+route-map 192.169.10.1-out permit 1
+exit
+route-map 192.169.10.1-out permit 1
+ match ip address prefix-list 192.169.10.1-pl-ipv4
+exit
+route-map 192.169.10.1-out permit 2
+exit
+route-map 192.169.10.1-out permit 2
+ match ipv6 address prefix-list 192.169.10.1-pl-ipv4
+exit
+ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+route-map 192.169.10.1-in permit 3
+exit
+route-map 192.169.10.1-in permit 3
+ match ip address prefix-list 192.169.10.1-inpl-ipv4
+exit
+route-map 192.169.10.1-in permit 4
+exit
+route-map 192.169.10.1-in permit 4
+ match ipv6 address prefix-list 192.169.10.1-inpl-ipv4
+exit
+router bgp 64515
+exit
+router bgp 64515
+ no bgp ebgp-requires-policy
+exit
+router bgp 64515
+ no bgp network import-check
+exit
+router bgp 64515
+ no bgp default ipv4-unicast
+exit
+router bgp 64515
+ bgp graceful-restart preserve-fw-state
+exit
+router bgp 64515
+ neighbor 192.169.10.1 remote-as 64514
+exit
+router bgp 64515
+ neighbor 192.169.10.1 timers connect 1
+exit
+router bgp 64515
+ address-family ipv4 unicast
+ exit
+exit
+router bgp 64515
+ address-family ipv4 unicast
+  neighbor 192.169.10.1 activate
+ exit
+exit
+router bgp 64515
+ address-family ipv4 unicast
+  neighbor 192.169.10.1 route-map 192.169.10.1-in in
+ exit
+exit
+router bgp 64515
+ address-family ipv4 unicast
+  neighbor 192.169.10.1 route-map 192.169.10.1-out out
+ exit
+exit
+router bgp 64515
+ address-family ipv6 unicast
+ exit
+exit
+router bgp 64515
+ address-family ipv6 unicast
+  neighbor 192.169.10.1 activate
+ exit
+exit
+router bgp 64515
+ address-family ipv6 unicast
+  neighbor 192.169.10.1 route-map 192.169.10.1-in in
+ exit
+exit
+router bgp 64515
+ address-family ipv6 unicast
+  neighbor 192.169.10.1 route-map 192.169.10.1-out out
+ exit
+exit
+Applying the configuration file
+2026-07-16 11:07:47,616  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16 11:07:47,616  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16 11:07:47,943  INFO: Loading Config object from vtysh show running
+2026-07-16 11:07:48,152  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16 11:07:48,152  INFO: "frr defaults traditional" cannot be removed
+2026-07-16 11:07:48,152  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16 11:07:48,265  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16 11:07:48,369  INFO: Executed "no debug bgp updates in"
+2026-07-16 11:07:48,490  INFO: Executed "no debug bgp updates out"
+2026-07-16 11:07:48,491  INFO: /var/run/frr/reload-AI0U2X.txt content
+['log file /etc/frr/frr.log debugging\n',
+ 'debug bgp updates\n',
+ 'ip nht resolve-via-default\n',
+ 'ipv6 nht resolve-via-default\n',
+ 'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+ 'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+ 'route-map 192.169.10.1-out permit 1\nexit\n',
+ 'route-map 192.169.10.1-out permit 1\n'
+ ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+ 'exit\n',
+ 'route-map 192.169.10.1-out permit 2\nexit\n',
+ 'route-map 192.169.10.1-out permit 2\n'
+ ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+ 'exit\n',
+ 'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+ 'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+ 'route-map 192.169.10.1-in permit 3\nexit\n',
+ 'route-map 192.169.10.1-in permit 3\n'
+ ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+ 'exit\n',
+ 'route-map 192.169.10.1-in permit 4\nexit\n',
+ 'route-map 192.169.10.1-in permit 4\n'
+ ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+ 'exit\n',
+ 'router bgp 64515\nexit\n',
+ 'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+ 'router bgp 64515\n no bgp network import-check\nexit\n',
+ 'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+ 'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+ 'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+ 'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+ 'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv4 unicast\n'
+ '  neighbor 192.169.10.1 activate\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv4 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv4 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv6 unicast\n'
+ '  neighbor 192.169.10.1 activate\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv6 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv6 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+ ' exit\n'
+ 'exit\n']
+[396|zebra] sending configuration
+[395|mgmtd] sending configuration
+[402|bgpd] sending configuration
+[410|watchfrr] sending configuration
+[412|staticd] sending configuration
+[413|bfdd] sending configuration
+Waiting for children to finish applying config...
+[396|zebra] done
+[413|bfdd] done
+[395|mgmtd] done
+[412|staticd] done
+[410|watchfrr] done
+[402|bgpd] done
+2026-07-16 11:07:48,781  INFO: Loading Config object from vtysh show running
+2026-07-16 11:07:49,003  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16 11:07:49,003  INFO: "frr defaults traditional" cannot be removed
+2026-07-16 11:07:49,003  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16 11:07:49,004  INFO: /var/run/frr/reload-FVI3QC.txt content
+['log file /etc/frr/frr.log debugging\n',
+ 'debug bgp updates\n',
+ 'ip nht resolve-via-default\n',
+ 'ipv6 nht resolve-via-default\n',
+ 'log file /etc/frr/frr.log debugging\n',
+ 'debug bgp updates\n',
+ 'ip nht resolve-via-default\n',
+ 'ipv6 nht resolve-via-default\n',
+ 'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+ 'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+ 'route-map 192.169.10.1-out permit 1\nexit\n',
+ 'route-map 192.169.10.1-out permit 1\n'
+ ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+ 'exit\n',
+ 'route-map 192.169.10.1-out permit 2\nexit\n',
+ 'route-map 192.169.10.1-out permit 2\n'
+ ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+ 'exit\n',
+ 'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+ 'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+ 'route-map 192.169.10.1-in permit 3\nexit\n',
+ 'route-map 192.169.10.1-in permit 3\n'
+ ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+ 'exit\n',
+ 'route-map 192.169.10.1-in permit 4\nexit\n',
+ 'route-map 192.169.10.1-in permit 4\n'
+ ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+ 'exit\n',
+ 'router bgp 64515\nexit\n',
+ 'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+ 'router bgp 64515\n no bgp network import-check\nexit\n',
+ 'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+ 'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+ 'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+ 'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+ 'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv4 unicast\n'
+ '  neighbor 192.169.10.1 activate\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv4 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv4 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv6 unicast\n'
+ '  neighbor 192.169.10.1 activate\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv6 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+ ' exit\n'
+ 'exit\n',
+ 'router bgp 64515\n'
+ ' address-family ipv6 unicast\n'
+ '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+ ' exit\n'
+ 'exit\n']
+[421|zebra] sending configuration
+[420|mgmtd] sending configuration
+[427|bgpd] sending configuration
+[435|watchfrr] sending configuration
+[437|staticd] sending configuration
+[438|bfdd] sending configuration
+Waiting for children to finish applying config...
+[421|zebra] done
+[427|bgpd] done
+[420|mgmtd] done
+[437|staticd] done
+[435|watchfrr] done
+[438|bfdd] done
+FRR reloaded successfully! 3 seconds
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-cp-frr-files
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-cp-reloader
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-cp-metrics
+
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-daemon-w5wxh-cp-frr-status
+

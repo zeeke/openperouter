@@ -1,0 +1,35 @@
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:07:2a:ab for link kindctrlpl1
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:ff:b4:69 for link pe-kind-control-plane/toswitch1
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:d7:e2:2f for link kindworker1
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:4f:4c:34 for link pe-kind-worker/toswitch1
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:a4:47:d3 for link kindctrlpl2
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:c8:ba:6e for link pe-kind-control-plane/toswitch2
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:e5:08:48 for link kindworker2
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:38:76:54 for link pe-kind-worker/toswitch2
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:21:ce:73 for link clab-kind-leafkind1/tokindworker
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:1d:d2:47 for link pe-kind-worker/toleafkind1
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:3b:6b:dc for link clab-kind-leafkind1/tokindctrlpl
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:cf:1c:ce for link pe-kind-control-plane/toleafkind1
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:01:d0:87 for link clab-kind-leafkind2/tokindworker
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:ed:8c:c4 for link pe-kind-worker/toleafkind2
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:59:a2:03 for link clab-kind-leafkind2/tokindctrlpl
+2026/07/16 11:05:05 Discovered MAC address aa:c1:ab:5b:6b:ee for link pe-kind-control-plane/toleafkind2
+2026/07/16 11:05:05 Spawning link monitor in host namespace
+2026/07/16 11:05:05 Found matching monitored pair kindctrlpl1 <-> pe-kind-control-plane/toswitch1
+2026/07/16 11:05:05 Skipping pair kindctrlpl1 <-> pe-kind-control-plane/toswitch1 as it exists
+2026/07/16 11:05:05 Found matching monitored pair kindworker1 <-> pe-kind-worker/toswitch1
+2026/07/16 11:05:05 Skipping pair kindworker1 <-> pe-kind-worker/toswitch1 as it exists
+2026/07/16 11:05:05 Found matching monitored pair kindctrlpl2 <-> pe-kind-control-plane/toswitch2
+2026/07/16 11:05:05 Skipping pair kindctrlpl2 <-> pe-kind-control-plane/toswitch2 as it exists
+2026/07/16 11:05:05 Found matching monitored pair kindworker2 <-> pe-kind-worker/toswitch2
+2026/07/16 11:05:05 Skipping pair kindworker2 <-> pe-kind-worker/toswitch2 as it exists
+2026/07/16 11:05:05 Spawning link monitor in namespace of container clab-kind-leafkind1
+2026/07/16 11:05:05 Found matching monitored pair clab-kind-leafkind1/tokindworker <-> pe-kind-worker/toleafkind1
+2026/07/16 11:05:05 Skipping pair clab-kind-leafkind1/tokindworker <-> pe-kind-worker/toleafkind1 as it exists
+2026/07/16 11:05:05 Found matching monitored pair clab-kind-leafkind1/tokindctrlpl <-> pe-kind-control-plane/toleafkind1
+2026/07/16 11:05:05 Skipping pair clab-kind-leafkind1/tokindctrlpl <-> pe-kind-control-plane/toleafkind1 as it exists
+2026/07/16 11:05:05 Spawning link monitor in namespace of container clab-kind-leafkind2
+2026/07/16 11:05:05 Found matching monitored pair clab-kind-leafkind2/tokindworker <-> pe-kind-worker/toleafkind2
+2026/07/16 11:05:05 Skipping pair clab-kind-leafkind2/tokindworker <-> pe-kind-worker/toleafkind2 as it exists
+2026/07/16 11:05:05 Found matching monitored pair clab-kind-leafkind2/tokindctrlpl <-> pe-kind-control-plane/toleafkind2
+2026/07/16 11:05:05 Skipping pair clab-kind-leafkind2/tokindctrlpl <-> pe-kind-control-plane/toleafkind2 as it exists

@@ -1,0 +1,62 @@
+-----------------------------------
+Dumping logs for pod frr-k8s-system-frr-k8s-webhook-server-79db7bf56f-96tnv-frr-k8s-webhook-server
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"setup","msg":"Starting certs generator"}
+{"action":"setting up cert rotation","caller":"main.go:239","level":"info","op":"startup","ts":"2026-07-16T11:04:41Z"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"setup","msg":"starting frr-k8s","version":"version v0.0.1 (no build information)"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"controller-runtime.metrics","msg":"Starting metrics server"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"controller-runtime.metrics","msg":"Serving metrics server","bindAddress":":7572","secure":false}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"starting cert rotator controller"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting EventSource","controller":"cert-rotator","source":"kind source: *unstructured.Unstructured"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting EventSource","controller":"cert-rotator","source":"kind source: *v1.Secret"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting Controller","controller":"cert-rotator"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting workers","controller":"cert-rotator","worker count":1}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"certs are ready in /tmp/k8s-webhook-server/serving-certs"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"Ensuring CA cert","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"Ensuring CA cert","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"cert-rotation","msg":"CA certs are injected to webhooks"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"setup","msg":"Starting webhooks"}
+{"action":"webhooks enabled","caller":"main.go:262","level":"info","op":"startup","ts":"2026-07-16T11:04:42Z"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Registering webhook","path":"/validate-frrk8s-metallb-io-v1beta1-frrconfiguration"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Starting webhook server"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Registering webhook","path":"/healthz"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.certwatcher","msg":"Updated current TLS certificate"}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Serving webhook server","host":"","port":9443}
+{"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.certwatcher","msg":"Starting certificate poll+watcher","interval":10}
+
+-----------------------------------
+Dumping previous logs for pod frr-k8s-system-frr-k8s-webhook-server-79db7bf56f-96tnv-frr-k8s-webhook-server
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"setup","msg":"Starting certs generator"}
+{"action":"setting up cert rotation","caller":"main.go:239","level":"info","op":"startup","ts":"2026-07-16T11:03:33Z"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"setup","msg":"starting frr-k8s","version":"version v0.0.1 (no build information)"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"controller-runtime.metrics","msg":"Starting metrics server"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"cert-rotation","msg":"starting cert rotator controller"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"controller-runtime.metrics","msg":"Serving metrics server","bindAddress":":7572","secure":false}
+{"level":"info","ts":"2026-07-16T11:03:33Z","msg":"Starting EventSource","controller":"cert-rotator","source":"kind source: *v1.Secret"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","msg":"Starting EventSource","controller":"cert-rotator","source":"kind source: *unstructured.Unstructured"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"cert-rotation","msg":"refreshing CA and server certs"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","msg":"Starting Controller","controller":"cert-rotator"}
+{"level":"info","ts":"2026-07-16T11:03:33Z","msg":"Starting workers","controller":"cert-rotator","worker count":1}
+{"level":"info","ts":"2026-07-16T11:03:33Z","logger":"cert-rotation","msg":"refreshing CA and server certs"}
+{"level":"info","ts":"2026-07-16T11:03:36Z","logger":"cert-rotation","msg":"server certs refreshed"}
+{"level":"info","ts":"2026-07-16T11:03:36Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+{"level":"info","ts":"2026-07-16T11:03:36Z","logger":"cert-rotation","msg":"Ensuring CA cert","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration"}
+{"level":"info","ts":"2026-07-16T11:03:36Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+{"level":"info","ts":"2026-07-16T11:03:36Z","logger":"cert-rotation","msg":"Ensuring CA cert","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration"}
+{"level":"error","ts":"2026-07-16T11:03:37Z","logger":"cert-rotation","msg":"could not refresh CA and server certs","error":"Operation cannot be fulfilled on secrets \"frr-k8s-webhook-server-cert\": the object has been modified; please apply your changes to the latest version and try again","stacktrace":"github.com/open-policy-agent/cert-controller/pkg/rotator.(*CertRotator).refreshCertIfNeeded.func1\n\t/go/pkg/mod/github.com/open-policy-agent/cert-controller@v0.10.2-0.20240531181455-2649f121ab97/pkg/rotator/rotator.go:322\nk8s.io/apimachinery/pkg/util/wait.runConditionWithCrashProtection\n\t/go/pkg/mod/k8s.io/apimachinery@v0.33.0/pkg/util/wait/wait.go:150\nk8s.io/apimachinery/pkg/util/wait.ExponentialBackoff\n\t/go/pkg/mod/k8s.io/apimachinery@v0.33.0/pkg/util/wait/backoff.go:477\ngithub.com/open-policy-agent/cert-controller/pkg/rotator.(*CertRotator).refreshCertIfNeeded\n\t/go/pkg/mod/github.com/open-policy-agent/cert-controller@v0.10.2-0.20240531181455-2649f121ab97/pkg/rotator/rotator.go:350\ngithub.com/open-policy-agent/cert-controller/pkg/rotator.(*CertRotator).Start\n\t/go/pkg/mod/github.com/open-policy-agent/cert-controller@v0.10.2-0.20240531181455-2649f121ab97/pkg/rotator/rotator.go:278\nsigs.k8s.io/controller-runtime/pkg/manager.(*runnableGroup).reconcile.func1\n\t/go/pkg/mod/sigs.k8s.io/controller-runtime@v0.20.4/pkg/manager/runnable_group.go:226"}
+{"level":"info","ts":"2026-07-16T11:03:37Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Stopping and waiting for non leader election runnables"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"stopping cert rotator controller"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Shutdown signal received, waiting for all workers to finish","controller":"cert-rotator"}
+I0716 11:04:41.353704       1 reflector.go:556] "Warning: watch ended with error" reflector="pkg/mod/k8s.io/client-go@v0.33.0/tools/cache/reflector.go:285" type="admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration" err="an error on the server (\"unable to decode an event from the watch stream: context canceled\") has prevented the request from succeeding"
+I0716 11:04:41.353830       1 reflector.go:556] "Warning: watch ended with error" reflector="pkg/mod/k8s.io/client-go@v0.33.0/tools/cache/reflector.go:285" type="*v1.Secret" err="an error on the server (\"unable to decode an event from the watch stream: context canceled\") has prevented the request from succeeding"
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"All workers finished","controller":"cert-rotator"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Stopping and waiting for leader election runnables"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Stopping and waiting for caches"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Stopping and waiting for webhooks"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Stopping and waiting for HTTP servers"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","logger":"controller-runtime.metrics","msg":"Shutting down metrics server with timeout of 1 minute"}
+{"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Wait completed, proceeding to shutdown the manager"}
+

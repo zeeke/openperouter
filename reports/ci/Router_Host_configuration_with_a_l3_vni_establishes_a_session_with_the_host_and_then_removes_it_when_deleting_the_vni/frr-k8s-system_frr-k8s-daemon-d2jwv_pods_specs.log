@@ -1,0 +1,1695 @@
+{
+    "metadata": {
+        "name": "frr-k8s-daemon-d2jwv",
+        "generateName": "frr-k8s-daemon-",
+        "namespace": "frr-k8s-system",
+        "uid": "58e9b6c9-3495-4d4b-8d47-e4f8dc5ad4d8",
+        "resourceVersion": "791",
+        "creationTimestamp": "2026-07-16T11:03:21Z",
+        "labels": {
+            "app": "frr-k8s",
+            "control-plane": "frr-k8s",
+            "controller-revision-hash": "67b8dcd48d",
+            "pod-template-generation": "1"
+        },
+        "annotations": {
+            "kubectl.kubernetes.io/default-container": "frr-k8s"
+        },
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "kind": "DaemonSet",
+                "name": "frr-k8s-daemon",
+                "uid": "f01948f1-f022-468f-b987-d4ae17d36777",
+                "controller": true,
+                "blockOwnerDeletion": true
+            }
+        ],
+        "managedFields": [
+            {
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:03:21Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            ".": {},
+                            "f:kubectl.kubernetes.io/default-container": {}
+                        },
+                        "f:generateName": {},
+                        "f:labels": {
+                            ".": {},
+                            "f:app": {},
+                            "f:control-plane": {},
+                            "f:controller-revision-hash": {},
+                            "f:pod-template-generation": {}
+                        },
+                        "f:ownerReferences": {
+                            ".": {},
+                            "k:{\"uid\":\"f01948f1-f022-468f-b987-d4ae17d36777\"}": {}
+                        }
+                    },
+                    "f:spec": {
+                        "f:affinity": {
+                            ".": {},
+                            "f:nodeAffinity": {
+                                ".": {},
+                                "f:requiredDuringSchedulingIgnoredDuringExecution": {}
+                            }
+                        },
+                        "f:containers": {
+                            "k:{\"name\":\"frr\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"TINI_SUBREAPER\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:value": {}
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:host": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:capabilities": {
+                                        ".": {},
+                                        "f:add": {}
+                                    }
+                                },
+                                "f:startupProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:host": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"frr-k8s\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"FRR_CONFIG_FILE\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:value": {}
+                                    },
+                                    "k:{\"name\":\"FRR_RELOADER_PID_FILE\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:value": {}
+                                    },
+                                    "k:{\"name\":\"NAMESPACE\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    },
+                                    "k:{\"name\":\"NODE_NAME\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:host": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":7572,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:hostPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:readinessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:host": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:resources": {
+                                    ".": {},
+                                    "f:limits": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    },
+                                    "f:requests": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    }
+                                },
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:allowPrivilegeEscalation": {},
+                                    "f:capabilities": {
+                                        ".": {},
+                                        "f:drop": {}
+                                    },
+                                    "f:readOnlyRootFilesystem": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr_reloader\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"frr-metrics\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":7573,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:hostPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/etc/frr_metrics\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"frr-status\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"NAMESPACE\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    },
+                                    "k:{\"name\":\"NODE_NAME\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    },
+                                    "k:{\"name\":\"POD_NAME\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/etc/frr_status\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"kube-rbac-proxy\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":9140,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:hostPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:resources": {
+                                    ".": {},
+                                    "f:limits": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    },
+                                    "f:requests": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    }
+                                },
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:allowPrivilegeEscalation": {},
+                                    "f:capabilities": {
+                                        ".": {},
+                                        "f:drop": {}
+                                    }
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {}
+                            },
+                            "k:{\"name\":\"kube-rbac-proxy-frr\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":9141,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:hostPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:resources": {
+                                    ".": {},
+                                    "f:limits": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    },
+                                    "f:requests": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    }
+                                },
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:allowPrivilegeEscalation": {},
+                                    "f:capabilities": {
+                                        ".": {},
+                                        "f:drop": {}
+                                    }
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {}
+                            },
+                            "k:{\"name\":\"reloader\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/etc/frr_reloader\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            }
+                        },
+                        "f:dnsPolicy": {},
+                        "f:enableServiceLinks": {},
+                        "f:hostNetwork": {},
+                        "f:initContainers": {
+                            ".": {},
+                            "k:{\"name\":\"cp-frr-files\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:runAsGroup": {},
+                                    "f:runAsUser": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/tmp/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"cp-frr-status\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr_status\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"cp-metrics\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr_metrics\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"cp-reloader\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr_reloader\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            }
+                        },
+                        "f:restartPolicy": {},
+                        "f:schedulerName": {},
+                        "f:securityContext": {},
+                        "f:serviceAccount": {},
+                        "f:serviceAccountName": {},
+                        "f:shareProcessNamespace": {},
+                        "f:terminationGracePeriodSeconds": {},
+                        "f:tolerations": {},
+                        "f:volumes": {
+                            ".": {},
+                            "k:{\"name\":\"frr-conf\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"frr-sockets\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"frr-startup\"}": {
+                                ".": {},
+                                "f:configMap": {
+                                    ".": {},
+                                    "f:defaultMode": {},
+                                    "f:name": {}
+                                },
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"frr-status\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"metrics\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"reloader\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "manager": "kubelet",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:03:42Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:status": {
+                        "f:conditions": {
+                            "k:{\"type\":\"ContainersReady\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Initialized\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"PodReadyToStartContainers\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Ready\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            }
+                        },
+                        "f:containerStatuses": {},
+                        "f:hostIP": {},
+                        "f:hostIPs": {},
+                        "f:initContainerStatuses": {},
+                        "f:phase": {},
+                        "f:podIP": {},
+                        "f:podIPs": {
+                            ".": {},
+                            "k:{\"ip\":\"172.18.0.3\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            },
+                            "k:{\"ip\":\"fc00:f853:ccd:e793::3\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            }
+                        },
+                        "f:startTime": {}
+                    }
+                },
+                "subresource": "status"
+            }
+        ]
+    },
+    "spec": {
+        "volumes": [
+            {
+                "name": "frr-sockets",
+                "emptyDir": {}
+            },
+            {
+                "name": "frr-startup",
+                "configMap": {
+                    "name": "frr-k8s-frr-startup",
+                    "defaultMode": 420
+                }
+            },
+            {
+                "name": "frr-conf",
+                "emptyDir": {}
+            },
+            {
+                "name": "reloader",
+                "emptyDir": {}
+            },
+            {
+                "name": "metrics",
+                "emptyDir": {}
+            },
+            {
+                "name": "frr-status",
+                "emptyDir": {}
+            },
+            {
+                "name": "kube-api-access-v59nn",
+                "projected": {
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "name": "kube-root-ca.crt",
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "path": "namespace",
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "defaultMode": 420
+                }
+            }
+        ],
+        "initContainers": [
+            {
+                "name": "cp-frr-files",
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "cp -rLf /tmp/frr/* /etc/frr/"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-startup",
+                        "mountPath": "/tmp/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "runAsUser": 100,
+                    "runAsGroup": 101
+                }
+            },
+            {
+                "name": "cp-reloader",
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "cp -f /frr-reloader.sh /etc/frr_reloader/"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "reloader",
+                        "mountPath": "/etc/frr_reloader"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            },
+            {
+                "name": "cp-metrics",
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "cp -f /frr-metrics /etc/frr_metrics/"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "metrics",
+                        "mountPath": "/etc/frr_metrics"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            },
+            {
+                "name": "cp-frr-status",
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "cp -f /frr-status /etc/frr_status/"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-status",
+                        "mountPath": "/etc/frr_status"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            }
+        ],
+        "containers": [
+            {
+                "name": "frr-k8s",
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "command": [
+                    "/frr-k8s"
+                ],
+                "args": [
+                    "--node-name=$(NODE_NAME)",
+                    "--log-level=debug",
+                    "--namespace=$(NAMESPACE)"
+                ],
+                "ports": [
+                    {
+                        "name": "monitoring",
+                        "hostPort": 7572,
+                        "containerPort": 7572,
+                        "protocol": "TCP"
+                    }
+                ],
+                "env": [
+                    {
+                        "name": "FRR_CONFIG_FILE",
+                        "value": "/etc/frr_reloader/frr.conf"
+                    },
+                    {
+                        "name": "FRR_RELOADER_PID_FILE",
+                        "value": "/etc/frr_reloader/reloader.pid"
+                    },
+                    {
+                        "name": "NODE_NAME",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "spec.nodeName"
+                            }
+                        }
+                    },
+                    {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                            }
+                        }
+                    }
+                ],
+                "resources": {
+                    "limits": {
+                        "cpu": "500m",
+                        "memory": "128Mi"
+                    },
+                    "requests": {
+                        "cpu": "10m",
+                        "memory": "64Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "reloader",
+                        "mountPath": "/etc/frr_reloader"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/metrics",
+                        "port": "monitoring",
+                        "host": "127.0.0.1",
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 15,
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 20,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "readinessProbe": {
+                    "httpGet": {
+                        "path": "/metrics",
+                        "port": "monitoring",
+                        "host": "127.0.0.1",
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 5,
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "allowPrivilegeEscalation": false
+                }
+            },
+            {
+                "name": "kube-rbac-proxy",
+                "image": "registry.k8s.io/kubebuilder/kube-rbac-proxy:v0.13.1",
+                "args": [
+                    "--secure-listen-address=0.0.0.0:9140",
+                    "--upstream=http://127.0.0.1:7572/",
+                    "--logtostderr=true",
+                    "--v=0"
+                ],
+                "ports": [
+                    {
+                        "name": "metricshttps",
+                        "hostPort": 9140,
+                        "containerPort": 9140,
+                        "protocol": "TCP"
+                    }
+                ],
+                "resources": {
+                    "limits": {
+                        "cpu": "500m",
+                        "memory": "128Mi"
+                    },
+                    "requests": {
+                        "cpu": "5m",
+                        "memory": "64Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "allowPrivilegeEscalation": false
+                }
+            },
+            {
+                "name": "kube-rbac-proxy-frr",
+                "image": "registry.k8s.io/kubebuilder/kube-rbac-proxy:v0.13.1",
+                "args": [
+                    "--secure-listen-address=0.0.0.0:9141",
+                    "--upstream=http://127.0.0.1:7573/",
+                    "--logtostderr=true",
+                    "--v=0"
+                ],
+                "ports": [
+                    {
+                        "name": "frrmetricshttps",
+                        "hostPort": 9141,
+                        "containerPort": 9141,
+                        "protocol": "TCP"
+                    }
+                ],
+                "resources": {
+                    "limits": {
+                        "cpu": "500m",
+                        "memory": "128Mi"
+                    },
+                    "requests": {
+                        "cpu": "5m",
+                        "memory": "64Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "allowPrivilegeEscalation": false
+                }
+            },
+            {
+                "name": "frr",
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "/sbin/tini -- /usr/lib/frr/docker-start \u0026\nattempts=0\nuntil [[ -f /etc/frr/frr.log || $attempts -eq 60 ]]; do\n  sleep 1\n  attempts=$(( $attempts + 1 ))\ndone\ntail -f /etc/frr/frr.log\n"
+                ],
+                "env": [
+                    {
+                        "name": "TINI_SUBREAPER",
+                        "value": "true"
+                    }
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/livez",
+                        "port": 7573,
+                        "host": "127.0.0.1",
+                        "scheme": "HTTP"
+                    },
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "startupProbe": {
+                    "httpGet": {
+                        "path": "/livez",
+                        "port": 7573,
+                        "host": "127.0.0.1",
+                        "scheme": "HTTP"
+                    },
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "failureThreshold": 30
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "capabilities": {
+                        "add": [
+                            "NET_ADMIN",
+                            "NET_RAW",
+                            "SYS_ADMIN",
+                            "NET_BIND_SERVICE"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "frr-metrics",
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "command": [
+                    "/etc/frr_metrics/frr-metrics"
+                ],
+                "args": [
+                    "--metrics-port=7573",
+                    "--metrics-bind-address=127.0.0.1"
+                ],
+                "ports": [
+                    {
+                        "name": "monitoring",
+                        "hostPort": 7573,
+                        "containerPort": 7573,
+                        "protocol": "TCP"
+                    }
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "metrics",
+                        "mountPath": "/etc/frr_metrics"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            },
+            {
+                "name": "frr-status",
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "command": [
+                    "/etc/frr_status/frr-status"
+                ],
+                "args": [
+                    "--node-name=$(NODE_NAME)",
+                    "--namespace=$(NAMESPACE)",
+                    "--pod-name=$(POD_NAME)"
+                ],
+                "env": [
+                    {
+                        "name": "NODE_NAME",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "spec.nodeName"
+                            }
+                        }
+                    },
+                    {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                            }
+                        }
+                    },
+                    {
+                        "name": "POD_NAME",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.name"
+                            }
+                        }
+                    }
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "frr-status",
+                        "mountPath": "/etc/frr_status"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            },
+            {
+                "name": "reloader",
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "command": [
+                    "/etc/frr_reloader/frr-reloader.sh"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "reloader",
+                        "mountPath": "/etc/frr_reloader"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 10,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "frr-k8s-daemon",
+        "serviceAccount": "frr-k8s-daemon",
+        "nodeName": "pe-kind-worker",
+        "hostNetwork": true,
+        "shareProcessNamespace": true,
+        "securityContext": {},
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchFields": [
+                                {
+                                    "key": "metadata.name",
+                                    "operator": "In",
+                                    "values": [
+                                        "pe-kind-worker"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+            {
+                "key": "node-role.kubernetes.io/master",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node-role.kubernetes.io/control-plane",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "effect": "NoExecute"
+            },
+            {
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "effect": "NoExecute"
+            },
+            {
+                "key": "node.kubernetes.io/disk-pressure",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/memory-pressure",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/pid-pressure",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/unschedulable",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/network-unavailable",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true,
+        "preemptionPolicy": "PreemptLowerPriority"
+    },
+    "status": {
+        "phase": "Running",
+        "conditions": [
+            {
+                "type": "PodReadyToStartContainers",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:25Z"
+            },
+            {
+                "type": "Initialized",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:36Z"
+            },
+            {
+                "type": "Ready",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:42Z"
+            },
+            {
+                "type": "ContainersReady",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:42Z"
+            },
+            {
+                "type": "PodScheduled",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:21Z"
+            }
+        ],
+        "hostIP": "172.18.0.3",
+        "hostIPs": [
+            {
+                "ip": "172.18.0.3"
+            },
+            {
+                "ip": "fc00:f853:ccd:e793::3"
+            }
+        ],
+        "podIP": "172.18.0.3",
+        "podIPs": [
+            {
+                "ip": "172.18.0.3"
+            },
+            {
+                "ip": "fc00:f853:ccd:e793::3"
+            }
+        ],
+        "startTime": "2026-07-16T11:03:21Z",
+        "initContainerStatuses": [
+            {
+                "name": "cp-frr-files",
+                "state": {
+                    "terminated": {
+                        "exitCode": 0,
+                        "reason": "Completed",
+                        "startedAt": "2026-07-16T11:03:24Z",
+                        "finishedAt": "2026-07-16T11:03:24Z",
+                        "containerID": "containerd://0cf9b8148d3c44a826bd0c82cd9c736f8082140a586a897e7c8409ccc16be9c7"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "imageID": "quay.io/frrouting/frr@sha256:f310c2ebb3827fa03b9674ee05e70a7d5eef2123bcc3b475eb2ef14dafcb52b4",
+                "containerID": "containerd://0cf9b8148d3c44a826bd0c82cd9c736f8082140a586a897e7c8409ccc16be9c7",
+                "started": false,
+                "volumeMounts": [
+                    {
+                        "name": "frr-startup",
+                        "mountPath": "/tmp/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "cp-reloader",
+                "state": {
+                    "terminated": {
+                        "exitCode": 0,
+                        "reason": "Completed",
+                        "startedAt": "2026-07-16T11:03:33Z",
+                        "finishedAt": "2026-07-16T11:03:33Z",
+                        "containerID": "containerd://9eb0436cbb3436c69711329f4a7f762acffeb5c01ecc6409c557555176d81f2d"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "imageID": "quay.io/metallb/frr-k8s@sha256:1b9aea79783c5e2e914e0956aa9b7e1287762d9cf38b8a0ee19b4a24accb9e74",
+                "containerID": "containerd://9eb0436cbb3436c69711329f4a7f762acffeb5c01ecc6409c557555176d81f2d",
+                "started": false,
+                "volumeMounts": [
+                    {
+                        "name": "reloader",
+                        "mountPath": "/etc/frr_reloader"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "cp-metrics",
+                "state": {
+                    "terminated": {
+                        "exitCode": 0,
+                        "reason": "Completed",
+                        "startedAt": "2026-07-16T11:03:34Z",
+                        "finishedAt": "2026-07-16T11:03:34Z",
+                        "containerID": "containerd://ceb09ba3523030118708bc48b4dbea9f740dd3afdf017616689988f7fedf7f0d"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "imageID": "quay.io/metallb/frr-k8s@sha256:1b9aea79783c5e2e914e0956aa9b7e1287762d9cf38b8a0ee19b4a24accb9e74",
+                "containerID": "containerd://ceb09ba3523030118708bc48b4dbea9f740dd3afdf017616689988f7fedf7f0d",
+                "started": false,
+                "volumeMounts": [
+                    {
+                        "name": "metrics",
+                        "mountPath": "/etc/frr_metrics"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "cp-frr-status",
+                "state": {
+                    "terminated": {
+                        "exitCode": 0,
+                        "reason": "Completed",
+                        "startedAt": "2026-07-16T11:03:35Z",
+                        "finishedAt": "2026-07-16T11:03:35Z",
+                        "containerID": "containerd://2e3ca169b9bffa4e9f5d6288fd36c76947d5845938ae6809e82840c89b4f67c6"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "imageID": "quay.io/metallb/frr-k8s@sha256:1b9aea79783c5e2e914e0956aa9b7e1287762d9cf38b8a0ee19b4a24accb9e74",
+                "containerID": "containerd://2e3ca169b9bffa4e9f5d6288fd36c76947d5845938ae6809e82840c89b4f67c6",
+                "started": false,
+                "volumeMounts": [
+                    {
+                        "name": "frr-status",
+                        "mountPath": "/etc/frr_status"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "containerStatuses": [
+            {
+                "name": "frr",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:36Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "imageID": "quay.io/frrouting/frr@sha256:f310c2ebb3827fa03b9674ee05e70a7d5eef2123bcc3b475eb2ef14dafcb52b4",
+                "containerID": "containerd://f8f8e2d50278fbb2516b90e05288033ddfb89be6bc5382d4b49f0200d82cf765",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "frr-k8s",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:36Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "imageID": "quay.io/metallb/frr-k8s@sha256:1b9aea79783c5e2e914e0956aa9b7e1287762d9cf38b8a0ee19b4a24accb9e74",
+                "containerID": "containerd://81c54d811eb9e079c297317d4a50ac24b7a8aa8c6d80294577d61636e6b5b079",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "reloader",
+                        "mountPath": "/etc/frr_reloader"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "frr-metrics",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:37Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "imageID": "quay.io/frrouting/frr@sha256:f310c2ebb3827fa03b9674ee05e70a7d5eef2123bcc3b475eb2ef14dafcb52b4",
+                "containerID": "containerd://ff502b25d960a63f9ad07df6937288a2ed88b3fc26a81b6dc84534d5c669991a",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "metrics",
+                        "mountPath": "/etc/frr_metrics"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "frr-status",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:37Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "imageID": "quay.io/frrouting/frr@sha256:f310c2ebb3827fa03b9674ee05e70a7d5eef2123bcc3b475eb2ef14dafcb52b4",
+                "containerID": "containerd://2f05e90a68e77e10f4bd85355de22ff0c0f8dbd79a96dab08fed4930905cf6ff",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "frr-status",
+                        "mountPath": "/etc/frr_status"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "kube-rbac-proxy",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:36Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "registry.k8s.io/kubebuilder/kube-rbac-proxy:v0.13.1",
+                "imageID": "sha256:eb5a02daef2feb1aba3cf562f206a9ca50c1d0d095782a645e9c4093482288c3",
+                "containerID": "containerd://c12e606c0022c50b04696cd3a807343be0df6f24333e1201277965b8062d2243",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "kube-rbac-proxy-frr",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:36Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "registry.k8s.io/kubebuilder/kube-rbac-proxy:v0.13.1",
+                "imageID": "sha256:eb5a02daef2feb1aba3cf562f206a9ca50c1d0d095782a645e9c4093482288c3",
+                "containerID": "containerd://6e5ccc4d734f9af7fb16b106bd7558d6ff497c8f567c3dd2958767ccc908094d",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "reloader",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:03:37Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/frrouting/frr:9.1.0",
+                "imageID": "quay.io/frrouting/frr@sha256:f310c2ebb3827fa03b9674ee05e70a7d5eef2123bcc3b475eb2ef14dafcb52b4",
+                "containerID": "containerd://0f21bf915415f861bae202a83266ee056eb8f99b94a440bc0db1ab04a7d2b55b",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frr-conf",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "reloader",
+                        "mountPath": "/etc/frr_reloader"
+                    },
+                    {
+                        "name": "kube-api-access-v59nn",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "qosClass": "Burstable"
+    }
+}

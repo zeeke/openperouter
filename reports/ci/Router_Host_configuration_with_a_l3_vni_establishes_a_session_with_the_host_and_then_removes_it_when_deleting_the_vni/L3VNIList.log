@@ -1,0 +1,57 @@
+{
+    "metadata": {
+        "resourceVersion": "2247"
+    },
+    "items": [
+        {
+            "kind": "L3VNI",
+            "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+            "metadata": {
+                "name": "red",
+                "namespace": "openperouter-system",
+                "uid": "67edc0c7-3df1-4280-ac4b-f66b4f657e8a",
+                "resourceVersion": "1346",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:07:43Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+                        "time": "2026-07-16T11:07:43Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:hostsession": {
+                                    ".": {},
+                                    "f:asn": {},
+                                    "f:hostasn": {},
+                                    "f:localcidr": {
+                                        ".": {},
+                                        "f:ipv4": {}
+                                    }
+                                },
+                                "f:vni": {},
+                                "f:vrf": {},
+                                "f:vxlanport": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "vrf": "red",
+                "vni": 100,
+                "vxlanport": 4789,
+                "hostsession": {
+                    "asn": 64514,
+                    "hostasn": 64515,
+                    "localcidr": {
+                        "ipv4": "192.169.10.0/24"
+                    }
+                }
+            }
+        }
+    ]
+}

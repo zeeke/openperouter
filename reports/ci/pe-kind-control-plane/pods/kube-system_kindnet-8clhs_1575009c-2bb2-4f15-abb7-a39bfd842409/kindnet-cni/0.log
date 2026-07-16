@@ -1,0 +1,609 @@
+2026-07-16T11:02:34.213190007Z stderr F I0716 11:02:34.212831       1 main.go:390] probe TCP address pe-kind-control-plane:6443
+2026-07-16T11:02:34.215850874Z stderr F I0716 11:02:34.215724       1 main.go:109] connected to apiserver: https://pe-kind-control-plane:6443
+2026-07-16T11:02:34.216161404Z stderr F I0716 11:02:34.216073       1 main.go:139] hostIP = 172.18.0.2
+2026-07-16T11:02:34.216169209Z stderr F podIP = 172.18.0.2
+2026-07-16T11:02:34.216484969Z stderr F I0716 11:02:34.216395       1 main.go:148] setting mtu 1500 for CNI 
+2026-07-16T11:02:34.216688289Z stderr F I0716 11:02:34.216616       1 main.go:178] kindnetd IP family: "dualstack"
+2026-07-16T11:02:34.216771474Z stderr F I0716 11:02:34.216733       1 main.go:182] noMask IPv4 subnets: [10.244.0.0/16]
+2026-07-16T11:02:34.417895627Z stderr F I0716 11:02:34.417608       1 main.go:196] noMask IPv6 subnets: [fd00:10:244::/56]
+2026-07-16T11:02:35.114235331Z stderr F I0716 11:02:35.114084       1 controller.go:361] Starting controller kube-network-policies
+2026-07-16T11:02:35.114637162Z stderr F I0716 11:02:35.114511       1 controller.go:365] Waiting for informer caches to sync
+2026-07-16T11:02:35.114782413Z stderr F I0716 11:02:35.114744       1 shared_informer.go:313] Waiting for caches to sync for kube-network-policies
+2026-07-16T11:02:35.316350315Z stderr F I0716 11:02:35.316079       1 shared_informer.go:320] Caches are synced for kube-network-policies
+2026-07-16T11:02:35.316367767Z stderr F I0716 11:02:35.316122       1 metrics.go:61] Registering metrics
+2026-07-16T11:02:35.316374971Z stderr F I0716 11:02:35.316183       1 controller.go:401] Syncing nftables rules
+2026-07-16T11:02:35.316635578Z stderr F I0716 11:02:35.316535       1 controller.go:386] error reading nfqueue stats: open /proc/net/netfilter/nfnetlink_queue: no such file or directory
+2026-07-16T11:02:45.11485973Z stderr F I0716 11:02:45.114528       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:02:45.114876291Z stderr F I0716 11:02:45.114605       1 main.go:301] handling current node
+2026-07-16T11:02:45.116678251Z stderr F I0716 11:02:45.116581       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:02:45.116697798Z stderr F I0716 11:02:45.116648       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:02:45.116965977Z stderr F I0716 11:02:45.116864       1 routes.go:62] Adding route {Ifindex: 0 Dst: 10.244.1.0/24 Src: <nil> Gw: 172.18.0.3 Flags: [] Table: 0 Realm: 0} 
+2026-07-16T11:02:45.118021378Z stderr F I0716 11:02:45.117746       1 routes.go:62] Adding route {Ifindex: 0 Dst: fd00:10:244:1::/64 Src: <nil> Gw: fc00:f853:ccd:e793::3 Flags: [] Table: 0 Realm: 0} 
+2026-07-16T11:02:55.115321173Z stderr F I0716 11:02:55.115158       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:02:55.115354265Z stderr F I0716 11:02:55.115192       1 main.go:301] handling current node
+2026-07-16T11:02:55.115359976Z stderr F I0716 11:02:55.115204       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:02:55.115366137Z stderr F I0716 11:02:55.115211       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:03:05.115567004Z stderr F I0716 11:03:05.114640       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:03:05.115596408Z stderr F I0716 11:03:05.114691       1 main.go:301] handling current node
+2026-07-16T11:03:05.115602189Z stderr F I0716 11:03:05.114709       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:03:05.115607108Z stderr F I0716 11:03:05.114729       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:03:15.121227353Z stderr F I0716 11:03:15.120889       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:03:15.121262769Z stderr F I0716 11:03:15.121063       1 main.go:301] handling current node
+2026-07-16T11:03:15.121283658Z stderr F I0716 11:03:15.121082       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:03:15.121287335Z stderr F I0716 11:03:15.121090       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:03:25.115360873Z stderr F I0716 11:03:25.115199       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:03:25.115397011Z stderr F I0716 11:03:25.115234       1 main.go:301] handling current node
+2026-07-16T11:03:25.115402761Z stderr F I0716 11:03:25.115247       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:03:25.115408482Z stderr F I0716 11:03:25.115253       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:03:35.115113029Z stderr F I0716 11:03:35.114997       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:03:35.115179693Z stderr F I0716 11:03:35.115119       1 main.go:301] handling current node
+2026-07-16T11:03:35.115191536Z stderr F I0716 11:03:35.115143       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:03:35.115196655Z stderr F I0716 11:03:35.115172       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:03:45.115907117Z stderr F I0716 11:03:45.115758       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:03:45.115942383Z stderr F I0716 11:03:45.115808       1 main.go:301] handling current node
+2026-07-16T11:03:45.115948775Z stderr F I0716 11:03:45.115825       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:03:45.115953053Z stderr F I0716 11:03:45.115839       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:03:55.115330336Z stderr F I0716 11:03:55.115184       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:03:55.115355222Z stderr F I0716 11:03:55.115220       1 main.go:301] handling current node
+2026-07-16T11:03:55.115361003Z stderr F I0716 11:03:55.115234       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:03:55.115365011Z stderr F I0716 11:03:55.115240       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:05.11496282Z stderr F I0716 11:04:05.114767       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:04:05.114987657Z stderr F I0716 11:04:05.114841       1 main.go:301] handling current node
+2026-07-16T11:04:05.114993888Z stderr F I0716 11:04:05.114856       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:04:05.114998617Z stderr F I0716 11:04:05.114863       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:15.114755955Z stderr F I0716 11:04:15.114599       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:04:15.114787734Z stderr F I0716 11:04:15.114667       1 main.go:301] handling current node
+2026-07-16T11:04:15.114793525Z stderr F I0716 11:04:15.114684       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:04:15.114798384Z stderr F I0716 11:04:15.114693       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:25.115474909Z stderr F I0716 11:04:25.115325       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:04:25.115508673Z stderr F I0716 11:04:25.115357       1 main.go:301] handling current node
+2026-07-16T11:04:25.115513111Z stderr F I0716 11:04:25.115371       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:04:25.115549018Z stderr F I0716 11:04:25.115379       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:35.115303272Z stderr F I0716 11:04:35.115159       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:04:35.115334861Z stderr F I0716 11:04:35.115192       1 main.go:301] handling current node
+2026-07-16T11:04:35.115342695Z stderr F I0716 11:04:35.115205       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:04:35.115346633Z stderr F I0716 11:04:35.115211       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:45.115850138Z stderr F I0716 11:04:45.115666       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:04:45.115883641Z stderr F I0716 11:04:45.115736       1 main.go:301] handling current node
+2026-07-16T11:04:45.115889462Z stderr F I0716 11:04:45.115750       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:04:45.115894792Z stderr F I0716 11:04:45.115756       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:55.115059632Z stderr F I0716 11:04:55.114826       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:04:55.115090259Z stderr F I0716 11:04:55.114876       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:04:55.115326496Z stderr F I0716 11:04:55.115232       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:04:55.115340222Z stderr F I0716 11:04:55.115250       1 main.go:301] handling current node
+2026-07-16T11:05:05.116561159Z stderr F I0716 11:05:05.115533       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:05:05.116590684Z stderr F I0716 11:05:05.115581       1 main.go:301] handling current node
+2026-07-16T11:05:05.116595714Z stderr F I0716 11:05:05.115597       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:05:05.116600513Z stderr F I0716 11:05:05.115605       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:05:15.118615737Z stderr F I0716 11:05:15.118343       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:05:15.118802343Z stderr F I0716 11:05:15.118619       1 main.go:301] handling current node
+2026-07-16T11:05:15.118813274Z stderr F I0716 11:05:15.118642       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:05:15.118819345Z stderr F I0716 11:05:15.118653       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:05:25.115518857Z stderr F I0716 11:05:25.115347       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:05:25.11553659Z stderr F I0716 11:05:25.115387       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:05:25.115974108Z stderr F I0716 11:05:25.115902       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:05:25.115982574Z stderr F I0716 11:05:25.115916       1 main.go:301] handling current node
+2026-07-16T11:05:35.114916219Z stderr F I0716 11:05:35.114768       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:05:35.11494829Z stderr F I0716 11:05:35.114804       1 main.go:301] handling current node
+2026-07-16T11:05:35.114954862Z stderr F I0716 11:05:35.114821       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:05:35.114960492Z stderr F I0716 11:05:35.114828       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:05:45.115949002Z stderr F I0716 11:05:45.115821       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:05:45.131144482Z stderr F I0716 11:05:45.115847       1 main.go:301] handling current node
+2026-07-16T11:05:45.131152667Z stderr F I0716 11:05:45.115860       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:05:45.131156435Z stderr F I0716 11:05:45.115866       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:05:55.115412197Z stderr F I0716 11:05:55.115205       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:05:55.115434909Z stderr F I0716 11:05:55.115256       1 main.go:301] handling current node
+2026-07-16T11:05:55.115439147Z stderr F I0716 11:05:55.115272       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:05:55.115442784Z stderr F I0716 11:05:55.115281       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:06:05.115380681Z stderr F I0716 11:06:05.115177       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:06:05.115413132Z stderr F I0716 11:06:05.115239       1 main.go:301] handling current node
+2026-07-16T11:06:05.115419814Z stderr F I0716 11:06:05.115252       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:06:05.115425064Z stderr F I0716 11:06:05.115258       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:06:15.119781738Z stderr F I0716 11:06:15.119598       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:06:15.119822995Z stderr F I0716 11:06:15.119651       1 main.go:301] handling current node
+2026-07-16T11:06:15.119829527Z stderr F I0716 11:06:15.119667       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:06:15.119834617Z stderr F I0716 11:06:15.119676       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:06:25.122777455Z stderr F I0716 11:06:25.121708       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:06:25.122802852Z stderr F I0716 11:06:25.121747       1 main.go:301] handling current node
+2026-07-16T11:06:25.122808382Z stderr F I0716 11:06:25.121763       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:06:25.122813412Z stderr F I0716 11:06:25.121772       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:06:35.115605163Z stderr F I0716 11:06:35.115421       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:06:35.115652601Z stderr F I0716 11:06:35.115486       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:06:35.116005761Z stderr F I0716 11:06:35.115928       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:06:35.116016702Z stderr F I0716 11:06:35.115954       1 main.go:301] handling current node
+2026-07-16T11:06:45.119717646Z stderr F I0716 11:06:45.119527       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:06:45.119743645Z stderr F I0716 11:06:45.119576       1 main.go:301] handling current node
+2026-07-16T11:06:45.119749505Z stderr F I0716 11:06:45.119591       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:06:45.119754655Z stderr F I0716 11:06:45.119599       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:06:55.12179557Z stderr F I0716 11:06:55.121562       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:06:55.121820086Z stderr F I0716 11:06:55.121607       1 main.go:301] handling current node
+2026-07-16T11:06:55.121825776Z stderr F I0716 11:06:55.121622       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:06:55.121840925Z stderr F I0716 11:06:55.121631       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:07:05.121835015Z stderr F I0716 11:07:05.121572       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:07:05.12185872Z stderr F I0716 11:07:05.121614       1 main.go:301] handling current node
+2026-07-16T11:07:05.121863999Z stderr F I0716 11:07:05.121630       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:07:05.121868678Z stderr F I0716 11:07:05.121639       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:07:15.11982181Z stderr F I0716 11:07:15.119684       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:07:15.119860743Z stderr F I0716 11:07:15.119802       1 main.go:301] handling current node
+2026-07-16T11:07:15.121536844Z stderr F I0716 11:07:15.119856       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:07:15.121556551Z stderr F I0716 11:07:15.121532       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:07:25.123044073Z stderr F I0716 11:07:25.122534       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:07:25.12307506Z stderr F I0716 11:07:25.122572       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:07:25.12308032Z stderr F I0716 11:07:25.122901       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:07:25.12308541Z stderr F I0716 11:07:25.122911       1 main.go:301] handling current node
+2026-07-16T11:07:35.115403085Z stderr F I0716 11:07:35.115290       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:07:35.115425497Z stderr F I0716 11:07:35.115334       1 main.go:301] handling current node
+2026-07-16T11:07:35.115430727Z stderr F I0716 11:07:35.115351       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:07:35.115435686Z stderr F I0716 11:07:35.115360       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:07:45.115240664Z stderr F I0716 11:07:45.114905       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:07:45.115264178Z stderr F I0716 11:07:45.114954       1 main.go:301] handling current node
+2026-07-16T11:07:45.115270169Z stderr F I0716 11:07:45.114970       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:07:45.115275399Z stderr F I0716 11:07:45.114978       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:07:55.12314911Z stderr F I0716 11:07:55.122676       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:07:55.123176602Z stderr F I0716 11:07:55.122825       1 main.go:301] handling current node
+2026-07-16T11:07:55.123181952Z stderr F I0716 11:07:55.122869       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:07:55.123187041Z stderr F I0716 11:07:55.122933       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:08:05.115593583Z stderr F I0716 11:08:05.115226       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:08:05.115617006Z stderr F I0716 11:08:05.115331       1 main.go:301] handling current node
+2026-07-16T11:08:05.115622336Z stderr F I0716 11:08:05.115360       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:08:05.115627265Z stderr F I0716 11:08:05.115371       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:08:15.115381095Z stderr F I0716 11:08:15.114808       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:08:15.115402745Z stderr F I0716 11:08:15.114848       1 main.go:301] handling current node
+2026-07-16T11:08:15.115406292Z stderr F I0716 11:08:15.114864       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:08:15.115409267Z stderr F I0716 11:08:15.114872       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:08:25.123348384Z stderr F I0716 11:08:25.122885       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:08:25.123361498Z stderr F I0716 11:08:25.123081       1 main.go:301] handling current node
+2026-07-16T11:08:25.123365105Z stderr F I0716 11:08:25.123104       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:08:25.123368021Z stderr F I0716 11:08:25.123115       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:08:35.116680166Z stderr F I0716 11:08:35.115808       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:08:35.116705724Z stderr F I0716 11:08:35.115851       1 main.go:301] handling current node
+2026-07-16T11:08:35.116711464Z stderr F I0716 11:08:35.115867       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:08:35.116716414Z stderr F I0716 11:08:35.115875       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:08:45.117466495Z stderr F I0716 11:08:45.116962       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:08:45.117484949Z stderr F I0716 11:08:45.117380       1 main.go:301] handling current node
+2026-07-16T11:08:45.117585668Z stderr F I0716 11:08:45.117494       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:08:45.117696264Z stderr F I0716 11:08:45.117588       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:08:55.12281741Z stderr F I0716 11:08:55.122699       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:08:55.122834221Z stderr F I0716 11:08:55.122738       1 main.go:301] handling current node
+2026-07-16T11:08:55.122839852Z stderr F I0716 11:08:55.122772       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:08:55.122844951Z stderr F I0716 11:08:55.122781       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:09:05.122685653Z stderr F I0716 11:09:05.122414       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:09:05.122757988Z stderr F I0716 11:09:05.122555       1 main.go:301] handling current node
+2026-07-16T11:09:05.12276422Z stderr F I0716 11:09:05.122577       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:09:05.122769209Z stderr F I0716 11:09:05.122632       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:09:15.115237471Z stderr F I0716 11:09:15.114650       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:09:15.115260835Z stderr F I0716 11:09:15.114720       1 main.go:301] handling current node
+2026-07-16T11:09:15.115267367Z stderr F I0716 11:09:15.114742       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:09:15.115271214Z stderr F I0716 11:09:15.114751       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:09:25.121940297Z stderr F I0716 11:09:25.121796       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:09:25.121957459Z stderr F I0716 11:09:25.121837       1 main.go:301] handling current node
+2026-07-16T11:09:25.121979501Z stderr F I0716 11:09:25.121854       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:09:25.121983277Z stderr F I0716 11:09:25.121864       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:09:35.115282227Z stderr F I0716 11:09:35.115064       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:09:35.115299079Z stderr F I0716 11:09:35.115189       1 main.go:301] handling current node
+2026-07-16T11:09:35.116817405Z stderr F I0716 11:09:35.116229       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:09:35.116828365Z stderr F I0716 11:09:35.116248       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:09:45.115481541Z stderr F I0716 11:09:45.114550       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:09:45.115499695Z stderr F I0716 11:09:45.114593       1 main.go:301] handling current node
+2026-07-16T11:09:45.115505165Z stderr F I0716 11:09:45.114609       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:09:45.115510405Z stderr F I0716 11:09:45.114618       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:09:55.12314231Z stderr F I0716 11:09:55.122600       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:09:55.123161997Z stderr F I0716 11:09:55.122688       1 main.go:301] handling current node
+2026-07-16T11:09:55.123583744Z stderr F I0716 11:09:55.122731       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:09:55.123595486Z stderr F I0716 11:09:55.123522       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:10:05.115857514Z stderr F I0716 11:10:05.115717       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:10:05.115873965Z stderr F I0716 11:10:05.115775       1 main.go:301] handling current node
+2026-07-16T11:10:05.115879505Z stderr F I0716 11:10:05.115792       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:10:05.115884254Z stderr F I0716 11:10:05.115801       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:10:15.122219735Z stderr F I0716 11:10:15.121814       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:10:15.123064834Z stderr F I0716 11:10:15.122517       1 main.go:301] handling current node
+2026-07-16T11:10:15.123080022Z stderr F I0716 11:10:15.122983       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:10:15.123086113Z stderr F I0716 11:10:15.123007       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:10:25.123249122Z stderr F I0716 11:10:25.122953       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:10:25.124592727Z stderr F I0716 11:10:25.124010       1 main.go:301] handling current node
+2026-07-16T11:10:25.124697216Z stderr F I0716 11:10:25.124481       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:10:25.125029988Z stderr F I0716 11:10:25.124665       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:10:35.11552028Z stderr F I0716 11:10:35.115039       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:10:35.115545517Z stderr F I0716 11:10:35.115104       1 main.go:301] handling current node
+2026-07-16T11:10:35.115551468Z stderr F I0716 11:10:35.115120       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:10:35.115569792Z stderr F I0716 11:10:35.115128       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:10:45.11554878Z stderr F I0716 11:10:45.115170       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:10:45.115581551Z stderr F I0716 11:10:45.115237       1 main.go:301] handling current node
+2026-07-16T11:10:45.11558641Z stderr F I0716 11:10:45.115254       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:10:45.115590046Z stderr F I0716 11:10:45.115265       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:10:55.114738413Z stderr F I0716 11:10:55.114609       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:10:55.114753151Z stderr F I0716 11:10:55.114649       1 main.go:301] handling current node
+2026-07-16T11:10:55.114890695Z stderr F I0716 11:10:55.114770       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:10:55.114896296Z stderr F I0716 11:10:55.114785       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:05.11484518Z stderr F I0716 11:11:05.114737       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:11:05.114858996Z stderr F I0716 11:11:05.114771       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:05.115168464Z stderr F I0716 11:11:05.115089       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:11:05.115176259Z stderr F I0716 11:11:05.115110       1 main.go:301] handling current node
+2026-07-16T11:11:15.124729923Z stderr F I0716 11:11:15.122347       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:11:15.124832705Z stderr F I0716 11:11:15.122390       1 main.go:301] handling current node
+2026-07-16T11:11:15.124842002Z stderr F I0716 11:11:15.122407       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:11:15.124847292Z stderr F I0716 11:11:15.122416       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:25.12174403Z stderr F I0716 11:11:25.121539       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:11:25.12176065Z stderr F I0716 11:11:25.121702       1 main.go:301] handling current node
+2026-07-16T11:11:25.122698152Z stderr F I0716 11:11:25.121744       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:11:25.122710645Z stderr F I0716 11:11:25.122404       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:35.115701413Z stderr F I0716 11:11:35.115278       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:11:35.115719968Z stderr F I0716 11:11:35.115327       1 main.go:301] handling current node
+2026-07-16T11:11:35.115824663Z stderr F I0716 11:11:35.115342       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:11:35.115833951Z stderr F I0716 11:11:35.115350       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:45.115047931Z stderr F I0716 11:11:45.114777       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:11:45.115066786Z stderr F I0716 11:11:45.114813       1 main.go:301] handling current node
+2026-07-16T11:11:45.115072657Z stderr F I0716 11:11:45.114828       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:11:45.115325329Z stderr F I0716 11:11:45.114836       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:55.119883582Z stderr F I0716 11:11:55.119640       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:11:55.119911465Z stderr F I0716 11:11:55.119677       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:11:55.122305897Z stderr F I0716 11:11:55.121399       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:11:55.122314273Z stderr F I0716 11:11:55.121420       1 main.go:301] handling current node
+2026-07-16T11:12:05.115681386Z stderr F I0716 11:12:05.115155       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:12:05.11591338Z stderr F I0716 11:12:05.115735       1 main.go:301] handling current node
+2026-07-16T11:12:05.115919Z stderr F I0716 11:12:05.115756       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:12:05.116105208Z stderr F I0716 11:12:05.115768       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:12:15.115328307Z stderr F I0716 11:12:15.115183       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:12:15.115354867Z stderr F I0716 11:12:15.115232       1 main.go:301] handling current node
+2026-07-16T11:12:15.115359355Z stderr F I0716 11:12:15.115251       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:12:15.115363162Z stderr F I0716 11:12:15.115260       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:12:25.121784793Z stderr F I0716 11:12:25.121528       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:12:25.121812285Z stderr F I0716 11:12:25.121566       1 main.go:301] handling current node
+2026-07-16T11:12:25.121816363Z stderr F I0716 11:12:25.121582       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:12:25.121819679Z stderr F I0716 11:12:25.121591       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:12:35.115317905Z stderr F I0716 11:12:35.115161       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:12:35.115347551Z stderr F I0716 11:12:35.115204       1 main.go:301] handling current node
+2026-07-16T11:12:35.115354183Z stderr F I0716 11:12:35.115222       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:12:35.115360134Z stderr F I0716 11:12:35.115231       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:12:45.115159466Z stderr F I0716 11:12:45.114846       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:12:45.115188691Z stderr F I0716 11:12:45.114885       1 main.go:301] handling current node
+2026-07-16T11:12:45.115195523Z stderr F I0716 11:12:45.114901       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:12:45.115201925Z stderr F I0716 11:12:45.114911       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:12:55.120962695Z stderr F I0716 11:12:55.120670       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:12:55.120992471Z stderr F I0716 11:12:55.120709       1 main.go:301] handling current node
+2026-07-16T11:12:55.120998011Z stderr F I0716 11:12:55.120726       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:12:55.121003071Z stderr F I0716 11:12:55.120735       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:13:05.114927566Z stderr F I0716 11:13:05.114737       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:13:05.115333144Z stderr F I0716 11:13:05.115174       1 main.go:301] handling current node
+2026-07-16T11:13:05.115359343Z stderr F I0716 11:13:05.115197       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:13:05.115364072Z stderr F I0716 11:13:05.115209       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:13:15.121840437Z stderr F I0716 11:13:15.121664       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:13:15.122070551Z stderr F I0716 11:13:15.121709       1 main.go:301] handling current node
+2026-07-16T11:13:15.122079898Z stderr F I0716 11:13:15.121726       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:13:15.12208602Z stderr F I0716 11:13:15.121735       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:13:25.125723634Z stderr F I0716 11:13:25.125386       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:13:25.127703069Z stderr F I0716 11:13:25.127633       1 main.go:301] handling current node
+2026-07-16T11:13:25.127812994Z stderr F I0716 11:13:25.127755       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:13:25.128146298Z stderr F I0716 11:13:25.128091       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:13:35.115785038Z stderr F I0716 11:13:35.115640       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:13:35.115815164Z stderr F I0716 11:13:35.115759       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:13:35.116223719Z stderr F I0716 11:13:35.116147       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:13:35.11881574Z stderr F I0716 11:13:35.118737       1 main.go:301] handling current node
+2026-07-16T11:13:45.116054508Z stderr F I0716 11:13:45.114806       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:13:45.116074165Z stderr F I0716 11:13:45.114859       1 main.go:301] handling current node
+2026-07-16T11:13:45.116080036Z stderr F I0716 11:13:45.114875       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:13:45.116085726Z stderr F I0716 11:13:45.114884       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:13:55.121062582Z stderr F I0716 11:13:55.120830       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:13:55.121079965Z stderr F I0716 11:13:55.120891       1 main.go:301] handling current node
+2026-07-16T11:13:55.121085535Z stderr F I0716 11:13:55.120907       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:13:55.121090424Z stderr F I0716 11:13:55.120916       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:14:05.114887542Z stderr F I0716 11:14:05.114783       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:14:05.115118575Z stderr F I0716 11:14:05.114966       1 main.go:301] handling current node
+2026-07-16T11:14:05.115128243Z stderr F I0716 11:14:05.115007       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:14:05.115133943Z stderr F I0716 11:14:05.115022       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:14:15.122567637Z stderr F I0716 11:14:15.122376       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:14:15.122619644Z stderr F I0716 11:14:15.122426       1 main.go:301] handling current node
+2026-07-16T11:14:15.122915806Z stderr F I0716 11:14:15.122645       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:14:15.122933168Z stderr F I0716 11:14:15.122836       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:14:25.123624767Z stderr F I0716 11:14:25.122656       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:14:25.123648581Z stderr F I0716 11:14:25.122694       1 main.go:301] handling current node
+2026-07-16T11:14:25.123652479Z stderr F I0716 11:14:25.122711       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:14:25.123656256Z stderr F I0716 11:14:25.122719       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:14:35.115449653Z stderr F I0716 11:14:35.114783       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:14:35.115464741Z stderr F I0716 11:14:35.114823       1 main.go:301] handling current node
+2026-07-16T11:14:35.115469079Z stderr F I0716 11:14:35.114839       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:14:35.115472856Z stderr F I0716 11:14:35.114848       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:14:45.115451612Z stderr F I0716 11:14:45.114813       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:14:45.115470126Z stderr F I0716 11:14:45.114855       1 main.go:301] handling current node
+2026-07-16T11:14:45.115475416Z stderr F I0716 11:14:45.114871       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:14:45.115480285Z stderr F I0716 11:14:45.114880       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:14:55.121128845Z stderr F I0716 11:14:55.120666       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:14:55.121146769Z stderr F I0716 11:14:55.120707       1 main.go:301] handling current node
+2026-07-16T11:14:55.12115268Z stderr F I0716 11:14:55.120723       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:14:55.12115811Z stderr F I0716 11:14:55.120732       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:15:05.116660225Z stderr F I0716 11:15:05.115518       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:15:05.11668447Z stderr F I0716 11:15:05.116638       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:15:05.118867043Z stderr F I0716 11:15:05.118336       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:15:05.118880258Z stderr F I0716 11:15:05.118358       1 main.go:301] handling current node
+2026-07-16T11:15:15.115916849Z stderr F I0716 11:15:15.115113       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:15:15.11593386Z stderr F I0716 11:15:15.115149       1 main.go:301] handling current node
+2026-07-16T11:15:15.115939962Z stderr F I0716 11:15:15.115165       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:15:15.115945622Z stderr F I0716 11:15:15.115173       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:15:25.11641499Z stderr F I0716 11:15:25.116262       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:15:25.116435619Z stderr F I0716 11:15:25.116319       1 main.go:301] handling current node
+2026-07-16T11:15:25.11644135Z stderr F I0716 11:15:25.116334       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:15:25.11644683Z stderr F I0716 11:15:25.116343       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:15:35.11550258Z stderr F I0716 11:15:35.114885       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:15:35.11552924Z stderr F I0716 11:15:35.114928       1 main.go:301] handling current node
+2026-07-16T11:15:35.115533238Z stderr F I0716 11:15:35.114943       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:15:35.115536574Z stderr F I0716 11:15:35.114951       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:15:45.121894876Z stderr F I0716 11:15:45.121583       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:15:45.121910745Z stderr F I0716 11:15:45.121638       1 main.go:301] handling current node
+2026-07-16T11:15:45.121914693Z stderr F I0716 11:15:45.121654       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:15:45.121918129Z stderr F I0716 11:15:45.121661       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:15:55.117154531Z stderr F I0716 11:15:55.116984       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:15:55.118183665Z stderr F I0716 11:15:55.118049       1 main.go:301] handling current node
+2026-07-16T11:15:55.118923878Z stderr F I0716 11:15:55.118846       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:15:55.119020499Z stderr F I0716 11:15:55.118931       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:16:05.115195736Z stderr F I0716 11:16:05.114772       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:16:05.115219771Z stderr F I0716 11:16:05.114819       1 main.go:301] handling current node
+2026-07-16T11:16:05.115225542Z stderr F I0716 11:16:05.114836       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:16:05.115230491Z stderr F I0716 11:16:05.114846       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:16:15.119711548Z stderr F I0716 11:16:15.118628       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:16:15.119726215Z stderr F I0716 11:16:15.118672       1 main.go:301] handling current node
+2026-07-16T11:16:15.119731626Z stderr F I0716 11:16:15.118688       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:16:15.119736885Z stderr F I0716 11:16:15.118696       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:16:25.11493268Z stderr F I0716 11:16:25.114564       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:16:25.114952758Z stderr F I0716 11:16:25.114685       1 main.go:301] handling current node
+2026-07-16T11:16:25.114966073Z stderr F I0716 11:16:25.114745       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:16:25.114971644Z stderr F I0716 11:16:25.114759       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:16:35.116366094Z stderr F I0716 11:16:35.115748       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:16:35.116389037Z stderr F I0716 11:16:35.115789       1 main.go:301] handling current node
+2026-07-16T11:16:35.116395149Z stderr F I0716 11:16:35.115804       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:16:35.116400599Z stderr F I0716 11:16:35.115812       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:16:45.122374802Z stderr F I0716 11:16:45.122031       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:16:45.122390281Z stderr F I0716 11:16:45.122201       1 main.go:301] handling current node
+2026-07-16T11:16:45.12239535Z stderr F I0716 11:16:45.122259       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:16:45.122409307Z stderr F I0716 11:16:45.122274       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:16:55.121249341Z stderr F I0716 11:16:55.120792       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:16:55.12127023Z stderr F I0716 11:16:55.120842       1 main.go:301] handling current node
+2026-07-16T11:16:55.121276031Z stderr F I0716 11:16:55.120858       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:16:55.121281211Z stderr F I0716 11:16:55.120867       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:05.116773573Z stderr F I0716 11:17:05.116547       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:17:05.116789162Z stderr F I0716 11:17:05.116596       1 main.go:301] handling current node
+2026-07-16T11:17:05.116794642Z stderr F I0716 11:17:05.116614       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:17:05.116800353Z stderr F I0716 11:17:05.116623       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:15.118842383Z stderr F I0716 11:17:15.118569       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:17:15.118857732Z stderr F I0716 11:17:15.118612       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:15.119040463Z stderr F I0716 11:17:15.118904       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:17:15.11904944Z stderr F I0716 11:17:15.118923       1 main.go:301] handling current node
+2026-07-16T11:17:25.117574898Z stderr F I0716 11:17:25.115757       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:17:25.117611066Z stderr F I0716 11:17:25.115794       1 main.go:301] handling current node
+2026-07-16T11:17:25.117617037Z stderr F I0716 11:17:25.115811       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:17:25.117622086Z stderr F I0716 11:17:25.115820       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:35.11638827Z stderr F I0716 11:17:35.115590       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:17:35.116406725Z stderr F I0716 11:17:35.115657       1 main.go:301] handling current node
+2026-07-16T11:17:35.116412596Z stderr F I0716 11:17:35.115673       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:17:35.116418597Z stderr F I0716 11:17:35.115682       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:45.121669644Z stderr F I0716 11:17:45.121566       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:17:45.12198834Z stderr F I0716 11:17:45.121713       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:45.122354264Z stderr F I0716 11:17:45.122290       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:17:45.124576728Z stderr F I0716 11:17:45.124502       1 main.go:301] handling current node
+2026-07-16T11:17:55.115446308Z stderr F I0716 11:17:55.115326       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:17:55.11664135Z stderr F I0716 11:17:55.116574       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:17:55.11725203Z stderr F I0716 11:17:55.117166       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:17:55.117261517Z stderr F I0716 11:17:55.117185       1 main.go:301] handling current node
+2026-07-16T11:18:05.115843638Z stderr F I0716 11:18:05.115601       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:18:05.115871981Z stderr F I0716 11:18:05.115748       1 main.go:301] handling current node
+2026-07-16T11:18:05.115876269Z stderr F I0716 11:18:05.115794       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:18:05.116033133Z stderr F I0716 11:18:05.115832       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:18:15.11930832Z stderr F I0716 11:18:15.119023       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:18:15.120053513Z stderr F I0716 11:18:15.119404       1 main.go:301] handling current node
+2026-07-16T11:18:15.120066497Z stderr F I0716 11:18:15.119509       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:18:15.120071967Z stderr F I0716 11:18:15.119548       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:18:25.116147744Z stderr F I0716 11:18:25.115698       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:18:25.116164596Z stderr F I0716 11:18:25.115734       1 main.go:301] handling current node
+2026-07-16T11:18:25.116170116Z stderr F I0716 11:18:25.115751       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:18:25.116175756Z stderr F I0716 11:18:25.115760       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:18:35.116255099Z stderr F I0716 11:18:35.116116       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:18:35.116272131Z stderr F I0716 11:18:35.116212       1 main.go:301] handling current node
+2026-07-16T11:18:35.117103625Z stderr F I0716 11:18:35.116874       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:18:35.117116018Z stderr F I0716 11:18:35.116947       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:18:45.122059763Z stderr F I0716 11:18:45.121787       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:18:45.12207975Z stderr F I0716 11:18:45.121855       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:18:45.124299389Z stderr F I0716 11:18:45.124198       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:18:45.124313315Z stderr F I0716 11:18:45.124229       1 main.go:301] handling current node
+2026-07-16T11:18:55.114670706Z stderr F I0716 11:18:55.114555       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:18:55.115412191Z stderr F I0716 11:18:55.115326       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:18:55.116395429Z stderr F I0716 11:18:55.116283       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:18:55.116641198Z stderr F I0716 11:18:55.116547       1 main.go:301] handling current node
+2026-07-16T11:19:05.124062089Z stderr F I0716 11:19:05.123309       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:19:05.124078589Z stderr F I0716 11:19:05.123354       1 main.go:301] handling current node
+2026-07-16T11:19:05.12408448Z stderr F I0716 11:19:05.123369       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:19:05.12408943Z stderr F I0716 11:19:05.123378       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:19:15.12006404Z stderr F I0716 11:19:15.119641       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:19:15.121122087Z stderr F I0716 11:19:15.120877       1 main.go:301] handling current node
+2026-07-16T11:19:15.121596744Z stderr F I0716 11:19:15.121168       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:19:15.121608296Z stderr F I0716 11:19:15.121536       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:19:25.120979833Z stderr F I0716 11:19:25.118279       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:19:25.121066126Z stderr F I0716 11:19:25.121001       1 main.go:301] handling current node
+2026-07-16T11:19:25.121193705Z stderr F I0716 11:19:25.121114       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:19:25.121245351Z stderr F I0716 11:19:25.121161       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:19:35.116608295Z stderr F I0716 11:19:35.116303       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:19:35.116628874Z stderr F I0716 11:19:35.116342       1 main.go:301] handling current node
+2026-07-16T11:19:35.116634224Z stderr F I0716 11:19:35.116359       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:19:35.116639193Z stderr F I0716 11:19:35.116367       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:19:45.115902529Z stderr F I0716 11:19:45.115602       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:19:45.115922617Z stderr F I0716 11:19:45.115638       1 main.go:301] handling current node
+2026-07-16T11:19:45.115928328Z stderr F I0716 11:19:45.115654       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:19:45.115934139Z stderr F I0716 11:19:45.115663       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:19:55.121327058Z stderr F I0716 11:19:55.119674       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:19:55.121348609Z stderr F I0716 11:19:55.119718       1 main.go:301] handling current node
+2026-07-16T11:19:55.121354049Z stderr F I0716 11:19:55.119735       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:19:55.121359108Z stderr F I0716 11:19:55.119746       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:20:05.122034365Z stderr F I0716 11:20:05.121866       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:20:05.124708392Z stderr F I0716 11:20:05.123342       1 main.go:301] handling current node
+2026-07-16T11:20:05.124721716Z stderr F I0716 11:20:05.123373       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:20:05.124726856Z stderr F I0716 11:20:05.123388       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:20:15.115145842Z stderr F I0716 11:20:15.114658       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:20:15.115168504Z stderr F I0716 11:20:15.114701       1 main.go:301] handling current node
+2026-07-16T11:20:15.115174505Z stderr F I0716 11:20:15.114717       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:20:15.115179895Z stderr F I0716 11:20:15.114727       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:20:25.114927165Z stderr F I0716 11:20:25.114741       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:20:25.114943035Z stderr F I0716 11:20:25.114834       1 main.go:301] handling current node
+2026-07-16T11:20:25.114948004Z stderr F I0716 11:20:25.114885       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:20:25.114952573Z stderr F I0716 11:20:25.114902       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:20:35.114724413Z stderr F I0716 11:20:35.114591       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:20:35.116293846Z stderr F I0716 11:20:35.114781       1 main.go:301] handling current node
+2026-07-16T11:20:35.116305357Z stderr F I0716 11:20:35.114826       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:20:35.116309505Z stderr F I0716 11:20:35.114838       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:20:45.121669012Z stderr F I0716 11:20:45.120182       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:20:45.12183355Z stderr F I0716 11:20:45.120219       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:20:45.125504008Z stderr F I0716 11:20:45.125216       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:20:45.125771808Z stderr F I0716 11:20:45.125598       1 main.go:301] handling current node
+2026-07-16T11:20:55.11532439Z stderr F I0716 11:20:55.114969       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:20:55.115776517Z stderr F I0716 11:20:55.115478       1 main.go:301] handling current node
+2026-07-16T11:20:55.115789501Z stderr F I0716 11:20:55.115496       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:20:55.115795462Z stderr F I0716 11:20:55.115506       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:21:05.123549965Z stderr F I0716 11:21:05.121706       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:21:05.123573439Z stderr F I0716 11:21:05.121743       1 main.go:301] handling current node
+2026-07-16T11:21:05.12357941Z stderr F I0716 11:21:05.121757       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:21:05.123585451Z stderr F I0716 11:21:05.121764       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:21:15.119679744Z stderr F I0716 11:21:15.118889       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:21:15.119698118Z stderr F I0716 11:21:15.118957       1 main.go:301] handling current node
+2026-07-16T11:21:15.119704009Z stderr F I0716 11:21:15.118975       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:21:15.11970982Z stderr F I0716 11:21:15.118982       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:21:25.115479083Z stderr F I0716 11:21:25.115102       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:21:25.115870677Z stderr F I0716 11:21:25.115435       1 main.go:301] handling current node
+2026-07-16T11:21:25.115882489Z stderr F I0716 11:21:25.115588       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:21:25.11588846Z stderr F I0716 11:21:25.115604       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:21:35.115336983Z stderr F I0716 11:21:35.114992       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:21:35.115352983Z stderr F I0716 11:21:35.115134       1 main.go:301] handling current node
+2026-07-16T11:21:35.115359164Z stderr F I0716 11:21:35.115151       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:21:35.116382251Z stderr F I0716 11:21:35.115160       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:21:45.12254641Z stderr F I0716 11:21:45.122380       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:21:45.122577889Z stderr F I0716 11:21:45.122454       1 main.go:301] handling current node
+2026-07-16T11:21:45.122581906Z stderr F I0716 11:21:45.122472       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:21:45.122585223Z stderr F I0716 11:21:45.122481       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:21:55.122524116Z stderr F I0716 11:21:55.122015       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:21:55.122538262Z stderr F I0716 11:21:55.122057       1 main.go:301] handling current node
+2026-07-16T11:21:55.122593245Z stderr F I0716 11:21:55.122526       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:21:55.123156147Z stderr F I0716 11:21:55.123002       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:22:05.121925128Z stderr F I0716 11:22:05.121737       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:22:05.121941478Z stderr F I0716 11:22:05.121774       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:22:05.124970659Z stderr F I0716 11:22:05.124838       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:22:05.124981259Z stderr F I0716 11:22:05.124882       1 main.go:301] handling current node
+2026-07-16T11:22:15.118529846Z stderr F I0716 11:22:15.118173       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:22:15.119049257Z stderr F I0716 11:22:15.118990       1 main.go:301] handling current node
+2026-07-16T11:22:15.119218533Z stderr F I0716 11:22:15.119118       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:22:15.119227399Z stderr F I0716 11:22:15.119162       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:22:25.11539478Z stderr F I0716 11:22:25.114715       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:22:25.115421149Z stderr F I0716 11:22:25.114778       1 main.go:301] handling current node
+2026-07-16T11:22:25.115427231Z stderr F I0716 11:22:25.114796       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:22:25.11543243Z stderr F I0716 11:22:25.114807       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:22:35.118651962Z stderr F I0716 11:22:35.116137       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:22:35.118671608Z stderr F I0716 11:22:35.116211       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:22:35.118677359Z stderr F I0716 11:22:35.116839       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:22:35.118683461Z stderr F I0716 11:22:35.117025       1 main.go:301] handling current node
+2026-07-16T11:22:45.118760507Z stderr F I0716 11:22:45.117997       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:22:45.118781016Z stderr F I0716 11:22:45.118041       1 main.go:301] handling current node
+2026-07-16T11:22:45.118787879Z stderr F I0716 11:22:45.118057       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:22:45.118793018Z stderr F I0716 11:22:45.118065       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:22:55.114828748Z stderr F I0716 11:22:55.114709       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:22:55.114847423Z stderr F I0716 11:22:55.114748       1 main.go:301] handling current node
+2026-07-16T11:22:55.114852703Z stderr F I0716 11:22:55.114765       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:22:55.114865387Z stderr F I0716 11:22:55.114774       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:05.116337604Z stderr F I0716 11:23:05.115943       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:23:05.116357692Z stderr F I0716 11:23:05.116067       1 main.go:301] handling current node
+2026-07-16T11:23:05.116363573Z stderr F I0716 11:23:05.116085       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:23:05.116369063Z stderr F I0716 11:23:05.116094       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:15.120596113Z stderr F I0716 11:23:15.118165       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:23:15.120614167Z stderr F I0716 11:23:15.118201       1 main.go:301] handling current node
+2026-07-16T11:23:15.120619377Z stderr F I0716 11:23:15.118217       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:23:15.120624206Z stderr F I0716 11:23:15.118224       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:25.115849172Z stderr F I0716 11:23:25.114536       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:23:25.115870942Z stderr F I0716 11:23:25.114607       1 main.go:301] handling current node
+2026-07-16T11:23:25.115877645Z stderr F I0716 11:23:25.114628       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:23:25.115883345Z stderr F I0716 11:23:25.114637       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:35.116093439Z stderr F I0716 11:23:35.115520       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:23:35.11700956Z stderr F I0716 11:23:35.116937       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:35.122241765Z stderr F I0716 11:23:35.122144       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:23:35.122260119Z stderr F I0716 11:23:35.122230       1 main.go:301] handling current node
+2026-07-16T11:23:45.117549212Z stderr F I0716 11:23:45.116537       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:23:45.119884455Z stderr F I0716 11:23:45.119606       1 main.go:301] handling current node
+2026-07-16T11:23:45.120855208Z stderr F I0716 11:23:45.120258       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:23:45.121395959Z stderr F I0716 11:23:45.120889       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:55.117929056Z stderr F I0716 11:23:55.116831       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:23:55.11794752Z stderr F I0716 11:23:55.116977       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:23:55.118228095Z stderr F I0716 11:23:55.118134       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:23:55.118283819Z stderr F I0716 11:23:55.118245       1 main.go:301] handling current node
+2026-07-16T11:24:05.121802288Z stderr F I0716 11:24:05.121691       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:24:05.121922465Z stderr F I0716 11:24:05.121866       1 main.go:301] handling current node
+2026-07-16T11:24:05.122004558Z stderr F I0716 11:24:05.121924       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:24:05.122012093Z stderr F I0716 11:24:05.121939       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:24:15.117790598Z stderr F I0716 11:24:15.117587       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:24:15.117811266Z stderr F I0716 11:24:15.117645       1 main.go:301] handling current node
+2026-07-16T11:24:15.120249801Z stderr F I0716 11:24:15.120145       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:24:15.120261513Z stderr F I0716 11:24:15.120180       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:24:25.114810355Z stderr F I0716 11:24:25.114640       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:24:25.114837215Z stderr F I0716 11:24:25.114684       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:24:25.115626279Z stderr F I0716 11:24:25.115557       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:24:25.11565386Z stderr F I0716 11:24:25.115580       1 main.go:301] handling current node
+2026-07-16T11:24:35.115241083Z stderr F I0716 11:24:35.115126       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:24:35.115570288Z stderr F I0716 11:24:35.115321       1 main.go:301] handling current node
+2026-07-16T11:24:35.115704208Z stderr F I0716 11:24:35.115345       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:24:35.115713015Z stderr F I0716 11:24:35.115355       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:24:45.118738211Z stderr F I0716 11:24:45.118587       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:24:45.11875878Z stderr F I0716 11:24:45.118623       1 main.go:301] handling current node
+2026-07-16T11:24:45.118763378Z stderr F I0716 11:24:45.118639       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:24:45.118767085Z stderr F I0716 11:24:45.118647       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:24:55.115134156Z stderr F I0716 11:24:55.114600       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:24:55.115970799Z stderr F I0716 11:24:55.115129       1 main.go:301] handling current node
+2026-07-16T11:24:55.115983473Z stderr F I0716 11:24:55.115151       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:24:55.115988763Z stderr F I0716 11:24:55.115161       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:25:05.119690759Z stderr F I0716 11:25:05.119563       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:25:05.119708222Z stderr F I0716 11:25:05.119604       1 main.go:301] handling current node
+2026-07-16T11:25:05.11971242Z stderr F I0716 11:25:05.119633       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:25:05.119718541Z stderr F I0716 11:25:05.119642       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:25:15.114816372Z stderr F I0716 11:25:15.114691       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:25:15.114841138Z stderr F I0716 11:25:15.114732       1 main.go:301] handling current node
+2026-07-16T11:25:15.114894107Z stderr F I0716 11:25:15.114749       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:25:15.114901541Z stderr F I0716 11:25:15.114757       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:25:25.115813521Z stderr F I0716 11:25:25.115104       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:25:25.115832607Z stderr F I0716 11:25:25.115142       1 main.go:301] handling current node
+2026-07-16T11:25:25.115849628Z stderr F I0716 11:25:25.115158       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:25:25.115853235Z stderr F I0716 11:25:25.115166       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:25:35.117318211Z stderr F I0716 11:25:35.115274       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:25:35.11733396Z stderr F I0716 11:25:35.115319       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:25:35.117337977Z stderr F I0716 11:25:35.115630       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:25:35.117341414Z stderr F I0716 11:25:35.115643       1 main.go:301] handling current node
+2026-07-16T11:25:45.121905355Z stderr F I0716 11:25:45.121542       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:25:45.12192417Z stderr F I0716 11:25:45.121582       1 main.go:301] handling current node
+2026-07-16T11:25:45.121928408Z stderr F I0716 11:25:45.121598       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:25:45.121931674Z stderr F I0716 11:25:45.121607       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:25:55.119158015Z stderr F I0716 11:25:55.118537       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:25:55.119174346Z stderr F I0716 11:25:55.118608       1 main.go:301] handling current node
+2026-07-16T11:25:55.119178333Z stderr F I0716 11:25:55.118625       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:25:55.11918189Z stderr F I0716 11:25:55.118636       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:26:05.123439101Z stderr F I0716 11:26:05.121629       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:26:05.123527196Z stderr F I0716 11:26:05.121680       1 main.go:301] handling current node
+2026-07-16T11:26:05.123535581Z stderr F I0716 11:26:05.121695       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:26:05.123541012Z stderr F I0716 11:26:05.121704       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:26:15.114660509Z stderr F I0716 11:26:15.114516       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:26:15.114845204Z stderr F I0716 11:26:15.114658       1 main.go:301] handling current node
+2026-07-16T11:26:15.114854592Z stderr F I0716 11:26:15.114703       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:26:15.114860293Z stderr F I0716 11:26:15.114714       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:26:25.120833683Z stderr F I0716 11:26:25.120680       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:26:25.120960931Z stderr F I0716 11:26:25.120886       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:26:25.121407365Z stderr F I0716 11:26:25.121324       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:26:25.121542818Z stderr F I0716 11:26:25.121507       1 main.go:301] handling current node
+2026-07-16T11:26:35.115317005Z stderr F I0716 11:26:35.115190       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:26:35.115332444Z stderr F I0716 11:26:35.115248       1 main.go:301] handling current node
+2026-07-16T11:26:35.115338215Z stderr F I0716 11:26:35.115264       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:26:35.11535185Z stderr F I0716 11:26:35.115272       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:26:45.115650066Z stderr F I0716 11:26:45.115144       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:26:45.115676014Z stderr F I0716 11:26:45.115615       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:26:45.127726573Z stderr F I0716 11:26:45.127620       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:26:45.127738525Z stderr F I0716 11:26:45.127642       1 main.go:301] handling current node
+2026-07-16T11:26:55.119351477Z stderr F I0716 11:26:55.118539       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:26:55.119371755Z stderr F I0716 11:26:55.118590       1 main.go:301] handling current node
+2026-07-16T11:26:55.119377385Z stderr F I0716 11:26:55.118628       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:26:55.119382905Z stderr F I0716 11:26:55.118638       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:27:05.11492491Z stderr F I0716 11:27:05.114806       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:27:05.115571066Z stderr F I0716 11:27:05.115197       1 main.go:301] handling current node
+2026-07-16T11:27:05.115810213Z stderr F I0716 11:27:05.115709       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:27:05.11597979Z stderr F I0716 11:27:05.115871       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 
+2026-07-16T11:27:15.115156691Z stderr F I0716 11:27:15.114904       1 main.go:297] Handling node with IPs: map[172.18.0.2:{} fc00:f853:ccd:e793::2:{}]
+2026-07-16T11:27:15.115176057Z stderr F I0716 11:27:15.114967       1 main.go:301] handling current node
+2026-07-16T11:27:15.11539708Z stderr F I0716 11:27:15.114984       1 main.go:297] Handling node with IPs: map[172.18.0.3:{} fc00:f853:ccd:e793::3:{}]
+2026-07-16T11:27:15.115407048Z stderr F I0716 11:27:15.115001       1 main.go:324] Node pe-kind-worker has CIDR [10.244.1.0/24 fd00:10:244:1::/64] 

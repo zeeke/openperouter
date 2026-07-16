@@ -37,7 +37,17 @@ func SetupPassthrough(ctx context.Context, client *Client, params hostnetwork.Pa
 		}
 	}()
 
-	if err := ensureTapPortInHostNamespace(ctx, client, portName, tapName, "main", peRouterNs); err != nil {
+	if err := ensureTapPort(ctx, client, portName, tapName, "main"); err != nil {
+		return err
+	}
+
+	// Assign IPs to the grout port while the TAP is still in the grout
+	// namespace — once the TAP is moved, grout considers the port disconnected.
+	if err := ensurePortAddresses(ctx, client, portName, params.LinkIPs.NSIPv4, params.LinkIPs.NSIPv6); err != nil {
+		return fmt.Errorf("failed to ensure IPs to grout port: %w", err)
+	}
+
+	if err := moveTapToHostNamespace(ctx, tapName, peRouterNs); err != nil {
 		return err
 	}
 
@@ -48,11 +58,6 @@ func SetupPassthrough(ctx context.Context, client *Client, params hostnetwork.Pa
 	}
 	if err := hostnetwork.AssignIPsToInterface(hostTap, params.LinkIPs.HostIPv4, params.LinkIPs.HostIPv6); err != nil {
 		return fmt.Errorf("failed to assign IPs to host TAP: %w", err)
-	}
-
-	// Assign IPs to the grout port "pt-ns" via grcli.
-	if err := ensurePortAddresses(ctx, client, portName, params.LinkIPs.NSIPv4, params.LinkIPs.NSIPv6); err != nil {
-		return fmt.Errorf("failed to ensure IPs to grout port: %w", err)
 	}
 
 	if err := netnamespace.In(peRouterNs, func() error {
@@ -83,10 +88,10 @@ func RemovePassthrough(ctx context.Context, client *Client) error {
 	return nil
 }
 
-// ensureTapPortInNamespace is idempotent: it creates the grout port and
-// moves the TAP to the host namespace if needed, and recovers from partial
-// setups where the port exists but the TAP is missing from the host NS.
-func ensureTapPortInHostNamespace(ctx context.Context, client *Client, portName, tapName, vrf string, groutNs netns.NsHandle) error {
+// ensureTapPort creates the grout port if it doesn't exist. It does NOT move the
+// TAP to the host namespace — call moveTapToHostNamespace separately after
+// assigning grout-side addresses.
+func ensureTapPort(ctx context.Context, client *Client, portName, tapName, vrf string) error {
 	portExists, err := client.portExists(ctx, portName)
 	if err != nil {
 		return fmt.Errorf("failed to check grout port %s: %w", portName, err)
@@ -101,6 +106,13 @@ func ensureTapPortInHostNamespace(ctx context.Context, client *Client, portName,
 		}
 	}
 
+	return nil
+}
+
+// moveTapToHostNamespace moves the TAP device to the host namespace if it isn't
+// already there. Must be called after grout-side addresses have been assigned —
+// once the TAP is moved, grout can no longer assign addresses to the port.
+func moveTapToHostNamespace(ctx context.Context, tapName string, groutNs netns.NsHandle) error {
 	tapExistsInHostNs, err := hostnetwork.LinkExists(tapName)
 	if err != nil {
 		return fmt.Errorf("failed to check if TAP %s exists: %w", tapName, err)

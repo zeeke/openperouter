@@ -1,0 +1,25 @@
+2026-07-16T11:04:41.552796621Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"setup","msg":"Starting certs generator"}
+2026-07-16T11:04:41.552831237Z stdout F {"action":"setting up cert rotation","caller":"main.go:239","level":"info","op":"startup","ts":"2026-07-16T11:04:41Z"}
+2026-07-16T11:04:41.552954567Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"setup","msg":"starting frr-k8s","version":"version v0.0.1 (no build information)"}
+2026-07-16T11:04:41.553067349Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"controller-runtime.metrics","msg":"Starting metrics server"}
+2026-07-16T11:04:41.553399018Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"controller-runtime.metrics","msg":"Serving metrics server","bindAddress":":7572","secure":false}
+2026-07-16T11:04:41.553405801Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"starting cert rotator controller"}
+2026-07-16T11:04:41.553409388Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting EventSource","controller":"cert-rotator","source":"kind source: *unstructured.Unstructured"}
+2026-07-16T11:04:41.553418414Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting EventSource","controller":"cert-rotator","source":"kind source: *v1.Secret"}
+2026-07-16T11:04:41.654364457Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting Controller","controller":"cert-rotator"}
+2026-07-16T11:04:41.654381358Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","msg":"Starting workers","controller":"cert-rotator","worker count":1}
+2026-07-16T11:04:41.655208553Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+2026-07-16T11:04:41.655221077Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"certs are ready in /tmp/k8s-webhook-server/serving-certs"}
+2026-07-16T11:04:41.655232809Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+2026-07-16T11:04:41.655611226Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"Ensuring CA cert","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration"}
+2026-07-16T11:04:41.659736533Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"no cert refresh needed"}
+2026-07-16T11:04:41.659977473Z stderr F {"level":"info","ts":"2026-07-16T11:04:41Z","logger":"cert-rotation","msg":"Ensuring CA cert","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration","name":"frr-k8s-validating-webhook-configuration","gvk":"admissionregistration.k8s.io/v1, Kind=ValidatingWebhookConfiguration"}
+2026-07-16T11:04:42.743601866Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"cert-rotation","msg":"CA certs are injected to webhooks"}
+2026-07-16T11:04:42.743633525Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"setup","msg":"Starting webhooks"}
+2026-07-16T11:04:42.743622529Z stdout F {"action":"webhooks enabled","caller":"main.go:262","level":"info","op":"startup","ts":"2026-07-16T11:04:42Z"}
+2026-07-16T11:04:42.74389188Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Registering webhook","path":"/validate-frrk8s-metallb-io-v1beta1-frrconfiguration"}
+2026-07-16T11:04:42.743991836Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Starting webhook server"}
+2026-07-16T11:04:42.744201739Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Registering webhook","path":"/healthz"}
+2026-07-16T11:04:42.744444921Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.certwatcher","msg":"Updated current TLS certificate"}
+2026-07-16T11:04:42.744665383Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.webhook","msg":"Serving webhook server","host":"","port":9443}
+2026-07-16T11:04:42.74482449Z stderr F {"level":"info","ts":"2026-07-16T11:04:42Z","logger":"controller-runtime.certwatcher","msg":"Starting certificate poll+watcher","interval":10}

@@ -1,0 +1,59 @@
+{
+    "metadata": {
+        "resourceVersion": "3414"
+    },
+    "items": [
+        {
+            "kind": "L3VNI",
+            "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+            "metadata": {
+                "name": "red",
+                "namespace": "openperouter-system",
+                "uid": "8eb1cef2-0252-4891-9273-b54d86eafc7c",
+                "resourceVersion": "2298",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:13:31Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+                        "time": "2026-07-16T11:13:31Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:hostsession": {
+                                    ".": {},
+                                    "f:asn": {},
+                                    "f:hostasn": {},
+                                    "f:localcidr": {
+                                        ".": {},
+                                        "f:ipv4": {},
+                                        "f:ipv6": {}
+                                    }
+                                },
+                                "f:vni": {},
+                                "f:vrf": {},
+                                "f:vxlanport": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "vrf": "red",
+                "vni": 100,
+                "vxlanport": 4789,
+                "hostsession": {
+                    "asn": 64514,
+                    "hostasn": 64515,
+                    "localcidr": {
+                        "ipv4": "192.169.10.0/24",
+                        "ipv6": "2001:db8:1::/64"
+                    }
+                }
+            }
+        }
+    ]
+}

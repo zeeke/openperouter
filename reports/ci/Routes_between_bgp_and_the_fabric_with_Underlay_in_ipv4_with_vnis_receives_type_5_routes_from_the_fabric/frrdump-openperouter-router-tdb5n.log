@@ -1,0 +1,2425 @@
+Dumping information for openperouter-router-tdb5n
+######## Show version
+
+FRRouting 10.5.3 (pe-kind-worker) on Linux(6.8.0-1059-azure).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+configured with:
+    '--build=x86_64-redhat-linux' '--host=x86_64-redhat-linux' '--program-prefix=' '--disable-dependency-tracking' '--prefix=/usr' '--exec-prefix=/usr' '--bindir=/usr/bin' '--sbindir=/usr/sbin' '--sysconfdir=/etc' '--datadir=/usr/share' '--includedir=/usr/include' '--libdir=/usr/lib64' '--libexecdir=/usr/libexec' '--localstatedir=/var' '--sharedstatedir=/var/lib' '--mandir=/usr/share/man' '--infodir=/usr/share/info' '--sbindir=/usr/libexec/frr' '--libdir=/usr/lib64/frr' '--libexecdir=/usr/libexec/frr' '--runstatedir=/run' '--with-crypto=openssl' '--with-moduledir=/usr/lib64/frr/modules' '--with-pkgconfigdir=/usr/share/pkgconfig' '--with-vtysh-pager=less' '--with-yangmodelsdir=/usr/share/frr-yang/' '--disable-babeld' '--disable-doc' '--disable-nhrpd' '--disable-pathd' '--disable-pbrd' '--enable-multipath=64' '--enable-pcre2posix' '--enable-user=frr' '--enable-group=frr' '--enable-vty-group=frr' 'build_alias=x86_64-redhat-linux' 'host_alias=x86_64-redhat-linux' 'PKG_CONFIG_PATH=:/usr/lib64/pkgconfig:/usr/share/pkgconfig' 'CC=ccache gcc' 'CXX=g++' 'LT_SYS_LIBRARY_PATH=/usr/lib64:'
+
+######## Show running config
+
+Building configuration...
+
+Current configuration:
+!
+frr version 10.5.3
+frr defaults traditional
+hostname pe-kind-worker
+log stdout
+log timestamp precision 3
+service integrated-vtysh-config
+!
+route-map allowall permit 1
+exit
+!
+debug zebra events
+debug zebra kernel
+debug zebra rib
+debug zebra nht
+debug zebra dplane dpdk
+debug zebra nexthop
+debug bgp keepalives
+debug bgp neighbor-events
+debug bgp nht
+debug bgp updates in
+debug bgp updates out
+debug bgp zebra
+debug bgp graceful-restart
+debug bfd peer
+debug bfd zebra
+debug bfd network
+!
+vrf main
+exit-vrf
+!
+router bgp 64512
+ bgp router-id 10.0.0.2
+ no bgp ebgp-requires-policy
+ no bgp default ipv4-unicast
+ no bgp network import-check
+ neighbor 192.168.11.2 remote-as internal
+ neighbor 192.168.12.2 remote-as internal
+ !
+ address-family ipv4 unicast
+  network 100.65.0.1/32
+  neighbor 192.168.11.2 activate
+  neighbor 192.168.11.2 next-hop-self force
+  neighbor 192.168.12.2 activate
+  neighbor 192.168.12.2 next-hop-self force
+ exit-address-family
+ !
+ address-family l2vpn evpn
+  advertise-all-vni
+  advertise-svi-ip
+ exit-address-family
+exit
+!
+end
+
+######## BGP Summary
+
+
+IPv4 Unicast Summary:
+BGP router identifier 10.0.0.2, local AS number 64512 VRF default vrf-id 0
+BGP table version 13
+RIB entries 1, using 128 bytes of memory
+Peers 2, using 47 KiB of memory
+
+Neighbor        V         AS   MsgRcvd   MsgSent   TblVer  InQ OutQ  Up/Down State/PfxRcd   PfxSnt Desc
+192.168.11.2    4      64512        37        42        0    0    0 00:03:14         Idle        0 N/A
+192.168.12.2    4          0        10        20        0    0    0    never         Idle        0 N/A
+
+Total number of neighbors 2
+
+######## BGP Neighbors
+
+
+Instance default:
+BGP neighbor is 192.168.11.2, remote AS 64512, local AS 64512, internal link
+  Local Role: undefined
+  Remote Role: undefined
+Hostname: leafkind1
+  BGP version 4, remote router ID 192.168.11.2, local router ID 10.0.0.2
+  BGP state = Idle
+  Last read 00:03:15, Last write 00:01:08
+  Hold time is 180 seconds, keepalive interval is 60 seconds
+  Configured hold time is 180 seconds, keepalive interval is 60 seconds
+  Configured tcp-mss is 0, synced tcp-mss is 0
+  Configured conditional advertisements interval is 60 seconds
+  Graceful restart information:
+    Local GR Mode: Helper*
+    Remote GR Mode: NotApplicable
+
+    R bit: False
+    N bit: False
+    Timers:
+      Configured Restart Time(sec): 120
+      Received Restart Time(sec): 120
+      Configured LLGR Stale Path Time(sec): 0
+  Message statistics:
+    Inq depth is 0
+    Outq depth is 0
+                         Sent       Rcvd
+    Opens:                  7          7
+    Notifications:          0         14
+    Updates:                4          7
+    Keepalives:            10          7
+    Route Refresh:         21          2
+    Capability:             0          0
+    Total:                 42         37
+
+  Prefix statistics:
+    Inbound filtered: 0
+    AS-PATH loop: 0
+    Originator loop: 0
+    Cluster loop: 0
+    Invalid next-hop: 0
+    Withdrawn: 0
+    Attributes discarded: 0
+
+  Minimum time between advertisement runs is 0 seconds
+  Update delay timer is 0 seconds (remaining: 0)
+
+ For address family: IPv4 Unicast
+  Not part of any update group
+  NEXT_HOP is always this router
+  Community attribute sent to this neighbor(all)
+  0 accepted prefixes
+
+  Connections established 1; dropped 1
+  Last reset 00:03:14,  Notification received (OPEN Message Error/Bad Peer AS)
+  Internal BGP neighbor may be up to 255 hops away.
+Local host: 192.168.11.4, Local port: 50028
+Foreign host: 192.168.11.2, Foreign port: 179
+Nexthop: 192.168.11.4
+Nexthop global: 2001:db8:11::4
+Nexthop local: fe80::a8c1:abff:fe4f:4c34
+BGP connection: shared network
+BGP Connect Retry Timer in Seconds: 30
+Next start timer due in 52 seconds
+Read thread: off  Write thread: off  FD used: -1
+
+BGP neighbor is 192.168.12.2, remote AS 0, local AS 64512, internal link
+  Local Role: undefined
+  Remote Role: undefined
+  BGP version 4, remote router ID 0.0.0.0, local router ID 10.0.0.2
+  BGP state = Idle
+  Last read 00:09:39, Last write 00:01:32
+  Hold time is 180 seconds, keepalive interval is 60 seconds
+  Configured hold time is 180 seconds, keepalive interval is 60 seconds
+  Configured tcp-mss is 0, synced tcp-mss is 0
+  Configured conditional advertisements interval is 60 seconds
+  Graceful restart information:
+    Local GR Mode: Helper*
+    Remote GR Mode: NotApplicable
+
+    R bit: False
+    N bit: False
+    Timers:
+      Configured Restart Time(sec): 120
+      Received Restart Time(sec): 0
+      Configured LLGR Stale Path Time(sec): 0
+  Message statistics:
+    Inq depth is 0
+    Outq depth is 0
+                         Sent       Rcvd
+    Opens:                 10         10
+    Notifications:         10          0
+    Updates:                0          0
+    Keepalives:             0          0
+    Route Refresh:          0          0
+    Capability:             0          0
+    Total:                 20         10
+
+  Prefix statistics:
+    Inbound filtered: 0
+    AS-PATH loop: 0
+    Originator loop: 0
+    Cluster loop: 0
+    Invalid next-hop: 0
+    Withdrawn: 0
+    Attributes discarded: 0
+
+  Minimum time between advertisement runs is 0 seconds
+  Update delay timer is 0 seconds (remaining: 0)
+
+ For address family: IPv4 Unicast
+  Not part of any update group
+  NEXT_HOP is always this router
+  Community attribute sent to this neighbor(all)
+  0 accepted prefixes
+
+  Connections established 0; dropped 0
+  Last reset 00:09:39,  Notification sent (OPEN Message Error/Bad Peer AS)
+  Message received that caused BGP to send a NOTIFICATION:
+    FFFFFFFF FFFFFFFF FFFFFFFF FFFFFFFF
+    008A0104 FC0100B4 C0A80C02 6D020601
+    04000100 01020601 04001900 46020202
+    00020246 00020641 040000FC 01020206
+    00020A45 08000101 01001946 01020C4C
+    0A000101 00000019 46000002 0D490B09
+    6C656166 6B696E64 3200020C 400A4078
+    00010180 00194680 0210470E 00010180
+    00000000 19468000 0000
+  Internal BGP neighbor may be up to 255 hops away.
+Local host: 192.168.12.4, Local port: 55698
+Foreign host: 192.168.12.2, Foreign port: 179
+Nexthop: 192.168.12.4
+Nexthop global: 2001:db8:12::4
+Nexthop local: fe80::a8c1:abff:fe38:7654
+BGP connection: shared network
+BGP Connect Retry Timer in Seconds: 30
+Next start timer due in 28 seconds
+Read thread: off  Write thread: off  FD used: -1
+
+
+
+######## RIB ipv4
+
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIP, O - OSPF, I - IS-IS, B - BGP, E - EIGRP,
+       T - Table, v - VNC, V - VNC-Direct, f - OpenFabric,
+       t - Table-Direct,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv4 unicast VRF blue:
+L * 100.65.0.1/32 is directly connected, main, weight 1, 00:15:27
+C>* 100.65.0.1/32 is directly connected, main, weight 1, 00:15:27
+C>* 192.168.11.0/24 is directly connected, u_toswitch1, weight 1, 00:09:41
+L>* 192.168.11.4/32 is directly connected, u_toswitch1, weight 1, 00:09:41
+C>* 192.168.12.0/24 is directly connected, u_toswitch2, weight 1, 00:09:40
+L>* 192.168.12.4/32 is directly connected, u_toswitch2, weight 1, 00:09:40
+
+######## RIB ipv6
+
+Codes: K - kernel route, C - connected, L - local, S - static,
+       R - RIPng, O - OSPFv3, I - IS-IS, B - BGP, T - Table,
+       v - VNC, V - VNC-Direct, f - OpenFabric, t - Table-Direct,
+       > - selected route, * - FIB route, q - queued, r - rejected, b - backup
+       t - trapped, o - offload failure
+
+IPv6 unicast VRF blue:
+C>* 2001:db8:11::/64 is directly connected, u_toswitch1, weight 1, 00:09:42
+L>* 2001:db8:11::4/128 is directly connected, u_toswitch1, weight 1, 00:09:42
+C>* 2001:db8:12::/64 is directly connected, u_toswitch2, weight 1, 00:09:41
+L>* 2001:db8:12::4/128 is directly connected, u_toswitch2, weight 1, 00:09:41
+C * fe80::/64 is directly connected, u_toswitch2, weight 1, 00:09:41
+C>* fe80::/64 is directly connected, u_toswitch1, weight 1, 00:09:42
+
+######## BGP route table ipv4
+
+
+Instance default:
+BGP table version is 13, local router ID is 10.0.0.2, vrf id 0
+Default local pref 100, local AS 64512
+Status codes:  s suppressed, d damped, h history, u unsorted, * valid, > best, = multipath,
+               i internal, r RIB-failure, S Stale, R Removed
+Nexthop codes: @NNN nexthop's vrf id, < announce-nh-self
+Origin codes:  i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+     Network          Next Hop            Metric LocPrf Weight Path
+ *>  100.65.0.1/32    0.0.0.0                  0         32768 i
+
+Displayed 1 routes and 1 total paths
+
+######## BGP route table ipv6
+
+
+Instance default:
+No BGP prefixes displayed, 0 exist
+
+######## EVPN Routes
+
+No prefixes displayed, 0 exist
+
+######## Zebra interface information
+
+Interface blue is up, line protocol is up
+  Link ups:       0    last: (never)
+  Link downs:     0    last: (never)
+  vrf: red
+  pseudo interface
+Interface main is up, line protocol is up
+  Link ups:       1    last: 2026/07/16 11:07:37.15
+  Link downs:     0    last: (never)
+  vrf: red
+  index 2 metric 0 mtu 1500 speed 10000 txqlen 1000
+  flags: <UP,LOWER_UP,RUNNING,NOARP>
+  MPLS  Not specified by CLI
+  Multicast config is Not specified by CLI
+  Shutdown config is Not specified by CLI
+  Type: Ethernet
+  HWaddr: ee:22:9b:7f:d6:d1
+  inet 100.65.0.1/32
+  Interface Type VRF
+  Interface Slave Type None
+  protodown: off 
+Interface pe-100 is up, line protocol is down
+  Link ups:       0    last: (never)
+  Link downs:     1    last: 2026/07/16 11:23:05.71
+  vrf: red
+  index 3461 metric 0 mtu 0 speed 10000 txqlen 512
+  flags: <UP,BROADCAST,ALLMULTI,MULTICAST>
+  MPLS  Not specified by CLI
+  Multicast config is Not specified by CLI
+  Shutdown config is Not specified by CLI
+  Type: Ethernet
+  HWaddr: da:e8:0f:7b:cb:e5
+  Interface Type Other
+  Interface Slave Type None
+  protodown: off 
+Interface red is up, line protocol is up
+  Link ups:       0    last: (never)
+  Link downs:     0    last: (never)
+  vrf: red
+  pseudo interface
+Interface u_toswitch1 is up, line protocol is up
+  Link ups:       1    last: 2026/07/16 11:13:23.47
+  Link downs:     1    last: 2026/07/16 11:13:23.32
+  vrf: red
+  index 1062 metric 0 mtu 1500 speed 10000 txqlen 512
+  flags: <UP,LOWER_UP,BROADCAST,RUNNING,ALLMULTI,MULTICAST>
+  MPLS  Not specified by CLI
+  Multicast config is Not specified by CLI
+  Shutdown config is Not specified by CLI
+  Type: Ethernet
+  HWaddr: aa:c1:ab:4f:4c:34
+  inet 192.168.11.4/24
+  inet6 fe80::a8c1:abff:fe4f:4c34/64
+  inet6 2001:db8:11::4/64
+  Interface Type Other
+  Interface Slave Type None
+  protodown: off 
+Interface u_toswitch2 is up, line protocol is up
+  Link ups:       1    last: 2026/07/16 11:13:24.47
+  Link downs:     1    last: 2026/07/16 11:13:23.79
+  vrf: red
+  index 1064 metric 0 mtu 1500 speed 10000 txqlen 512
+  flags: <UP,LOWER_UP,BROADCAST,RUNNING,ALLMULTI,MULTICAST>
+  MPLS  Not specified by CLI
+  Multicast config is Not specified by CLI
+  Shutdown config is Not specified by CLI
+  Type: Ethernet
+  HWaddr: aa:c1:ab:38:76:54
+  inet 192.168.12.4/24
+  inet6 fe80::a8c1:abff:fe38:7654/64
+  inet6 2001:db8:12::4/64
+  Interface Type Other
+  Interface Slave Type None
+  protodown: off 
+Interface vni100 is up, line protocol is up
+  Link ups:       1    last: 2026/07/16 11:23:05.49
+  Link downs:     1    last: 2026/07/16 11:23:05.49
+  vrf: red
+  index 3459 metric 0 mtu 1450 speed 10000 txqlen 1000
+  flags: <UP,LOWER_UP,BROADCAST,RUNNING,MULTICAST>
+  MPLS  Not specified by CLI
+  Multicast config is Not specified by CLI
+  Shutdown config is Not specified by CLI
+  Type: Ethernet
+  HWaddr: ee:22:9b:7f:d6:d1
+  Interface Type Vxlan
+  Interface Slave Type Bridge
+ VTEP IP: 100.65.0.1 Link Interface main  VxLAN Id 100
+  protodown: off 
+  Parent interface: main
+Interface vni200 is up, line protocol is up
+  Link ups:       1    last: 2026/07/16 11:23:04.92
+  Link downs:     1    last: 2026/07/16 11:23:04.92
+  vrf: red
+  index 3456 metric 0 mtu 1450 speed 10000 txqlen 1000
+  flags: <UP,LOWER_UP,BROADCAST,RUNNING,MULTICAST>
+  MPLS  Not specified by CLI
+  Multicast config is Not specified by CLI
+  Shutdown config is Not specified by CLI
+  Type: Ethernet
+  HWaddr: ee:22:9b:7f:d6:d1
+  Interface Type Vxlan
+  Interface Slave Type Bridge
+ VTEP IP: 100.65.0.1 Link Interface main  VxLAN Id 200
+  protodown: off 
+  Parent interface: main
+
+######## ip link
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: main: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UNKNOWN mode DEFAULT group default qlen 500
+    link/none 
+1061: tap_toswitch1: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc multiq state UNKNOWN mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff
+1062: u_toswitch1: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff
+    alias Grout control plane interface
+1063: tap_toswitch2: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc multiq state UNKNOWN mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff
+1064: u_toswitch2: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff
+    alias Grout control plane interface
+69: toswitch2@if70: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group 4242 qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+86: toswitch1@if87: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group 4242 qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+3459: vni100: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1450 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether ee:22:9b:7f:d6:d1 brd ff:ff:ff:ff:ff:ff
+    alias Grout control plane interface
+
+######## ip address
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host proto kernel_lo 
+       valid_lft forever preferred_lft forever
+2: main: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UNKNOWN group default qlen 500
+    link/none 
+    inet 100.65.0.1/32 scope global main
+       valid_lft forever preferred_lft forever
+1061: tap_toswitch1: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc multiq state UNKNOWN group default qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::a8c1:abff:fe4f:4c34/64 scope link dadfailed tentative proto kernel_ll 
+       valid_lft forever preferred_lft forever
+1062: u_toswitch1: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.11.4/32 scope global u_toswitch1
+       valid_lft forever preferred_lft forever
+    inet6 2001:db8:11::4/128 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a8c1:abff:fe4f:4c34/128 scope link 
+       valid_lft forever preferred_lft forever
+1063: tap_toswitch2: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc multiq state UNKNOWN group default qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::a8c1:abff:fe38:7654/64 scope link dadfailed tentative proto kernel_ll 
+       valid_lft forever preferred_lft forever
+1064: u_toswitch2: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.12.4/32 scope global u_toswitch2
+       valid_lft forever preferred_lft forever
+    inet6 2001:db8:12::4/128 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a8c1:abff:fe38:7654/128 scope link 
+       valid_lft forever preferred_lft forever
+69: toswitch2@if70: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group 4242 qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::a8c1:abff:fe38:7654/64 scope link 
+       valid_lft forever preferred_lft forever
+86: toswitch1@if87: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group 4242 qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet6 fe80::a8c1:abff:fe4f:4c34/64 scope link 
+       valid_lft forever preferred_lft forever
+3459: vni100: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1450 qdisc fq_codel state UP group default qlen 1000
+    link/ether ee:22:9b:7f:d6:d1 brd ff:ff:ff:ff:ff:ff
+
+######## ip neigh
+
+fe80::a8c1:abff:feff:b469 dev toswitch1 lladdr aa:c1:ab:ff:b4:69 router STALE 
+fe80::a8c1:abff:fec8:ba6e dev toswitch2 lladdr aa:c1:ab:c8:ba:6e router STALE 
+
+######## Detailed interface statistics
+
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    RX:  bytes packets errors dropped  missed   mcast           
+             0       0      0       0       0       0 
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+             0       0      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       0 
+2: main: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UNKNOWN mode DEFAULT group default qlen 500
+    link/none 
+    RX:  bytes packets errors dropped  missed   mcast           
+             0       0      0       0       0       0 
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+         25301     328      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       0 
+1061: tap_toswitch1: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc multiq state UNKNOWN mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff
+    RX:  bytes packets errors dropped  missed   mcast           
+         10884     121      0       0       0       0 
+    RX errors:  length    crc   frame    fifo overrun otherhost
+                     0      0       0       0       0        99 
+    TX:  bytes packets errors dropped carrier collsns           
+         12246     142      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       0 
+1062: u_toswitch1: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff
+    alias Grout control plane interface
+    RX:  bytes packets errors dropped  missed   mcast           
+         10508     117      0       0       0       0 
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+           490       7      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       2 
+1063: tap_toswitch2: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc multiq state UNKNOWN mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff
+    RX:  bytes packets errors dropped  missed   mcast           
+         16768     193      0       0       0       0 
+    RX errors:  length    crc   frame    fifo overrun otherhost
+                     0      0       0       0       0       173 
+    TX:  bytes packets errors dropped carrier collsns           
+         17318     196      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       0 
+1064: u_toswitch2: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff
+    alias Grout control plane interface
+    RX:  bytes packets errors dropped  missed   mcast           
+         15364     169      0       0       0       0 
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+           490       7      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       2 
+69: toswitch2@if70: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group 4242 qlen 1000
+    link/ether aa:c1:ab:38:76:54 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    RX:  bytes packets errors dropped  missed   mcast           
+       1119099     394      0     410       0       0 
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+         23758     274      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       4 
+86: toswitch1@if87: <BROADCAST,MULTICAST,ALLMULTI,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group 4242 qlen 1000
+    link/ether aa:c1:ab:4f:4c:34 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    RX:  bytes packets errors dropped  missed   mcast           
+       1115285     349      0     408       0       0 
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0 
+    TX:  bytes packets errors dropped carrier collsns           
+         17869     202      0       0       0       0 
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0       4 
+
+######## ip vrf
+
+Name              Table
+-----------------------
+No VRF has been configured
+
+######## ip route table all
+
+default dev u_toswitch1 table 999 metric 1062 
+default dev u_toswitch2 table 999 metric 1064 
+default dev vni200 table 999 metric 3464 
+default dev main metric 4294967295 
+192.168.11.0/24 dev main src 192.168.11.4 
+192.168.12.0/24 dev main src 192.168.12.4 
+local 100.65.0.1 dev main table local proto kernel scope host src 100.65.0.1 
+local 127.0.0.0/8 dev lo table local proto kernel scope host src 127.0.0.1 
+local 127.0.0.1 dev lo table local proto kernel scope host src 127.0.0.1 
+broadcast 127.255.255.255 dev lo table local proto kernel scope link src 127.0.0.1 
+local 192.168.11.4 dev u_toswitch1 table local proto kernel scope host src 192.168.11.4 
+local 192.168.12.4 dev u_toswitch2 table local proto kernel scope host src 192.168.12.4 
+default dev u_toswitch1 table 999 metric 1062 pref medium
+default dev u_toswitch2 table 999 metric 1064 pref medium
+default dev vni200 table 999 metric 3464 pref medium
+2001:db8:11::4 dev u_toswitch1 proto kernel metric 256 pref medium
+2001:db8:11::/64 dev main src 2001:db8:11::4 metric 1024 pref medium
+2001:db8:12::4 dev u_toswitch2 proto kernel metric 256 pref medium
+2001:db8:12::/64 dev main src 2001:db8:12::4 metric 1024 pref medium
+fe80::a8c1:abff:fe38:7654 dev u_toswitch2 proto kernel metric 256 pref medium
+fe80::a8c1:abff:fe4f:4c34 dev u_toswitch1 proto kernel metric 256 pref medium
+fe80::/64 dev toswitch1 proto kernel metric 256 pref medium
+fe80::/64 dev toswitch2 proto kernel metric 256 pref medium
+fe80::/64 dev tap_toswitch1 proto kernel metric 256 pref medium
+fe80::/64 dev tap_toswitch2 proto kernel metric 256 pref medium
+default via fe80::a8c1:abff:feff:b469 dev toswitch1 proto ra metric 1024 expires 1777sec hoplimit 255 pref medium
+default via fe80::a8c1:abff:fec8:ba6e dev toswitch2 proto ra metric 1024 expires 1699sec hoplimit 255 pref medium
+default dev main metric 4294967295 pref medium
+local ::1 dev lo table local proto kernel metric 0 pref medium
+local 2001:db8:11::4 dev u_toswitch1 table local proto kernel metric 0 pref medium
+local 2001:db8:12::4 dev u_toswitch2 table local proto kernel metric 0 pref medium
+local fe80::a8c1:abff:fe38:7654 dev toswitch2 table local proto kernel metric 0 pref medium
+local fe80::a8c1:abff:fe38:7654 dev u_toswitch2 table local proto kernel metric 0 pref medium
+local fe80::a8c1:abff:fe4f:4c34 dev toswitch1 table local proto kernel metric 0 pref medium
+local fe80::a8c1:abff:fe4f:4c34 dev u_toswitch1 table local proto kernel metric 0 pref medium
+multicast ff00::/8 dev toswitch1 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev main table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev toswitch2 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev tap_toswitch1 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev u_toswitch1 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev tap_toswitch2 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev u_toswitch2 table local proto kernel metric 256 pref medium
+multicast ff00::/8 dev vni200 table local proto kernel metric 256 pref medium
+
+######## bridge fdb show
+
+01:00:5e:00:00:01 dev tap_toswitch1 self permanent
+33:33:00:00:00:01 dev tap_toswitch1 self permanent
+33:33:ff:4f:4c:34 dev tap_toswitch1 self permanent
+33:33:00:00:00:01 dev u_toswitch1 self permanent
+01:00:5e:00:00:01 dev u_toswitch1 self permanent
+01:00:5e:00:00:01 dev tap_toswitch2 self permanent
+33:33:00:00:00:01 dev tap_toswitch2 self permanent
+33:33:ff:38:76:54 dev tap_toswitch2 self permanent
+33:33:00:00:00:01 dev u_toswitch2 self permanent
+01:00:5e:00:00:01 dev u_toswitch2 self permanent
+33:33:00:00:00:01 dev toswitch2 self permanent
+33:33:ff:38:76:54 dev toswitch2 self permanent
+01:00:5e:00:00:01 dev toswitch2 self permanent
+33:33:00:00:00:01 dev toswitch1 self permanent
+33:33:ff:4f:4c:34 dev toswitch1 self permanent
+01:00:5e:00:00:01 dev toswitch1 self permanent
+33:33:00:00:00:01 dev vni200 self permanent
+01:00:5e:00:00:01 dev vni200 self permanent
+33:33:00:00:00:01 dev pe-200 self permanent
+
+######## show bgp ipv4 neighbors 192.168.11.2 advertised-routes
+
+
+######## show bgp ipv4 neighbors 192.168.11.2 advertised-routes detail
+
+
+######## show bgp ipv4 neighbors 192.168.11.2 graceful-restart
+
+
+Codes: GR - Graceful Restart, * -  Inheriting Global GR Config,
+       Restart - GR Mode-Restarting, Helper - GR Mode-Helper,
+       Disable - GR Mode-Disable.
+
+BGP neighbor is 192.168.11.2, remote AS 64512, local AS 64512, internal link
+  Local Role: undefined
+  Remote Role: undefined
+  BGP state = Idle
+  Neighbor GR capabilities:
+  Graceful restart information:
+    Local GR Mode: Helper*
+    Remote GR Mode: NotApplicable
+
+    R bit: False
+    N bit: False
+    Timers:
+      Configured Restart Time(sec): 120
+      Received Restart Time(sec): 120
+      Configured LLGR Stale Path Time(sec): 0
+
+
+######## show bgp ipv4 neighbors 192.168.12.2 advertised-routes
+
+
+######## show bgp ipv4 neighbors 192.168.12.2 advertised-routes detail
+
+
+######## show bgp ipv4 neighbors 192.168.12.2 graceful-restart
+
+
+Codes: GR - Graceful Restart, * -  Inheriting Global GR Config,
+       Restart - GR Mode-Restarting, Helper - GR Mode-Helper,
+       Disable - GR Mode-Disable.
+
+BGP neighbor is 192.168.12.2, remote AS 0, local AS 64512, internal link
+  Local Role: undefined
+  Remote Role: undefined
+  BGP state = Idle
+  Neighbor GR capabilities:
+  Graceful restart information:
+    Local GR Mode: Helper*
+    Remote GR Mode: NotApplicable
+
+    R bit: False
+    N bit: False
+    Timers:
+      Configured Restart Time(sec): 120
+      Received Restart Time(sec): 0
+      Configured LLGR Stale Path Time(sec): 0
+
+
+
+Grout version:
+grcli 0.16.1-0.g996fd937.el10
+
+
+
+######## grcli interface show
+
+NAME         ID  FLAGS                        MODE  DOMAIN  TYPE   INFO
+main          1  up running tracing           VRF   main    vrf    ip4 routes=65536 tbl8=256 ip6 routes=65536 tbl8=262144
+u_toswitch1   2  up running allmulti tracing  VRF   main    port   devargs=net_tapfx8v91h5,remote=toswitch1,iface=tap_toswitch1 mac=aa:c1:ab:4f:4c:34
+u_toswitch2   3  up running allmulti tracing  VRF   main    port   devargs=net_tapc07t5mqr,remote=toswitch2,iface=tap_toswitch2 mac=aa:c1:ab:38:76:54
+blue          4  up running tracing           VRF   blue    vrf    ip4 routes=65536 tbl8=256 ip6 routes=65536 tbl8=262144
+vni200        5  up running tracing           VRF   blue    vxlan  vni=200 local=100.65.0.1 encap_vrf=main
+pe-200        6  up allmulti tracing          VRF   blue    port   devargs=net_tapqj79itae,iface=host-200 mac=ca:ab:a8:fd:b9:a7
+red           7  up running tracing           VRF   red     vrf    ip4 routes=65536 tbl8=256 ip6 routes=65536 tbl8=262144
+
+######## grcli address show
+
+IFACE        FAMILY  ADDRESS
+main         ipv4    100.65.0.1/32
+u_toswitch1  ipv4    192.168.11.4/24
+u_toswitch2  ipv4    192.168.12.4/24
+u_toswitch1  ipv6    fe80::a8c1:abff:fe4f:4c34/64
+u_toswitch1  ipv6    2001:db8:11::4/64
+u_toswitch2  ipv6    fe80::a8c1:abff:fe38:7654/64
+u_toswitch2  ipv6    2001:db8:12::4/64
+
+######## grcli route show
+
+VRF   FAMILY  DESTINATION       ORIGIN  NEXT_HOP
+main  ipv4    100.65.0.1/32     link    type=L3 iface=main vrf=main origin=INTERNAL family=ipv4 addr=100.65.0.1/32 mac=ee:22:9b:7f:d6:d1 flags=static local link
+main  ipv4    192.168.11.0/24   link    type=L3 iface=u_toswitch1 vrf=main origin=INTERNAL family=ipv4 addr=192.168.11.4/24 mac=aa:c1:ab:4f:4c:34 flags=static local li
+main  ipv4    192.168.12.0/24   link    type=L3 iface=u_toswitch2 vrf=main origin=INTERNAL family=ipv4 addr=192.168.12.4/24 mac=aa:c1:ab:38:76:54 flags=static local li
+main  ipv6    2001:db8:11::/64  link    type=L3 iface=u_toswitch1 vrf=main origin=INTERNAL family=ipv6 addr=2001:db8:11::4/64 mac=aa:c1:ab:4f:4c:34 flags=static local
+main  ipv6    2001:db8:12::/64  link    type=L3 iface=u_toswitch2 vrf=main origin=INTERNAL family=ipv6 addr=2001:db8:12::4/64 mac=aa:c1:ab:38:76:54 flags=static local
+main  ipv6    fe80:2::/64       link    type=L3 iface=u_toswitch1 vrf=main origin=INTERNAL family=ipv6 addr=fe80::a8c1:abff:fe4f:4c34/64 mac=aa:c1:ab:4f:4c:34 flags=st
+main  ipv6    fe80:3::/64       link    type=L3 iface=u_toswitch2 vrf=main origin=INTERNAL family=ipv6 addr=fe80::a8c1:abff:fe38:7654/64 mac=aa:c1:ab:38:76:54 flags=st
+
+######## grcli nexthop show
+
+
+######## grcli stats show
+
+NODE      BATCHES  PACKETS  PKTS/BATCH  CYCLES/BATCH  CYCLES/PKT
+idle          253        0         0.0      601715.5         0.0
+overhead    64768        0         0.0          92.1         0.0
+
+######## grcli trace show
+
+--------- 11:22:25.060662705 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:25.071662715 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:25.096662739 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:25.099662742 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:26.504663987 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:c8:67:e2:58:38 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:26.551664019 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:c8:67:e2:58:38 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:26.572664034 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:26.575664036 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:26.594664049 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:26.605664057 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:26.720664136 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:27.010664337 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 9e:31:ba:71:fc:1e > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:27.023664346 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 9e:31:ba:71:fc:1e > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:27.049664364 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 9e:31:ba:71:fc:1e > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:27.062664373 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:27.135664423 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:27.148664432 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:27.351664573 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:28.531665390 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0a:5d:df:84:76:03 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:28.543665398 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0a:5d:df:84:76:03 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:28.577665421 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0a:5d:df:84:76:03 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:28.600665437 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:28.619665450 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:28.698665505 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:29.112665791 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0e:ef:05:27:50:4b > 33:33:ff:27:50:4b type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff27:504b ttl=255 proto=ICMPv6(58)
+ip6_input_local:
+icmp6_input: neigh solicit who has fe80::cef:5ff:fe27:504b? / Option type=14 len=8(1)
+ndp_ns_input: neigh solicit who has fe80::cef:5ff:fe27:504b? / Option type=14 len=8(1)
+control_output:
+
+--------- 11:22:29.123665799 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0e:ef:05:27:50:4b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:29.152665819 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:29.155665821 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:29.183665841 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:29.511666068 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:30.489666745 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d6:a1:35:f0:6f:66 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:30.497666750 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d6:a1:35:f0:6f:66 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:30.530666773 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:30.911667037 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 22:71:d7:7a:92:c1 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:30.926667047 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 22:71:d7:7a:92:c1 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:30.951667064 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 22:71:d7:7a:92:c1 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:30.960667071 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:30.965667074 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:31.104667170 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:31.392667369 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:31.492667439 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:32.512668145 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 92:3e:d3:35:d8:68 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:32.529668156 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 92:3e:d3:35:d8:68 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:32.557668176 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:32.581668192 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:32.945668444 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:32.960668455 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 96:8c:03:51:38:3b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:32.970668462 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 96:8c:03:51:38:3b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:32.991668476 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 96:8c:03:51:38:3b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:33.004668485 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:33.026668500 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:33.298668689 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:34.380669323 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:cd:57:73:02:6b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:34.393669320 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:cd:57:73:02:6b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:34.425669314 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:34.431669313 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:34.513669298 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:34.728669258 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:34.815669242 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:6c:78:e2:84:60 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:34.827669239 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:6c:78:e2:84:60 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:34.857669233 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:6c:78:e2:84:60 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:34.871669231 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:35.065669195 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:35.095669189 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:36.230668978 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 72:d4:f3:1d:53:fa > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:36.270668971 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:36.277668969 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:36.543668920 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:36.714668888 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: b2:16:f6:5e:f5:16 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:36.753668881 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:36.767668878 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:36.991668836 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:37.087668818 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:38.357668582 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 62:33:d9:c0:f2:cd > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:38.368668580 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 62:33:d9:c0:f2:cd > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.395668574 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.401668573 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.780668839 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: ee:8f:40:ba:15:6a > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.783668841 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.802668856 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: ee:8f:40:ba:15:6a > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.814668865 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:38.815668866 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:38.830668877 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:39.135669111 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:39.208669167 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:40.279669988 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: aa:d4:bc:55:5e:b9 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:40.289669996 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: aa:d4:bc:55:5e:b9 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:40.325670024 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:40.416670093 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:40.568670210 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:40.739670341 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 12:da:1f:88:5f:8a > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:40.749670349 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 12:da:1f:88:5f:8a > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:40.782670374 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:40.793670382 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:42.255671504 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: a6:66:92:29:b5:03 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:42.262671509 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: a6:66:92:29:b5:03 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:42.400671623 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:42.575671768 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:42.683671857 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 36:fe:32:bb:a5:44 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:42.712671881 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:43.039672151 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.078673009 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 82:d7:a6:dd:b3:ff > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:44.092673020 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 82:d7:a6:dd:b3:ff > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.126673048 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.522673375 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: a6:c9:59:2c:74:33 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:44.544673393 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: a6:c9:59:2c:74:33 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.587673429 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: a6:c9:59:2c:74:33 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.601673440 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.605673444 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:44.799673604 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:44.799673604 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:45.031673795 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:45.247673974 cpu 1 ---------
+control_input:
+iface_output: iface=u_toswitch1
+port_output:
+port_tx-p0q0: shared RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_GOOD RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+
+--------- 11:22:45.361674068 cpu 1 ---------
+port_rx-p0q0: RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=u_toswitch1 mode=VRF
+eth_input: aa:c1:ab:ff:b4:69 > 33:33:00:00:00:01 type=IPv6(0x86dd)
+ip6_input: fe80::a8c1:abff:feff:b469 > ff02::1 ttl=255 proto=ICMPv6(58)
+ip6_input_local:
+icmp6_input: router advert / Option src_lladdr=aa:c1:ab:ff:b4:69
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.088674668 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: b6:ed:83:1d:99:1c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:46.100674678 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: b6:ed:83:1d:99:1c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.144674714 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.471674984 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 62:b1:f7:bc:73:1d > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:46.480674992 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 62:b1:f7:bc:73:1d > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.515675020 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 62:b1:f7:bc:73:1d > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.543675044 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:46.543675044 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.592675084 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.679675156 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:46.799675255 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:47.167675559 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:48.097676326 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: e2:a4:60:21:10:07 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:48.110676337 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: e2:a4:60:21:10:07 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:48.150676370 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:48.251676454 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:48.368676550 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:48.536676689 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: ee:c3:12:09:b4:6b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:48.590676733 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:49.015677084 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:49.031677097 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:49.964677868 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: be:72:45:d2:79:83 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:49.978677879 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: be:72:45:d2:79:83 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.015677910 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.312678159 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.391678231 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:50.398678238 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: b6:f2:eb:d1:82:13 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.417678255 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: b6:f2:eb:d1:82:13 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.428678266 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.440678277 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:50.457678292 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:50.583678409 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.074679785 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: f6:db:6d:0a:91:e0 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.077679787 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: f6:db:6d:0a:91:e0 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.105679813 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: f6:db:6d:0a:91:e0 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.108679816 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.114679821 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.193679894 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:52.240679938 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.458680139 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5e:57:48:12:f2:96 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:52.470680150 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5e:57:48:12:f2:96 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.497680175 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:52.501680178 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:53.892681462 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 42:71:d9:f4:49:8c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:53.923681491 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 42:71:d9:f4:49:8c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:53.943681509 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:54.388681920 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0a:9d:a5:aa:90:2b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:54.427681956 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 0a:9d:a5:aa:90:2b > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:54.437681965 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:54.441681969 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:54.585682102 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:56.084683485 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:b5:76:df:f7:49 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:56.096683496 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:b5:76:df:f7:49 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.125683522 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.127683524 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.303683687 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:56.660684016 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 36:38:e2:10:30:9f > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:56.674684029 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 36:38:e2:10:30:9f > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.711684063 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.718684070 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.768684116 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:56.960684293 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:57.152684470 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:58.323685545 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: f2:b3:0d:0f:91:6d > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:58.339685557 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: f2:b3:0d:0f:91:6d > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.373685584 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: f2:b3:0d:0f:91:6d > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.389685596 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.393685599 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.752685879 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:58.795685913 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 72:57:49:5f:15:23 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:22:58.814685928 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 72:57:49:5f:15:23 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.834685943 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 72:57:49:5f:15:23 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.845685952 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.875685975 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:22:58.955686038 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:ff:ae:e0:43 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ffae:e043 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:22:59.359686353 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:23:00.464687215 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:66:42:82:ce:28 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:23:00.484687231 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: d2:66:42:82:ce:28 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:23:00.525687263 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:23:00.530687266 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:23:00.712687408 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:00:00:03 type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff00:3 ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:23:00.839687508 cpu 3 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 5a:cf:69:5c:a9:4c > 33:33:ff:5c:a9:4c type=IPv6(0x86dd)
+ip6_input: :: > ff02::1:ff5c:a94c ttl=255 proto=ICMPv6(58)
+ip6_input_not_member: drop
+
+--------- 11:23:00.963687604 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 8a:b2:b1:a4:34:52 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_not_member: drop
+
+--------- 11:23:00.974687613 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 8a:b2:b1:a4:34:52 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:23:01.001687634 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 8a:b2:b1:a4:34:52 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+--------- 11:23:01.013687643 cpu 1 ---------
+(null): RX_L4_CKSUM_UNKNOWN RX_IP_CKSUM_UNKNOWN RX_OUTER_L4_CKSUM_UNKNOWN TX_L4_NO_CKSUM
+iface_input: iface=[deleted] mode=VRF
+eth_input: 3e:5d:c0:ae:e0:43 > 33:33:00:00:00:16 type=IPv6(0x86dd)
+ip6_input: :: > ff02::16 ttl=1 proto=HOPOPT(0)
+ip6_input_local:
+icmp6_input: type=143 code=0
+icmp6_input_unsupported: drop
+
+
+######## tc filter show
+
+
+######## tc qdisc show
+
+qdisc noqueue 0: dev lo root refcnt 2 
+qdisc noqueue 0: dev toswitch1 root refcnt 2 
+qdisc ingress ffff: dev toswitch1 parent ffff:fff1 ---------------- 
+qdisc fq_codel 0: dev main root refcnt 2 limit 10240p flows 1024 quantum 1500 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64 
+qdisc noqueue 0: dev toswitch2 root refcnt 2 
+qdisc ingress ffff: dev toswitch2 parent ffff:fff1 ---------------- 
+qdisc multiq 1: dev tap_toswitch1 root refcnt 257 bands 1/256 
+qdisc ingress ffff: dev tap_toswitch1 parent ffff:fff1 ---------------- 
+qdisc fq_codel 0: dev u_toswitch1 root refcnt 2 limit 10240p flows 1024 quantum 1514 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64 
+qdisc multiq 1: dev tap_toswitch2 root refcnt 257 bands 1/256 
+qdisc ingress ffff: dev tap_toswitch2 parent ffff:fff1 ---------------- 
+qdisc fq_codel 0: dev u_toswitch2 root refcnt 2 limit 10240p flows 1024 quantum 1514 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64 
+qdisc fq_codel 0: dev gr-loop4 root refcnt 2 limit 10240p flows 1024 quantum 1500 target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64 
+qdisc noqueue 0: dev blue root refcnt 2 
+
+

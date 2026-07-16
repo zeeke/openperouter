@@ -1,0 +1,57 @@
+2026-07-16T11:05:58.448722965Z stdout F CentOS Stream 10 - BaseOS                       1.8 MB/s | 7.0 MB     00:03    
+2026-07-16T11:06:01.635152573Z stdout F CentOS Stream 10 - AppStream                    2.3 MB/s | 3.6 MB     00:01    
+2026-07-16T11:06:03.341883597Z stdout F CentOS Stream 10 - Extras packages               10 kB/s |  10 kB     00:00    
+2026-07-16T11:06:03.966457425Z stdout F Dependencies resolved.
+2026-07-16T11:06:03.967192736Z stdout F ================================================================================
+2026-07-16T11:06:03.967204447Z stdout F  Package          Architecture Version                    Repository       Size
+2026-07-16T11:06:03.96721136Z stdout F ================================================================================
+2026-07-16T11:06:03.967217843Z stdout F Installing:
+2026-07-16T11:06:03.967223974Z stdout F  tcpdump          x86_64       14:4.99.4-10.el10          appstream       503 k
+2026-07-16T11:06:03.967247167Z stdout F Installing dependencies:
+2026-07-16T11:06:03.967253008Z stdout F  libibverbs       x86_64       62.0-2.el10                baseos          484 k
+2026-07-16T11:06:03.96725918Z stdout F  libnl3           x86_64       3.11.0-1.el10              baseos          361 k
+2026-07-16T11:06:03.967265732Z stdout F  libpcap          x86_64       14:1.10.4-7.el10           baseos          175 k
+2026-07-16T11:06:03.967271222Z stdout F 
+2026-07-16T11:06:03.96727535Z stdout F Transaction Summary
+2026-07-16T11:06:03.967278776Z stdout F ================================================================================
+2026-07-16T11:06:03.967282513Z stdout F Install  4 Packages
+2026-07-16T11:06:03.96728579Z stdout F 
+2026-07-16T11:06:03.967631839Z stdout F Total download size: 1.5 M
+2026-07-16T11:06:03.96772042Z stdout F Installed size: 3.9 M
+2026-07-16T11:06:03.967906297Z stdout F Downloading Packages:
+2026-07-16T11:06:05.630048391Z stdout F (1/4): libpcap-1.10.4-7.el10.x86_64.rpm         224 kB/s | 175 kB     00:00    
+2026-07-16T11:06:05.661897242Z stdout F (2/4): libnl3-3.11.0-1.el10.x86_64.rpm          444 kB/s | 361 kB     00:00    
+2026-07-16T11:06:05.705982326Z stdout F (3/4): libibverbs-62.0-2.el10.x86_64.rpm        564 kB/s | 484 kB     00:00    
+2026-07-16T11:06:07.314647486Z stdout F (4/4): tcpdump-4.99.4-10.el10.x86_64.rpm        299 kB/s | 503 kB     00:01    
+2026-07-16T11:06:07.316662551Z stdout F --------------------------------------------------------------------------------
+2026-07-16T11:06:07.317386503Z stdout F Total                                           455 kB/s | 1.5 MB     00:03     
+2026-07-16T11:06:07.33760175Z stdout F CentOS Stream 10 - BaseOS                       1.6 MB/s | 1.6 kB     00:00    
+2026-07-16T11:06:07.343277403Z stderr F Importing GPG key 0x8483C65D:
+2026-07-16T11:06:07.343295537Z stderr F  Userid     : "CentOS (CentOS Official Signing Key) <security@centos.org>"
+2026-07-16T11:06:07.343300907Z stderr F  Fingerprint: 99DB 70FA E1D7 CE22 7FB6 4882 05B5 55B3 8483 C65D
+2026-07-16T11:06:07.343305636Z stderr F  From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial-SHA256
+2026-07-16T11:06:07.373333158Z stdout F Key imported successfully
+2026-07-16T11:06:07.437706156Z stdout F Running transaction check
+2026-07-16T11:06:07.44929271Z stdout F Transaction check succeeded.
+2026-07-16T11:06:07.449614291Z stdout F Running transaction test
+2026-07-16T11:06:07.514848283Z stdout F Transaction test succeeded.
+2026-07-16T11:06:07.514868481Z stdout F Running transaction
+2026-07-16T11:06:07.606792308Z stdout F   Preparing        :                                                        1/1 
+2026-07-16T11:06:07.643879107Z stdout F   Installing       : libnl3-3.11.0-1.el10.x86_64                            1/4 
+2026-07-16T11:06:07.662698012Z stdout F   Installing       : libibverbs-62.0-2.el10.x86_64                          2/4 
+2026-07-16T11:06:07.666791148Z stdout F   Installing       : libpcap-14:1.10.4-7.el10.x86_64                        3/4 
+2026-07-16T11:06:07.722881824Z stdout F   Running scriptlet: tcpdump-14:4.99.4-10.el10.x86_64                       4/4 
+2026-07-16T11:06:07.722911289Z stdout F useradd: Warning: missing or non-executable shell '/usr/sbin/nologin'
+2026-07-16T11:06:07.722914776Z stdout F 
+2026-07-16T11:06:07.753743555Z stdout F   Installing       : tcpdump-14:4.99.4-10.el10.x86_64                       4/4 
+2026-07-16T11:06:08.065545211Z stdout F   Running scriptlet: tcpdump-14:4.99.4-10.el10.x86_64                       4/4 
+2026-07-16T11:06:08.065565189Z stdout F 
+2026-07-16T11:06:08.065570719Z stdout F Installed:
+2026-07-16T11:06:08.065575719Z stdout F   libibverbs-62.0-2.el10.x86_64          libnl3-3.11.0-1.el10.x86_64            
+2026-07-16T11:06:08.065580477Z stdout F   libpcap-14:1.10.4-7.el10.x86_64        tcpdump-14:4.99.4-10.el10.x86_64       
+2026-07-16T11:06:08.065585317Z stdout F 
+2026-07-16T11:06:08.065590135Z stdout F Complete!
+2026-07-16T11:06:08.176143995Z stderr F tcpdump: data link type LINUX_SLL2
+2026-07-16T11:06:08.176165695Z stderr F dropped privs to tcpdump
+2026-07-16T11:06:08.176171626Z stderr F tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+2026-07-16T11:06:08.176176876Z stderr F listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes

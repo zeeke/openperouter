@@ -1,0 +1,61 @@
+Client: Docker Engine - Community
+ Version:    28.0.4
+ Context:    default
+ Debug Mode: false
+ Plugins:
+  buildx: Docker Buildx (Docker Inc.)
+    Version:  v0.35.0
+    Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+  compose: Docker Compose (Docker Inc.)
+    Version:  v2.38.2
+    Path:     /usr/libexec/docker/cli-plugins/docker-compose
+
+Server:
+ Containers: 16
+  Running: 16
+  Paused: 0
+  Stopped: 0
+ Images: 10
+ Server Version: 28.0.4
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Using metacopy: false
+  Native Overlay Diff: false
+  userxattr: false
+ Logging Driver: json-file
+ Cgroup Driver: systemd
+ Cgroup Version: 2
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+ Swarm: inactive
+ Runtimes: io.containerd.runc.v2 runc
+ Default Runtime: runc
+ Init Binary: docker-init
+ containerd version: e53c7c1516c3b2bff98eb76f1f4117477e6f4e66
+ runc version: v1.3.6-0-g491b69ba
+ init version: de40ad0
+ Security Options:
+  apparmor
+  seccomp
+   Profile: builtin
+  cgroupns
+ Kernel Version: 6.8.0-1059-azure
+ Operating System: Ubuntu 22.04.5 LTS
+ OSType: linux
+ Architecture: x86_64
+ CPUs: 4
+ Total Memory: 15.62GiB
+ Name: runnervmos4r4
+ ID: 0a400a3c-5380-42e6-bc3f-0a6e5b2cd0fd
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Username: githubactions
+ Experimental: false
+ Insecure Registries:
+  ::1/128
+  127.0.0.0/8
+ Live Restore Enabled: false
+

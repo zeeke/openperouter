@@ -1,0 +1,4 @@
+2026-07-16T11:03:34.622329375Z stdout F kubeconfig is created in /host/etc/cni/net.d/multus.d/multus.kubeconfig
+2026-07-16T11:03:34.622357608Z stdout F kubeconfig file is created.
+2026-07-16T11:03:34.622361585Z stdout F master capabilities is get from conflist
+2026-07-16T11:03:34.689896364Z stdout F multus config file is created.

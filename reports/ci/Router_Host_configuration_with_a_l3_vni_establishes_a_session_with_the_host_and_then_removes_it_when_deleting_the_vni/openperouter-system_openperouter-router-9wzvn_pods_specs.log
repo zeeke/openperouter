@@ -1,0 +1,1243 @@
+{
+    "metadata": {
+        "name": "openperouter-router-9wzvn",
+        "generateName": "openperouter-router-",
+        "namespace": "openperouter-system",
+        "uid": "0ed1d2da-2679-4127-8b44-1b2daa9b99c8",
+        "resourceVersion": "1167",
+        "creationTimestamp": "2026-07-16T11:05:50Z",
+        "labels": {
+            "app": "router",
+            "app.kubernetes.io/component": "router",
+            "app.kubernetes.io/instance": "openperouter",
+            "app.kubernetes.io/name": "openperouter",
+            "controller-revision-hash": "67c7b45585",
+            "pod-template-generation": "1"
+        },
+        "annotations": {
+            "kubectl.kubernetes.io/default-container": "frr"
+        },
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "kind": "DaemonSet",
+                "name": "openperouter-router",
+                "uid": "b9314097-35a3-491b-8c5f-8921d870d4ba",
+                "controller": true,
+                "blockOwnerDeletion": true
+            }
+        ],
+        "managedFields": [
+            {
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:05:50Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            ".": {},
+                            "f:kubectl.kubernetes.io/default-container": {}
+                        },
+                        "f:generateName": {},
+                        "f:labels": {
+                            ".": {},
+                            "f:app": {},
+                            "f:app.kubernetes.io/component": {},
+                            "f:app.kubernetes.io/instance": {},
+                            "f:app.kubernetes.io/name": {},
+                            "f:controller-revision-hash": {},
+                            "f:pod-template-generation": {}
+                        },
+                        "f:ownerReferences": {
+                            ".": {},
+                            "k:{\"uid\":\"b9314097-35a3-491b-8c5f-8921d870d4ba\"}": {}
+                        }
+                    },
+                    "f:spec": {
+                        "f:affinity": {
+                            ".": {},
+                            "f:nodeAffinity": {
+                                ".": {},
+                                "f:requiredDuringSchedulingIgnoredDuringExecution": {}
+                            }
+                        },
+                        "f:containers": {
+                            "k:{\"name\":\"frr\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"GROUT_SOCK_PATH\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:value": {}
+                                    },
+                                    "k:{\"name\":\"TINI_SUBREAPER\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:value": {}
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:capabilities": {
+                                        ".": {},
+                                        "f:add": {}
+                                    }
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/grout\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/netns\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:mountPropagation": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"grout\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"GROUT_SOCK_PATH\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:value": {}
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:exec": {
+                                        ".": {},
+                                        "f:command": {}
+                                    },
+                                    "f:failureThreshold": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:readinessProbe": {
+                                    ".": {},
+                                    "f:exec": {
+                                        ".": {},
+                                        "f:command": {}
+                                    },
+                                    "f:failureThreshold": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:resources": {
+                                    ".": {},
+                                    "f:limits": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    },
+                                    "f:requests": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    }
+                                },
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:privileged": {}
+                                },
+                                "f:startupProbe": {
+                                    ".": {},
+                                    "f:exec": {
+                                        ".": {},
+                                        "f:command": {}
+                                    },
+                                    "f:failureThreshold": {},
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/usr/bin/nsenter\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {},
+                                        "f:readOnly": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/grout\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/netns\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:mountPropagation": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"reloader\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":9080,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:hostPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:readinessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:resources": {},
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:seLinuxOptions": {
+                                        ".": {},
+                                        "f:type": {}
+                                    }
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/etc/perouter\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/var/run/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"tcpdump\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:privileged": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/var/run/netns\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:mountPropagation": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            },
+                            "k:{\"name\":\"tcpdump-host\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:privileged": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {}
+                            }
+                        },
+                        "f:dnsPolicy": {},
+                        "f:enableServiceLinks": {},
+                        "f:hostNetwork": {},
+                        "f:initContainers": {
+                            ".": {},
+                            "k:{\"name\":\"cp-frr-files\"}": {
+                                ".": {},
+                                "f:command": {},
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:name": {},
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/etc/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/etc/perouter\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    },
+                                    "k:{\"mountPath\":\"/tmp/frr\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {}
+                                    }
+                                }
+                            }
+                        },
+                        "f:restartPolicy": {},
+                        "f:schedulerName": {},
+                        "f:securityContext": {},
+                        "f:serviceAccount": {},
+                        "f:serviceAccountName": {},
+                        "f:shareProcessNamespace": {},
+                        "f:terminationGracePeriodSeconds": {},
+                        "f:tolerations": {},
+                        "f:volumes": {
+                            ".": {},
+                            "k:{\"name\":\"frr-sockets\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"frr-startup\"}": {
+                                ".": {},
+                                "f:configMap": {
+                                    ".": {},
+                                    "f:defaultMode": {},
+                                    "f:name": {}
+                                },
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"frrconfig\"}": {
+                                ".": {},
+                                "f:emptyDir": {},
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"frrsharedconfig\"}": {
+                                ".": {},
+                                "f:hostPath": {
+                                    ".": {},
+                                    "f:path": {},
+                                    "f:type": {}
+                                },
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"grout-socket\"}": {
+                                ".": {},
+                                "f:hostPath": {
+                                    ".": {},
+                                    "f:path": {},
+                                    "f:type": {}
+                                },
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"host-nsenter\"}": {
+                                ".": {},
+                                "f:hostPath": {
+                                    ".": {},
+                                    "f:path": {},
+                                    "f:type": {}
+                                },
+                                "f:name": {}
+                            },
+                            "k:{\"name\":\"netns\"}": {
+                                ".": {},
+                                "f:hostPath": {
+                                    ".": {},
+                                    "f:path": {},
+                                    "f:type": {}
+                                },
+                                "f:name": {}
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "manager": "kubelet",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:05:57Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:status": {
+                        "f:conditions": {
+                            "k:{\"type\":\"ContainersReady\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Initialized\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"PodReadyToStartContainers\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Ready\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            }
+                        },
+                        "f:containerStatuses": {},
+                        "f:hostIP": {},
+                        "f:hostIPs": {},
+                        "f:initContainerStatuses": {},
+                        "f:phase": {},
+                        "f:podIP": {},
+                        "f:podIPs": {
+                            ".": {},
+                            "k:{\"ip\":\"172.18.0.2\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            },
+                            "k:{\"ip\":\"fc00:f853:ccd:e793::2\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            }
+                        },
+                        "f:startTime": {}
+                    }
+                },
+                "subresource": "status"
+            }
+        ]
+    },
+    "spec": {
+        "volumes": [
+            {
+                "name": "frr-sockets",
+                "emptyDir": {}
+            },
+            {
+                "name": "frr-startup",
+                "configMap": {
+                    "name": "frr-startup",
+                    "defaultMode": 420
+                }
+            },
+            {
+                "name": "frrsharedconfig",
+                "hostPath": {
+                    "path": "/etc/perouter/frr",
+                    "type": "DirectoryOrCreate"
+                }
+            },
+            {
+                "name": "frrconfig",
+                "emptyDir": {}
+            },
+            {
+                "name": "netns",
+                "hostPath": {
+                    "path": "/var/run/netns",
+                    "type": ""
+                }
+            },
+            {
+                "name": "grout-socket",
+                "hostPath": {
+                    "path": "/var/run/openperouter/grout",
+                    "type": "DirectoryOrCreate"
+                }
+            },
+            {
+                "name": "host-nsenter",
+                "hostPath": {
+                    "path": "/usr/bin/nsenter",
+                    "type": "File"
+                }
+            },
+            {
+                "name": "kube-api-access-gkzk7",
+                "projected": {
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "name": "kube-root-ca.crt",
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "path": "namespace",
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "defaultMode": 420
+                }
+            }
+        ],
+        "initContainers": [
+            {
+                "name": "cp-frr-files",
+                "image": "quay.io/openperouter/router:main-grout",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "cp -rLf /tmp/frr/* /etc/frr/\nif [ -f /etc/perouter/frr.conf ]; then\n  cp /etc/perouter/frr.conf /etc/frr/frr.conf\nfi\n"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-startup",
+                        "mountPath": "/tmp/frr"
+                    },
+                    {
+                        "name": "frrconfig",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "frrsharedconfig",
+                        "mountPath": "/etc/perouter"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            }
+        ],
+        "containers": [
+            {
+                "name": "frr",
+                "image": "quay.io/openperouter/router:main-grout",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "TIMEOUT=60\nWAITED=0\nuntil [ -e /var/run/netns/perouter ]; do\n  echo \"Waiting for named netns /var/run/netns/perouter...\"\n  sleep 1\n  WAITED=$((WAITED + 1))\n  if [ \"$WAITED\" -ge \"$TIMEOUT\" ]; then\n    echo \"Timed out waiting for named netns after ${TIMEOUT}s\"\n    exit 1\n  fi\ndone\nexec nsenter --net=/var/run/netns/perouter /sbin/tini -- /usr/lib/frr/docker-start\n"
+                ],
+                "env": [
+                    {
+                        "name": "TINI_SUBREAPER",
+                        "value": "true"
+                    },
+                    {
+                        "name": "GROUT_SOCK_PATH",
+                        "value": "/var/run/grout/grout.sock"
+                    }
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frrconfig",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "netns",
+                        "mountPath": "/var/run/netns",
+                        "mountPropagation": "HostToContainer"
+                    },
+                    {
+                        "name": "grout-socket",
+                        "mountPath": "/var/run/grout"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/healthz",
+                        "port": 9080,
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 15,
+                    "timeoutSeconds": 10,
+                    "periodSeconds": 20,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "capabilities": {
+                        "add": [
+                            "NET_ADMIN",
+                            "NET_RAW",
+                            "SYS_ADMIN",
+                            "NET_BIND_SERVICE"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "reloader",
+                "image": "quay.io/openperouter/router:main-grout",
+                "command": [
+                    "/reloader"
+                ],
+                "args": [
+                    "--frrconfig=/etc/perouter/frr.conf",
+                    "--unixsocket=/etc/perouter/reload.sock",
+                    "--loglevel=debug"
+                ],
+                "ports": [
+                    {
+                        "name": "health",
+                        "hostPort": 9080,
+                        "containerPort": 9080,
+                        "protocol": "TCP"
+                    }
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "frrconfig",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frrsharedconfig",
+                        "mountPath": "/etc/perouter"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/healthz",
+                        "port": 9080,
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 15,
+                    "timeoutSeconds": 10,
+                    "periodSeconds": 20,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "readinessProbe": {
+                    "httpGet": {
+                        "path": "/readyz",
+                        "port": 9080,
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 5,
+                    "timeoutSeconds": 10,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "seLinuxOptions": {
+                        "type": "spc_t"
+                    }
+                }
+            },
+            {
+                "name": "grout",
+                "image": "quay.io/openperouter/router:main-grout",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "TIMEOUT=60\nWAITED=0\nuntil [ -e /var/run/netns/perouter ]; do\n  echo \"Waiting for named netns /var/run/netns/perouter...\"\n  sleep 1\n  WAITED=$((WAITED + 1))\n  if [ \"$WAITED\" -ge \"$TIMEOUT\" ]; then\n    echo \"Timed out waiting for named netns after ${TIMEOUT}s\"\n    exit 1\n  fi\ndone\nGROUT_ARGS=\"--test-mode --socket-mode 0666\"\nGROUT_ARGS=\"${GROUT_ARGS} --verbose\"\nGROUT_ARGS=\"${GROUT_ARGS} --trace-packets\"\nexec nsenter --net=/var/run/netns/perouter grout ${GROUT_ARGS}\n"
+                ],
+                "env": [
+                    {
+                        "name": "GROUT_SOCK_PATH",
+                        "value": "/var/run/grout/grout.sock"
+                    }
+                ],
+                "resources": {
+                    "limits": {
+                        "cpu": "500m",
+                        "memory": "2Gi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "512Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "grout-socket",
+                        "mountPath": "/var/run/grout"
+                    },
+                    {
+                        "name": "netns",
+                        "mountPath": "/var/run/netns",
+                        "mountPropagation": "HostToContainer"
+                    },
+                    {
+                        "name": "host-nsenter",
+                        "readOnly": true,
+                        "mountPath": "/usr/bin/nsenter"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "exec": {
+                        "command": [
+                            "/bin/sh",
+                            "-c",
+                            "grcli -e"
+                        ]
+                    },
+                    "timeoutSeconds": 5,
+                    "periodSeconds": 30,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "/bin/sh",
+                            "-c",
+                            "grcli -e"
+                        ]
+                    },
+                    "timeoutSeconds": 5,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "/bin/sh",
+                            "-c",
+                            "grcli -e trace enable all"
+                        ]
+                    },
+                    "initialDelaySeconds": 2,
+                    "timeoutSeconds": 5,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "failureThreshold": 12
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "privileged": true
+                }
+            },
+            {
+                "name": "tcpdump",
+                "image": "quay.io/centos/centos:stream10",
+                "command": [
+                    "/bin/sh",
+                    "-xc",
+                    "yum install -y tcpdump\nnsenter --net=/var/run/netns/perouter tcpdump -e -nn -i any tcp port 179 or udp port 4789 or tcp port 8090\n"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "netns",
+                        "mountPath": "/var/run/netns",
+                        "mountPropagation": "HostToContainer"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "privileged": true
+                }
+            },
+            {
+                "name": "tcpdump-host",
+                "image": "quay.io/centos/centos:stream10",
+                "command": [
+                    "/bin/sh",
+                    "-c",
+                    "yum install -y tcpdump\ntcpdump -e -nn -i any udp port 4789 or tcp port 8090\n"
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "privileged": true
+                }
+            }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 10,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "openperouter-perouter",
+        "serviceAccount": "openperouter-perouter",
+        "nodeName": "pe-kind-control-plane",
+        "hostNetwork": true,
+        "shareProcessNamespace": true,
+        "securityContext": {},
+        "affinity": {
+            "nodeAffinity": {
+                "requiredDuringSchedulingIgnoredDuringExecution": {
+                    "nodeSelectorTerms": [
+                        {
+                            "matchFields": [
+                                {
+                                    "key": "metadata.name",
+                                    "operator": "In",
+                                    "values": [
+                                        "pe-kind-control-plane"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+            {
+                "key": "node-role.kubernetes.io/master",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node-role.kubernetes.io/control-plane",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "effect": "NoExecute"
+            },
+            {
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "effect": "NoExecute"
+            },
+            {
+                "key": "node.kubernetes.io/disk-pressure",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/memory-pressure",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/pid-pressure",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/unschedulable",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/network-unavailable",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true,
+        "preemptionPolicy": "PreemptLowerPriority"
+    },
+    "status": {
+        "phase": "Running",
+        "conditions": [
+            {
+                "type": "PodReadyToStartContainers",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:51Z"
+            },
+            {
+                "type": "Initialized",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:52Z"
+            },
+            {
+                "type": "Ready",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:57Z"
+            },
+            {
+                "type": "ContainersReady",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:57Z"
+            },
+            {
+                "type": "PodScheduled",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:50Z"
+            }
+        ],
+        "hostIP": "172.18.0.2",
+        "hostIPs": [
+            {
+                "ip": "172.18.0.2"
+            },
+            {
+                "ip": "fc00:f853:ccd:e793::2"
+            }
+        ],
+        "podIP": "172.18.0.2",
+        "podIPs": [
+            {
+                "ip": "172.18.0.2"
+            },
+            {
+                "ip": "fc00:f853:ccd:e793::2"
+            }
+        ],
+        "startTime": "2026-07-16T11:05:50Z",
+        "initContainerStatuses": [
+            {
+                "name": "cp-frr-files",
+                "state": {
+                    "terminated": {
+                        "exitCode": 0,
+                        "reason": "Completed",
+                        "startedAt": "2026-07-16T11:05:50Z",
+                        "finishedAt": "2026-07-16T11:05:50Z",
+                        "containerID": "containerd://cceca3fe7ac4ce3c772b9cd8c5c7bdcea4500bfca4812e5b905641a7e2b0b158"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/openperouter/router:main-grout",
+                "imageID": "sha256:96280faf9eafab4f144c395485c08def0efca25579d22d18d85ebeaa5310630c",
+                "containerID": "containerd://cceca3fe7ac4ce3c772b9cd8c5c7bdcea4500bfca4812e5b905641a7e2b0b158",
+                "started": false,
+                "volumeMounts": [
+                    {
+                        "name": "frr-startup",
+                        "mountPath": "/tmp/frr"
+                    },
+                    {
+                        "name": "frrconfig",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "frrsharedconfig",
+                        "mountPath": "/etc/perouter"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "containerStatuses": [
+            {
+                "name": "frr",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:05:52Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/openperouter/router:main-grout",
+                "imageID": "sha256:96280faf9eafab4f144c395485c08def0efca25579d22d18d85ebeaa5310630c",
+                "containerID": "containerd://5f2eda2ce9ca0c926da93338e7e092b7cad06ff67f08da0151147ec28f296639",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frrconfig",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "netns",
+                        "mountPath": "/var/run/netns"
+                    },
+                    {
+                        "name": "grout-socket",
+                        "mountPath": "/var/run/grout"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "grout",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:05:53Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/openperouter/router:main-grout",
+                "imageID": "sha256:96280faf9eafab4f144c395485c08def0efca25579d22d18d85ebeaa5310630c",
+                "containerID": "containerd://3854706ae87ec83fa77a4b96d30dd06abd48e144cbf342e34947ce105437f243",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "grout-socket",
+                        "mountPath": "/var/run/grout"
+                    },
+                    {
+                        "name": "netns",
+                        "mountPath": "/var/run/netns"
+                    },
+                    {
+                        "name": "host-nsenter",
+                        "mountPath": "/usr/bin/nsenter",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "reloader",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:05:52Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/openperouter/router:main-grout",
+                "imageID": "sha256:96280faf9eafab4f144c395485c08def0efca25579d22d18d85ebeaa5310630c",
+                "containerID": "containerd://9aa064c8f10cb143cd8d1ded52c465e675d48d54565bc6ebc82ce7e128a29599",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "frrconfig",
+                        "mountPath": "/etc/frr"
+                    },
+                    {
+                        "name": "frr-sockets",
+                        "mountPath": "/var/run/frr"
+                    },
+                    {
+                        "name": "frrsharedconfig",
+                        "mountPath": "/etc/perouter"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "tcpdump",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:05:54Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/centos/centos:stream10",
+                "imageID": "quay.io/centos/centos@sha256:e465ba2bdfb7243192b9274c95d2cbac55363f944131776517fd9cfb9ff62731",
+                "containerID": "containerd://9031a7688e5dfb970c83795de001d1fd1825cc1c683caf59b90b7da748f3bce9",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "netns",
+                        "mountPath": "/var/run/netns"
+                    },
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            },
+            {
+                "name": "tcpdump-host",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:05:54Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/centos/centos:stream10",
+                "imageID": "quay.io/centos/centos@sha256:e465ba2bdfb7243192b9274c95d2cbac55363f944131776517fd9cfb9ff62731",
+                "containerID": "containerd://52e19df55b941871006fc569bc966d9ed0d4b4a43372cde760dcf02a64d2a7eb",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "kube-api-access-gkzk7",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "qosClass": "Burstable"
+    }
+}

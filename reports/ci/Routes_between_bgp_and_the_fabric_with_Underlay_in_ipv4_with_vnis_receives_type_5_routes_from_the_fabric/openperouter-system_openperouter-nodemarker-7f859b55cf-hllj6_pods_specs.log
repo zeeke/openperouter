@@ -1,0 +1,481 @@
+{
+    "metadata": {
+        "name": "openperouter-nodemarker-7f859b55cf-hllj6",
+        "generateName": "openperouter-nodemarker-7f859b55cf-",
+        "namespace": "openperouter-system",
+        "uid": "3f6f4657-4ab0-4c6a-96c0-80be1eed4cfd",
+        "resourceVersion": "1194",
+        "creationTimestamp": "2026-07-16T11:05:50Z",
+        "labels": {
+            "app": "nodemarker",
+            "app.kubernetes.io/component": "nodemarker",
+            "app.kubernetes.io/instance": "openperouter",
+            "app.kubernetes.io/name": "openperouter",
+            "pod-template-hash": "7f859b55cf"
+        },
+        "annotations": {
+            "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"kindnet\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.244.1.3\",\n        \"fd00:10:244:1::3\"\n    ],\n    \"mac\": \"12:c2:6e:78:3d:35\",\n    \"default\": true,\n    \"dns\": {},\n    \"gateway\": [\n        \"\\u003cnil\\u003e\",\n        \"\\u003cnil\\u003e\"\n    ]\n}]",
+            "kubectl.kubernetes.io/default-container": "nodemarker"
+        },
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "kind": "ReplicaSet",
+                "name": "openperouter-nodemarker-7f859b55cf",
+                "uid": "b4872cac-ba35-4c19-89db-d316b9749e8a",
+                "controller": true,
+                "blockOwnerDeletion": true
+            }
+        ],
+        "managedFields": [
+            {
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:05:50Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            ".": {},
+                            "f:kubectl.kubernetes.io/default-container": {}
+                        },
+                        "f:generateName": {},
+                        "f:labels": {
+                            ".": {},
+                            "f:app": {},
+                            "f:app.kubernetes.io/component": {},
+                            "f:app.kubernetes.io/instance": {},
+                            "f:app.kubernetes.io/name": {},
+                            "f:pod-template-hash": {}
+                        },
+                        "f:ownerReferences": {
+                            ".": {},
+                            "k:{\"uid\":\"b4872cac-ba35-4c19-89db-d316b9749e8a\"}": {}
+                        }
+                    },
+                    "f:spec": {
+                        "f:containers": {
+                            "k:{\"name\":\"nodemarker\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"NAMESPACE\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":8081,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    },
+                                    "k:{\"containerPort\":9443,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:readinessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:resources": {},
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/tmp/k8s-webhook-server/serving-certs\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {},
+                                        "f:readOnly": {}
+                                    }
+                                }
+                            }
+                        },
+                        "f:dnsPolicy": {},
+                        "f:enableServiceLinks": {},
+                        "f:restartPolicy": {},
+                        "f:schedulerName": {},
+                        "f:securityContext": {},
+                        "f:serviceAccount": {},
+                        "f:serviceAccountName": {},
+                        "f:terminationGracePeriodSeconds": {},
+                        "f:tolerations": {},
+                        "f:volumes": {
+                            ".": {},
+                            "k:{\"name\":\"cert\"}": {
+                                ".": {},
+                                "f:name": {},
+                                "f:secret": {
+                                    ".": {},
+                                    "f:defaultMode": {},
+                                    "f:secretName": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "manager": "multus",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:05:53Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            "f:k8s.v1.cni.cncf.io/network-status": {}
+                        }
+                    }
+                },
+                "subresource": "status"
+            },
+            {
+                "manager": "kubelet",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:06:05Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:status": {
+                        "f:conditions": {
+                            "k:{\"type\":\"ContainersReady\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Initialized\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"PodReadyToStartContainers\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Ready\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            }
+                        },
+                        "f:containerStatuses": {},
+                        "f:hostIP": {},
+                        "f:hostIPs": {},
+                        "f:phase": {},
+                        "f:podIP": {},
+                        "f:podIPs": {
+                            ".": {},
+                            "k:{\"ip\":\"10.244.1.3\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            },
+                            "k:{\"ip\":\"fd00:10:244:1::3\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            }
+                        },
+                        "f:startTime": {}
+                    }
+                },
+                "subresource": "status"
+            }
+        ]
+    },
+    "spec": {
+        "volumes": [
+            {
+                "name": "cert",
+                "secret": {
+                    "secretName": "openpe-webhook-server-cert",
+                    "defaultMode": 420
+                }
+            },
+            {
+                "name": "kube-api-access-x2wch",
+                "projected": {
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "name": "kube-root-ca.crt",
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "path": "namespace",
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "defaultMode": 420
+                }
+            }
+        ],
+        "containers": [
+            {
+                "name": "nodemarker",
+                "image": "quay.io/openperouter/router:main-grout",
+                "command": [
+                    "/nodemarker"
+                ],
+                "args": [
+                    "--loglevel=debug",
+                    "--namespace=$(NAMESPACE)",
+                    "--datapath=grout"
+                ],
+                "ports": [
+                    {
+                        "name": "webhook-server",
+                        "containerPort": 9443,
+                        "protocol": "TCP"
+                    },
+                    {
+                        "name": "health",
+                        "containerPort": 8081,
+                        "protocol": "TCP"
+                    }
+                ],
+                "env": [
+                    {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                            }
+                        }
+                    }
+                ],
+                "resources": {},
+                "volumeMounts": [
+                    {
+                        "name": "cert",
+                        "readOnly": true,
+                        "mountPath": "/tmp/k8s-webhook-server/serving-certs"
+                    },
+                    {
+                        "name": "kube-api-access-x2wch",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/healthz",
+                        "port": "health",
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 15,
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 20,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "readinessProbe": {
+                    "httpGet": {
+                        "path": "/readyz",
+                        "port": "health",
+                        "scheme": "HTTP"
+                    },
+                    "initialDelaySeconds": 5,
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+            }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 30,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "openperouter-controller",
+        "serviceAccount": "openperouter-controller",
+        "nodeName": "pe-kind-worker",
+        "securityContext": {},
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+            {
+                "key": "node-role.kubernetes.io/master",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node-role.kubernetes.io/control-plane",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "effect": "NoExecute",
+                "tolerationSeconds": 300
+            },
+            {
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "effect": "NoExecute",
+                "tolerationSeconds": 300
+            }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true,
+        "preemptionPolicy": "PreemptLowerPriority"
+    },
+    "status": {
+        "phase": "Running",
+        "conditions": [
+            {
+                "type": "PodReadyToStartContainers",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:54Z"
+            },
+            {
+                "type": "Initialized",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:50Z"
+            },
+            {
+                "type": "Ready",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:06:05Z"
+            },
+            {
+                "type": "ContainersReady",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:06:05Z"
+            },
+            {
+                "type": "PodScheduled",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:05:50Z"
+            }
+        ],
+        "hostIP": "172.18.0.3",
+        "hostIPs": [
+            {
+                "ip": "172.18.0.3"
+            },
+            {
+                "ip": "fc00:f853:ccd:e793::3"
+            }
+        ],
+        "podIP": "10.244.1.3",
+        "podIPs": [
+            {
+                "ip": "10.244.1.3"
+            },
+            {
+                "ip": "fd00:10:244:1::3"
+            }
+        ],
+        "startTime": "2026-07-16T11:05:50Z",
+        "containerStatuses": [
+            {
+                "name": "nodemarker",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:05:53Z"
+                    }
+                },
+                "lastState": {},
+                "ready": true,
+                "restartCount": 0,
+                "image": "quay.io/openperouter/router:main-grout",
+                "imageID": "sha256:96280faf9eafab4f144c395485c08def0efca25579d22d18d85ebeaa5310630c",
+                "containerID": "containerd://5f8e703c45b9eb8100a4b24bf8d41515bc810334a00b04312e4e29641788d082",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "cert",
+                        "mountPath": "/tmp/k8s-webhook-server/serving-certs",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "name": "kube-api-access-x2wch",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "qosClass": "BestEffort"
+    }
+}

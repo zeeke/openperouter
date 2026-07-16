@@ -1,0 +1,4 @@
+2026-07-16T11:02:11.633Z|00001|vlog|INFO|opened log file /var/log/openvswitch/ovsdb-server.log
+2026-07-16T11:02:11.639Z|00002|ovsdb_server|INFO|ovsdb-server (Open vSwitch) 3.1.0
+2026-07-16T11:02:21.660Z|00003|memory|INFO|7684 kB peak resident set size after 10.0 seconds
+2026-07-16T11:02:21.660Z|00004|memory|INFO|atoms:47 cells:39 monitors:2 n-weak-refs:0 sessions:1

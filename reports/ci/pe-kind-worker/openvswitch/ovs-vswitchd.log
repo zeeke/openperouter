@@ -1,0 +1,21 @@
+2026-07-16T11:02:11.864Z|00001|vlog|INFO|opened log file /var/log/openvswitch/ovs-vswitchd.log
+2026-07-16T11:02:11.873Z|00002|ovs_numa|INFO|Discovered 4 CPU cores on NUMA node 0
+2026-07-16T11:02:11.873Z|00003|ovs_numa|INFO|Discovered 1 NUMA nodes and 4 CPU cores
+2026-07-16T11:02:11.873Z|00004|reconnect|INFO|unix:/var/run/openvswitch/db.sock: connecting...
+2026-07-16T11:02:11.873Z|00005|reconnect|INFO|unix:/var/run/openvswitch/db.sock: connected
+2026-07-16T11:02:11.893Z|00006|bridge|INFO|ovs-vswitchd (Open vSwitch) 3.1.0
+2026-07-16T11:02:24.128Z|00007|memory|INFO|18532 kB peak resident set size after 12.3 seconds
+2026-07-16T11:02:24.128Z|00008|memory|INFO|idl-cells-Open_vSwitch:17
+2026-07-16T11:09:42.681Z|00009|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:10:00.063Z|00010|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:11:14.222Z|00011|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:12:12.668Z|00012|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:13:41.156Z|00013|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:14:13.430Z|00014|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:15:30.595Z|00015|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:18:17.512Z|00016|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:20:14.242Z|00017|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-200 device failed: No such device
+2026-07-16T11:21:10.502Z|00018|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-200 device failed: No such device
+2026-07-16T11:22:25.624Z|00019|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:22:39.495Z|00020|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:22:49.099Z|00021|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device

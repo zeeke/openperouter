@@ -1,0 +1,509 @@
+{
+    "metadata": {
+        "name": "frr-k8s-webhook-server-79db7bf56f-96tnv",
+        "generateName": "frr-k8s-webhook-server-79db7bf56f-",
+        "namespace": "frr-k8s-system",
+        "uid": "334cec0f-1d90-4528-867d-8f43134045da",
+        "resourceVersion": "916",
+        "creationTimestamp": "2026-07-16T11:03:21Z",
+        "labels": {
+            "app": "frr-k8s-webhook-server",
+            "control-plane": "webhook-server",
+            "pod-template-hash": "79db7bf56f"
+        },
+        "annotations": {
+            "kubectl.kubernetes.io/default-container": "frr-k8s-webhook-server"
+        },
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "kind": "ReplicaSet",
+                "name": "frr-k8s-webhook-server-79db7bf56f",
+                "uid": "a5f8f28f-5966-4e0f-827a-3d16cf9a5e04",
+                "controller": true,
+                "blockOwnerDeletion": true
+            }
+        ],
+        "managedFields": [
+            {
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:03:21Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:metadata": {
+                        "f:annotations": {
+                            ".": {},
+                            "f:kubectl.kubernetes.io/default-container": {}
+                        },
+                        "f:generateName": {},
+                        "f:labels": {
+                            ".": {},
+                            "f:app": {},
+                            "f:control-plane": {},
+                            "f:pod-template-hash": {}
+                        },
+                        "f:ownerReferences": {
+                            ".": {},
+                            "k:{\"uid\":\"a5f8f28f-5966-4e0f-827a-3d16cf9a5e04\"}": {}
+                        }
+                    },
+                    "f:spec": {
+                        "f:containers": {
+                            "k:{\"name\":\"frr-k8s-webhook-server\"}": {
+                                ".": {},
+                                "f:args": {},
+                                "f:command": {},
+                                "f:env": {
+                                    ".": {},
+                                    "k:{\"name\":\"NAMESPACE\"}": {
+                                        ".": {},
+                                        "f:name": {},
+                                        "f:valueFrom": {
+                                            ".": {},
+                                            "f:fieldRef": {}
+                                        }
+                                    }
+                                },
+                                "f:image": {},
+                                "f:imagePullPolicy": {},
+                                "f:livenessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:name": {},
+                                "f:ports": {
+                                    ".": {},
+                                    "k:{\"containerPort\":7572,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    },
+                                    "k:{\"containerPort\":9443,\"protocol\":\"TCP\"}": {
+                                        ".": {},
+                                        "f:containerPort": {},
+                                        "f:name": {},
+                                        "f:protocol": {}
+                                    }
+                                },
+                                "f:readinessProbe": {
+                                    ".": {},
+                                    "f:failureThreshold": {},
+                                    "f:httpGet": {
+                                        ".": {},
+                                        "f:path": {},
+                                        "f:port": {},
+                                        "f:scheme": {}
+                                    },
+                                    "f:initialDelaySeconds": {},
+                                    "f:periodSeconds": {},
+                                    "f:successThreshold": {},
+                                    "f:timeoutSeconds": {}
+                                },
+                                "f:resources": {
+                                    ".": {},
+                                    "f:limits": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    },
+                                    "f:requests": {
+                                        ".": {},
+                                        "f:cpu": {},
+                                        "f:memory": {}
+                                    }
+                                },
+                                "f:securityContext": {
+                                    ".": {},
+                                    "f:allowPrivilegeEscalation": {},
+                                    "f:capabilities": {
+                                        ".": {},
+                                        "f:drop": {}
+                                    },
+                                    "f:readOnlyRootFilesystem": {}
+                                },
+                                "f:terminationMessagePath": {},
+                                "f:terminationMessagePolicy": {},
+                                "f:volumeMounts": {
+                                    ".": {},
+                                    "k:{\"mountPath\":\"/tmp/k8s-webhook-server/serving-certs\"}": {
+                                        ".": {},
+                                        "f:mountPath": {},
+                                        "f:name": {},
+                                        "f:readOnly": {}
+                                    }
+                                }
+                            }
+                        },
+                        "f:dnsPolicy": {},
+                        "f:enableServiceLinks": {},
+                        "f:restartPolicy": {},
+                        "f:schedulerName": {},
+                        "f:securityContext": {},
+                        "f:serviceAccount": {},
+                        "f:serviceAccountName": {},
+                        "f:terminationGracePeriodSeconds": {},
+                        "f:tolerations": {},
+                        "f:volumes": {
+                            ".": {},
+                            "k:{\"name\":\"cert\"}": {
+                                ".": {},
+                                "f:name": {},
+                                "f:secret": {
+                                    ".": {},
+                                    "f:defaultMode": {},
+                                    "f:secretName": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "manager": "kubelet",
+                "operation": "Update",
+                "apiVersion": "v1",
+                "time": "2026-07-16T11:04:52Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                    "f:status": {
+                        "f:conditions": {
+                            "k:{\"type\":\"ContainersReady\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Initialized\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"PodReadyToStartContainers\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            },
+                            "k:{\"type\":\"Ready\"}": {
+                                ".": {},
+                                "f:lastProbeTime": {},
+                                "f:lastTransitionTime": {},
+                                "f:status": {},
+                                "f:type": {}
+                            }
+                        },
+                        "f:containerStatuses": {},
+                        "f:hostIP": {},
+                        "f:hostIPs": {},
+                        "f:phase": {},
+                        "f:podIP": {},
+                        "f:podIPs": {
+                            ".": {},
+                            "k:{\"ip\":\"10.244.1.2\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            },
+                            "k:{\"ip\":\"fd00:10:244:1::2\"}": {
+                                ".": {},
+                                "f:ip": {}
+                            }
+                        },
+                        "f:startTime": {}
+                    }
+                },
+                "subresource": "status"
+            }
+        ]
+    },
+    "spec": {
+        "volumes": [
+            {
+                "name": "cert",
+                "secret": {
+                    "secretName": "frr-k8s-webhook-server-cert",
+                    "defaultMode": 420
+                }
+            },
+            {
+                "name": "kube-api-access-rkrsh",
+                "projected": {
+                    "sources": [
+                        {
+                            "serviceAccountToken": {
+                                "expirationSeconds": 3607,
+                                "path": "token"
+                            }
+                        },
+                        {
+                            "configMap": {
+                                "name": "kube-root-ca.crt",
+                                "items": [
+                                    {
+                                        "key": "ca.crt",
+                                        "path": "ca.crt"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "downwardAPI": {
+                                "items": [
+                                    {
+                                        "path": "namespace",
+                                        "fieldRef": {
+                                            "apiVersion": "v1",
+                                            "fieldPath": "metadata.namespace"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "defaultMode": 420
+                }
+            }
+        ],
+        "containers": [
+            {
+                "name": "frr-k8s-webhook-server",
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "command": [
+                    "/frr-k8s"
+                ],
+                "args": [
+                    "--log-level=info",
+                    "--webhook-mode=onlywebhook",
+                    "--namespace=$(NAMESPACE)",
+                    "--metrics-bind-address=:7572"
+                ],
+                "ports": [
+                    {
+                        "name": "monitoring",
+                        "containerPort": 7572,
+                        "protocol": "TCP"
+                    },
+                    {
+                        "name": "webhook",
+                        "containerPort": 9443,
+                        "protocol": "TCP"
+                    }
+                ],
+                "env": [
+                    {
+                        "name": "NAMESPACE",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.namespace"
+                            }
+                        }
+                    }
+                ],
+                "resources": {
+                    "limits": {
+                        "cpu": "500m",
+                        "memory": "128Mi"
+                    },
+                    "requests": {
+                        "cpu": "10m",
+                        "memory": "64Mi"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "name": "cert",
+                        "readOnly": true,
+                        "mountPath": "/tmp/k8s-webhook-server/serving-certs"
+                    },
+                    {
+                        "name": "kube-api-access-rkrsh",
+                        "readOnly": true,
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+                    }
+                ],
+                "livenessProbe": {
+                    "httpGet": {
+                        "path": "/healthz",
+                        "port": "webhook",
+                        "scheme": "HTTPS"
+                    },
+                    "initialDelaySeconds": 15,
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 20,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "readinessProbe": {
+                    "httpGet": {
+                        "path": "/healthz",
+                        "port": "webhook",
+                        "scheme": "HTTPS"
+                    },
+                    "initialDelaySeconds": 5,
+                    "timeoutSeconds": 1,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent",
+                "securityContext": {
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "allowPrivilegeEscalation": false
+                }
+            }
+        ],
+        "restartPolicy": "Always",
+        "terminationGracePeriodSeconds": 10,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "frr-k8s-daemon",
+        "serviceAccount": "frr-k8s-daemon",
+        "nodeName": "pe-kind-worker",
+        "securityContext": {},
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+            {
+                "key": "node-role.kubernetes.io/master",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node-role.kubernetes.io/control-plane",
+                "operator": "Exists",
+                "effect": "NoSchedule"
+            },
+            {
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "effect": "NoExecute",
+                "tolerationSeconds": 300
+            },
+            {
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "effect": "NoExecute",
+                "tolerationSeconds": 300
+            }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true,
+        "preemptionPolicy": "PreemptLowerPriority"
+    },
+    "status": {
+        "phase": "Running",
+        "conditions": [
+            {
+                "type": "PodReadyToStartContainers",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:34Z"
+            },
+            {
+                "type": "Initialized",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:21Z"
+            },
+            {
+                "type": "Ready",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:04:52Z"
+            },
+            {
+                "type": "ContainersReady",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:04:52Z"
+            },
+            {
+                "type": "PodScheduled",
+                "status": "True",
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-07-16T11:03:21Z"
+            }
+        ],
+        "hostIP": "172.18.0.3",
+        "hostIPs": [
+            {
+                "ip": "172.18.0.3"
+            },
+            {
+                "ip": "fc00:f853:ccd:e793::3"
+            }
+        ],
+        "podIP": "10.244.1.2",
+        "podIPs": [
+            {
+                "ip": "10.244.1.2"
+            },
+            {
+                "ip": "fd00:10:244:1::2"
+            }
+        ],
+        "startTime": "2026-07-16T11:03:21Z",
+        "containerStatuses": [
+            {
+                "name": "frr-k8s-webhook-server",
+                "state": {
+                    "running": {
+                        "startedAt": "2026-07-16T11:04:41Z"
+                    }
+                },
+                "lastState": {
+                    "terminated": {
+                        "exitCode": 0,
+                        "reason": "Completed",
+                        "startedAt": "2026-07-16T11:03:33Z",
+                        "finishedAt": "2026-07-16T11:04:41Z",
+                        "containerID": "containerd://ee8325d4b959a06ba12c5ead79f77fc95c16eb7f25105d45ec36f7ceb15e630c"
+                    }
+                },
+                "ready": true,
+                "restartCount": 1,
+                "image": "quay.io/metallb/frr-k8s:v0.0.18",
+                "imageID": "quay.io/metallb/frr-k8s@sha256:1b9aea79783c5e2e914e0956aa9b7e1287762d9cf38b8a0ee19b4a24accb9e74",
+                "containerID": "containerd://e69088b53f803d265d34c9e1ae6991889075595559d3ae6fd9dfed42dd64f1b6",
+                "started": true,
+                "volumeMounts": [
+                    {
+                        "name": "cert",
+                        "mountPath": "/tmp/k8s-webhook-server/serving-certs",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "name": "kube-api-access-rkrsh",
+                        "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    }
+                ]
+            }
+        ],
+        "qosClass": "Burstable"
+    }
+}

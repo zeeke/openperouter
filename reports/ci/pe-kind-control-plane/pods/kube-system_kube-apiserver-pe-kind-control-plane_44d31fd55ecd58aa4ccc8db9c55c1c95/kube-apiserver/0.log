@@ -1,0 +1,246 @@
+2026-07-16T11:02:19.533095586Z stderr F W0716 11:02:19.531395       1 registry.go:256] calling componentGlobalsRegistry.AddFlags more than once, the registry will be set by the latest flags
+2026-07-16T11:02:19.533120492Z stderr F I0716 11:02:19.532201       1 options.go:238] external host was not specified, using 172.18.0.2
+2026-07-16T11:02:19.534826128Z stderr F I0716 11:02:19.534730       1 server.go:143] Version: v1.32.2
+2026-07-16T11:02:19.535129615Z stderr F I0716 11:02:19.535086       1 server.go:145] "Golang settings" GOGC="" GOMAXPROCS="" GOTRACEBACK=""
+2026-07-16T11:02:20.345868033Z stderr F W0716 11:02:20.345742       1 logging.go:55] [core] [Channel #1 SubChannel #3]grpc: addrConn.createTransport failed to connect to {Addr: "127.0.0.1:2379", ServerName: "127.0.0.1:2379", }. Err: connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:2379: connect: connection refused"
+2026-07-16T11:02:20.346039594Z stderr F W0716 11:02:20.345985       1 logging.go:55] [core] [Channel #2 SubChannel #4]grpc: addrConn.createTransport failed to connect to {Addr: "127.0.0.1:2379", ServerName: "127.0.0.1:2379", }. Err: connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:2379: connect: connection refused"
+2026-07-16T11:02:20.348404101Z stderr F I0716 11:02:20.348272       1 shared_informer.go:313] Waiting for caches to sync for node_authorizer
+2026-07-16T11:02:20.357882459Z stderr F I0716 11:02:20.357763       1 shared_informer.go:313] Waiting for caches to sync for *generic.policySource[*k8s.io/api/admissionregistration/v1.ValidatingAdmissionPolicy,*k8s.io/api/admissionregistration/v1.ValidatingAdmissionPolicyBinding,k8s.io/apiserver/pkg/admission/plugin/policy/validating.Validator]
+2026-07-16T11:02:20.365332428Z stderr F I0716 11:02:20.365218       1 plugins.go:157] Loaded 13 mutating admission controller(s) successfully in the following order: NamespaceLifecycle,LimitRanger,ServiceAccount,NodeRestriction,TaintNodesByCondition,Priority,DefaultTolerationSeconds,DefaultStorageClass,StorageObjectInUseProtection,RuntimeClass,DefaultIngressClass,MutatingAdmissionPolicy,MutatingAdmissionWebhook.
+2026-07-16T11:02:20.365447473Z stderr F I0716 11:02:20.365376       1 plugins.go:160] Loaded 13 validating admission controller(s) successfully in the following order: LimitRanger,ServiceAccount,PodSecurity,Priority,PersistentVolumeClaimResize,RuntimeClass,CertificateApproval,CertificateSigning,ClusterTrustBundleAttest,CertificateSubjectRestriction,ValidatingAdmissionPolicy,ValidatingAdmissionWebhook,ResourceQuota.
+2026-07-16T11:02:20.36584212Z stderr F I0716 11:02:20.365780       1 instance.go:233] Using reconciler: lease
+2026-07-16T11:02:20.367050007Z stderr F W0716 11:02:20.366974       1 logging.go:55] [core] [Channel #5 SubChannel #6]grpc: addrConn.createTransport failed to connect to {Addr: "127.0.0.1:2379", ServerName: "127.0.0.1:2379", }. Err: connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:2379: connect: connection refused"
+2026-07-16T11:02:21.717607625Z stderr F I0716 11:02:21.717166       1 handler.go:286] Adding GroupVersion apiextensions.k8s.io v1 to ResourceManager
+2026-07-16T11:02:21.717635978Z stderr F W0716 11:02:21.717212       1 genericapiserver.go:767] Skipping API apiextensions.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:21.835640141Z stderr F I0716 11:02:21.835436       1 handler.go:286] Adding GroupVersion  v1 to ResourceManager
+2026-07-16T11:02:21.835912429Z stderr F I0716 11:02:21.835798       1 apis.go:106] API group "internal.apiserver.k8s.io" is not enabled, skipping.
+2026-07-16T11:02:21.958576979Z stderr F I0716 11:02:21.955821       1 apis.go:106] API group "storagemigration.k8s.io" is not enabled, skipping.
+2026-07-16T11:02:22.019235714Z stderr F I0716 11:02:22.019098       1 apis.go:106] API group "resource.k8s.io" is not enabled, skipping.
+2026-07-16T11:02:22.026674442Z stderr F I0716 11:02:22.026539       1 handler.go:286] Adding GroupVersion authentication.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.026701392Z stderr F W0716 11:02:22.026561       1 genericapiserver.go:767] Skipping API authentication.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.026721961Z stderr F W0716 11:02:22.026568       1 genericapiserver.go:767] Skipping API authentication.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.027074319Z stderr F I0716 11:02:22.026999       1 handler.go:286] Adding GroupVersion authorization.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.027083145Z stderr F W0716 11:02:22.027013       1 genericapiserver.go:767] Skipping API authorization.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.027715637Z stderr F I0716 11:02:22.027649       1 handler.go:286] Adding GroupVersion autoscaling v2 to ResourceManager
+2026-07-16T11:02:22.028279881Z stderr F I0716 11:02:22.028208       1 handler.go:286] Adding GroupVersion autoscaling v1 to ResourceManager
+2026-07-16T11:02:22.028286494Z stderr F W0716 11:02:22.028224       1 genericapiserver.go:767] Skipping API autoscaling/v2beta1 because it has no resources.
+2026-07-16T11:02:22.02829017Z stderr F W0716 11:02:22.028228       1 genericapiserver.go:767] Skipping API autoscaling/v2beta2 because it has no resources.
+2026-07-16T11:02:22.029382882Z stderr F I0716 11:02:22.029311       1 handler.go:286] Adding GroupVersion batch v1 to ResourceManager
+2026-07-16T11:02:22.029393201Z stderr F W0716 11:02:22.029325       1 genericapiserver.go:767] Skipping API batch/v1beta1 because it has no resources.
+2026-07-16T11:02:22.030063093Z stderr F I0716 11:02:22.029997       1 handler.go:286] Adding GroupVersion certificates.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.030074715Z stderr F W0716 11:02:22.030010       1 genericapiserver.go:767] Skipping API certificates.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.030079303Z stderr F W0716 11:02:22.030015       1 genericapiserver.go:767] Skipping API certificates.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.030471285Z stderr F I0716 11:02:22.030401       1 handler.go:286] Adding GroupVersion coordination.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.030480322Z stderr F W0716 11:02:22.030413       1 genericapiserver.go:767] Skipping API coordination.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.030484069Z stderr F W0716 11:02:22.030418       1 genericapiserver.go:767] Skipping API coordination.k8s.io/v1alpha2 because it has no resources.
+2026-07-16T11:02:22.031023176Z stderr F I0716 11:02:22.030951       1 handler.go:286] Adding GroupVersion discovery.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.031029238Z stderr F W0716 11:02:22.030964       1 genericapiserver.go:767] Skipping API discovery.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.032058471Z stderr F I0716 11:02:22.031981       1 handler.go:286] Adding GroupVersion networking.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.032068499Z stderr F W0716 11:02:22.031996       1 genericapiserver.go:767] Skipping API networking.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.032072236Z stderr F W0716 11:02:22.032002       1 genericapiserver.go:767] Skipping API networking.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.032414386Z stderr F I0716 11:02:22.032348       1 handler.go:286] Adding GroupVersion node.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.032420858Z stderr F W0716 11:02:22.032362       1 genericapiserver.go:767] Skipping API node.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.032424565Z stderr F W0716 11:02:22.032366       1 genericapiserver.go:767] Skipping API node.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.033299444Z stderr F I0716 11:02:22.033203       1 handler.go:286] Adding GroupVersion policy v1 to ResourceManager
+2026-07-16T11:02:22.033315083Z stderr F W0716 11:02:22.033217       1 genericapiserver.go:767] Skipping API policy/v1beta1 because it has no resources.
+2026-07-16T11:02:22.034302718Z stderr F I0716 11:02:22.034210       1 handler.go:286] Adding GroupVersion rbac.authorization.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.034333505Z stderr F W0716 11:02:22.034224       1 genericapiserver.go:767] Skipping API rbac.authorization.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.034337603Z stderr F W0716 11:02:22.034229       1 genericapiserver.go:767] Skipping API rbac.authorization.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.034672699Z stderr F I0716 11:02:22.034588       1 handler.go:286] Adding GroupVersion scheduling.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.034682678Z stderr F W0716 11:02:22.034604       1 genericapiserver.go:767] Skipping API scheduling.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.034686325Z stderr F W0716 11:02:22.034608       1 genericapiserver.go:767] Skipping API scheduling.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.035960916Z stderr F I0716 11:02:22.035861       1 handler.go:286] Adding GroupVersion storage.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.035977066Z stderr F W0716 11:02:22.035876       1 genericapiserver.go:767] Skipping API storage.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.035980703Z stderr F W0716 11:02:22.035880       1 genericapiserver.go:767] Skipping API storage.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.036971101Z stderr F I0716 11:02:22.036888       1 handler.go:286] Adding GroupVersion flowcontrol.apiserver.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.036983494Z stderr F W0716 11:02:22.036909       1 genericapiserver.go:767] Skipping API flowcontrol.apiserver.k8s.io/v1beta3 because it has no resources.
+2026-07-16T11:02:22.036987822Z stderr F W0716 11:02:22.036917       1 genericapiserver.go:767] Skipping API flowcontrol.apiserver.k8s.io/v1beta2 because it has no resources.
+2026-07-16T11:02:22.03699193Z stderr F W0716 11:02:22.036921       1 genericapiserver.go:767] Skipping API flowcontrol.apiserver.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.045211324Z stderr F I0716 11:02:22.045091       1 handler.go:286] Adding GroupVersion apps v1 to ResourceManager
+2026-07-16T11:02:22.04657319Z stderr F W0716 11:02:22.045172       1 genericapiserver.go:767] Skipping API apps/v1beta2 because it has no resources.
+2026-07-16T11:02:22.046584311Z stderr F W0716 11:02:22.045184       1 genericapiserver.go:767] Skipping API apps/v1beta1 because it has no resources.
+2026-07-16T11:02:22.050544269Z stderr F I0716 11:02:22.050406       1 handler.go:286] Adding GroupVersion admissionregistration.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.050556642Z stderr F W0716 11:02:22.050438       1 genericapiserver.go:767] Skipping API admissionregistration.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.050559908Z stderr F W0716 11:02:22.050447       1 genericapiserver.go:767] Skipping API admissionregistration.k8s.io/v1alpha1 because it has no resources.
+2026-07-16T11:02:22.051687262Z stderr F I0716 11:02:22.051599       1 handler.go:286] Adding GroupVersion events.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.051699115Z stderr F W0716 11:02:22.051618       1 genericapiserver.go:767] Skipping API events.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.068463214Z stderr F I0716 11:02:22.068294       1 handler.go:286] Adding GroupVersion apiregistration.k8s.io v1 to ResourceManager
+2026-07-16T11:02:22.068513729Z stderr F W0716 11:02:22.068316       1 genericapiserver.go:767] Skipping API apiregistration.k8s.io/v1beta1 because it has no resources.
+2026-07-16T11:02:22.371800261Z stderr F I0716 11:02:22.371658       1 dynamic_cafile_content.go:161] "Starting controller" name="request-header::/etc/kubernetes/pki/front-proxy-ca.crt"
+2026-07-16T11:02:22.37182666Z stderr F I0716 11:02:22.371668       1 dynamic_cafile_content.go:161] "Starting controller" name="client-ca-bundle::/etc/kubernetes/pki/ca.crt"
+2026-07-16T11:02:22.372046551Z stderr F I0716 11:02:22.371960       1 dynamic_serving_content.go:135] "Starting controller" name="serving-cert::/etc/kubernetes/pki/apiserver.crt::/etc/kubernetes/pki/apiserver.key"
+2026-07-16T11:02:22.372208754Z stderr F I0716 11:02:22.372104       1 secure_serving.go:213] Serving securely on [::]:6443
+2026-07-16T11:02:22.372215106Z stderr F I0716 11:02:22.372165       1 tlsconfig.go:243] "Starting DynamicServingCertificateController"
+2026-07-16T11:02:22.372497985Z stderr F I0716 11:02:22.372422       1 controller.go:119] Starting legacy_token_tracking_controller
+2026-07-16T11:02:22.372506661Z stderr F I0716 11:02:22.372439       1 shared_informer.go:313] Waiting for caches to sync for configmaps
+2026-07-16T11:02:22.372990425Z stderr F I0716 11:02:22.372892       1 controller.go:80] Starting OpenAPI V3 AggregationController
+2026-07-16T11:02:22.372996316Z stderr F I0716 11:02:22.372931       1 apf_controller.go:377] Starting API Priority and Fairness config controller
+2026-07-16T11:02:22.373018585Z stderr F I0716 11:02:22.372949       1 remote_available_controller.go:411] Starting RemoteAvailability controller
+2026-07-16T11:02:22.373023534Z stderr F I0716 11:02:22.372965       1 cache.go:32] Waiting for caches to sync for RemoteAvailability controller
+2026-07-16T11:02:22.373139793Z stderr F I0716 11:02:22.373086       1 customresource_discovery_controller.go:292] Starting DiscoveryController
+2026-07-16T11:02:22.373190847Z stderr F I0716 11:02:22.373141       1 system_namespaces_controller.go:66] Starting system namespaces controller
+2026-07-16T11:02:22.373549819Z stderr F I0716 11:02:22.373475       1 apiservice_controller.go:100] Starting APIServiceRegistrationController
+2026-07-16T11:02:22.373558836Z stderr F I0716 11:02:22.373488       1 cache.go:32] Waiting for caches to sync for APIServiceRegistrationController controller
+2026-07-16T11:02:22.374338784Z stderr F I0716 11:02:22.374215       1 gc_controller.go:78] Starting apiserver lease garbage collector
+2026-07-16T11:02:22.374463685Z stderr F I0716 11:02:22.374389       1 cluster_authentication_trust_controller.go:462] Starting cluster_authentication_trust_controller controller
+2026-07-16T11:02:22.374475767Z stderr F I0716 11:02:22.374408       1 shared_informer.go:313] Waiting for caches to sync for cluster_authentication_trust_controller
+2026-07-16T11:02:22.37453622Z stderr F I0716 11:02:22.374441       1 local_available_controller.go:156] Starting LocalAvailability controller
+2026-07-16T11:02:22.374542321Z stderr F I0716 11:02:22.374478       1 cache.go:32] Waiting for caches to sync for LocalAvailability controller
+2026-07-16T11:02:22.374545848Z stderr F I0716 11:02:22.374499       1 aggregator.go:169] waiting for initial CRD sync...
+2026-07-16T11:02:22.374550336Z stderr F I0716 11:02:22.374512       1 controller.go:78] Starting OpenAPI AggregationController
+2026-07-16T11:02:22.375001822Z stderr F I0716 11:02:22.374896       1 dynamic_serving_content.go:135] "Starting controller" name="aggregator-proxy-cert::/etc/kubernetes/pki/front-proxy-client.crt::/etc/kubernetes/pki/front-proxy-client.key"
+2026-07-16T11:02:22.375252671Z stderr F I0716 11:02:22.375171       1 dynamic_cafile_content.go:161] "Starting controller" name="client-ca-bundle::/etc/kubernetes/pki/ca.crt"
+2026-07-16T11:02:22.375308986Z stderr F I0716 11:02:22.375247       1 dynamic_cafile_content.go:161] "Starting controller" name="request-header::/etc/kubernetes/pki/front-proxy-ca.crt"
+2026-07-16T11:02:22.375637097Z stderr F I0716 11:02:22.375533       1 crdregistration_controller.go:114] Starting crd-autoregister controller
+2026-07-16T11:02:22.375647236Z stderr F I0716 11:02:22.375551       1 shared_informer.go:313] Waiting for caches to sync for crd-autoregister
+2026-07-16T11:02:22.376036183Z stderr F I0716 11:02:22.375894       1 controller.go:142] Starting OpenAPI controller
+2026-07-16T11:02:22.376042504Z stderr F I0716 11:02:22.375925       1 controller.go:90] Starting OpenAPI V3 controller
+2026-07-16T11:02:22.376046422Z stderr F I0716 11:02:22.375941       1 naming_controller.go:294] Starting NamingConditionController
+2026-07-16T11:02:22.376049858Z stderr F I0716 11:02:22.375955       1 establishing_controller.go:81] Starting EstablishingController
+2026-07-16T11:02:22.37606153Z stderr F I0716 11:02:22.375970       1 nonstructuralschema_controller.go:195] Starting NonStructuralSchemaConditionController
+2026-07-16T11:02:22.376075536Z stderr F I0716 11:02:22.375989       1 apiapproval_controller.go:189] Starting KubernetesAPIApprovalPolicyConformantConditionController
+2026-07-16T11:02:22.376079664Z stderr F I0716 11:02:22.376001       1 crd_finalizer.go:269] Starting CRDFinalizer
+2026-07-16T11:02:22.449081573Z stderr F I0716 11:02:22.448894       1 shared_informer.go:320] Caches are synced for node_authorizer
+2026-07-16T11:02:22.458749414Z stderr F I0716 11:02:22.458667       1 shared_informer.go:320] Caches are synced for *generic.policySource[*k8s.io/api/admissionregistration/v1.ValidatingAdmissionPolicy,*k8s.io/api/admissionregistration/v1.ValidatingAdmissionPolicyBinding,k8s.io/apiserver/pkg/admission/plugin/policy/validating.Validator]
+2026-07-16T11:02:22.458761547Z stderr F I0716 11:02:22.458692       1 policy_source.go:240] refreshing policies
+2026-07-16T11:02:22.473099384Z stderr F I0716 11:02:22.473008       1 cache.go:39] Caches are synced for RemoteAvailability controller
+2026-07-16T11:02:22.473111046Z stderr F I0716 11:02:22.473032       1 shared_informer.go:320] Caches are synced for configmaps
+2026-07-16T11:02:22.473115334Z stderr F I0716 11:02:22.473050       1 apf_controller.go:382] Running API Priority and Fairness config worker
+2026-07-16T11:02:22.473119481Z stderr F I0716 11:02:22.473060       1 apf_controller.go:385] Running API Priority and Fairness periodic rebalancing process
+2026-07-16T11:02:22.47365944Z stderr F I0716 11:02:22.473516       1 cache.go:39] Caches are synced for APIServiceRegistrationController controller
+2026-07-16T11:02:22.4736703Z stderr F I0716 11:02:22.473596       1 handler_discovery.go:451] Starting ResourceDiscoveryManager
+2026-07-16T11:02:22.475744879Z stderr F I0716 11:02:22.474457       1 shared_informer.go:320] Caches are synced for cluster_authentication_trust_controller
+2026-07-16T11:02:22.47575601Z stderr F I0716 11:02:22.474594       1 controller.go:615] quota admission added evaluator for: namespaces
+2026-07-16T11:02:22.475760058Z stderr F I0716 11:02:22.474727       1 cache.go:39] Caches are synced for LocalAvailability controller
+2026-07-16T11:02:22.4761054Z stderr F I0716 11:02:22.475573       1 shared_informer.go:320] Caches are synced for crd-autoregister
+2026-07-16T11:02:22.476114698Z stderr F I0716 11:02:22.475769       1 aggregator.go:171] initial CRD sync complete...
+2026-07-16T11:02:22.476118845Z stderr F I0716 11:02:22.475778       1 autoregister_controller.go:144] Starting autoregister controller
+2026-07-16T11:02:22.476122482Z stderr F I0716 11:02:22.475784       1 cache.go:32] Waiting for caches to sync for autoregister controller
+2026-07-16T11:02:22.476125809Z stderr F I0716 11:02:22.475790       1 cache.go:39] Caches are synced for autoregister controller
+2026-07-16T11:02:22.487513995Z stderr F I0716 11:02:22.487125       1 controller.go:615] quota admission added evaluator for: leases.coordination.k8s.io
+2026-07-16T11:02:23.378483851Z stderr F I0716 11:02:23.378310       1 storage_scheduling.go:95] created PriorityClass system-node-critical with value 2000001000
+2026-07-16T11:02:23.381580288Z stderr F I0716 11:02:23.381387       1 storage_scheduling.go:95] created PriorityClass system-cluster-critical with value 2000000000
+2026-07-16T11:02:23.381595837Z stderr F I0716 11:02:23.381405       1 storage_scheduling.go:111] all system priority classes are created successfully or already exist.
+2026-07-16T11:02:23.692871272Z stderr F I0716 11:02:23.692715       1 controller.go:615] quota admission added evaluator for: roles.rbac.authorization.k8s.io
+2026-07-16T11:02:23.72014681Z stderr F I0716 11:02:23.719880       1 controller.go:615] quota admission added evaluator for: rolebindings.rbac.authorization.k8s.io
+2026-07-16T11:02:23.780479358Z stderr F I0716 11:02:23.780262       1 alloc.go:330] "allocated clusterIPs" service="default/kubernetes" clusterIPs={"IPv4":"10.96.0.1"}
+2026-07-16T11:02:23.784922559Z stderr F W0716 11:02:23.784809       1 lease.go:265] Resetting endpoints for master service "kubernetes" to [172.18.0.2]
+2026-07-16T11:02:23.785879907Z stderr F I0716 11:02:23.785777       1 controller.go:615] quota admission added evaluator for: endpoints
+2026-07-16T11:02:23.789203264Z stderr F I0716 11:02:23.789095       1 controller.go:615] quota admission added evaluator for: endpointslices.discovery.k8s.io
+2026-07-16T11:02:24.957981947Z stderr F I0716 11:02:24.957836       1 controller.go:615] quota admission added evaluator for: serviceaccounts
+2026-07-16T11:02:24.966178808Z stderr F I0716 11:02:24.965999       1 controller.go:615] quota admission added evaluator for: deployments.apps
+2026-07-16T11:02:24.976219109Z stderr F I0716 11:02:24.976076       1 alloc.go:330] "allocated clusterIPs" service="kube-system/kube-dns" clusterIPs={"IPv4":"10.96.0.10"}
+2026-07-16T11:02:24.990281187Z stderr F I0716 11:02:24.990178       1 controller.go:615] quota admission added evaluator for: daemonsets.apps
+2026-07-16T11:02:31.747259134Z stderr F I0716 11:02:31.747042       1 controller.go:615] quota admission added evaluator for: controllerrevisions.apps
+2026-07-16T11:02:31.8024853Z stderr F I0716 11:02:31.802354       1 controller.go:615] quota admission added evaluator for: replicasets.apps
+2026-07-16T11:03:20.88783424Z stderr F I0716 11:03:20.887631       1 handler.go:286] Adding GroupVersion frrk8s.metallb.io v1beta1 to ResourceManager
+2026-07-16T11:03:20.925616937Z stderr F I0716 11:03:20.924876       1 handler.go:286] Adding GroupVersion frrk8s.metallb.io v1beta1 to ResourceManager
+2026-07-16T11:03:20.930796804Z stderr F I0716 11:03:20.930646       1 handler.go:286] Adding GroupVersion frrk8s.metallb.io v1beta1 to ResourceManager
+2026-07-16T11:03:20.971366319Z stderr F I0716 11:03:20.971227       1 alloc.go:330] "allocated clusterIPs" service="frr-k8s-system/frr-k8s-metrics-service" clusterIPs={"IPv4":"10.96.186.145"}
+2026-07-16T11:03:20.985093723Z stderr F I0716 11:03:20.984943       1 alloc.go:330] "allocated clusterIPs" service="frr-k8s-system/frr-k8s-webhook-service" clusterIPs={"IPv4":"10.96.218.206"}
+2026-07-16T11:03:21.611422579Z stderr F I0716 11:03:21.609572       1 handler.go:286] Adding GroupVersion k8s.cni.cncf.io v1 to ResourceManager
+2026-07-16T11:05:50.1241339Z stderr F I0716 11:05:50.123401       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:50.144713024Z stderr F I0716 11:05:50.144579       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:50.149744033Z stderr F I0716 11:05:50.149641       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:50.158183301Z stderr F I0716 11:05:50.158039       1 alloc.go:330] "allocated clusterIPs" service="openperouter-system/openpe-webhook-service" clusterIPs={"IPv4":"10.96.131.222"}
+2026-07-16T11:05:50.175712798Z stderr F I0716 11:05:50.175548       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:50.190238995Z stderr F I0716 11:05:50.190074       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:50.208934812Z stderr F I0716 11:05:50.208794       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:50.223931738Z stderr F I0716 11:05:50.223808       1 handler.go:286] Adding GroupVersion openpe.openperouter.github.io v1alpha1 to ResourceManager
+2026-07-16T11:05:52.283251473Z stderr F I0716 11:05:52.282973       1 controller.go:615] quota admission added evaluator for: routernodeconfigurationstatuses.openpe.openperouter.github.io
+2026-07-16T11:07:35.960382044Z stderr F I0716 11:07:35.960272       1 controller.go:615] quota admission added evaluator for: underlays.openpe.openperouter.github.io
+2026-07-16T11:07:43.747912154Z stderr F I0716 11:07:43.747781       1 controller.go:615] quota admission added evaluator for: l3vnis.openpe.openperouter.github.io
+2026-07-16T11:07:43.850481148Z stderr F I0716 11:07:43.849906       1 controller.go:615] quota admission added evaluator for: frrconfigurations.frrk8s.metallb.io
+2026-07-16T11:07:57.843338524Z stderr F E0716 11:07:57.843168       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:34402->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:08:00.471849419Z stderr F E0716 11:08:00.471524       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:34416->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:08:05.857596675Z stderr F E0716 11:08:05.857418       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:47268->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:08:06.882714382Z stderr F I0716 11:08:06.882153       1 controller.go:615] quota admission added evaluator for: bgpsessionstates.frrk8s.metallb.io
+2026-07-16T11:08:16.742087087Z stderr F E0716 11:08:16.740071       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:50864->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:08:18.081479157Z stderr F E0716 11:08:18.081015       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:50876->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:08:30.085627206Z stderr F E0716 11:08:30.085210       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:56624->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:08:48.898759366Z stderr F E0716 11:08:48.897677       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:45654->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:08:55.68948517Z stderr F E0716 11:08:55.687982       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40542->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:08:57.041107719Z stderr F E0716 11:08:57.037287       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40552->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:09:06.339533976Z stderr F E0716 11:09:06.339325       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42314->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:09:30.938927779Z stderr F E0716 11:09:30.938810       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:46366->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:10:04.018056996Z stderr F E0716 11:10:04.017027       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:46556->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:10:06.691647536Z stderr F E0716 11:10:06.690949       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:46588->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:10:09.390349871Z stderr F E0716 11:10:09.390220       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:46598->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:11:46.233225314Z stderr F E0716 11:11:46.232623       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:54524->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:12:11.677609436Z stderr F E0716 11:12:11.674861       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:55682->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:12:44.306289092Z stderr F E0716 11:12:44.306109       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52718->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:12:44.445258473Z stderr F E0716 11:12:44.445070       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52724->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:12:45.008970115Z stderr F E0716 11:12:45.008717       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52748->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:12:45.150535085Z stderr F E0716 11:12:45.150258       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52754->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:12:46.230841809Z stderr F E0716 11:12:46.230725       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52824->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:12:48.305866044Z stderr F E0716 11:12:48.305294       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52944->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:12:50.285893158Z stderr F E0716 11:12:50.285756       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:35540->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:13:44.966554347Z stderr F E0716 11:13:44.966430       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:33880->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:14:20.594425717Z stderr F E0716 11:14:20.589181       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:33828->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:14:24.637313072Z stderr F E0716 11:14:24.635869       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:59124->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:14:34.161508326Z stderr F E0716 11:14:34.161280       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60506->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:15:01.221013632Z stderr F E0716 11:15:01.220675       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60076->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:15:03.944424786Z stderr F E0716 11:15:03.944310       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:43298->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:16:27.062295306Z stderr F E0716 11:16:27.062159       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:55448->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:16:37.950226619Z stderr F E0716 11:16:37.950108       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52998->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:03.570819923Z stderr F E0716 11:17:03.570672       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:48184->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:14.407684731Z stderr F E0716 11:17:14.407156       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:49084->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:15.787930042Z stderr F E0716 11:17:15.787832       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:49100->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:19.894456999Z stderr F E0716 11:17:19.894225       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:49112->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:26.792767814Z stderr F E0716 11:17:26.791081       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:41950->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:29.451641073Z stderr F E0716 11:17:29.451271       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:41976->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:17:39.038288701Z stderr F E0716 11:17:39.037754       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40164->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:02.054696571Z stderr F E0716 11:18:02.053913       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:54286->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:08.752233366Z stderr F E0716 11:18:08.752016       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42236->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:18:25.159548692Z stderr F E0716 11:18:25.159191       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:39560->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:33.324547687Z stderr F E0716 11:18:33.322344       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:38128->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:18:34.654853865Z stderr F E0716 11:18:34.654615       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:38166->172.18.0.2:10250: write: connection reset by peer
+2026-07-16T11:18:39.494163339Z stderr F E0716 11:18:39.493991       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:38380->172.18.0.2:10250: write: connection reset by peer
+2026-07-16T11:18:40.386431303Z stderr F E0716 11:18:40.386200       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:38402->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:18:42.890368471Z stderr F E0716 11:18:42.889040       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42186->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:44.430365327Z stderr F E0716 11:18:44.429743       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42230->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:44.669533472Z stderr F E0716 11:18:44.665971       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42246->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:47.645016769Z stderr F E0716 11:18:47.644742       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42358->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:47.917331725Z stderr F E0716 11:18:47.915831       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42368->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:50.767026895Z stderr F E0716 11:18:50.766661       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42444->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:52.615984295Z stderr F E0716 11:18:52.613442       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:57828->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:52.956535339Z stderr F E0716 11:18:52.956439       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:57842->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:18:54.355525038Z stderr F E0716 11:18:54.355138       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:57876->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:55.248064355Z stderr F E0716 11:18:55.247846       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:57902->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:18:57.51003362Z stderr F E0716 11:18:57.509194       1 upgradeaware.go:441] Error proxying data from backend to client: read tcp 172.18.0.2:57954->172.18.0.3:10250: read: connection reset by peer
+2026-07-16T11:19:05.678086078Z stderr F E0716 11:19:05.674144       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:56964->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:19:07.784901306Z stderr F E0716 11:19:07.784688       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:57020->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:04.482593996Z stderr F E0716 11:20:04.481894       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:58544->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:12.109194986Z stderr F E0716 11:20:12.108800       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:58586->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:15.985699821Z stderr F E0716 11:20:15.983604       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60762->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:17.250340828Z stderr F E0716 11:20:17.249836       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60768->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:24.895466127Z stderr F E0716 11:20:24.895302       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:35562->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:31.335235381Z stderr F E0716 11:20:31.332619       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:35622->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:45.268216683Z stderr F E0716 11:20:45.266653       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:59366->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:20:56.646999508Z stderr F E0716 11:20:56.646902       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:36484->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:21:00.478600752Z stderr F E0716 11:21:00.477046       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:36522->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:21:06.829056307Z stderr F E0716 11:21:06.828857       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:51844->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:21:08.120796019Z stderr F E0716 11:21:08.120649       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:51854->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:21:45.289725387Z stderr F E0716 11:21:45.289184       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:35896->172.18.0.2:10250: write: connection reset by peer
+2026-07-16T11:21:55.667196929Z stderr F E0716 11:21:55.663509       1 upgradeaware.go:441] Error proxying data from backend to client: write tcp 172.18.0.2:6443->172.18.0.1:47684: write: broken pipe
+2026-07-16T11:21:55.667214192Z stderr F E0716 11:21:55.664136       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40268->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:21:58.216336755Z stderr F E0716 11:21:58.216101       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40280->172.18.0.2:10250: write: connection reset by peer
+2026-07-16T11:21:59.48337505Z stderr F E0716 11:21:59.482453       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40284->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:02.041701823Z stderr F E0716 11:22:02.041609       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:40304->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:13.471053641Z stderr F E0716 11:22:13.470628       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:33404->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:22.397107247Z stderr F E0716 11:22:22.396589       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60178->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:31.388044736Z stderr F E0716 11:22:31.385638       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60258->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:42.955619538Z stderr F E0716 11:22:42.954087       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52242->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:51.957529495Z stderr F E0716 11:22:51.957387       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:52312->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:22:56.802538911Z stderr F E0716 11:22:56.802144       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:42864->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:23:01.677874483Z stderr F E0716 11:23:01.677787       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:43042->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:23:07.226549017Z stderr F E0716 11:23:07.225732       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:34920->172.18.0.3:10250: write: connection reset by peer
+2026-07-16T11:23:07.899669942Z stderr F E0716 11:23:07.898365       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:34932->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:23:08.70051219Z stderr F E0716 11:23:08.698400       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:34946->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:23:08.985783215Z stderr F E0716 11:23:08.985112       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:34956->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:23:19.431438273Z stderr F E0716 11:23:19.430679       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:55400->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:23:19.878523858Z stderr F E0716 11:23:19.877609       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:43946->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:23:26.455562993Z stderr F E0716 11:23:26.451743       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:51170->172.18.0.2:10250: write: broken pipe
+2026-07-16T11:25:59.866604639Z stderr F I0716 11:25:59.866070       1 controller.go:615] quota admission added evaluator for: l3passthroughs.openpe.openperouter.github.io
+2026-07-16T11:26:26.966489843Z stderr F E0716 11:26:26.965663       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:60614->172.18.0.3:10250: write: broken pipe
+2026-07-16T11:26:59.372998372Z stderr F E0716 11:26:59.372741       1 upgradeaware.go:427] Error proxying data from client to backend: write tcp 172.18.0.2:41660->172.18.0.3:10250: write: broken pipe

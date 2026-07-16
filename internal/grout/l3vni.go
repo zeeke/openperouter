@@ -39,7 +39,17 @@ func SetupL3VNI(ctx context.Context, client *Client, params hostnetwork.L3VNIPar
 		}
 	}()
 
-	if err := ensureTapPortInHostNamespace(ctx, client, linkPair.NamespaceSide, linkPair.HostSide, params.VRF, ns); err != nil {
+	if err := ensureTapPort(ctx, client, linkPair.NamespaceSide, linkPair.HostSide, params.VRF); err != nil {
+		return err
+	}
+
+	// Assign IPs to the grout port while the TAP is still in the grout
+	// namespace — once the TAP is moved, grout considers the port disconnected.
+	if err := ensurePortAddresses(ctx, client, linkPair.NamespaceSide, params.LinkIPs.NSIPv4, params.LinkIPs.NSIPv6); err != nil {
+		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
+	}
+
+	if err := moveTapToHostNamespace(ctx, linkPair.HostSide, ns); err != nil {
 		return err
 	}
 
@@ -57,10 +67,6 @@ func SetupL3VNI(ctx context.Context, client *Client, params hostnetwork.L3VNIPar
 	}
 	if err := hostnetwork.SetVethMTUForTunnelOverhead(hostTap, underlayMTU, hostnetwork.VXLanOverhead); err != nil {
 		return fmt.Errorf("failed to set MTU on host TAP %s: %w", linkPair.HostSide, err)
-	}
-
-	if err := ensurePortAddresses(ctx, client, linkPair.NamespaceSide, params.LinkIPs.NSIPv4, params.LinkIPs.NSIPv6); err != nil {
-		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
 	}
 
 	return nil

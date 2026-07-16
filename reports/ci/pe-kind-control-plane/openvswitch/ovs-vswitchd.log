@@ -1,0 +1,18 @@
+2026-07-16T11:02:11.868Z|00001|vlog|INFO|opened log file /var/log/openvswitch/ovs-vswitchd.log
+2026-07-16T11:02:11.872Z|00002|ovs_numa|INFO|Discovered 4 CPU cores on NUMA node 0
+2026-07-16T11:02:11.872Z|00003|ovs_numa|INFO|Discovered 1 NUMA nodes and 4 CPU cores
+2026-07-16T11:02:11.872Z|00004|reconnect|INFO|unix:/var/run/openvswitch/db.sock: connecting...
+2026-07-16T11:02:11.872Z|00005|reconnect|INFO|unix:/var/run/openvswitch/db.sock: connected
+2026-07-16T11:02:11.893Z|00006|bridge|INFO|ovs-vswitchd (Open vSwitch) 3.1.0
+2026-07-16T11:02:24.128Z|00007|memory|INFO|18532 kB peak resident set size after 12.3 seconds
+2026-07-16T11:02:24.128Z|00008|memory|INFO|idl-cells-Open_vSwitch:17
+2026-07-16T11:07:45.151Z|00009|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:08:26.371Z|00010|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:11:01.096Z|00011|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:12:03.744Z|00012|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:14:14.548Z|00013|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:18:31.417Z|00014|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:18:34.593Z|00015|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:19:28.552Z|00016|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device
+2026-07-16T11:20:15.474Z|00017|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-200 device failed: No such device
+2026-07-16T11:22:53.281Z|00018|netdev_linux|INFO|ioctl(SIOCGIFHWADDR) on host-100 device failed: No such device

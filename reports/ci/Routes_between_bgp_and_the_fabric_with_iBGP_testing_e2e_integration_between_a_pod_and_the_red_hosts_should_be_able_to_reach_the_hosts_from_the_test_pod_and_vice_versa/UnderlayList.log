@@ -1,0 +1,74 @@
+{
+    "metadata": {
+        "resourceVersion": "3414"
+    },
+    "items": [
+        {
+            "kind": "Underlay",
+            "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+            "metadata": {
+                "name": "underlay",
+                "namespace": "openperouter-system",
+                "uid": "f1f9d236-20aa-44f5-a6ca-68a8bbb840a2",
+                "resourceVersion": "2259",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:13:22Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+                        "time": "2026-07-16T11:13:22Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:asn": {},
+                                "f:interfaces": {},
+                                "f:neighbors": {},
+                                "f:routeridcidr": {},
+                                "f:tunnelEndpoint": {
+                                    ".": {},
+                                    "f:cidrs": {}
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "asn": 64512,
+                "routeridcidr": "10.0.0.0/24",
+                "neighbors": [
+                    {
+                        "type": "internal",
+                        "address": "192.168.11.2"
+                    },
+                    {
+                        "type": "internal",
+                        "address": "192.168.12.2"
+                    }
+                ],
+                "interfaces": [
+                    {
+                        "type": "NetworkDevice",
+                        "networkDevice": {
+                            "interfaceName": "toswitch1"
+                        }
+                    },
+                    {
+                        "type": "NetworkDevice",
+                        "networkDevice": {
+                            "interfaceName": "toswitch2"
+                        }
+                    }
+                ],
+                "tunnelEndpoint": {
+                    "cidrs": [
+                        "100.65.0.0/24"
+                    ]
+                }
+            }
+        }
+    ]
+}

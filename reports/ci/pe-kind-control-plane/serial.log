@@ -1,0 +1,137 @@
+INFO: ensuring we can execute mount/umount even with userns-remap
+INFO: remounting /sys read-only
+INFO: making mounts shared
+INFO: detected cgroup v2
+INFO: clearing and regenerating /etc/machine-id
+Initializing machine ID from D-Bus machine ID.
+INFO: faking /sys/class/dmi/id/product_name to be "kind"
+INFO: faking /sys/class/dmi/id/product_uuid to be random
+INFO: faking /sys/devices/virtual/dmi/id/product_uuid as well
+INFO: setting iptables to detected mode: nft
+INFO: detected IPv4 address: 172.18.0.2
+INFO: detected IPv6 address: fc00:f853:ccd:e793::2
+INFO: starting init
+[18t7[32766;32766H[6n8[!p]104\[0m[?7h[1G[0Jsystemd 261.1-3 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +IPE +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF -XKBCOMMON -UTMP +LIBARCHIVE)
+Detected virtualization docker.
+Detected architecture x86-64.
+
+[0;1;39mWelcome to [0m[1mDebian GNU/Linux forky/sid[0m[0;1;39m![0m
+
+]3008;start=748d092f275c4d4c9893414a893737da;user=root;hostname=pe-kind-control-plane;machineid=6da98d3b55874abeb0eba1b99979766f;bootid=f796fecf81e844e8a37e27e9f807ad4b;pid=1;comm=systemd;type=boot\/etc/systemd/system/kubelet.service:19: Support for option CPUAccounting= has been removed and it is ignored
+/etc/systemd/system/kubelet.slice:7: Support for option CPUAccounting= has been removed and it is ignored
+Queued start job for default target graphical.target.
+[[0;32m  OK  [0m] Created slice [0;1;39mkubelet.slice[0m - slice used to run Kubernetes / Kubelet.
+[[0;32m  OK  [0m] Created slice [0;1;39msystem-getty.slice[0m - Slice /system/getty.
+[[0;32m  OK  [0m] Created slice [0;1;39msystem-modprobe.slice[0m - Slice /system/modprobe.
+[[0;32m  OK  [0m] Created slice [0;1;39muser.slice[0m - User and Session Slice.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-ask-password-conso…[0mequests to Console Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-ask-password-wall.…[0md Requests to Wall Directory Watch.
+[[0;32m  OK  [0m] Set up automount [0;1;39mproc-sys-fs-binfm…[0mormats File System Automount Point.
+[[0;32m  OK  [0m] Reached target [0;1;39mimports.target[0m - Image Downloads.
+[[0;32m  OK  [0m] Reached target [0;1;39mintegritysetup.targ…[0m Local Integrity Protected Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mnetwork-online.target[0m - Network is Online.
+[[0;32m  OK  [0m] Reached target [0;1;39mslices.target[0m - Slice Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mswap.target[0m - Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mveritysetup.target[0m - Local Verity Protected Volumes.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-ask-password.…[0m User Interactively for a Password.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-creds.socket[0m - Credential Encryption/Decryption.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-factory-reset.socket[0m - Factory Reset Management.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-hostnamed.socket[0m - Hostname Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-journald-dev-…socket[0m - Journal Socket (/dev/log).
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-journald.socket[0m - Journal Sockets.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-mute-console.…[0mnsole Output Muting Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-userdbd.socket[0m - User Database Manager Socket.
+         Mounting [0;1;39mdev-hugepages.mount[0m - Huge Pages File System...
+         Mounting [0;1;39msys-kernel-debug.mount[0m - Kernel Debug File System...
+         Mounting [0;1;39msys-kernel-tracing.mount[0m - Kernel Trace File System...
+         Starting [0;1;39mkmod-static-nodes.service[0m…eate List of Static Device Nodes...
+         Mounting [0;1;39msys-kernel-config.mount[0m - Kernel Configuration File System...
+         Mounting [0;1;39msys-fs-fuse-connections.mount[0m - FUSE Control File System...
+         Starting [0;1;39msystemd-journald.service[0m - Journal Service...
+         Starting [0;1;39msystemd-modules-load.service[0m - Load Kernel Modules...
+         Starting [0;1;39msystemd-remount-fs.servic…[0munt Root and Kernel File Systems...
+[[0;32m  OK  [0m] Reached target [0;1;39mcryptsetup.target[0m - Local Encrypted Volumes.
+         Starting [0;1;39msystemd-udev-load-credent…[0mLoad udev Rules from Credentials...
+[[0;32m  OK  [0m] Mounted [0;1;39mdev-hugepages.mount[0m - Huge Pages File System.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-kernel-debug.mount[0m - Kernel Debug File System.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-kernel-tracing.mount[0m - Kernel Trace File System.
+[[0;32m  OK  [0m] Finished [0;1;39mkmod-static-nodes.service[0m…Create List of Static Device Nodes.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-kernel-config.mount[0m - Kernel Configuration File System.
+[[0;32m  OK  [0m] Mounted [0;1;39msys-fs-fuse-connections.mount[0m - FUSE Control File System.
+         Starting [0;1;39msystemd-tmpfiles-setup-de…[0m Device Nodes in /dev gracefully...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-modules-load.service[0m - Load Kernel Modules.
+         Starting [0;1;39msystemd-sysctl.service[0m - Apply Kernel Variables...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-udev-load-credent…[0m- Load udev Rules from Credentials.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-remount-fs.servic…[0mmount Root and Kernel File Systems.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-sysctl.service[0m - Apply Kernel Variables.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup-de…[0mic Device Nodes in /dev gracefully.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-journald.service[0m - Journal Service.
+         Starting [0;1;39msystemd-journal-flush.ser…[0msh Journal to Persistent Storage...
+         Starting [0;1;39msystemd-sysusers.service[0m - Create System Users...
+         Starting [0;1;39msystemd-userdbd.service[0m - User Database Manager...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-journal-flush.ser…[0mlush Journal to Persistent Storage.
+         Mounting [0;1;39mproc-sys-fs-binfmt_misc.m…[0mcutable File Formats File System...
+[[0;32m  OK  [0m] Mounted [0;1;39mproc-sys-fs-binfmt_misc.mo…[0mxecutable File Formats File System.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-userdbd.service[0m - User Database Manager.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-sysusers.service[0m - Create System Users.
+         Starting [0;1;39msystemd-journalctl.socket[0m - Journal Log Access Socket...
+         Starting [0;1;39msystemd-tmpfiles-setup-de…[0meate Static Device Nodes in /dev...
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-journalctl.socket[0m - Journal Log Access Socket.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup-de…[0mCreate Static Device Nodes in /dev.
+[[0;32m  OK  [0m] Reached target [0;1;39mlocal-fs-pre.target[0m…Preparation for Local File Systems.
+[[0;32m  OK  [0m] Reached target [0;1;39mlocal-fs.target[0m - Local File Systems.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-sysext.socket[0m… System Extension Image Management.
+         Starting [0;1;39movsdb-server.service[0m - Open vSwitch Database Unit...
+         Starting [0;1;39msystemd-tmpfiles-setup.se…[0mate System Files and Directories...
+         Starting [0;1;39msystemd-userdb-load-crede…[0mr/group Records from Credentials...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-userdb-load-crede…[0mser/group Records from Credentials.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-setup.se…[0mreate System Files and Directories.
+         Starting [0;1;39mldconfig.service[0m - Rebuild Dynamic Linker Cache...
+         Starting [0;1;39msystemd-journal-catalog-u…ervice[0m - Rebuild Journal Catalog...
+[[0;32m  OK  [0m] Finished [0;1;39mldconfig.service[0m - Rebuild Dynamic Linker Cache.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-journal-catalog-u….service[0m - Rebuild Journal Catalog.
+         Starting [0;1;39msystemd-update-done.service[0m - Update is Completed...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-update-done.service[0m - Update is Completed.
+[[0;32m  OK  [0m] Reached target [0;1;39msysinit.target[0m - System Initialization.
+[[0;32m  OK  [0m] Started [0;1;39mtpm-udev.path[0m - Handle dynamically added tpm devices.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-tmpfiles-clean.tim…[0my Cleanup of Temporary Directories.
+[[0;32m  OK  [0m] Reached target [0;1;39mpaths.target[0m - Path Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mtimers.target[0m - Timer Units.
+[[0;32m  OK  [0m] Listening on [0;1;39mdbus.socket[0m - D-Bus System Message Bus Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mnetavark-dhcp-proxy.socket[0m - Netavark DHCP proxy socket.
+[[0;32m  OK  [0m] Listening on [0;1;39msystemd-logind-varlin…[0mer Login Management Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39muuidd.socket[0m - UUID daemon activation socket.
+[[0;32m  OK  [0m] Reached target [0;1;39msockets.target[0m - Socket Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mbasic.target[0m - Basic System.
+         Starting [0;1;39mdbus.service[0m - D-Bus System Message Bus...
+         Starting [0;1;39mnetavark-dhcp-proxy.service[0m - Netavark DHCP proxy service...
+         Starting [0;1;39msystemd-logind.service[0m - User Login Management...
+         Starting [0;1;39msystemd-user-sessions.service[0m - Permit User Sessions...
+         Starting [0;1;39mundo-mount-hacks.service[0m - Undo KIND mount hacks...
+[[0;32m  OK  [0m] Started [0;1;39mnetavark-dhcp-proxy.service[0m - Netavark DHCP proxy service.
+[[0;32m  OK  [0m] Started [0;1;39mtpm-udev.service[0m - Handle dynamically added tpm devices.
+[[0;32m  OK  [0m] Started [0;1;39movsdb-server.service[0m - Open vSwitch Database Unit.
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-user-sessions.service[0m - Permit User Sessions.
+[[0;32m  OK  [0m] Finished [0;1;39mundo-mount-hacks.service[0m - Undo KIND mount hacks.
+[[0;32m  OK  [0m] Started [0;1;39mconsole-getty.service[0m - Console Getty.
+         Starting [0;1;39mcontainerd.service[0m - containerd container runtime...
+[[0;32m  OK  [0m] Started [0;1;39mgetty@tty1.service[0m - Getty on tty1.
+[[0;32m  OK  [0m] Reached target [0;1;39mgetty.target[0m - Login Prompts.
+         Starting [0;1;39movs-vswitchd.service[0m - Open vSwitch Forwarding Unit...
+[[0;32m  OK  [0m] Started [0;1;39mdbus.service[0m - D-Bus System Message Bus.
+[[0;32m  OK  [0m] Started [0;1;39mtpm-udev.service[0m - Handle dynamically added tpm devices.
+[[0;32m  OK  [0m] Started [0;1;39mtpm-udev.service[0m - Handle dynamically added tpm devices.
+[[0;32m  OK  [0m] Started [0;1;39msystemd-logind.service[0m - User Login Management.
+[[0;32m  OK  [0m] Started [0;1;39mtpm-udev.service[0m - Handle dynamically added tpm devices.
+[[0;32m  OK  [0m] Started [0;1;39movs-vswitchd.service[0m - Open vSwitch Forwarding Unit.
+         Starting [0;1;39mopenvswitch-switch.service[0m - Open vSwitch...
+         Starting [0;1;39movs-record-hostname.service[0m - Open vSwitch Record Hostname...
+[[0;32m  OK  [0m] Started [0;1;39mcontainerd.service[0m - containerd container runtime.
+[[0;32m  OK  [0m] Finished [0;1;39mopenvswitch-switch.service[0m - Open vSwitch.
+[[0;32m  OK  [0m] Reached target [0;1;39mmulti-user.target[0m - Multi-User System.
+[[0;32m  OK  [0m] Reached target [0;1;39mgraphical.target[0m - Graphical Interface.
+[[0;32m  OK  [0m] Started [0;1;39mtpm-udev.service[0m - Handle dynamically added tpm devices.
+[[0;32m  OK  [0m] Finished [0;1;39movs-record-hostname.service[0m - Open vSwitch Record Hostname.
+[!p]104\[0m[?7h[1G[0J7[32766;32766H[6n8[!p]104\[0m[?7h[1G[0J7[32766;32766H[6n8]3008;start=f41513a77dd74428a10bec10dd879628;user=root;hostname=pe-kind-control-plane;machineid=6da98d3b55874abeb0eba1b99979766f;bootid=f796fecf81e844e8a37e27e9f807ad4b;pid=209;comm=(agetty);servicename=console-getty.service;invocationid=7af00faa76184749ba6226b697e627c0;type=service\
+Debian GNU/Linux forky/sid pe-kind-control-plane console
+

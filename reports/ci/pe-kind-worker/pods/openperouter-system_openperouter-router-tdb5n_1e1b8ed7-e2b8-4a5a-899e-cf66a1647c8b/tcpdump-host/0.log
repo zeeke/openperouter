@@ -1,0 +1,108 @@
+2026-07-16T11:05:58.170868318Z stdout F CentOS Stream 10 - BaseOS                       2.0 MB/s | 7.0 MB     00:03    
+2026-07-16T11:06:00.682587763Z stdout F CentOS Stream 10 - AppStream                    3.6 MB/s | 3.6 MB     00:00    
+2026-07-16T11:06:02.863099882Z stdout F CentOS Stream 10 - Extras packages              9.3 kB/s |  10 kB     00:01    
+2026-07-16T11:06:03.468526402Z stdout F Dependencies resolved.
+2026-07-16T11:06:03.468587897Z stdout F ================================================================================
+2026-07-16T11:06:03.468608346Z stdout F  Package          Architecture Version                    Repository       Size
+2026-07-16T11:06:03.468611431Z stdout F ================================================================================
+2026-07-16T11:06:03.468614237Z stdout F Installing:
+2026-07-16T11:06:03.468617052Z stdout F  tcpdump          x86_64       14:4.99.4-10.el10          appstream       503 k
+2026-07-16T11:06:03.468620338Z stdout F Installing dependencies:
+2026-07-16T11:06:03.468623323Z stdout F  libibverbs       x86_64       62.0-2.el10                baseos          484 k
+2026-07-16T11:06:03.468626129Z stdout F  libnl3           x86_64       3.11.0-1.el10              baseos          361 k
+2026-07-16T11:06:03.468628924Z stdout F  libpcap          x86_64       14:1.10.4-7.el10           baseos          175 k
+2026-07-16T11:06:03.468631529Z stdout F 
+2026-07-16T11:06:03.468634304Z stdout F Transaction Summary
+2026-07-16T11:06:03.468637219Z stdout F ================================================================================
+2026-07-16T11:06:03.468639985Z stdout F Install  4 Packages
+2026-07-16T11:06:03.468642499Z stdout F 
+2026-07-16T11:06:03.469049539Z stdout F Total download size: 1.5 M
+2026-07-16T11:06:03.470151528Z stdout F Installed size: 3.9 M
+2026-07-16T11:06:03.470159212Z stdout F Downloading Packages:
+2026-07-16T11:06:04.903850498Z stdout F (1/4): libpcap-1.10.4-7.el10.x86_64.rpm         246 kB/s | 175 kB     00:00    
+2026-07-16T11:06:04.955370379Z stdout F (2/4): libnl3-3.11.0-1.el10.x86_64.rpm          475 kB/s | 361 kB     00:00    
+2026-07-16T11:06:04.972683548Z stdout F (3/4): libibverbs-62.0-2.el10.x86_64.rpm        621 kB/s | 484 kB     00:00    
+2026-07-16T11:06:05.290115625Z stdout F (4/4): tcpdump-4.99.4-10.el10.x86_64.rpm        1.3 MB/s | 503 kB     00:00    
+2026-07-16T11:06:05.291538242Z stdout F --------------------------------------------------------------------------------
+2026-07-16T11:06:05.292057943Z stdout F Total                                           836 kB/s | 1.5 MB     00:01     
+2026-07-16T11:06:05.302978543Z stdout F CentOS Stream 10 - BaseOS                       1.6 MB/s | 1.6 kB     00:00    
+2026-07-16T11:06:05.305509972Z stderr F Importing GPG key 0x8483C65D:
+2026-07-16T11:06:05.305524058Z stderr F  Userid     : "CentOS (CentOS Official Signing Key) <security@centos.org>"
+2026-07-16T11:06:05.305529308Z stderr F  Fingerprint: 99DB 70FA E1D7 CE22 7FB6 4882 05B5 55B3 8483 C65D
+2026-07-16T11:06:05.305535089Z stderr F  From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial-SHA256
+2026-07-16T11:06:05.323927694Z stdout F Key imported successfully
+2026-07-16T11:06:05.365701097Z stdout F Running transaction check
+2026-07-16T11:06:05.373364895Z stdout F Transaction check succeeded.
+2026-07-16T11:06:05.373415189Z stdout F Running transaction test
+2026-07-16T11:06:05.409811759Z stdout F Transaction test succeeded.
+2026-07-16T11:06:05.410222246Z stdout F Running transaction
+2026-07-16T11:06:05.469078955Z stdout F   Preparing        :                                                        1/1 
+2026-07-16T11:06:05.493098113Z stdout F   Installing       : libnl3-3.11.0-1.el10.x86_64                            1/4 
+2026-07-16T11:06:05.501897418Z stdout F   Installing       : libibverbs-62.0-2.el10.x86_64                          2/4 
+2026-07-16T11:06:05.503860546Z stdout F   Installing       : libpcap-14:1.10.4-7.el10.x86_64                        3/4 
+2026-07-16T11:06:05.528426954Z stdout F   Running scriptlet: tcpdump-14:4.99.4-10.el10.x86_64                       4/4 
+2026-07-16T11:06:05.528486586Z stdout F useradd: Warning: missing or non-executable shell '/usr/sbin/nologin'
+2026-07-16T11:06:05.528493789Z stdout F 
+2026-07-16T11:06:05.549123658Z stdout F   Installing       : tcpdump-14:4.99.4-10.el10.x86_64                       4/4 
+2026-07-16T11:06:05.642313078Z stdout F   Running scriptlet: tcpdump-14:4.99.4-10.el10.x86_64                       4/4 
+2026-07-16T11:06:05.642333295Z stdout F 
+2026-07-16T11:06:05.642338906Z stdout F Installed:
+2026-07-16T11:06:05.642344256Z stdout F   libibverbs-62.0-2.el10.x86_64          libnl3-3.11.0-1.el10.x86_64            
+2026-07-16T11:06:05.642349335Z stdout F   libpcap-14:1.10.4-7.el10.x86_64        tcpdump-14:4.99.4-10.el10.x86_64       
+2026-07-16T11:06:05.642354856Z stdout F 
+2026-07-16T11:06:05.642361328Z stdout F Complete!
+2026-07-16T11:06:05.704815997Z stderr F tcpdump: data link type LINUX_SLL2
+2026-07-16T11:06:05.705012074Z stderr F dropped privs to tcpdump
+2026-07-16T11:06:05.705144751Z stderr F tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+2026-07-16T11:06:05.705162524Z stderr F listening on any, link-type LINUX_SLL2 (Linux cooked v2), snapshot length 262144 bytes
+2026-07-16T11:27:00.097835998Z stdout F 11:27:00.050029 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 80: 10.244.1.5.53034 > 192.168.22.2.8090: Flags [S], seq 2018505379, win 64240, options [mss 1460,sackOK,TS val 1463764342 ecr 0,nop,wscale 7], length 0
+2026-07-16T11:27:00.097859693Z stdout F 11:27:00.050065 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 80: 192.169.10.3.53034 > 192.168.22.2.8090: Flags [S], seq 2018505379, win 64240, options [mss 1460,sackOK,TS val 1463764342 ecr 0,nop,wscale 7], length 0
+2026-07-16T11:27:00.097866015Z stdout F 11:27:00.052062 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 80: 192.168.22.2.8090 > 192.169.10.3.53034: Flags [S.], seq 2191847567, ack 2018505380, win 56688, options [mss 9460,sackOK,TS val 2761123056 ecr 1463764342,nop,wscale 7], length 0
+2026-07-16T11:27:00.097873619Z stdout F 11:27:00.052091 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 80: 192.168.22.2.8090 > 10.244.1.5.53034: Flags [S.], seq 2191847567, ack 2018505380, win 56688, options [mss 9460,sackOK,TS val 2761123056 ecr 1463764342,nop,wscale 7], length 0
+2026-07-16T11:27:00.097878778Z stdout F 11:27:00.052117 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53034 > 192.168.22.2.8090: Flags [.], ack 1, win 502, options [nop,nop,TS val 1463764344 ecr 2761123056], length 0
+2026-07-16T11:27:00.097884369Z stdout F 11:27:00.052125 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53034 > 192.168.22.2.8090: Flags [.], ack 1, win 502, options [nop,nop,TS val 1463764344 ecr 2761123056], length 0
+2026-07-16T11:27:00.09789058Z stdout F 11:27:00.053026 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 161: 10.244.1.5.53034 > 192.168.22.2.8090: Flags [P.], seq 1:90, ack 1, win 502, options [nop,nop,TS val 1463764345 ecr 2761123056], length 89
+2026-07-16T11:27:00.09789566Z stdout F 11:27:00.053038 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 161: 192.169.10.3.53034 > 192.168.22.2.8090: Flags [P.], seq 1:90, ack 1, win 502, options [nop,nop,TS val 1463764345 ecr 2761123056], length 89
+2026-07-16T11:27:00.097900749Z stdout F 11:27:00.053708 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 192.169.10.3.53034: Flags [.], ack 90, win 443, options [nop,nop,TS val 2761123057 ecr 1463764345], length 0
+2026-07-16T11:27:00.097905608Z stdout F 11:27:00.053721 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 10.244.1.5.53034: Flags [.], ack 90, win 443, options [nop,nop,TS val 2761123057 ecr 1463764345], length 0
+2026-07-16T11:27:00.097910377Z stdout F 11:27:00.054941 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 207: 192.168.22.2.8090 > 192.169.10.3.53034: Flags [P.], seq 1:136, ack 90, win 443, options [nop,nop,TS val 2761123058 ecr 1463764345], length 135
+2026-07-16T11:27:00.097924774Z stdout F 11:27:00.054954 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 207: 192.168.22.2.8090 > 10.244.1.5.53034: Flags [P.], seq 1:136, ack 90, win 443, options [nop,nop,TS val 2761123058 ecr 1463764345], length 135
+2026-07-16T11:27:00.097928331Z stdout F 11:27:00.054974 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53034 > 192.168.22.2.8090: Flags [.], ack 136, win 501, options [nop,nop,TS val 1463764347 ecr 2761123058], length 0
+2026-07-16T11:27:00.097931947Z stdout F 11:27:00.054982 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53034 > 192.168.22.2.8090: Flags [.], ack 136, win 501, options [nop,nop,TS val 1463764347 ecr 2761123058], length 0
+2026-07-16T11:27:00.097935584Z stdout F 11:27:00.055205 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53034 > 192.168.22.2.8090: Flags [F.], seq 90, ack 136, win 501, options [nop,nop,TS val 1463764347 ecr 2761123058], length 0
+2026-07-16T11:27:00.097939011Z stdout F 11:27:00.055234 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53034 > 192.168.22.2.8090: Flags [F.], seq 90, ack 136, win 501, options [nop,nop,TS val 1463764347 ecr 2761123058], length 0
+2026-07-16T11:27:00.097942417Z stdout F 11:27:00.060225 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 192.169.10.3.53034: Flags [F.], seq 136, ack 91, win 443, options [nop,nop,TS val 2761123064 ecr 1463764347], length 0
+2026-07-16T11:27:01.120954898Z stdout F 11:27:00.060239 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 10.244.1.5.53034: Flags [F.], seq 136, ack 91, win 443, options [nop,nop,TS val 2761123064 ecr 1463764347], length 0
+2026-07-16T11:27:01.120969976Z stdout F 11:27:00.060261 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53034 > 192.168.22.2.8090: Flags [.], ack 137, win 501, options [nop,nop,TS val 1463764352 ecr 2761123064], length 0
+2026-07-16T11:27:01.120973663Z stdout F 11:27:00.060272 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53034 > 192.168.22.2.8090: Flags [.], ack 137, win 501, options [nop,nop,TS val 1463764352 ecr 2761123064], length 0
+2026-07-16T11:27:01.12097759Z stdout F 11:27:00.283515 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 80: 10.244.1.5.53044 > 192.168.22.2.8090: Flags [S], seq 3237010098, win 64240, options [mss 1460,sackOK,TS val 1463764576 ecr 0,nop,wscale 7], length 0
+2026-07-16T11:27:01.120980936Z stdout F 11:27:00.283559 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 80: 192.169.10.3.53044 > 192.168.22.2.8090: Flags [S], seq 3237010098, win 64240, options [mss 1460,sackOK,TS val 1463764576 ecr 0,nop,wscale 7], length 0
+2026-07-16T11:27:01.120984423Z stdout F 11:27:00.295925 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 80: 192.168.22.2.8090 > 192.169.10.3.53044: Flags [S.], seq 2747241979, ack 3237010099, win 56688, options [mss 9460,sackOK,TS val 2761123299 ecr 1463764576,nop,wscale 7], length 0
+2026-07-16T11:27:01.120987839Z stdout F 11:27:00.295947 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 80: 192.168.22.2.8090 > 10.244.1.5.53044: Flags [S.], seq 2747241979, ack 3237010099, win 56688, options [mss 9460,sackOK,TS val 2761123299 ecr 1463764576,nop,wscale 7], length 0
+2026-07-16T11:27:01.120990975Z stdout F 11:27:00.295981 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53044 > 192.168.22.2.8090: Flags [.], ack 1, win 502, options [nop,nop,TS val 1463764588 ecr 2761123299], length 0
+2026-07-16T11:27:01.121003258Z stdout F 11:27:00.295991 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53044 > 192.168.22.2.8090: Flags [.], ack 1, win 502, options [nop,nop,TS val 1463764588 ecr 2761123299], length 0
+2026-07-16T11:27:01.121006875Z stdout F 11:27:00.298706 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 161: 10.244.1.5.53044 > 192.168.22.2.8090: Flags [P.], seq 1:90, ack 1, win 502, options [nop,nop,TS val 1463764591 ecr 2761123299], length 89
+2026-07-16T11:27:01.121010482Z stdout F 11:27:00.298733 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 161: 192.169.10.3.53044 > 192.168.22.2.8090: Flags [P.], seq 1:90, ack 1, win 502, options [nop,nop,TS val 1463764591 ecr 2761123299], length 89
+2026-07-16T11:27:01.121013808Z stdout F 11:27:00.301941 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 192.169.10.3.53044: Flags [.], ack 90, win 443, options [nop,nop,TS val 2761123304 ecr 1463764591], length 0
+2026-07-16T11:27:01.121017054Z stdout F 11:27:00.301956 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 10.244.1.5.53044: Flags [.], ack 90, win 443, options [nop,nop,TS val 2761123304 ecr 1463764591], length 0
+2026-07-16T11:27:01.12102012Z stdout F 11:27:00.302084 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 202: 192.168.22.2.8090 > 192.169.10.3.53044: Flags [P.], seq 1:131, ack 90, win 443, options [nop,nop,TS val 2761123305 ecr 1463764591], length 130
+2026-07-16T11:27:01.121023496Z stdout F 11:27:00.302095 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 202: 192.168.22.2.8090 > 10.244.1.5.53044: Flags [P.], seq 1:131, ack 90, win 443, options [nop,nop,TS val 2761123305 ecr 1463764591], length 130
+2026-07-16T11:27:01.121026772Z stdout F 11:27:00.302134 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53044 > 192.168.22.2.8090: Flags [.], ack 131, win 501, options [nop,nop,TS val 1463764594 ecr 2761123305], length 0
+2026-07-16T11:27:01.121030028Z stdout F 11:27:00.302142 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53044 > 192.168.22.2.8090: Flags [.], ack 131, win 501, options [nop,nop,TS val 1463764594 ecr 2761123305], length 0
+2026-07-16T11:27:01.121364403Z stdout F 11:27:00.303115 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53044 > 192.168.22.2.8090: Flags [F.], seq 90, ack 131, win 501, options [nop,nop,TS val 1463764595 ecr 2761123305], length 0
+2026-07-16T11:27:01.121369763Z stdout F 11:27:00.303127 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53044 > 192.168.22.2.8090: Flags [F.], seq 90, ack 131, win 501, options [nop,nop,TS val 1463764595 ecr 2761123305], length 0
+2026-07-16T11:27:01.121373249Z stdout F 11:27:00.306833 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 192.169.10.3.53044: Flags [F.], seq 131, ack 91, win 443, options [nop,nop,TS val 2761123310 ecr 1463764595], length 0
+2026-07-16T11:27:01.121376575Z stdout F 11:27:00.306846 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 72: 192.168.22.2.8090 > 10.244.1.5.53044: Flags [F.], seq 131, ack 91, win 443, options [nop,nop,TS val 2761123310 ecr 1463764595], length 0
+2026-07-16T11:27:01.121380072Z stdout F 11:27:00.306870 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.53044 > 192.168.22.2.8090: Flags [.], ack 132, win 501, options [nop,nop,TS val 1463764599 ecr 2761123310], length 0
+2026-07-16T11:27:01.121383258Z stdout F 11:27:00.306880 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 192.169.10.3.53044 > 192.168.22.2.8090: Flags [.], ack 132, win 501, options [nop,nop,TS val 1463764599 ecr 2761123310], length 0
+2026-07-16T11:27:01.121387085Z stdout F 11:27:00.432302 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 80: 192.168.22.2.58374 > 10.244.1.5.8090: Flags [S], seq 3641984026, win 56760, options [mss 9460,sackOK,TS val 3275049956 ecr 0,nop,wscale 7], length 0
+2026-07-16T11:27:01.121397675Z stdout F 11:27:00.432343 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 80: 192.168.22.2.58374 > 10.244.1.5.8090: Flags [S], seq 3641984026, win 56760, options [mss 9460,sackOK,TS val 3275049956 ecr 0,nop,wscale 7], length 0
+2026-07-16T11:27:01.121401201Z stdout F 11:27:00.432375 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 80: 10.244.1.5.8090 > 192.168.22.2.58374: Flags [S.], seq 4141194622, ack 3641984027, win 65160, options [mss 1460,sackOK,TS val 1463764724 ecr 3275049956,nop,wscale 7], length 0
+2026-07-16T11:27:01.121404618Z stdout F 11:27:00.432385 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 80: 10.244.1.5.8090 > 192.168.22.2.58374: Flags [S.], seq 4141194622, ack 3641984027, win 65160, options [mss 1460,sackOK,TS val 1463764724 ecr 3275049956,nop,wscale 7], length 0
+2026-07-16T11:27:01.121407904Z stdout F 11:27:00.433964 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 72: 192.168.22.2.58374 > 10.244.1.5.8090: Flags [.], ack 1, win 444, options [nop,nop,TS val 3275049957 ecr 1463764724], length 0
+2026-07-16T11:27:01.12141122Z stdout F 11:27:00.433982 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 72: 192.168.22.2.58374 > 10.244.1.5.8090: Flags [.], ack 1, win 444, options [nop,nop,TS val 3275049957 ecr 1463764724], length 0
+2026-07-16T11:27:01.121414116Z stdout F 11:27:00.435197 pt-host In  ifindex 3660 22:90:11:55:f9:a4 ethertype IPv4 (0x0800), length 159: 192.168.22.2.58374 > 10.244.1.5.8090: Flags [P.], seq 1:88, ack 1, win 444, options [nop,nop,TS val 3275049957 ecr 1463764724], length 87
+2026-07-16T11:27:01.121417051Z stdout F 11:27:00.435210 veth1f07b962 Out ifindex 6 8a:df:07:a2:8e:8c ethertype IPv4 (0x0800), length 159: 192.168.22.2.58374 > 10.244.1.5.8090: Flags [P.], seq 1:88, ack 1, win 444, options [nop,nop,TS val 3275049957 ecr 1463764724], length 87
+2026-07-16T11:27:01.121420257Z stdout F 11:27:00.435224 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 72: 10.244.1.5.8090 > 192.168.22.2.58374: Flags [.], ack 88, win 509, options [nop,nop,TS val 1463764727 ecr 3275049957], length 0
+2026-07-16T11:27:01.121423613Z stdout F 11:27:00.435231 pt-host Out ifindex 3660 7a:d6:73:d9:12:20 ethertype IPv4 (0x0800), length 72: 10.244.1.5.8090 > 192.168.22.2.58374: Flags [.], ack 88, win 509, options [nop,nop,TS val 1463764727 ecr 3275049957], length 0
+2026-07-16T11:27:01.121426799Z stdout F 11:27:00.435869 veth1f07b962 In  ifindex 6 82:7f:0e:71:36:31 ethertype IPv4 (0x0800), length 207: 10.244.1.5.8090 > 192.168.22.2.58374: Flags [P.], seq 1:136, ack 88, win 509, options [nop,nop,TS val 1463764728 ecr 3275049957], length 135

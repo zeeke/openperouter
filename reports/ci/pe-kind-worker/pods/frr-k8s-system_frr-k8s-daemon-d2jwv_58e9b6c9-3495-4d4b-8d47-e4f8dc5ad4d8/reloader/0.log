@@ -1,0 +1,2084 @@
+2026-07-16T11:03:37.593219935Z stdout F PID is: 202, writing to /etc/frr_reloader/reloader.pid
+2026-07-16T11:03:39.740278582Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:03:39.74072596Z stdout F Checking the configuration file syntax
+2026-07-16T11:03:39.912181131Z stdout F 
+2026-07-16T11:03:39.921363306Z stdout F Lines To Delete
+2026-07-16T11:03:39.921386589Z stdout F ===============
+2026-07-16T11:03:39.92139238Z stdout F no log file /etc/frr/frr.log informational
+2026-07-16T11:03:39.921396808Z stdout F 
+2026-07-16T11:03:39.921401407Z stdout F Lines To Add
+2026-07-16T11:03:39.921405856Z stdout F ============
+2026-07-16T11:03:39.921410364Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:03:39.921415143Z stdout F log timestamp precision 3
+2026-07-16T11:03:39.921420102Z stdout F debug zebra events
+2026-07-16T11:03:39.921424751Z stdout F debug zebra nht
+2026-07-16T11:03:39.92142942Z stdout F debug zebra kernel
+2026-07-16T11:03:39.921433988Z stdout F debug zebra rib
+2026-07-16T11:03:39.921438497Z stdout F debug zebra nexthop
+2026-07-16T11:03:39.921443075Z stdout F debug bgp neighbor-events
+2026-07-16T11:03:39.92146716Z stdout F debug bgp updates
+2026-07-16T11:03:39.921474273Z stdout F debug bgp keepalives
+2026-07-16T11:03:39.921478752Z stdout F debug bgp nht
+2026-07-16T11:03:39.92148331Z stdout F debug bgp zebra
+2026-07-16T11:03:39.921487939Z stdout F debug bfd network
+2026-07-16T11:03:39.921492357Z stdout F debug bfd peer
+2026-07-16T11:03:39.921496795Z stdout F debug bfd zebra
+2026-07-16T11:03:39.921501294Z stdout F ip nht resolve-via-default
+2026-07-16T11:03:39.921505652Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:03:39.921568509Z stdout F Applying the configuration file
+2026-07-16T11:03:39.9849681Z stdout F 2026-07-16 11:03:39,984  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:03:40.236829518Z stdout F 2026-07-16 11:03:39,984  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:03:40.236856048Z stdout F 2026-07-16 11:03:40,087  INFO: Loading Config object from vtysh show running
+2026-07-16T11:03:40.236862991Z stdout F 2026-07-16 11:03:40,139  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:03:40.236869403Z stdout F 2026-07-16 11:03:40,139  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:03:40.236875915Z stdout F 2026-07-16 11:03:40,139  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:03:40.236882277Z stdout F 2026-07-16 11:03:40,188  INFO: Executed "no log file /etc/frr/frr.log informational"
+2026-07-16T11:03:40.236888659Z stdout F 2026-07-16 11:03:40,188  INFO: /var/run/frr/reload-LRPG9D.txt content
+2026-07-16T11:03:40.236895391Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:03:40.236902104Z stdout F  'log timestamp precision 3\n',
+2026-07-16T11:03:40.236908786Z stdout F  'debug zebra events\n',
+2026-07-16T11:03:40.236915028Z stdout F  'debug zebra nht\n',
+2026-07-16T11:03:40.2369214Z stdout F  'debug zebra kernel\n',
+2026-07-16T11:03:40.236927802Z stdout F  'debug zebra rib\n',
+2026-07-16T11:03:40.236934214Z stdout F  'debug zebra nexthop\n',
+2026-07-16T11:03:40.236940235Z stdout F  'debug bgp neighbor-events\n',
+2026-07-16T11:03:40.236946587Z stdout F  'debug bgp updates\n',
+2026-07-16T11:03:40.236952859Z stdout F  'debug bgp keepalives\n',
+2026-07-16T11:03:40.23695919Z stdout F  'debug bgp nht\n',
+2026-07-16T11:03:40.236965502Z stdout F  'debug bgp zebra\n',
+2026-07-16T11:03:40.236971744Z stdout F  'debug bfd network\n',
+2026-07-16T11:03:40.236977745Z stdout F  'debug bfd peer\n',
+2026-07-16T11:03:40.236984167Z stdout F  'debug bfd zebra\n',
+2026-07-16T11:03:40.236990379Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:03:40.23699642Z stdout F  'ipv6 nht resolve-via-default\n']
+2026-07-16T11:03:40.30103951Z stdout F [271|mgmtd] sending configuration
+2026-07-16T11:03:40.301086939Z stdout F [272|zebra] sending configuration
+2026-07-16T11:03:40.301091337Z stdout F [278|bgpd] sending configuration
+2026-07-16T11:03:40.301094663Z stdout F [271|mgmtd] done
+2026-07-16T11:03:40.301097939Z stdout F [272|zebra] done
+2026-07-16T11:03:40.301101336Z stdout F [286|watchfrr] sending configuration
+2026-07-16T11:03:40.301104422Z stdout F [278|bgpd] done
+2026-07-16T11:03:40.301107347Z stdout F [288|staticd] sending configuration
+2026-07-16T11:03:40.301110293Z stdout F [289|bfdd] sending configuration
+2026-07-16T11:03:40.301113468Z stdout F [286|watchfrr] done
+2026-07-16T11:03:40.301118768Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:03:40.301122044Z stdout F [288|staticd] done
+2026-07-16T11:03:40.30112507Z stdout F [289|bfdd] done
+2026-07-16T11:03:40.301128336Z stdout F 2026-07-16 11:03:40,246  INFO: Loading Config object from vtysh show running
+2026-07-16T11:03:40.301131442Z stdout F 2026-07-16 11:03:40,300  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:03:40.301134338Z stdout F 2026-07-16 11:03:40,300  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:03:40.301138806Z stdout F 2026-07-16 11:03:40,300  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:03:40.301142082Z stdout F 2026-07-16 11:03:40,300  INFO: /var/run/frr/reload-FYO93H.txt content
+2026-07-16T11:03:40.301145238Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:03:40.301148233Z stdout F  'debug bgp updates\n',
+2026-07-16T11:03:40.301151319Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:03:40.301154265Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:03:40.30115725Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:03:40.301160066Z stdout F  'log timestamp precision 3\n',
+2026-07-16T11:03:40.301162871Z stdout F  'debug zebra events\n',
+2026-07-16T11:03:40.301165716Z stdout F  'debug zebra nht\n',
+2026-07-16T11:03:40.301168611Z stdout F  'debug zebra kernel\n',
+2026-07-16T11:03:40.301171507Z stdout F  'debug zebra rib\n',
+2026-07-16T11:03:40.468372675Z stdout F  'debug zebra nexthop\n',
+2026-07-16T11:03:40.468390448Z stdout F  'debug bgp neighbor-events\n',
+2026-07-16T11:03:40.468395878Z stdout F  'debug bgp updates\n',
+2026-07-16T11:03:40.468400426Z stdout F  'debug bgp keepalives\n',
+2026-07-16T11:03:40.468404003Z stdout F  'debug bgp nht\n',
+2026-07-16T11:03:40.46840751Z stdout F  'debug bgp zebra\n',
+2026-07-16T11:03:40.468411497Z stdout F  'debug bfd network\n',
+2026-07-16T11:03:40.468415074Z stdout F  'debug bfd peer\n',
+2026-07-16T11:03:40.468418611Z stdout F  'debug bfd zebra\n',
+2026-07-16T11:03:40.468421867Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:03:40.468425343Z stdout F  'ipv6 nht resolve-via-default\n']
+2026-07-16T11:03:40.468428158Z stdout F [296|mgmtd] sending configuration
+2026-07-16T11:03:40.468430964Z stdout F [297|zebra] sending configuration
+2026-07-16T11:03:40.46843426Z stdout F [303|bgpd] sending configuration
+2026-07-16T11:03:40.468436995Z stdout F [296|mgmtd] done
+2026-07-16T11:03:40.468440101Z stdout F [311|watchfrr] sending configuration
+2026-07-16T11:03:40.468443367Z stdout F [313|staticd] sending configuration
+2026-07-16T11:03:40.468446573Z stdout F [314|bfdd] sending configuration
+2026-07-16T11:03:40.468475146Z stdout F [303|bgpd] done
+2026-07-16T11:03:40.468479344Z stdout F [297|zebra] done
+2026-07-16T11:03:40.468485485Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:03:40.468489813Z stdout F [313|staticd] done
+2026-07-16T11:03:40.468493621Z stdout F [311|watchfrr] done
+2026-07-16T11:03:40.468497438Z stdout F [314|bfdd] done
+2026-07-16T11:03:40.521093159Z stdout F FRR reloaded successfully! 1 seconds
+2026-07-16T11:07:46.874992292Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:07:46.875546777Z stdout F Checking the configuration file syntax
+2026-07-16T11:07:47.420287404Z stdout F 
+2026-07-16T11:07:47.420305107Z stdout F Lines To Delete
+2026-07-16T11:07:47.420310657Z stdout F ===============
+2026-07-16T11:07:47.420329462Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:07:47.420333851Z stdout F no debug bgp updates in
+2026-07-16T11:07:47.420336986Z stdout F no debug bgp updates out
+2026-07-16T11:07:47.420340072Z stdout F 
+2026-07-16T11:07:47.420343428Z stdout F Lines To Add
+2026-07-16T11:07:47.420364938Z stdout F ============
+2026-07-16T11:07:47.420369747Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:07:47.420373064Z stdout F debug bgp updates
+2026-07-16T11:07:47.42037637Z stdout F ip nht resolve-via-default
+2026-07-16T11:07:47.420379496Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:07:47.420382962Z stdout F ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any
+2026-07-16T11:07:47.420386278Z stdout F ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:07:47.420389965Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:07:47.420393121Z stdout F exit
+2026-07-16T11:07:47.420396457Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:07:47.420402298Z stdout F  match ip address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:07:47.420405895Z stdout F exit
+2026-07-16T11:07:47.420409321Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:07:47.420412908Z stdout F exit
+2026-07-16T11:07:47.420416425Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:07:47.420420202Z stdout F  match ipv6 address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:07:47.420424039Z stdout F exit
+2026-07-16T11:07:47.420427586Z stdout F ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:07:47.420430872Z stdout F ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:07:47.420434528Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:07:47.420438135Z stdout F exit
+2026-07-16T11:07:47.420441341Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:07:47.420444207Z stdout F  match ip address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:07:47.420447343Z stdout F exit
+2026-07-16T11:07:47.420450569Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:07:47.420457502Z stdout F exit
+2026-07-16T11:07:47.420461128Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:07:47.420494781Z stdout F  match ipv6 address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:07:47.420498318Z stdout F exit
+2026-07-16T11:07:47.420501694Z stdout F router bgp 64515
+2026-07-16T11:07:47.420505301Z stdout F exit
+2026-07-16T11:07:47.420867958Z stdout F router bgp 64515
+2026-07-16T11:07:47.421075005Z stdout F  no bgp ebgp-requires-policy
+2026-07-16T11:07:47.421078702Z stdout F exit
+2026-07-16T11:07:47.421081717Z stdout F router bgp 64515
+2026-07-16T11:07:47.421084863Z stdout F  no bgp network import-check
+2026-07-16T11:07:47.421087839Z stdout F exit
+2026-07-16T11:07:47.421090794Z stdout F router bgp 64515
+2026-07-16T11:07:47.42109397Z stdout F  no bgp default ipv4-unicast
+2026-07-16T11:07:47.421097186Z stdout F exit
+2026-07-16T11:07:47.421100573Z stdout F router bgp 64515
+2026-07-16T11:07:47.42110419Z stdout F  bgp graceful-restart preserve-fw-state
+2026-07-16T11:07:47.421107997Z stdout F exit
+2026-07-16T11:07:47.421111664Z stdout F router bgp 64515
+2026-07-16T11:07:47.4211152Z stdout F  neighbor 192.169.10.1 remote-as 64514
+2026-07-16T11:07:47.421118486Z stdout F exit
+2026-07-16T11:07:47.421122303Z stdout F router bgp 64515
+2026-07-16T11:07:47.42112557Z stdout F  neighbor 192.169.10.1 timers connect 1
+2026-07-16T11:07:47.421129066Z stdout F exit
+2026-07-16T11:07:47.421132522Z stdout F router bgp 64515
+2026-07-16T11:07:47.421135528Z stdout F  address-family ipv4 unicast
+2026-07-16T11:07:47.421156277Z stdout F  exit
+2026-07-16T11:07:47.421159593Z stdout F exit
+2026-07-16T11:07:47.421162528Z stdout F router bgp 64515
+2026-07-16T11:07:47.421165384Z stdout F  address-family ipv4 unicast
+2026-07-16T11:07:47.42116847Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:07:47.421171716Z stdout F  exit
+2026-07-16T11:07:47.421175372Z stdout F exit
+2026-07-16T11:07:47.421178609Z stdout F router bgp 64515
+2026-07-16T11:07:47.421181734Z stdout F  address-family ipv4 unicast
+2026-07-16T11:07:47.421193887Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:07:47.421197113Z stdout F  exit
+2026-07-16T11:07:47.421199989Z stdout F exit
+2026-07-16T11:07:47.421203284Z stdout F router bgp 64515
+2026-07-16T11:07:47.42120635Z stdout F  address-family ipv4 unicast
+2026-07-16T11:07:47.421209566Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:07:47.421212522Z stdout F  exit
+2026-07-16T11:07:47.421215197Z stdout F exit
+2026-07-16T11:07:47.421218052Z stdout F router bgp 64515
+2026-07-16T11:07:47.421220767Z stdout F  address-family ipv6 unicast
+2026-07-16T11:07:47.421223362Z stdout F  exit
+2026-07-16T11:07:47.421225887Z stdout F exit
+2026-07-16T11:07:47.421228472Z stdout F router bgp 64515
+2026-07-16T11:07:47.421231036Z stdout F  address-family ipv6 unicast
+2026-07-16T11:07:47.421233591Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:07:47.421236126Z stdout F  exit
+2026-07-16T11:07:47.421238671Z stdout F exit
+2026-07-16T11:07:47.421241226Z stdout F router bgp 64515
+2026-07-16T11:07:47.42124387Z stdout F  address-family ipv6 unicast
+2026-07-16T11:07:47.421246425Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:07:47.421249Z stdout F  exit
+2026-07-16T11:07:47.421251805Z stdout F exit
+2026-07-16T11:07:47.421547387Z stdout F router bgp 64515
+2026-07-16T11:07:47.421551856Z stdout F  address-family ipv6 unicast
+2026-07-16T11:07:47.441707746Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:07:47.441719238Z stdout F  exit
+2026-07-16T11:07:47.441722965Z stdout F exit
+2026-07-16T11:07:47.442112392Z stdout F Applying the configuration file
+2026-07-16T11:07:47.615413702Z stdout F 2026-07-16 11:07:47,614  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:07:48.498856578Z stdout F 2026-07-16 11:07:47,614  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:07:48.498870634Z stdout F 2026-07-16 11:07:47,887  INFO: Loading Config object from vtysh show running
+2026-07-16T11:07:48.498874501Z stdout F 2026-07-16 11:07:48,097  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:07:48.498877918Z stdout F 2026-07-16 11:07:48,098  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:07:48.498881314Z stdout F 2026-07-16 11:07:48,098  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:07:48.49888435Z stdout F 2026-07-16 11:07:48,268  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:07:48.498887425Z stdout F 2026-07-16 11:07:48,387  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:07:48.498890922Z stdout F 2026-07-16 11:07:48,497  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:07:48.498894639Z stdout F 2026-07-16 11:07:48,498  INFO: /var/run/frr/reload-WF272T.txt content
+2026-07-16T11:07:48.498899027Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:07:48.498902644Z stdout F  'debug bgp updates\n',
+2026-07-16T11:07:48.498907042Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:07:48.498910599Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:07:48.498914105Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+2026-07-16T11:07:48.498917702Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:07:48.498921549Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:07:48.498924735Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:07:48.499137372Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:07:48.499142702Z stdout F  'exit\n',
+2026-07-16T11:07:48.499146249Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:07:48.499149425Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:07:48.499163201Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:07:48.499167108Z stdout F  'exit\n',
+2026-07-16T11:07:48.499170344Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:07:48.499174612Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:07:48.499178289Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:07:48.499181585Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:07:48.49918453Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:07:48.499187807Z stdout F  'exit\n',
+2026-07-16T11:07:48.499191002Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:07:48.499194128Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:07:48.499197425Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:07:48.499200671Z stdout F  'exit\n',
+2026-07-16T11:07:48.499204097Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:07:48.499207233Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:07:48.499210138Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:07:48.499213264Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:07:48.49921636Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:07:48.499219466Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:07:48.499222561Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:07:48.665759583Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:07:48.665781294Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:48.665786023Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:07:48.66579034Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:07:48.665793967Z stdout F  ' exit\n'
+2026-07-16T11:07:48.665797634Z stdout F  'exit\n',
+2026-07-16T11:07:48.66580088Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:48.665804166Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:07:48.665807753Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:07:48.665811069Z stdout F  ' exit\n'
+2026-07-16T11:07:48.665814265Z stdout F  'exit\n',
+2026-07-16T11:07:48.665817561Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:48.665820958Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:07:48.665824214Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:07:48.66582741Z stdout F  ' exit\n'
+2026-07-16T11:07:48.665830325Z stdout F  'exit\n',
+2026-07-16T11:07:48.665833211Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:07:48.665836036Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:48.665838811Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:07:48.665841596Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:07:48.665844191Z stdout F  ' exit\n'
+2026-07-16T11:07:48.665846956Z stdout F  'exit\n',
+2026-07-16T11:07:48.665849982Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:48.665852997Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:07:48.665856795Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:07:48.665860031Z stdout F  ' exit\n'
+2026-07-16T11:07:48.665863327Z stdout F  'exit\n',
+2026-07-16T11:07:48.665866633Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:48.665869819Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:07:48.665873275Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:07:48.665876451Z stdout F  ' exit\n'
+2026-07-16T11:07:48.665879738Z stdout F  'exit\n']
+2026-07-16T11:07:48.665882933Z stdout F [421|mgmtd] sending configuration
+2026-07-16T11:07:48.665885939Z stdout F [422|zebra] sending configuration
+2026-07-16T11:07:48.665889736Z stdout F [428|bgpd] sending configuration
+2026-07-16T11:07:48.665893032Z stdout F [436|watchfrr] sending configuration
+2026-07-16T11:07:48.665907559Z stdout F [438|staticd] sending configuration
+2026-07-16T11:07:49.164519886Z stdout F [439|bfdd] sending configuration
+2026-07-16T11:07:49.164536407Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:07:49.164540154Z stdout F [422|zebra] done
+2026-07-16T11:07:49.164543209Z stdout F [438|staticd] done
+2026-07-16T11:07:49.164546325Z stdout F [421|mgmtd] done
+2026-07-16T11:07:49.164549271Z stdout F [439|bfdd] done
+2026-07-16T11:07:49.164552457Z stdout F [436|watchfrr] done
+2026-07-16T11:07:49.164555402Z stdout F [428|bgpd] done
+2026-07-16T11:07:49.164558458Z stdout F 2026-07-16 11:07:48,919  INFO: Loading Config object from vtysh show running
+2026-07-16T11:07:49.164561494Z stdout F 2026-07-16 11:07:49,163  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:07:49.164564409Z stdout F 2026-07-16 11:07:49,163  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:07:49.164567475Z stdout F 2026-07-16 11:07:49,163  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:07:49.16457028Z stdout F 2026-07-16 11:07:49,164  INFO: /var/run/frr/reload-WSD08K.txt content
+2026-07-16T11:07:49.164573496Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:07:49.164592601Z stdout F  'debug bgp updates\n',
+2026-07-16T11:07:49.164596409Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:07:49.164599665Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:07:49.164602911Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:07:49.164608371Z stdout F  'debug bgp updates\n',
+2026-07-16T11:07:49.164611647Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:07:49.164614593Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:07:49.164617819Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+2026-07-16T11:07:49.164620954Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:07:49.16462401Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:07:49.164627056Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:07:49.164630482Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:07:49.164633778Z stdout F  'exit\n',
+2026-07-16T11:07:49.164637015Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:07:49.16464002Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:07:49.164642835Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:07:49.1646456Z stdout F  'exit\n',
+2026-07-16T11:07:49.164648897Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:07:49.164651983Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:07:49.164655108Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:07:49.164658184Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:07:49.164661049Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:07:49.164664576Z stdout F  'exit\n',
+2026-07-16T11:07:49.164668062Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:07:49.164671058Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:07:49.164674254Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:07:49.16467721Z stdout F  'exit\n',
+2026-07-16T11:07:49.164680516Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:07:49.164683832Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:07:49.164687178Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:07:49.164690394Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:07:49.16469346Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:07:49.164696365Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:07:49.164699541Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:07:49.381917087Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:07:49.381942615Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:49.381946653Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:07:49.381949948Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:07:49.381953185Z stdout F  ' exit\n'
+2026-07-16T11:07:49.38195621Z stdout F  'exit\n',
+2026-07-16T11:07:49.381959246Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:49.381962412Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:07:49.381966369Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:07:49.381984894Z stdout F  ' exit\n'
+2026-07-16T11:07:49.381988621Z stdout F  'exit\n',
+2026-07-16T11:07:49.381991717Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:49.381994892Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:07:49.382000533Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:07:49.382003669Z stdout F  ' exit\n'
+2026-07-16T11:07:49.382006594Z stdout F  'exit\n',
+2026-07-16T11:07:49.38200971Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:07:49.382013127Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:49.382016132Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:07:49.382019338Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:07:49.382022765Z stdout F  ' exit\n'
+2026-07-16T11:07:49.38202569Z stdout F  'exit\n',
+2026-07-16T11:07:49.382028686Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:49.382031631Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:07:49.382034877Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:07:49.382038334Z stdout F  ' exit\n'
+2026-07-16T11:07:49.382041309Z stdout F  'exit\n',
+2026-07-16T11:07:49.382044255Z stdout F  'router bgp 64515\n'
+2026-07-16T11:07:49.38204727Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:07:49.382050366Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:07:49.382053212Z stdout F  ' exit\n'
+2026-07-16T11:07:49.382056107Z stdout F  'exit\n']
+2026-07-16T11:07:49.382059123Z stdout F [446|mgmtd] sending configuration
+2026-07-16T11:07:49.382062088Z stdout F [447|zebra] sending configuration
+2026-07-16T11:07:49.382065765Z stdout F [453|bgpd] sending configuration
+2026-07-16T11:07:49.382069071Z stdout F [461|watchfrr] sending configuration
+2026-07-16T11:07:49.382072047Z stdout F [463|staticd] sending configuration
+2026-07-16T11:07:49.952302804Z stdout F [464|bfdd] sending configuration
+2026-07-16T11:07:49.952317692Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:07:49.95232188Z stdout F [461|watchfrr] done
+2026-07-16T11:07:49.952325116Z stdout F [447|zebra] done
+2026-07-16T11:07:49.952328262Z stdout F [446|mgmtd] done
+2026-07-16T11:07:49.952331307Z stdout F [464|bfdd] done
+2026-07-16T11:07:49.952334103Z stdout F [463|staticd] done
+2026-07-16T11:07:49.952336948Z stdout F [453|bgpd] done
+2026-07-16T11:07:50.051885962Z stdout F FRR reloaded successfully! 4 seconds
+2026-07-16T11:13:22.413677836Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:13:22.413941539Z stdout F Checking the configuration file syntax
+2026-07-16T11:13:23.284159062Z stdout F 
+2026-07-16T11:13:23.313281203Z stdout F Lines To Delete
+2026-07-16T11:13:23.313294288Z stdout F ===============
+2026-07-16T11:13:23.313299878Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:13:23.313304757Z stdout F no debug bgp updates in
+2026-07-16T11:13:23.313308985Z stdout F no debug bgp updates out
+2026-07-16T11:13:23.313313313Z stdout F no router bgp 64515
+2026-07-16T11:13:23.313318032Z stdout F no route-map 192.169.10.1-out permit 1
+2026-07-16T11:13:23.313322631Z stdout F no route-map 192.169.10.1-out permit 2
+2026-07-16T11:13:23.313326979Z stdout F no route-map 192.169.10.1-in permit 3
+2026-07-16T11:13:23.313331267Z stdout F no route-map 192.169.10.1-in permit 4
+2026-07-16T11:13:23.313345714Z stdout F 
+2026-07-16T11:13:23.313363177Z stdout F Lines To Add
+2026-07-16T11:13:23.313365922Z stdout F ============
+2026-07-16T11:13:23.313368647Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:13:23.313371392Z stdout F debug bgp updates
+2026-07-16T11:13:23.313374217Z stdout F ip nht resolve-via-default
+2026-07-16T11:13:23.313376772Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:13:23.313379728Z stdout F no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any
+2026-07-16T11:13:23.313382483Z stdout F no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:13:23.313385148Z stdout F no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:13:23.313387913Z stdout F no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:13:23.313877289Z stdout F Applying the configuration file
+2026-07-16T11:13:23.472344307Z stdout F 2026-07-16 11:13:23,471  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:13:25.872239605Z stdout F 2026-07-16 11:13:23,471  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:13:25.872256857Z stdout F 2026-07-16 11:13:23,864  INFO: Loading Config object from vtysh show running
+2026-07-16T11:13:25.872260373Z stdout F 2026-07-16 11:13:24,234  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:13:25.872263679Z stdout F 2026-07-16 11:13:24,239  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:13:25.872266996Z stdout F 2026-07-16 11:13:24,249  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:13:25.872269891Z stdout F 2026-07-16 11:13:24,418  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:13:25.872272736Z stdout F 2026-07-16 11:13:24,569  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:13:25.872275812Z stdout F 2026-07-16 11:13:24,812  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:13:25.872279219Z stdout F 2026-07-16 11:13:25,134  INFO: Executed "no router bgp 64515"
+2026-07-16T11:13:25.872282094Z stdout F 2026-07-16 11:13:25,357  INFO: Executed "no route-map 192.169.10.1-out permit 1"
+2026-07-16T11:13:25.872284909Z stdout F 2026-07-16 11:13:25,560  INFO: Executed "no route-map 192.169.10.1-out permit 2"
+2026-07-16T11:13:25.872287664Z stdout F 2026-07-16 11:13:25,748  INFO: Executed "no route-map 192.169.10.1-in permit 3"
+2026-07-16T11:13:25.87229064Z stdout F 2026-07-16 11:13:25,870  INFO: Executed "no route-map 192.169.10.1-in permit 4"
+2026-07-16T11:13:26.173294135Z stdout F 2026-07-16 11:13:25,871  INFO: /var/run/frr/reload-OFRKF9.txt content
+2026-07-16T11:13:26.173311948Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:13:26.173316827Z stdout F  'debug bgp updates\n',
+2026-07-16T11:13:26.173320564Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:13:26.17332399Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:13:26.173328048Z stdout F  'no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+2026-07-16T11:13:26.173331494Z stdout F  'no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:13:26.173334911Z stdout F  'no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:13:26.173338458Z stdout F  'no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n']
+2026-07-16T11:13:26.173341854Z stdout F [2089|mgmtd] sending configuration
+2026-07-16T11:13:26.17334525Z stdout F [2090|zebra] sending configuration
+2026-07-16T11:13:26.173348827Z stdout F [2096|bgpd] sending configuration
+2026-07-16T11:13:26.173352133Z stdout F [2089|mgmtd] done
+2026-07-16T11:13:26.17335571Z stdout F [2090|zebra] done
+2026-07-16T11:13:26.173359076Z stdout F [2104|watchfrr] sending configuration
+2026-07-16T11:13:26.173362472Z stdout F [2096|bgpd] done
+2026-07-16T11:13:26.173365999Z stdout F [2107|bfdd] sending configuration
+2026-07-16T11:13:26.173556385Z stdout F [2106|staticd] sending configuration
+2026-07-16T11:13:26.173564981Z stdout F [2106|staticd] done
+2026-07-16T11:13:26.173568758Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:13:26.173572125Z stdout F [2104|watchfrr] done
+2026-07-16T11:13:26.173577935Z stdout F [2107|bfdd] done
+2026-07-16T11:13:26.173581462Z stdout F 2026-07-16 11:13:26,027  INFO: Loading Config object from vtysh show running
+2026-07-16T11:13:26.173585129Z stdout F 2026-07-16 11:13:26,169  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:13:26.173588746Z stdout F 2026-07-16 11:13:26,169  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:13:26.978577941Z stdout F 2026-07-16 11:13:26,170  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:13:26.978599622Z stdout F 2026-07-16 11:13:26,172  INFO: /var/run/frr/reload-2HX9ON.txt content
+2026-07-16T11:13:26.978603609Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:13:26.978607036Z stdout F  'debug bgp updates\n',
+2026-07-16T11:13:26.978609911Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:13:26.978612777Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:13:26.978615852Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:13:26.978619118Z stdout F  'debug bgp updates\n',
+2026-07-16T11:13:26.978622044Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:13:26.97862528Z stdout F  'ipv6 nht resolve-via-default\n']
+2026-07-16T11:13:26.978628526Z stdout F [2114|mgmtd] sending configuration
+2026-07-16T11:13:26.978631501Z stdout F [2115|zebra] sending configuration
+2026-07-16T11:13:26.978634607Z stdout F [2114|mgmtd] done
+2026-07-16T11:13:26.978637483Z stdout F [2131|staticd] sending configuration
+2026-07-16T11:13:26.978640318Z stdout F [2132|bfdd] sending configuration
+2026-07-16T11:13:26.978643474Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:13:26.978646339Z stdout F [2121|bgpd] sending configuration
+2026-07-16T11:13:26.978649575Z stdout F [2131|staticd] done
+2026-07-16T11:13:26.978652611Z stdout F [2129|watchfrr] sending configuration
+2026-07-16T11:13:26.978655767Z stdout F [2132|bfdd] done
+2026-07-16T11:13:26.978659053Z stdout F [2129|watchfrr] done
+2026-07-16T11:13:26.979115187Z stdout F [2121|bgpd] done
+2026-07-16T11:13:26.979120096Z stdout F [2115|zebra] done
+2026-07-16T11:13:27.343371616Z stdout F FRR reloaded successfully! 5 seconds
+2026-07-16T11:13:34.859516331Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:13:34.859532321Z stdout F Checking the configuration file syntax
+2026-07-16T11:13:35.298511265Z stdout F 
+2026-07-16T11:13:35.299969424Z stdout F Lines To Delete
+2026-07-16T11:13:35.299981646Z stdout F ===============
+2026-07-16T11:13:35.299986055Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:13:35.299989621Z stdout F no debug bgp updates in
+2026-07-16T11:13:35.299992867Z stdout F no debug bgp updates out
+2026-07-16T11:13:35.299996003Z stdout F 
+2026-07-16T11:13:35.299999329Z stdout F Lines To Add
+2026-07-16T11:13:35.300002916Z stdout F ============
+2026-07-16T11:13:35.300006964Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:13:35.30001046Z stdout F debug bgp updates
+2026-07-16T11:13:35.300013676Z stdout F ip nht resolve-via-default
+2026-07-16T11:13:35.300016652Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:13:35.300019968Z stdout F ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.4/32
+2026-07-16T11:13:35.300023104Z stdout F ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:13:35.30002633Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:13:35.300029446Z stdout F exit
+2026-07-16T11:13:35.300032742Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:13:35.3000528Z stdout F  match ip address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:13:35.300056877Z stdout F exit
+2026-07-16T11:13:35.300060253Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:13:35.300063489Z stdout F exit
+2026-07-16T11:13:35.300066735Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:13:35.300085801Z stdout F  match ipv6 address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:13:35.300089729Z stdout F exit
+2026-07-16T11:13:35.300092895Z stdout F ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:13:35.30009585Z stdout F ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:13:35.300099637Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:13:35.300103555Z stdout F exit
+2026-07-16T11:13:35.300107051Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:13:35.300110407Z stdout F  match ip address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:13:35.300113874Z stdout F exit
+2026-07-16T11:13:35.30011713Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:13:35.300120456Z stdout F exit
+2026-07-16T11:13:35.300123532Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:13:35.300126878Z stdout F  match ipv6 address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:13:35.300130515Z stdout F exit
+2026-07-16T11:13:35.300135444Z stdout F ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::4/128
+2026-07-16T11:13:35.3001387Z stdout F ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any
+2026-07-16T11:13:35.300142477Z stdout F route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:13:35.300145433Z stdout F exit
+2026-07-16T11:13:35.300148749Z stdout F route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:13:35.300151995Z stdout F  match ip address prefix-list 2001:db8:1::1-pl-ipv6
+2026-07-16T11:13:35.30015488Z stdout F exit
+2026-07-16T11:13:35.300157796Z stdout F route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:13:35.300160651Z stdout F exit
+2026-07-16T11:13:35.300163537Z stdout F route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:13:35.300166332Z stdout F  match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6
+2026-07-16T11:13:35.300169408Z stdout F exit
+2026-07-16T11:13:35.300172524Z stdout F ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any
+2026-07-16T11:13:35.300175529Z stdout F ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any
+2026-07-16T11:13:35.300179076Z stdout F route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:13:35.300182362Z stdout F exit
+2026-07-16T11:13:35.300185708Z stdout F route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:13:35.300188714Z stdout F  match ip address prefix-list 2001:db8:1::1-inpl-ipv6
+2026-07-16T11:13:35.300192Z stdout F exit
+2026-07-16T11:13:35.300195426Z stdout F route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:13:35.300198653Z stdout F exit
+2026-07-16T11:13:35.300201868Z stdout F route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:13:35.300204944Z stdout F  match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6
+2026-07-16T11:13:35.30020814Z stdout F exit
+2026-07-16T11:13:35.300211566Z stdout F router bgp 64515
+2026-07-16T11:13:35.300215013Z stdout F exit
+2026-07-16T11:13:35.300218219Z stdout F router bgp 64515
+2026-07-16T11:13:35.300221746Z stdout F  no bgp ebgp-requires-policy
+2026-07-16T11:13:35.300225383Z stdout F exit
+2026-07-16T11:13:35.30023446Z stdout F router bgp 64515
+2026-07-16T11:13:35.300238186Z stdout F  no bgp network import-check
+2026-07-16T11:13:35.300241893Z stdout F exit
+2026-07-16T11:13:35.300245089Z stdout F router bgp 64515
+2026-07-16T11:13:35.300248536Z stdout F  no bgp default ipv4-unicast
+2026-07-16T11:13:35.300252523Z stdout F exit
+2026-07-16T11:13:35.30025601Z stdout F router bgp 64515
+2026-07-16T11:13:35.300259707Z stdout F  bgp graceful-restart preserve-fw-state
+2026-07-16T11:13:35.300263303Z stdout F exit
+2026-07-16T11:13:35.300266359Z stdout F router bgp 64515
+2026-07-16T11:13:35.300269836Z stdout F  neighbor 192.169.10.1 remote-as 64514
+2026-07-16T11:13:35.300273542Z stdout F exit
+2026-07-16T11:13:35.300276699Z stdout F router bgp 64515
+2026-07-16T11:13:35.300280155Z stdout F  neighbor 192.169.10.1 timers connect 1
+2026-07-16T11:13:35.300283291Z stdout F exit
+2026-07-16T11:13:35.300286587Z stdout F router bgp 64515
+2026-07-16T11:13:35.300289833Z stdout F  neighbor 2001:db8:1::1 remote-as 64514
+2026-07-16T11:13:35.30029917Z stdout F exit
+2026-07-16T11:13:35.300302327Z stdout F router bgp 64515
+2026-07-16T11:13:35.300305442Z stdout F  neighbor 2001:db8:1::1 timers connect 1
+2026-07-16T11:13:35.300308949Z stdout F exit
+2026-07-16T11:13:35.300312205Z stdout F router bgp 64515
+2026-07-16T11:13:35.300315481Z stdout F  neighbor 2001:db8:1::1 disable-connected-check
+2026-07-16T11:13:35.300318677Z stdout F exit
+2026-07-16T11:13:35.300321652Z stdout F router bgp 64515
+2026-07-16T11:13:35.300324658Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300327914Z stdout F  exit
+2026-07-16T11:13:35.30033115Z stdout F exit
+2026-07-16T11:13:35.300334507Z stdout F router bgp 64515
+2026-07-16T11:13:35.300337602Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300340919Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:13:35.300344325Z stdout F  exit
+2026-07-16T11:13:35.300347581Z stdout F exit
+2026-07-16T11:13:35.300350657Z stdout F router bgp 64515
+2026-07-16T11:13:35.300353893Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300357129Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:13:35.300360135Z stdout F  exit
+2026-07-16T11:13:35.300363811Z stdout F exit
+2026-07-16T11:13:35.300367869Z stdout F router bgp 64515
+2026-07-16T11:13:35.300371336Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300375072Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:13:35.3003789Z stdout F  exit
+2026-07-16T11:13:35.300382276Z stdout F exit
+2026-07-16T11:13:35.300385462Z stdout F router bgp 64515
+2026-07-16T11:13:35.300388918Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300392756Z stdout F   neighbor 2001:db8:1::1 activate
+2026-07-16T11:13:35.300396072Z stdout F  exit
+2026-07-16T11:13:35.300399388Z stdout F exit
+2026-07-16T11:13:35.300402795Z stdout F router bgp 64515
+2026-07-16T11:13:35.300406211Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300409748Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in
+2026-07-16T11:13:35.300412934Z stdout F  exit
+2026-07-16T11:13:35.300416119Z stdout F exit
+2026-07-16T11:13:35.300419546Z stdout F router bgp 64515
+2026-07-16T11:13:35.300422922Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.30042714Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out
+2026-07-16T11:13:35.300430576Z stdout F  exit
+2026-07-16T11:13:35.300433802Z stdout F exit
+2026-07-16T11:13:35.300437139Z stdout F router bgp 64515
+2026-07-16T11:13:35.300440605Z stdout F  address-family ipv4 unicast
+2026-07-16T11:13:35.300443751Z stdout F   network 10.244.1.4/32 
+2026-07-16T11:13:35.300447218Z stdout F  exit
+2026-07-16T11:13:35.300478486Z stdout F exit
+2026-07-16T11:13:35.314823994Z stdout F router bgp 64515
+2026-07-16T11:13:35.31483743Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314840395Z stdout F  exit
+2026-07-16T11:13:35.314842689Z stdout F exit
+2026-07-16T11:13:35.314844783Z stdout F router bgp 64515
+2026-07-16T11:13:35.314846847Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314848911Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:13:35.314851155Z stdout F  exit
+2026-07-16T11:13:35.314853329Z stdout F exit
+2026-07-16T11:13:35.314855393Z stdout F router bgp 64515
+2026-07-16T11:13:35.314858148Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314865061Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:13:35.314868317Z stdout F  exit
+2026-07-16T11:13:35.314871654Z stdout F exit
+2026-07-16T11:13:35.3148751Z stdout F router bgp 64515
+2026-07-16T11:13:35.314878526Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314881842Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:13:35.314885039Z stdout F  exit
+2026-07-16T11:13:35.314909284Z stdout F exit
+2026-07-16T11:13:35.31491266Z stdout F router bgp 64515
+2026-07-16T11:13:35.314915916Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314919363Z stdout F   neighbor 2001:db8:1::1 activate
+2026-07-16T11:13:35.31492313Z stdout F  exit
+2026-07-16T11:13:35.314935743Z stdout F exit
+2026-07-16T11:13:35.31493941Z stdout F router bgp 64515
+2026-07-16T11:13:35.314942937Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314946113Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in
+2026-07-16T11:13:35.314949379Z stdout F  exit
+2026-07-16T11:13:35.314952575Z stdout F exit
+2026-07-16T11:13:35.314955591Z stdout F router bgp 64515
+2026-07-16T11:13:35.314958436Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314961912Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out
+2026-07-16T11:13:35.31496622Z stdout F  exit
+2026-07-16T11:13:35.314969446Z stdout F exit
+2026-07-16T11:13:35.314972652Z stdout F router bgp 64515
+2026-07-16T11:13:35.314976299Z stdout F  address-family ipv6 unicast
+2026-07-16T11:13:35.314979616Z stdout F   network fd00:10:244:1::4/128 
+2026-07-16T11:13:35.314983022Z stdout F  exit
+2026-07-16T11:13:35.314986308Z stdout F exit
+2026-07-16T11:13:35.315001466Z stdout F Applying the configuration file
+2026-07-16T11:13:35.457107396Z stdout F 2026-07-16 11:13:35,455  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:13:36.514113351Z stdout F 2026-07-16 11:13:35,456  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:13:36.514129441Z stdout F 2026-07-16 11:13:35,835  INFO: Loading Config object from vtysh show running
+2026-07-16T11:13:36.514132748Z stdout F 2026-07-16 11:13:35,983  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:13:36.514135773Z stdout F 2026-07-16 11:13:35,983  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:13:36.514138649Z stdout F 2026-07-16 11:13:35,983  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:13:36.514141414Z stdout F 2026-07-16 11:13:36,123  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:13:36.514144159Z stdout F 2026-07-16 11:13:36,346  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:13:36.514146884Z stdout F 2026-07-16 11:13:36,511  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:13:36.51414971Z stdout F 2026-07-16 11:13:36,513  INFO: /var/run/frr/reload-U65O57.txt content
+2026-07-16T11:13:36.514152775Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:13:36.51415565Z stdout F  'debug bgp updates\n',
+2026-07-16T11:13:36.514158726Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:13:36.514161441Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:13:36.514164137Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.4/32\n',
+2026-07-16T11:13:36.514211134Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:13:36.514215072Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:13:36.514218829Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:13:36.514324437Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:13:36.514328734Z stdout F  'exit\n',
+2026-07-16T11:13:36.5143319Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:13:36.514335117Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:13:36.514338323Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:13:36.514341629Z stdout F  'exit\n',
+2026-07-16T11:13:36.514345025Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:13:36.514348311Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:13:36.514351357Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:13:36.514354613Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:13:36.514357739Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:13:36.514361025Z stdout F  'exit\n',
+2026-07-16T11:13:36.514364181Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:13:36.514376434Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:13:36.51437986Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:13:36.514383166Z stdout F  'exit\n',
+2026-07-16T11:13:36.514386382Z stdout F  'ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::4/128\n',
+2026-07-16T11:13:36.514389708Z stdout F  'ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:13:36.514393195Z stdout F  'route-map 2001:db8:1::1-out permit 1\nexit\n',
+2026-07-16T11:13:36.514396231Z stdout F  'route-map 2001:db8:1::1-out permit 1\n'
+2026-07-16T11:13:36.514399387Z stdout F  ' match ip address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:13:36.514402532Z stdout F  'exit\n',
+2026-07-16T11:13:36.514405829Z stdout F  'route-map 2001:db8:1::1-out permit 2\nexit\n',
+2026-07-16T11:13:36.514409305Z stdout F  'route-map 2001:db8:1::1-out permit 2\n'
+2026-07-16T11:13:36.514992897Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:13:36.515002315Z stdout F  'exit\n',
+2026-07-16T11:13:36.515005371Z stdout F  'ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:13:36.515008126Z stdout F  'ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n',
+2026-07-16T11:13:36.515011112Z stdout F  'route-map 2001:db8:1::1-in permit 3\nexit\n',
+2026-07-16T11:13:36.515013797Z stdout F  'route-map 2001:db8:1::1-in permit 3\n'
+2026-07-16T11:13:36.515016502Z stdout F  ' match ip address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:13:36.515019137Z stdout F  'exit\n',
+2026-07-16T11:13:36.515021932Z stdout F  'route-map 2001:db8:1::1-in permit 4\nexit\n',
+2026-07-16T11:13:36.515024697Z stdout F  'route-map 2001:db8:1::1-in permit 4\n'
+2026-07-16T11:13:36.515027422Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:13:36.515030097Z stdout F  'exit\n',
+2026-07-16T11:13:36.515032992Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:13:36.515035728Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:13:36.515038393Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:13:36.515041098Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:13:36.515044113Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:13:36.515046889Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:13:36.515049563Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:13:36.515052299Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 remote-as 64514\nexit\n',
+2026-07-16T11:13:36.515054974Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 timers connect 1\nexit\n',
+2026-07-16T11:13:36.516844854Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 disable-connected-check\nexit\n',
+2026-07-16T11:13:36.516855042Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:13:36.51685883Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516861946Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516865212Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:13:36.516868327Z stdout F  ' exit\n'
+2026-07-16T11:13:36.516871283Z stdout F  'exit\n',
+2026-07-16T11:13:36.516874519Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516877996Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516880991Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:13:36.516884057Z stdout F  ' exit\n'
+2026-07-16T11:13:36.516886882Z stdout F  'exit\n',
+2026-07-16T11:13:36.516889818Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516892593Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516895398Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:13:36.516898334Z stdout F  ' exit\n'
+2026-07-16T11:13:36.516901169Z stdout F  'exit\n',
+2026-07-16T11:13:36.516942827Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516947015Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516950251Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:13:36.516953547Z stdout F  ' exit\n'
+2026-07-16T11:13:36.516957194Z stdout F  'exit\n',
+2026-07-16T11:13:36.516960239Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516963496Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516966601Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:13:36.516969727Z stdout F  ' exit\n'
+2026-07-16T11:13:36.516973023Z stdout F  'exit\n',
+2026-07-16T11:13:36.516976309Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516979856Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516983453Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:13:36.516986709Z stdout F  ' exit\n'
+2026-07-16T11:13:36.516989735Z stdout F  'exit\n',
+2026-07-16T11:13:36.51699262Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.516995455Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:36.516998311Z stdout F  '  network 10.244.1.4/32 \n'
+2026-07-16T11:13:36.517001016Z stdout F  ' exit\n'
+2026-07-16T11:13:36.517003671Z stdout F  'exit\n',
+2026-07-16T11:13:36.753667607Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:13:36.753682465Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753687073Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.75369083Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:13:36.753694146Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753697543Z stdout F  'exit\n',
+2026-07-16T11:13:36.753701019Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753704616Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.753708453Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:13:36.75371192Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753715276Z stdout F  'exit\n',
+2026-07-16T11:13:36.753718732Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753722179Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.753725475Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:13:36.753728651Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753750201Z stdout F  'exit\n',
+2026-07-16T11:13:36.753754489Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753757875Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.753761152Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:13:36.753764658Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753767844Z stdout F  'exit\n',
+2026-07-16T11:13:36.753771211Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753774537Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.753777823Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:13:36.753781069Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753784325Z stdout F  'exit\n',
+2026-07-16T11:13:36.753787872Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753791118Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.753794624Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:13:36.753797941Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753801156Z stdout F  'exit\n',
+2026-07-16T11:13:36.753804342Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:36.753807639Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:36.753810885Z stdout F  '  network fd00:10:244:1::4/128 \n'
+2026-07-16T11:13:36.753813951Z stdout F  ' exit\n'
+2026-07-16T11:13:36.753817177Z stdout F  'exit\n']
+2026-07-16T11:13:36.753820613Z stdout F [2186|mgmtd] sending configuration
+2026-07-16T11:13:36.753823578Z stdout F [2187|zebra] sending configuration
+2026-07-16T11:13:36.753826915Z stdout F [2193|bgpd] sending configuration
+2026-07-16T11:13:37.490291557Z stdout F [2203|staticd] sending configuration
+2026-07-16T11:13:37.490307748Z stdout F [2201|watchfrr] sending configuration
+2026-07-16T11:13:37.490320832Z stdout F [2204|bfdd] sending configuration
+2026-07-16T11:13:37.490324439Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:13:37.490327625Z stdout F [2204|bfdd] done
+2026-07-16T11:13:37.490331121Z stdout F [2187|zebra] done
+2026-07-16T11:13:37.490334618Z stdout F [2201|watchfrr] done
+2026-07-16T11:13:37.490337744Z stdout F [2203|staticd] done
+2026-07-16T11:13:37.490340559Z stdout F [2186|mgmtd] done
+2026-07-16T11:13:37.490343314Z stdout F [2193|bgpd] done
+2026-07-16T11:13:37.49034636Z stdout F 2026-07-16 11:13:37,168  INFO: Loading Config object from vtysh show running
+2026-07-16T11:13:37.490349225Z stdout F 2026-07-16 11:13:37,477  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:13:37.49058692Z stdout F 2026-07-16 11:13:37,481  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:13:37.490591599Z stdout F 2026-07-16 11:13:37,483  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:13:37.490594554Z stdout F 2026-07-16 11:13:37,484  INFO: /var/run/frr/reload-A8XFGY.txt content
+2026-07-16T11:13:37.49059757Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:13:37.490600505Z stdout F  'debug bgp updates\n',
+2026-07-16T11:13:37.490603521Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:13:37.490606276Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:13:37.490608981Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:13:37.490611776Z stdout F  'debug bgp updates\n',
+2026-07-16T11:13:37.490614471Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:13:37.490617147Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:13:37.490619972Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.4/32\n',
+2026-07-16T11:13:37.490622907Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:13:37.49205093Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:13:37.49206199Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:13:37.492066108Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:13:37.492069334Z stdout F  'exit\n',
+2026-07-16T11:13:37.49207234Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:13:37.492075195Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:13:37.49207805Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:13:37.492082799Z stdout F  'exit\n',
+2026-07-16T11:13:37.492086005Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:13:37.492088821Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:13:37.492092027Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:13:37.492095182Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:13:37.492098529Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:13:37.492102095Z stdout F  'exit\n',
+2026-07-16T11:13:37.492105642Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:13:37.492108878Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:13:37.492112164Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:13:37.492114959Z stdout F  'exit\n',
+2026-07-16T11:13:37.492118306Z stdout F  'ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::4/128\n',
+2026-07-16T11:13:37.492121121Z stdout F  'ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:13:37.492123836Z stdout F  'route-map 2001:db8:1::1-out permit 1\nexit\n',
+2026-07-16T11:13:37.492126601Z stdout F  'route-map 2001:db8:1::1-out permit 1\n'
+2026-07-16T11:13:37.492129697Z stdout F  ' match ip address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:13:37.492132603Z stdout F  'exit\n',
+2026-07-16T11:13:37.49229703Z stdout F  'route-map 2001:db8:1::1-out permit 2\nexit\n',
+2026-07-16T11:13:37.492301889Z stdout F  'route-map 2001:db8:1::1-out permit 2\n'
+2026-07-16T11:13:37.492304915Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:13:37.492315134Z stdout F  'exit\n',
+2026-07-16T11:13:37.49231825Z stdout F  'ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:13:37.492321075Z stdout F  'ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n',
+2026-07-16T11:13:37.49232383Z stdout F  'route-map 2001:db8:1::1-in permit 3\nexit\n',
+2026-07-16T11:13:37.492326505Z stdout F  'route-map 2001:db8:1::1-in permit 3\n'
+2026-07-16T11:13:37.492329301Z stdout F  ' match ip address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:13:37.492332056Z stdout F  'exit\n',
+2026-07-16T11:13:37.492334751Z stdout F  'route-map 2001:db8:1::1-in permit 4\nexit\n',
+2026-07-16T11:13:37.492337436Z stdout F  'route-map 2001:db8:1::1-in permit 4\n'
+2026-07-16T11:13:37.492340171Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:13:37.492343016Z stdout F  'exit\n',
+2026-07-16T11:13:37.492345972Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:13:37.492348707Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:13:37.492351422Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:13:37.492354177Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:13:37.492356962Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:13:37.492359818Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:13:37.492362523Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:13:37.492589528Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 remote-as 64514\nexit\n',
+2026-07-16T11:13:37.492598474Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 timers connect 1\nexit\n',
+2026-07-16T11:13:37.49260148Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 disable-connected-check\nexit\n',
+2026-07-16T11:13:37.492604365Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:13:37.492607601Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.492610407Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.492613172Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:13:37.492615937Z stdout F  ' exit\n'
+2026-07-16T11:13:37.492618672Z stdout F  'exit\n',
+2026-07-16T11:13:37.492621417Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.492624343Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.492627118Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:13:37.492629893Z stdout F  ' exit\n'
+2026-07-16T11:13:37.492632618Z stdout F  'exit\n',
+2026-07-16T11:13:37.492635323Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.492638098Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.492640834Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:13:37.492643659Z stdout F  ' exit\n'
+2026-07-16T11:13:37.492646364Z stdout F  'exit\n',
+2026-07-16T11:13:37.492649199Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.492651964Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.49265472Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:13:37.492657405Z stdout F  ' exit\n'
+2026-07-16T11:13:37.4926601Z stdout F  'exit\n',
+2026-07-16T11:13:37.492662825Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.49266555Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.492668275Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:13:37.49267101Z stdout F  ' exit\n'
+2026-07-16T11:13:37.492673695Z stdout F  'exit\n',
+2026-07-16T11:13:37.4926764Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.492679155Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.49268186Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:13:37.492684556Z stdout F  ' exit\n'
+2026-07-16T11:13:37.492687261Z stdout F  'exit\n',
+2026-07-16T11:13:37.49269779Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646063035Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:13:37.646079435Z stdout F  '  network 10.244.1.4/32 \n'
+2026-07-16T11:13:37.646083122Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646086088Z stdout F  'exit\n',
+2026-07-16T11:13:37.646089474Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:13:37.646093612Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646096838Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646100174Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:13:37.6461033Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646106646Z stdout F  'exit\n',
+2026-07-16T11:13:37.646110003Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646113108Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646116835Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:13:37.646119961Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646123207Z stdout F  'exit\n',
+2026-07-16T11:13:37.646126874Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646130751Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646134017Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:13:37.646137283Z stdout F  ' exit\n'
+2026-07-16T11:13:37.64614084Z stdout F  'exit\n',
+2026-07-16T11:13:37.646202175Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646206022Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646212074Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:13:37.64621542Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646218606Z stdout F  'exit\n',
+2026-07-16T11:13:37.646221942Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646225419Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646228785Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:13:37.646232011Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646235167Z stdout F  'exit\n',
+2026-07-16T11:13:37.646238543Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646241849Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646245225Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:13:37.646248311Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646251537Z stdout F  'exit\n',
+2026-07-16T11:13:37.646254944Z stdout F  'router bgp 64515\n'
+2026-07-16T11:13:37.646258741Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:13:37.646262017Z stdout F  '  network fd00:10:244:1::4/128 \n'
+2026-07-16T11:13:37.646265243Z stdout F  ' exit\n'
+2026-07-16T11:13:37.646268419Z stdout F  'exit\n']
+2026-07-16T11:13:38.565082969Z stdout F [2215|mgmtd] sending configuration
+2026-07-16T11:13:38.565098718Z stdout F [2216|zebra] sending configuration
+2026-07-16T11:13:38.565102295Z stdout F [2222|bgpd] sending configuration
+2026-07-16T11:13:38.565106092Z stdout F [2230|watchfrr] sending configuration
+2026-07-16T11:13:38.565109288Z stdout F [2232|staticd] sending configuration
+2026-07-16T11:13:38.565112564Z stdout F [2233|bfdd] sending configuration
+2026-07-16T11:13:38.565116562Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:13:38.565120239Z stdout F [2215|mgmtd] done
+2026-07-16T11:13:38.565123675Z stdout F [2233|bfdd] done
+2026-07-16T11:13:38.565127182Z stdout F [2230|watchfrr] done
+2026-07-16T11:13:38.565130608Z stdout F [2232|staticd] done
+2026-07-16T11:13:38.565133714Z stdout F [2216|zebra] done
+2026-07-16T11:13:38.56513686Z stdout F [2222|bgpd] done
+2026-07-16T11:13:38.78957578Z stdout F FRR reloaded successfully! 4 seconds
+2026-07-16T11:19:55.369502739Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:19:55.369954714Z stdout F Checking the configuration file syntax
+2026-07-16T11:19:55.875640116Z stdout F 
+2026-07-16T11:19:55.892535194Z stdout F Lines To Delete
+2026-07-16T11:19:55.892553509Z stdout F ===============
+2026-07-16T11:19:55.892562094Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:19:55.892567455Z stdout F no debug bgp updates in
+2026-07-16T11:19:55.892581851Z stdout F no debug bgp updates out
+2026-07-16T11:19:55.892585108Z stdout F no router bgp 64515
+2026-07-16T11:19:55.892588163Z stdout F no route-map 192.169.10.1-out permit 1
+2026-07-16T11:19:55.892591039Z stdout F no route-map 192.169.10.1-out permit 2
+2026-07-16T11:19:55.892593904Z stdout F no route-map 192.169.10.1-in permit 3
+2026-07-16T11:19:55.892596689Z stdout F no route-map 192.169.10.1-in permit 4
+2026-07-16T11:19:55.892599444Z stdout F no route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:19:55.89260232Z stdout F no route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:19:55.892605145Z stdout F no route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:19:55.89260807Z stdout F no route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:19:55.892610625Z stdout F 
+2026-07-16T11:19:55.89261335Z stdout F Lines To Add
+2026-07-16T11:19:55.892616085Z stdout F ============
+2026-07-16T11:19:55.892618981Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:19:55.892621796Z stdout F debug bgp updates
+2026-07-16T11:19:55.892624601Z stdout F ip nht resolve-via-default
+2026-07-16T11:19:55.892627547Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:19:55.892630633Z stdout F no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.4/32
+2026-07-16T11:19:55.892634109Z stdout F no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:19:55.892636894Z stdout F no ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any
+2026-07-16T11:19:55.89263998Z stdout F no ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any
+2026-07-16T11:19:55.892642845Z stdout F no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:19:55.892645731Z stdout F no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:19:55.892648847Z stdout F no ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::4/128
+2026-07-16T11:19:55.892651812Z stdout F no ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any
+2026-07-16T11:19:55.892670697Z stdout F Applying the configuration file
+2026-07-16T11:19:56.03434451Z stdout F 2026-07-16 11:19:56,033  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:19:58.04493995Z stdout F 2026-07-16 11:19:56,033  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:19:58.044954858Z stdout F 2026-07-16 11:19:56,304  INFO: Loading Config object from vtysh show running
+2026-07-16T11:19:58.044958274Z stdout F 2026-07-16 11:19:56,598  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:19:58.04496111Z stdout F 2026-07-16 11:19:56,599  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:19:58.044966169Z stdout F 2026-07-16 11:19:56,599  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:19:58.044969135Z stdout F 2026-07-16 11:19:56,788  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:19:58.04497208Z stdout F 2026-07-16 11:19:56,984  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:19:58.044974936Z stdout F 2026-07-16 11:19:57,104  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:19:58.044977911Z stdout F 2026-07-16 11:19:57,235  INFO: Executed "no router bgp 64515"
+2026-07-16T11:19:58.044980667Z stdout F 2026-07-16 11:19:57,362  INFO: Executed "no route-map 192.169.10.1-out permit 1"
+2026-07-16T11:19:58.044983572Z stdout F 2026-07-16 11:19:57,497  INFO: Executed "no route-map 192.169.10.1-out permit 2"
+2026-07-16T11:19:58.045125076Z stdout F 2026-07-16 11:19:57,616  INFO: Executed "no route-map 192.169.10.1-in permit 3"
+2026-07-16T11:19:58.045131037Z stdout F 2026-07-16 11:19:57,735  INFO: Executed "no route-map 192.169.10.1-in permit 4"
+2026-07-16T11:19:58.350750319Z stdout F 2026-07-16 11:19:57,878  INFO: Executed "no route-map 2001:db8:1::1-out permit 1"
+2026-07-16T11:19:58.350768072Z stdout F 2026-07-16 11:19:58,044  INFO: Executed "no route-map 2001:db8:1::1-out permit 2"
+2026-07-16T11:19:58.350782389Z stdout F 2026-07-16 11:19:58,144  INFO: Executed "no route-map 2001:db8:1::1-in permit 3"
+2026-07-16T11:19:58.350786216Z stdout F 2026-07-16 11:19:58,247  INFO: Executed "no route-map 2001:db8:1::1-in permit 4"
+2026-07-16T11:19:58.350789813Z stdout F 2026-07-16 11:19:58,248  INFO: /var/run/frr/reload-3C0Y3P.txt content
+2026-07-16T11:19:58.350793139Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:19:58.350797227Z stdout F  'debug bgp updates\n',
+2026-07-16T11:19:58.350800794Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:19:58.35080427Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:19:58.350807767Z stdout F  'no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.4/32\n',
+2026-07-16T11:19:58.350811313Z stdout F  'no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:19:58.350856297Z stdout F  'no ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:19:58.350859423Z stdout F  'no ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:19:58.350862509Z stdout F  'no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:19:58.350865675Z stdout F  'no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:19:58.350869432Z stdout F  'no ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit '
+2026-07-16T11:19:58.350872728Z stdout F  'fd00:10:244:1::4/128\n',
+2026-07-16T11:19:58.350876295Z stdout F  'no ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n']
+2026-07-16T11:19:58.677438824Z stdout F [3840|mgmtd] sending configuration
+2026-07-16T11:19:58.677448232Z stdout F [3841|zebra] sending configuration
+2026-07-16T11:19:58.677473409Z stdout F [3847|bgpd] sending configuration
+2026-07-16T11:19:58.67747935Z stdout F [3840|mgmtd] done
+2026-07-16T11:19:58.677482847Z stdout F [3841|zebra] done
+2026-07-16T11:19:58.677486153Z stdout F [3858|bfdd] sending configuration
+2026-07-16T11:19:58.677489489Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:19:58.677492675Z stdout F [3855|watchfrr] sending configuration
+2026-07-16T11:19:58.67749557Z stdout F [3857|staticd] sending configuration
+2026-07-16T11:19:58.677498586Z stdout F [3857|staticd] done
+2026-07-16T11:19:58.677502063Z stdout F [3858|bfdd] done
+2026-07-16T11:19:58.677505279Z stdout F [3855|watchfrr] done
+2026-07-16T11:19:58.677508325Z stdout F [3847|bgpd] done
+2026-07-16T11:19:58.67751152Z stdout F 2026-07-16 11:19:58,384  INFO: Loading Config object from vtysh show running
+2026-07-16T11:19:58.677515037Z stdout F 2026-07-16 11:19:58,521  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:19:58.677518373Z stdout F 2026-07-16 11:19:58,521  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:19:58.67752206Z stdout F 2026-07-16 11:19:58,522  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:19:58.677525326Z stdout F 2026-07-16 11:19:58,522  INFO: /var/run/frr/reload-KXF3CD.txt content
+2026-07-16T11:19:58.677529003Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:19:58.677532399Z stdout F  'debug bgp updates\n',
+2026-07-16T11:19:58.677536126Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:19:58.677539573Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:19:58.677542719Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:19:58.677545975Z stdout F  'debug bgp updates\n',
+2026-07-16T11:19:58.677549562Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:19:58.677553028Z stdout F  'ipv6 nht resolve-via-default\n']
+2026-07-16T11:19:58.677556845Z stdout F [3865|mgmtd] sending configuration
+2026-07-16T11:19:58.961034262Z stdout F [3866|zebra] sending configuration
+2026-07-16T11:19:58.961051484Z stdout F [3872|bgpd] sending configuration
+2026-07-16T11:19:58.961055832Z stdout F [3866|zebra] done
+2026-07-16T11:19:58.961531941Z stdout F [3865|mgmtd] done
+2026-07-16T11:19:58.961541559Z stdout F [3872|bgpd] done
+2026-07-16T11:19:58.961558471Z stdout F [3880|watchfrr] sending configuration
+2026-07-16T11:19:58.961561797Z stdout F [3880|watchfrr] done
+2026-07-16T11:19:58.9617615Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:19:58.961767051Z stdout F [3882|staticd] sending configuration
+2026-07-16T11:19:58.961770407Z stdout F [3883|bfdd] sending configuration
+2026-07-16T11:19:58.961773473Z stdout F [3882|staticd] done
+2026-07-16T11:19:58.961776589Z stdout F [3883|bfdd] done
+2026-07-16T11:19:59.123832576Z stdout F FRR reloaded successfully! 4 seconds
+2026-07-16T11:26:02.991444875Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:26:02.993783534Z stdout F Checking the configuration file syntax
+2026-07-16T11:26:03.879027098Z stdout F 
+2026-07-16T11:26:03.880135098Z stdout F Lines To Delete
+2026-07-16T11:26:03.880150026Z stdout F ===============
+2026-07-16T11:26:03.880250303Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:26:03.88025923Z stdout F no debug bgp updates in
+2026-07-16T11:26:03.880264941Z stdout F no debug bgp updates out
+2026-07-16T11:26:03.88026989Z stdout F 
+2026-07-16T11:26:03.880274919Z stdout F Lines To Add
+2026-07-16T11:26:03.880279898Z stdout F ============
+2026-07-16T11:26:03.880285599Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:26:03.880291179Z stdout F debug bgp updates
+2026-07-16T11:26:03.88029654Z stdout F ip nht resolve-via-default
+2026-07-16T11:26:03.880301809Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:26:03.88030751Z stdout F ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any
+2026-07-16T11:26:03.880312619Z stdout F ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:26:03.880317929Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:26:03.8803236Z stdout F exit
+2026-07-16T11:26:03.880331475Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:26:03.880336655Z stdout F  match ip address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:26:03.880341674Z stdout F exit
+2026-07-16T11:26:03.880346994Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:26:03.880352043Z stdout F exit
+2026-07-16T11:26:03.880357153Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:26:03.880362292Z stdout F  match ipv6 address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:26:03.880367111Z stdout F exit
+2026-07-16T11:26:03.88043615Z stdout F ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:26:03.880443314Z stdout F ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:26:03.880448403Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:26:03.880454204Z stdout F exit
+2026-07-16T11:26:03.880463201Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:26:03.880469142Z stdout F  match ip address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:26:03.880474562Z stdout F exit
+2026-07-16T11:26:03.880479551Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:26:03.880484881Z stdout F exit
+2026-07-16T11:26:03.880490211Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:26:03.880512784Z stdout F  match ipv6 address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:26:03.880518274Z stdout F exit
+2026-07-16T11:26:03.880523804Z stdout F ip prefix-list 2001:db8:1::1-pl-ipv6 seq 1 deny any
+2026-07-16T11:26:03.880528883Z stdout F ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any
+2026-07-16T11:26:03.880534164Z stdout F route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:26:03.880539353Z stdout F exit
+2026-07-16T11:26:03.880544503Z stdout F route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:26:03.880549853Z stdout F  match ip address prefix-list 2001:db8:1::1-pl-ipv6
+2026-07-16T11:26:03.880555724Z stdout F exit
+2026-07-16T11:26:03.880560763Z stdout F route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:26:03.880565722Z stdout F exit
+2026-07-16T11:26:03.880570842Z stdout F route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:26:03.880576182Z stdout F  match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6
+2026-07-16T11:26:03.880581131Z stdout F exit
+2026-07-16T11:26:03.8805859Z stdout F ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any
+2026-07-16T11:26:03.880602401Z stdout F ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any
+2026-07-16T11:26:03.880605867Z stdout F route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:26:03.880609043Z stdout F exit
+2026-07-16T11:26:03.880612169Z stdout F route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:26:03.880615245Z stdout F  match ip address prefix-list 2001:db8:1::1-inpl-ipv6
+2026-07-16T11:26:03.880618561Z stdout F exit
+2026-07-16T11:26:03.880622178Z stdout F route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:26:03.880625594Z stdout F exit
+2026-07-16T11:26:03.880628941Z stdout F route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:26:03.880631916Z stdout F  match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6
+2026-07-16T11:26:03.880635322Z stdout F exit
+2026-07-16T11:26:03.880638759Z stdout F router bgp 64515
+2026-07-16T11:26:03.880642015Z stdout F exit
+2026-07-16T11:26:03.880645401Z stdout F router bgp 64515
+2026-07-16T11:26:03.880648798Z stdout F  no bgp ebgp-requires-policy
+2026-07-16T11:26:03.880651903Z stdout F exit
+2026-07-16T11:26:03.880654969Z stdout F router bgp 64515
+2026-07-16T11:26:03.880658205Z stdout F  no bgp network import-check
+2026-07-16T11:26:03.880661391Z stdout F exit
+2026-07-16T11:26:03.880664707Z stdout F router bgp 64515
+2026-07-16T11:26:03.880667833Z stdout F  no bgp default ipv4-unicast
+2026-07-16T11:26:03.88067122Z stdout F exit
+2026-07-16T11:26:03.880674576Z stdout F router bgp 64515
+2026-07-16T11:26:03.880678092Z stdout F  bgp graceful-restart preserve-fw-state
+2026-07-16T11:26:03.880681348Z stdout F exit
+2026-07-16T11:26:03.880684745Z stdout F router bgp 64515
+2026-07-16T11:26:03.880688091Z stdout F  neighbor 192.169.10.1 remote-as 64514
+2026-07-16T11:26:03.880691457Z stdout F exit
+2026-07-16T11:26:03.880694773Z stdout F router bgp 64515
+2026-07-16T11:26:03.88069829Z stdout F  neighbor 192.169.10.1 timers connect 1
+2026-07-16T11:26:03.880701646Z stdout F exit
+2026-07-16T11:26:03.880704802Z stdout F router bgp 64515
+2026-07-16T11:26:03.880708339Z stdout F  neighbor 2001:db8:1::1 remote-as 64514
+2026-07-16T11:26:03.880711825Z stdout F exit
+2026-07-16T11:26:03.880734778Z stdout F router bgp 64515
+2026-07-16T11:26:03.880739026Z stdout F  neighbor 2001:db8:1::1 timers connect 1
+2026-07-16T11:26:03.880742563Z stdout F exit
+2026-07-16T11:26:03.880745829Z stdout F router bgp 64515
+2026-07-16T11:26:03.880749155Z stdout F  neighbor 2001:db8:1::1 disable-connected-check
+2026-07-16T11:26:03.880752311Z stdout F exit
+2026-07-16T11:26:03.880755487Z stdout F router bgp 64515
+2026-07-16T11:26:03.880758603Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880761889Z stdout F  exit
+2026-07-16T11:26:03.880765305Z stdout F exit
+2026-07-16T11:26:03.880768571Z stdout F router bgp 64515
+2026-07-16T11:26:03.880772098Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880775544Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:26:03.88077865Z stdout F  exit
+2026-07-16T11:26:03.880781946Z stdout F exit
+2026-07-16T11:26:03.880785172Z stdout F router bgp 64515
+2026-07-16T11:26:03.880788659Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880792306Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:26:03.880797665Z stdout F  exit
+2026-07-16T11:26:03.880801172Z stdout F exit
+2026-07-16T11:26:03.880804549Z stdout F router bgp 64515
+2026-07-16T11:26:03.880808105Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880811391Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:26:03.880814597Z stdout F  exit
+2026-07-16T11:26:03.880817903Z stdout F exit
+2026-07-16T11:26:03.88082135Z stdout F router bgp 64515
+2026-07-16T11:26:03.880824456Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880828663Z stdout F   neighbor 2001:db8:1::1 activate
+2026-07-16T11:26:03.88083197Z stdout F  exit
+2026-07-16T11:26:03.880835046Z stdout F exit
+2026-07-16T11:26:03.880838101Z stdout F router bgp 64515
+2026-07-16T11:26:03.880841137Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880850705Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in
+2026-07-16T11:26:03.880853861Z stdout F  exit
+2026-07-16T11:26:03.880857127Z stdout F exit
+2026-07-16T11:26:03.880860343Z stdout F router bgp 64515
+2026-07-16T11:26:03.880863439Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:03.880866734Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out
+2026-07-16T11:26:03.880870101Z stdout F  exit
+2026-07-16T11:26:03.880873086Z stdout F exit
+2026-07-16T11:26:03.880876292Z stdout F router bgp 64515
+2026-07-16T11:26:03.880879428Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.880882695Z stdout F  exit
+2026-07-16T11:26:03.88088591Z stdout F exit
+2026-07-16T11:26:03.880889156Z stdout F router bgp 64515
+2026-07-16T11:26:03.935593733Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.935612047Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:26:03.935616144Z stdout F  exit
+2026-07-16T11:26:03.935619941Z stdout F exit
+2026-07-16T11:26:03.935623348Z stdout F router bgp 64515
+2026-07-16T11:26:03.935626884Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.935630792Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:26:03.935634619Z stdout F  exit
+2026-07-16T11:26:03.935637885Z stdout F exit
+2026-07-16T11:26:03.935641241Z stdout F router bgp 64515
+2026-07-16T11:26:03.935644437Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.935647633Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:26:03.935650779Z stdout F  exit
+2026-07-16T11:26:03.935653895Z stdout F exit
+2026-07-16T11:26:03.935657481Z stdout F router bgp 64515
+2026-07-16T11:26:03.935660357Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.935663723Z stdout F   neighbor 2001:db8:1::1 activate
+2026-07-16T11:26:03.935666939Z stdout F  exit
+2026-07-16T11:26:03.935670095Z stdout F exit
+2026-07-16T11:26:03.935673361Z stdout F router bgp 64515
+2026-07-16T11:26:03.935676667Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.935679753Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in
+2026-07-16T11:26:03.93568324Z stdout F  exit
+2026-07-16T11:26:03.935686386Z stdout F exit
+2026-07-16T11:26:03.935689822Z stdout F router bgp 64515
+2026-07-16T11:26:03.935693018Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:03.935696424Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out
+2026-07-16T11:26:03.93569982Z stdout F  exit
+2026-07-16T11:26:03.935703247Z stdout F exit
+2026-07-16T11:26:03.935706543Z stdout F Applying the configuration file
+2026-07-16T11:26:04.235126117Z stdout F 2026-07-16 11:26:04,234  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:26:05.622978478Z stdout F 2026-07-16 11:26:04,234  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:26:05.622993587Z stdout F 2026-07-16 11:26:04,627  INFO: Loading Config object from vtysh show running
+2026-07-16T11:26:05.622997744Z stdout F 2026-07-16 11:26:04,967  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:26:05.623001301Z stdout F 2026-07-16 11:26:04,967  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:26:05.623004647Z stdout F 2026-07-16 11:26:04,968  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:26:05.623008705Z stdout F 2026-07-16 11:26:05,202  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:26:05.623011801Z stdout F 2026-07-16 11:26:05,384  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:26:05.623014956Z stdout F 2026-07-16 11:26:05,618  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:26:05.623018132Z stdout F 2026-07-16 11:26:05,620  INFO: /var/run/frr/reload-2VX7EX.txt content
+2026-07-16T11:26:05.62302224Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:05.623026067Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:05.623039081Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:05.623042518Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:05.623045924Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+2026-07-16T11:26:05.62304898Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:26:05.623052326Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:26:05.623055823Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:26:05.623058918Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:05.623062124Z stdout F  'exit\n',
+2026-07-16T11:26:05.623066102Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:26:05.623147925Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:26:05.623152303Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:05.623155579Z stdout F  'exit\n',
+2026-07-16T11:26:05.623158915Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:26:05.623162432Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:26:05.623165778Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:26:05.623169204Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:26:05.623172661Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:05.623176047Z stdout F  'exit\n',
+2026-07-16T11:26:05.623179394Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:26:05.623182309Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:26:05.623185134Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:05.623187959Z stdout F  'exit\n',
+2026-07-16T11:26:05.623190825Z stdout F  'ip prefix-list 2001:db8:1::1-pl-ipv6 seq 1 deny any\n',
+2026-07-16T11:26:05.623193901Z stdout F  'ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:26:05.623197036Z stdout F  'route-map 2001:db8:1::1-out permit 1\nexit\n',
+2026-07-16T11:26:05.623199922Z stdout F  'route-map 2001:db8:1::1-out permit 1\n'
+2026-07-16T11:26:05.623202787Z stdout F  ' match ip address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:05.623206043Z stdout F  'exit\n',
+2026-07-16T11:26:05.623208889Z stdout F  'route-map 2001:db8:1::1-out permit 2\nexit\n',
+2026-07-16T11:26:05.623212055Z stdout F  'route-map 2001:db8:1::1-out permit 2\n'
+2026-07-16T11:26:05.623215361Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:05.623218877Z stdout F  'exit\n',
+2026-07-16T11:26:05.623222574Z stdout F  'ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:26:05.623225279Z stdout F  'ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n',
+2026-07-16T11:26:05.623228155Z stdout F  'route-map 2001:db8:1::1-in permit 3\nexit\n',
+2026-07-16T11:26:05.62323095Z stdout F  'route-map 2001:db8:1::1-in permit 3\n'
+2026-07-16T11:26:05.623233815Z stdout F  ' match ip address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:05.623236721Z stdout F  'exit\n',
+2026-07-16T11:26:05.623239576Z stdout F  'route-map 2001:db8:1::1-in permit 4\nexit\n',
+2026-07-16T11:26:05.623242672Z stdout F  'route-map 2001:db8:1::1-in permit 4\n'
+2026-07-16T11:26:05.623246038Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:05.623248944Z stdout F  'exit\n',
+2026-07-16T11:26:05.623251819Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:26:05.623254895Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:26:05.62325791Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:26:05.623261457Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:26:05.623265324Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:26:05.62326845Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:26:05.623277918Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:26:05.623281735Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 remote-as 64514\nexit\n',
+2026-07-16T11:26:05.623285552Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 timers connect 1\nexit\n',
+2026-07-16T11:26:05.623428198Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 disable-connected-check\nexit\n',
+2026-07-16T11:26:05.623434059Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:26:05.623437145Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.623440201Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:05.623442896Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:05.623445691Z stdout F  ' exit\n'
+2026-07-16T11:26:05.623497057Z stdout F  'exit\n',
+2026-07-16T11:26:05.623500684Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.623504571Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:05.623512015Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:05.623515251Z stdout F  ' exit\n'
+2026-07-16T11:26:05.623518537Z stdout F  'exit\n',
+2026-07-16T11:26:05.623522324Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.623525661Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:05.623528636Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:05.623531792Z stdout F  ' exit\n'
+2026-07-16T11:26:05.623535609Z stdout F  'exit\n',
+2026-07-16T11:26:05.623538815Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.623542011Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:05.623545317Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:05.623548834Z stdout F  ' exit\n'
+2026-07-16T11:26:05.62355203Z stdout F  'exit\n',
+2026-07-16T11:26:05.623554995Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.623558171Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:05.623561487Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:05.623564673Z stdout F  ' exit\n'
+2026-07-16T11:26:05.624044359Z stdout F  'exit\n',
+2026-07-16T11:26:05.624048457Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.624052074Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:05.62405543Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:05.624058877Z stdout F  ' exit\n'
+2026-07-16T11:26:05.624062123Z stdout F  'exit\n',
+2026-07-16T11:26:05.624065369Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:26:05.624068705Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:05.624071961Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:05.624075207Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:05.624078613Z stdout F  ' exit\n'
+2026-07-16T11:26:06.577831016Z stdout F  'exit\n',
+2026-07-16T11:26:06.577848499Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.577852666Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:06.577856724Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:06.577860231Z stdout F  ' exit\n'
+2026-07-16T11:26:06.577864018Z stdout F  'exit\n',
+2026-07-16T11:26:06.577867173Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.577870399Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:06.577873876Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:06.577877142Z stdout F  ' exit\n'
+2026-07-16T11:26:06.577880759Z stdout F  'exit\n',
+2026-07-16T11:26:06.577884105Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.577887391Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:06.577910034Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:06.577914001Z stdout F  ' exit\n'
+2026-07-16T11:26:06.577917638Z stdout F  'exit\n',
+2026-07-16T11:26:06.577921114Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.57792444Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:06.577938707Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:06.577942033Z stdout F  ' exit\n'
+2026-07-16T11:26:06.577945169Z stdout F  'exit\n',
+2026-07-16T11:26:06.577948275Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.577951641Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:06.577954877Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:06.577957913Z stdout F  ' exit\n'
+2026-07-16T11:26:06.577961149Z stdout F  'exit\n']
+2026-07-16T11:26:06.577964445Z stdout F [4135|mgmtd] sending configuration
+2026-07-16T11:26:06.577967571Z stdout F [4136|zebra] sending configuration
+2026-07-16T11:26:06.577971248Z stdout F [4142|bgpd] sending configuration
+2026-07-16T11:26:06.577974524Z stdout F [4150|watchfrr] sending configuration
+2026-07-16T11:26:06.577977459Z stdout F [4152|staticd] sending configuration
+2026-07-16T11:26:06.577980596Z stdout F [4153|bfdd] sending configuration
+2026-07-16T11:26:06.577983891Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:26:06.577987088Z stdout F [4153|bfdd] done
+2026-07-16T11:26:06.577991185Z stdout F [4152|staticd] done
+2026-07-16T11:26:06.577994401Z stdout F [4135|mgmtd] done
+2026-07-16T11:26:06.577998038Z stdout F [4150|watchfrr] done
+2026-07-16T11:26:06.983866544Z stdout F [4136|zebra] done
+2026-07-16T11:26:06.983881562Z stdout F [4142|bgpd] done
+2026-07-16T11:26:06.98388587Z stdout F 2026-07-16 11:26:06,573  INFO: Loading Config object from vtysh show running
+2026-07-16T11:26:06.983889397Z stdout F 2026-07-16 11:26:06,981  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:26:06.983892713Z stdout F 2026-07-16 11:26:06,981  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:26:06.983896269Z stdout F 2026-07-16 11:26:06,982  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:26:06.983899265Z stdout F 2026-07-16 11:26:06,982  INFO: /var/run/frr/reload-JTD8BD.txt content
+2026-07-16T11:26:06.983902822Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:06.983906078Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:06.983909454Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:06.98391271Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:06.983916457Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:06.983919673Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:06.983942826Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:06.983946924Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:06.983950521Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+2026-07-16T11:26:06.983954388Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:26:06.983957554Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:26:06.98396094Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:26:06.983964807Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:06.983968144Z stdout F  'exit\n',
+2026-07-16T11:26:06.9839716Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:26:06.983975417Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:26:06.984371197Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:06.984377769Z stdout F  'exit\n',
+2026-07-16T11:26:06.984381275Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:26:06.984384562Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:26:06.984389711Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:26:06.984393158Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:26:06.984396484Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:06.98439971Z stdout F  'exit\n',
+2026-07-16T11:26:06.984402956Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:26:06.984406042Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:26:06.984418805Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:06.984422101Z stdout F  'exit\n',
+2026-07-16T11:26:06.984425608Z stdout F  'ip prefix-list 2001:db8:1::1-pl-ipv6 seq 1 deny any\n',
+2026-07-16T11:26:06.984429135Z stdout F  'ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:26:06.984432521Z stdout F  'route-map 2001:db8:1::1-out permit 1\nexit\n',
+2026-07-16T11:26:06.984436458Z stdout F  'route-map 2001:db8:1::1-out permit 1\n'
+2026-07-16T11:26:06.984440125Z stdout F  ' match ip address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:06.984443241Z stdout F  'exit\n',
+2026-07-16T11:26:06.984446577Z stdout F  'route-map 2001:db8:1::1-out permit 2\nexit\n',
+2026-07-16T11:26:06.984450274Z stdout F  'route-map 2001:db8:1::1-out permit 2\n'
+2026-07-16T11:26:06.984454081Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:06.984457608Z stdout F  'exit\n',
+2026-07-16T11:26:06.984574677Z stdout F  'ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:26:06.984739554Z stdout F  'ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n',
+2026-07-16T11:26:06.984744233Z stdout F  'route-map 2001:db8:1::1-in permit 3\nexit\n',
+2026-07-16T11:26:06.984747369Z stdout F  'route-map 2001:db8:1::1-in permit 3\n'
+2026-07-16T11:26:06.984750455Z stdout F  ' match ip address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:06.9847535Z stdout F  'exit\n',
+2026-07-16T11:26:06.984756616Z stdout F  'route-map 2001:db8:1::1-in permit 4\nexit\n',
+2026-07-16T11:26:06.984760003Z stdout F  'route-map 2001:db8:1::1-in permit 4\n'
+2026-07-16T11:26:06.984763239Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:06.984766275Z stdout F  'exit\n',
+2026-07-16T11:26:06.9847693Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:26:06.984772406Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:26:06.984775412Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:26:06.984778487Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:26:06.984782164Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:26:06.98478544Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:26:06.984788726Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:26:06.984792203Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 remote-as 64514\nexit\n',
+2026-07-16T11:26:06.98479617Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 timers connect 1\nexit\n',
+2026-07-16T11:26:06.984799457Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 disable-connected-check\nexit\n',
+2026-07-16T11:26:06.984802452Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:26:06.984805578Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984809195Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:06.984812671Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:06.984816017Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984819664Z stdout F  'exit\n',
+2026-07-16T11:26:06.98482307Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984826457Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:06.984829693Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:06.984832949Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984835945Z stdout F  'exit\n',
+2026-07-16T11:26:06.98483898Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984842277Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:06.984845813Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:06.98484936Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984853046Z stdout F  'exit\n',
+2026-07-16T11:26:06.984856112Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984859278Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:06.98487065Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:06.984874136Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984877562Z stdout F  'exit\n',
+2026-07-16T11:26:06.984880818Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984884405Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:06.984887631Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:06.984890977Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984894464Z stdout F  'exit\n',
+2026-07-16T11:26:06.98489781Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984900906Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:06.984904132Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:06.984907458Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984910905Z stdout F  'exit\n',
+2026-07-16T11:26:06.98491406Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:26:06.984917357Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984920833Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:06.984923919Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:06.984927436Z stdout F  ' exit\n'
+2026-07-16T11:26:06.984930591Z stdout F  'exit\n',
+2026-07-16T11:26:06.984933687Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:06.984937264Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:07.642688003Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:07.64270244Z stdout F  ' exit\n'
+2026-07-16T11:26:07.642706037Z stdout F  'exit\n',
+2026-07-16T11:26:07.642709804Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:07.64271331Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:07.642716547Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:07.642720053Z stdout F  ' exit\n'
+2026-07-16T11:26:07.642723279Z stdout F  'exit\n',
+2026-07-16T11:26:07.642726776Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:07.642729921Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:07.642733127Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:07.642736384Z stdout F  ' exit\n'
+2026-07-16T11:26:07.64273968Z stdout F  'exit\n',
+2026-07-16T11:26:07.642743046Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:07.642746242Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:07.642751742Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:07.64278259Z stdout F  ' exit\n'
+2026-07-16T11:26:07.642787279Z stdout F  'exit\n',
+2026-07-16T11:26:07.642791226Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:07.642794582Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:07.642797999Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:07.642801325Z stdout F  ' exit\n'
+2026-07-16T11:26:07.642804861Z stdout F  'exit\n']
+2026-07-16T11:26:07.642807997Z stdout F [4167|mgmtd] sending configuration
+2026-07-16T11:26:07.642811284Z stdout F [4168|zebra] sending configuration
+2026-07-16T11:26:07.64281451Z stdout F [4174|bgpd] sending configuration
+2026-07-16T11:26:07.642817986Z stdout F [4182|watchfrr] sending configuration
+2026-07-16T11:26:07.642821222Z stdout F [4184|staticd] sending configuration
+2026-07-16T11:26:07.642824438Z stdout F [4185|bfdd] sending configuration
+2026-07-16T11:26:07.642827864Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:26:07.642831101Z stdout F [4174|bgpd] done
+2026-07-16T11:26:07.642834587Z stdout F [4185|bfdd] done
+2026-07-16T11:26:07.642837743Z stdout F [4182|watchfrr] done
+2026-07-16T11:26:07.642841069Z stdout F [4184|staticd] done
+2026-07-16T11:26:07.642844375Z stdout F [4167|mgmtd] done
+2026-07-16T11:26:07.642847481Z stdout F [4168|zebra] done
+2026-07-16T11:26:07.849348499Z stdout F FRR reloaded successfully! 5 seconds
+2026-07-16T11:26:41.758218186Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:26:41.758239886Z stdout F Checking the configuration file syntax
+2026-07-16T11:26:42.626571488Z stdout F 
+2026-07-16T11:26:42.673075833Z stdout F Lines To Delete
+2026-07-16T11:26:42.673093386Z stdout F ===============
+2026-07-16T11:26:42.673097904Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:26:42.673101801Z stdout F no debug bgp updates in
+2026-07-16T11:26:42.673104947Z stdout F no debug bgp updates out
+2026-07-16T11:26:42.673108233Z stdout F no router bgp 64515
+2026-07-16T11:26:42.673112061Z stdout F no route-map 192.169.10.1-out permit 1
+2026-07-16T11:26:42.673134232Z stdout F no route-map 192.169.10.1-out permit 2
+2026-07-16T11:26:42.673137588Z stdout F no route-map 192.169.10.1-in permit 3
+2026-07-16T11:26:42.673141085Z stdout F no route-map 192.169.10.1-in permit 4
+2026-07-16T11:26:42.673144651Z stdout F no route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:26:42.673147817Z stdout F no route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:26:42.673151013Z stdout F no route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:26:42.673154059Z stdout F no route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:26:42.673156965Z stdout F 
+2026-07-16T11:26:42.6731601Z stdout F Lines To Add
+2026-07-16T11:26:42.673164228Z stdout F ============
+2026-07-16T11:26:42.673167594Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:26:42.673174898Z stdout F debug bgp updates
+2026-07-16T11:26:42.673178405Z stdout F ip nht resolve-via-default
+2026-07-16T11:26:42.673181781Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:26:42.673185818Z stdout F no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any
+2026-07-16T11:26:42.673189275Z stdout F no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:26:42.673192601Z stdout F no ip prefix-list 2001:db8:1::1-pl-ipv6 seq 1 deny any
+2026-07-16T11:26:42.673195897Z stdout F no ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any
+2026-07-16T11:26:42.673199163Z stdout F no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:26:42.673202129Z stdout F no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:26:42.673205134Z stdout F no ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any
+2026-07-16T11:26:42.6732083Z stdout F no ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any
+2026-07-16T11:26:42.676517983Z stdout F Applying the configuration file
+2026-07-16T11:26:42.933105622Z stdout F 2026-07-16 11:26:42,932  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:26:45.540253559Z stdout F 2026-07-16 11:26:42,932  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:26:45.540273105Z stdout F 2026-07-16 11:26:43,407  INFO: Loading Config object from vtysh show running
+2026-07-16T11:26:45.540276732Z stdout F 2026-07-16 11:26:43,825  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:26:45.540280249Z stdout F 2026-07-16 11:26:43,830  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:26:45.540283705Z stdout F 2026-07-16 11:26:43,830  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:26:45.540286771Z stdout F 2026-07-16 11:26:44,102  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:26:45.540290067Z stdout F 2026-07-16 11:26:44,272  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:26:45.540293584Z stdout F 2026-07-16 11:26:44,451  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:26:45.540312268Z stdout F 2026-07-16 11:26:44,588  INFO: Executed "no router bgp 64515"
+2026-07-16T11:26:45.540316086Z stdout F 2026-07-16 11:26:44,745  INFO: Executed "no route-map 192.169.10.1-out permit 1"
+2026-07-16T11:26:45.540319412Z stdout F 2026-07-16 11:26:44,901  INFO: Executed "no route-map 192.169.10.1-out permit 2"
+2026-07-16T11:26:45.540322848Z stdout F 2026-07-16 11:26:45,058  INFO: Executed "no route-map 192.169.10.1-in permit 3"
+2026-07-16T11:26:45.540326094Z stdout F 2026-07-16 11:26:45,219  INFO: Executed "no route-map 192.169.10.1-in permit 4"
+2026-07-16T11:26:45.96416295Z stdout F 2026-07-16 11:26:45,368  INFO: Executed "no route-map 2001:db8:1::1-out permit 1"
+2026-07-16T11:26:45.964185522Z stdout F 2026-07-16 11:26:45,539  INFO: Executed "no route-map 2001:db8:1::1-out permit 2"
+2026-07-16T11:26:45.96418981Z stdout F 2026-07-16 11:26:45,683  INFO: Executed "no route-map 2001:db8:1::1-in permit 3"
+2026-07-16T11:26:45.964192966Z stdout F 2026-07-16 11:26:45,840  INFO: Executed "no route-map 2001:db8:1::1-in permit 4"
+2026-07-16T11:26:45.964195811Z stdout F 2026-07-16 11:26:45,841  INFO: /var/run/frr/reload-PPIX7X.txt content
+2026-07-16T11:26:45.964198887Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:45.964202353Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:45.96420567Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:45.964208836Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:45.964212102Z stdout F  'no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 deny any\n',
+2026-07-16T11:26:45.964215668Z stdout F  'no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:26:45.964218784Z stdout F  'no ip prefix-list 2001:db8:1::1-pl-ipv6 seq 1 deny any\n',
+2026-07-16T11:26:45.96422186Z stdout F  'no ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:26:45.964224735Z stdout F  'no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:26:45.964227661Z stdout F  'no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:26:45.964230606Z stdout F  'no ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:26:45.964233742Z stdout F  'no ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n']
+2026-07-16T11:26:45.964236748Z stdout F [4374|mgmtd] sending configuration
+2026-07-16T11:26:46.511620537Z stdout F [4375|zebra] sending configuration
+2026-07-16T11:26:46.511637548Z stdout F [4381|bgpd] sending configuration
+2026-07-16T11:26:46.511641686Z stdout F [4374|mgmtd] done
+2026-07-16T11:26:46.511644872Z stdout F [4389|watchfrr] sending configuration
+2026-07-16T11:26:46.511648078Z stdout F [4391|staticd] sending configuration
+2026-07-16T11:26:46.511651134Z stdout F [4392|bfdd] sending configuration
+2026-07-16T11:26:46.51165473Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:26:46.511657716Z stdout F [4375|zebra] done
+2026-07-16T11:26:46.511660802Z stdout F [4389|watchfrr] done
+2026-07-16T11:26:46.511663647Z stdout F [4381|bgpd] done
+2026-07-16T11:26:46.511666472Z stdout F [4391|staticd] done
+2026-07-16T11:26:46.511669428Z stdout F [4392|bfdd] done
+2026-07-16T11:26:46.511762742Z stdout F 2026-07-16 11:26:46,013  INFO: Loading Config object from vtysh show running
+2026-07-16T11:26:46.511766539Z stdout F 2026-07-16 11:26:46,311  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:26:46.511769835Z stdout F 2026-07-16 11:26:46,312  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:26:46.511773082Z stdout F 2026-07-16 11:26:46,312  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:26:46.511776388Z stdout F 2026-07-16 11:26:46,312  INFO: /var/run/frr/reload-GN1IIA.txt content
+2026-07-16T11:26:46.511779443Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:46.511782409Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:46.511785665Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:46.512092238Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:46.512097447Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:46.512100914Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:46.512103759Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:46.512106614Z stdout F  'ipv6 nht resolve-via-default\n']
+2026-07-16T11:26:46.51210974Z stdout F [4400|mgmtd] sending configuration
+2026-07-16T11:26:46.512113257Z stdout F [4401|zebra] sending configuration
+2026-07-16T11:26:47.181567136Z stdout F [4407|bgpd] sending configuration
+2026-07-16T11:26:47.181587394Z stdout F [4401|zebra] done
+2026-07-16T11:26:47.181600689Z stdout F [4407|bgpd] done
+2026-07-16T11:26:47.181604105Z stdout F [4415|watchfrr] sending configuration
+2026-07-16T11:26:47.181607171Z stdout F [4417|staticd] sending configuration
+2026-07-16T11:26:47.181610457Z stdout F [4418|bfdd] sending configuration
+2026-07-16T11:26:47.181616298Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:26:47.181619524Z stdout F [4418|bfdd] done
+2026-07-16T11:26:47.18162299Z stdout F [4415|watchfrr] done
+2026-07-16T11:26:47.181626407Z stdout F [4417|staticd] done
+2026-07-16T11:26:47.181629753Z stdout F [4400|mgmtd] done
+2026-07-16T11:26:47.326141044Z stdout F FRR reloaded successfully! 6 seconds
+2026-07-16T11:26:51.561991414Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:26:51.563001771Z stdout F Checking the configuration file syntax
+2026-07-16T11:26:52.204969218Z stdout F 
+2026-07-16T11:26:52.204992621Z stdout F Lines To Delete
+2026-07-16T11:26:52.204996649Z stdout F ===============
+2026-07-16T11:26:52.205000466Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:26:52.205004433Z stdout F no debug bgp updates in
+2026-07-16T11:26:52.205007299Z stdout F no debug bgp updates out
+2026-07-16T11:26:52.205009924Z stdout F 
+2026-07-16T11:26:52.205012799Z stdout F Lines To Add
+2026-07-16T11:26:52.205015845Z stdout F ============
+2026-07-16T11:26:52.205020554Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:26:52.20502384Z stdout F debug bgp updates
+2026-07-16T11:26:52.205026855Z stdout F ip nht resolve-via-default
+2026-07-16T11:26:52.205030652Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:26:52.20503482Z stdout F ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.5/32
+2026-07-16T11:26:52.205037806Z stdout F ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:26:52.205041232Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:26:52.205044488Z stdout F exit
+2026-07-16T11:26:52.205103208Z stdout F route-map 192.169.10.1-out permit 1
+2026-07-16T11:26:52.205107256Z stdout F  match ip address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:26:52.205110231Z stdout F exit
+2026-07-16T11:26:52.205113207Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:26:52.205116092Z stdout F exit
+2026-07-16T11:26:52.205118887Z stdout F route-map 192.169.10.1-out permit 2
+2026-07-16T11:26:52.205121672Z stdout F  match ipv6 address prefix-list 192.169.10.1-pl-ipv4
+2026-07-16T11:26:52.205124528Z stdout F exit
+2026-07-16T11:26:52.205127423Z stdout F ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:26:52.205130399Z stdout F ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:26:52.205133534Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:26:52.20513642Z stdout F exit
+2026-07-16T11:26:52.205139225Z stdout F route-map 192.169.10.1-in permit 3
+2026-07-16T11:26:52.20514197Z stdout F  match ip address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:26:52.205144715Z stdout F exit
+2026-07-16T11:26:52.205147501Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:26:52.205150386Z stdout F exit
+2026-07-16T11:26:52.205153171Z stdout F route-map 192.169.10.1-in permit 4
+2026-07-16T11:26:52.205155846Z stdout F  match ipv6 address prefix-list 192.169.10.1-inpl-ipv4
+2026-07-16T11:26:52.205158441Z stdout F exit
+2026-07-16T11:26:52.205161477Z stdout F ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::5/128
+2026-07-16T11:26:52.205164182Z stdout F ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any
+2026-07-16T11:26:52.205166917Z stdout F route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:26:52.205169742Z stdout F exit
+2026-07-16T11:26:52.205172317Z stdout F route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:26:52.205174962Z stdout F  match ip address prefix-list 2001:db8:1::1-pl-ipv6
+2026-07-16T11:26:52.205177697Z stdout F exit
+2026-07-16T11:26:52.205180562Z stdout F route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:26:52.205183338Z stdout F exit
+2026-07-16T11:26:52.205186303Z stdout F route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:26:52.205218644Z stdout F  match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6
+2026-07-16T11:26:52.20522215Z stdout F exit
+2026-07-16T11:26:52.205224985Z stdout F ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any
+2026-07-16T11:26:52.205227861Z stdout F ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any
+2026-07-16T11:26:52.205231197Z stdout F route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:26:52.205233872Z stdout F exit
+2026-07-16T11:26:52.205236838Z stdout F route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:26:52.205239643Z stdout F  match ip address prefix-list 2001:db8:1::1-inpl-ipv6
+2026-07-16T11:26:52.205242398Z stdout F exit
+2026-07-16T11:26:52.205245333Z stdout F route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:26:52.205248459Z stdout F exit
+2026-07-16T11:26:52.205251334Z stdout F route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:26:52.20525419Z stdout F  match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6
+2026-07-16T11:26:52.205256845Z stdout F exit
+2026-07-16T11:26:52.20525961Z stdout F router bgp 64515
+2026-07-16T11:26:52.205262415Z stdout F exit
+2026-07-16T11:26:52.20526516Z stdout F router bgp 64515
+2026-07-16T11:26:52.205268016Z stdout F  no bgp ebgp-requires-policy
+2026-07-16T11:26:52.205270801Z stdout F exit
+2026-07-16T11:26:52.205273636Z stdout F router bgp 64515
+2026-07-16T11:26:52.205276501Z stdout F  no bgp network import-check
+2026-07-16T11:26:52.205279297Z stdout F exit
+2026-07-16T11:26:52.205282072Z stdout F router bgp 64515
+2026-07-16T11:26:52.205284907Z stdout F  no bgp default ipv4-unicast
+2026-07-16T11:26:52.205287642Z stdout F exit
+2026-07-16T11:26:52.205290468Z stdout F router bgp 64515
+2026-07-16T11:26:52.205293233Z stdout F  bgp graceful-restart preserve-fw-state
+2026-07-16T11:26:52.205295978Z stdout F exit
+2026-07-16T11:26:52.205298723Z stdout F router bgp 64515
+2026-07-16T11:26:52.205328018Z stdout F  neighbor 192.169.10.1 remote-as 64514
+2026-07-16T11:26:52.205330873Z stdout F exit
+2026-07-16T11:26:52.205333628Z stdout F router bgp 64515
+2026-07-16T11:26:52.205336384Z stdout F  neighbor 192.169.10.1 timers connect 1
+2026-07-16T11:26:52.205339109Z stdout F exit
+2026-07-16T11:26:52.205341673Z stdout F router bgp 64515
+2026-07-16T11:26:52.205344619Z stdout F  neighbor 2001:db8:1::1 remote-as 64514
+2026-07-16T11:26:52.205347474Z stdout F exit
+2026-07-16T11:26:52.20535033Z stdout F router bgp 64515
+2026-07-16T11:26:52.205353155Z stdout F  neighbor 2001:db8:1::1 timers connect 1
+2026-07-16T11:26:52.20535591Z stdout F exit
+2026-07-16T11:26:52.205358685Z stdout F router bgp 64515
+2026-07-16T11:26:52.205361641Z stdout F  neighbor 2001:db8:1::1 disable-connected-check
+2026-07-16T11:26:52.205364426Z stdout F exit
+2026-07-16T11:26:52.205367221Z stdout F router bgp 64515
+2026-07-16T11:26:52.205369996Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205372711Z stdout F  exit
+2026-07-16T11:26:52.205375457Z stdout F exit
+2026-07-16T11:26:52.205378211Z stdout F router bgp 64515
+2026-07-16T11:26:52.205381027Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205383942Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:26:52.205386707Z stdout F  exit
+2026-07-16T11:26:52.205389493Z stdout F exit
+2026-07-16T11:26:52.205392879Z stdout F router bgp 64515
+2026-07-16T11:26:52.205396235Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205399371Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:26:52.205402487Z stdout F  exit
+2026-07-16T11:26:52.205406094Z stdout F exit
+2026-07-16T11:26:52.20540955Z stdout F router bgp 64515
+2026-07-16T11:26:52.205412566Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205415351Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:26:52.205418186Z stdout F  exit
+2026-07-16T11:26:52.205436761Z stdout F exit
+2026-07-16T11:26:52.205439766Z stdout F router bgp 64515
+2026-07-16T11:26:52.205442582Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205445968Z stdout F   neighbor 2001:db8:1::1 activate
+2026-07-16T11:26:52.205448863Z stdout F  exit
+2026-07-16T11:26:52.205456308Z stdout F exit
+2026-07-16T11:26:52.205459263Z stdout F router bgp 64515
+2026-07-16T11:26:52.205461928Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205467518Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in
+2026-07-16T11:26:52.205470534Z stdout F  exit
+2026-07-16T11:26:52.205473179Z stdout F exit
+2026-07-16T11:26:52.205475944Z stdout F router bgp 64515
+2026-07-16T11:26:52.205478799Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.205481615Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out
+2026-07-16T11:26:52.20548427Z stdout F  exit
+2026-07-16T11:26:52.205487035Z stdout F exit
+2026-07-16T11:26:52.20548967Z stdout F router bgp 64515
+2026-07-16T11:26:52.205492305Z stdout F  address-family ipv4 unicast
+2026-07-16T11:26:52.20549514Z stdout F   network 10.244.1.5/32 
+2026-07-16T11:26:52.205497885Z stdout F  exit
+2026-07-16T11:26:52.2055006Z stdout F exit
+2026-07-16T11:26:52.222370093Z stdout F router bgp 64515
+2026-07-16T11:26:52.222381805Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222385372Z stdout F  exit
+2026-07-16T11:26:52.222388718Z stdout F exit
+2026-07-16T11:26:52.222391784Z stdout F router bgp 64515
+2026-07-16T11:26:52.22239493Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222397945Z stdout F   neighbor 192.169.10.1 activate
+2026-07-16T11:26:52.222401332Z stdout F  exit
+2026-07-16T11:26:52.222404678Z stdout F exit
+2026-07-16T11:26:52.222407974Z stdout F router bgp 64515
+2026-07-16T11:26:52.222411321Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222414627Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-in in
+2026-07-16T11:26:52.222772365Z stdout F  exit
+2026-07-16T11:26:52.222779288Z stdout F exit
+2026-07-16T11:26:52.222783045Z stdout F router bgp 64515
+2026-07-16T11:26:52.22278609Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222789517Z stdout F   neighbor 192.169.10.1 route-map 192.169.10.1-out out
+2026-07-16T11:26:52.222793284Z stdout F  exit
+2026-07-16T11:26:52.22279648Z stdout F exit
+2026-07-16T11:26:52.222800127Z stdout F router bgp 64515
+2026-07-16T11:26:52.222803814Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.22280744Z stdout F   neighbor 2001:db8:1::1 activate
+2026-07-16T11:26:52.222813662Z stdout F  exit
+2026-07-16T11:26:52.222816858Z stdout F exit
+2026-07-16T11:26:52.222820124Z stdout F router bgp 64515
+2026-07-16T11:26:52.22282337Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222826867Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in
+2026-07-16T11:26:52.222830093Z stdout F  exit
+2026-07-16T11:26:52.222833269Z stdout F exit
+2026-07-16T11:26:52.222836254Z stdout F router bgp 64515
+2026-07-16T11:26:52.22283937Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222842666Z stdout F   neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out
+2026-07-16T11:26:52.222845812Z stdout F  exit
+2026-07-16T11:26:52.222848818Z stdout F exit
+2026-07-16T11:26:52.222851944Z stdout F router bgp 64515
+2026-07-16T11:26:52.22285527Z stdout F  address-family ipv6 unicast
+2026-07-16T11:26:52.222858356Z stdout F   network fd00:10:244:1::5/128 
+2026-07-16T11:26:52.222861441Z stdout F  exit
+2026-07-16T11:26:52.223170669Z stdout F exit
+2026-07-16T11:26:52.223182651Z stdout F Applying the configuration file
+2026-07-16T11:26:52.429113538Z stdout F 2026-07-16 11:26:52,426  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"
+2026-07-16T11:26:53.858218702Z stdout F 2026-07-16 11:26:52,427  INFO: Loading Config object from file /etc/frr_reloader/frr.conf
+2026-07-16T11:26:53.858261812Z stdout F 2026-07-16 11:26:52,739  INFO: Loading Config object from vtysh show running
+2026-07-16T11:26:53.858265579Z stdout F 2026-07-16 11:26:53,072  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:26:53.858278213Z stdout F 2026-07-16 11:26:53,073  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:26:53.858281229Z stdout F 2026-07-16 11:26:53,073  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:26:53.858284194Z stdout F 2026-07-16 11:26:53,504  INFO: Executed "no log file /etc/frr/frr.log"
+2026-07-16T11:26:53.858627245Z stdout F 2026-07-16 11:26:53,706  INFO: Executed "no debug bgp updates in"
+2026-07-16T11:26:53.858635831Z stdout F 2026-07-16 11:26:53,856  INFO: Executed "no debug bgp updates out"
+2026-07-16T11:26:53.858638927Z stdout F 2026-07-16 11:26:53,857  INFO: /var/run/frr/reload-YOHWNX.txt content
+2026-07-16T11:26:53.858642003Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:53.858645349Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:53.858648475Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:53.858651129Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:53.858654055Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.5/32\n',
+2026-07-16T11:26:53.858657141Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:26:53.858659836Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:26:53.858662541Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:26:53.858677208Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:53.858680164Z stdout F  'exit\n',
+2026-07-16T11:26:53.858683049Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:26:53.858685874Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:26:53.858688619Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:53.858691445Z stdout F  'exit\n',
+2026-07-16T11:26:53.85869418Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:26:53.858696965Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:26:53.85869978Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:26:53.858702676Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:26:53.858705401Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:53.858708176Z stdout F  'exit\n',
+2026-07-16T11:26:53.858710881Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:26:53.858713646Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:26:53.858716402Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:53.858719187Z stdout F  'exit\n',
+2026-07-16T11:26:53.858722052Z stdout F  'ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::5/128\n',
+2026-07-16T11:26:53.858724877Z stdout F  'ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:26:53.858727623Z stdout F  'route-map 2001:db8:1::1-out permit 1\nexit\n',
+2026-07-16T11:26:53.858730328Z stdout F  'route-map 2001:db8:1::1-out permit 1\n'
+2026-07-16T11:26:53.858733143Z stdout F  ' match ip address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:53.858736539Z stdout F  'exit\n',
+2026-07-16T11:26:53.858740527Z stdout F  'route-map 2001:db8:1::1-out permit 2\nexit\n',
+2026-07-16T11:26:53.858743562Z stdout F  'route-map 2001:db8:1::1-out permit 2\n'
+2026-07-16T11:26:53.858746638Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:53.858749724Z stdout F  'exit\n',
+2026-07-16T11:26:53.858752459Z stdout F  'ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:26:53.858755224Z stdout F  'ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n',
+2026-07-16T11:26:53.858758109Z stdout F  'route-map 2001:db8:1::1-in permit 3\nexit\n',
+2026-07-16T11:26:53.858760885Z stdout F  'route-map 2001:db8:1::1-in permit 3\n'
+2026-07-16T11:26:53.85876364Z stdout F  ' match ip address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:53.858766515Z stdout F  'exit\n',
+2026-07-16T11:26:53.858769551Z stdout F  'route-map 2001:db8:1::1-in permit 4\nexit\n',
+2026-07-16T11:26:53.858780211Z stdout F  'route-map 2001:db8:1::1-in permit 4\n'
+2026-07-16T11:26:53.858783507Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:53.858786392Z stdout F  'exit\n',
+2026-07-16T11:26:53.858789308Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:26:53.858792083Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:26:53.858794928Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:26:53.858797874Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:26:53.858800899Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:26:53.858804065Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:26:53.8588069Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:26:53.858809686Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 remote-as 64514\nexit\n',
+2026-07-16T11:26:53.858812491Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 timers connect 1\nexit\n',
+2026-07-16T11:26:53.858846695Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 disable-connected-check\nexit\n',
+2026-07-16T11:26:53.858850782Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:26:53.858854019Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858857375Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858860611Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:53.858863817Z stdout F  ' exit\n'
+2026-07-16T11:26:53.858867053Z stdout F  'exit\n',
+2026-07-16T11:26:53.858870149Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858873335Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858876591Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:53.858879797Z stdout F  ' exit\n'
+2026-07-16T11:26:53.858882662Z stdout F  'exit\n',
+2026-07-16T11:26:53.858888062Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858891769Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858894925Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:53.85889784Z stdout F  ' exit\n'
+2026-07-16T11:26:53.858900826Z stdout F  'exit\n',
+2026-07-16T11:26:53.858904282Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858907629Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858910965Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:53.85891385Z stdout F  ' exit\n'
+2026-07-16T11:26:53.858917407Z stdout F  'exit\n',
+2026-07-16T11:26:53.858921595Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858924801Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858928498Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:53.858931764Z stdout F  ' exit\n'
+2026-07-16T11:26:53.85893538Z stdout F  'exit\n',
+2026-07-16T11:26:53.858938226Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858941482Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858944397Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:53.858947233Z stdout F  ' exit\n'
+2026-07-16T11:26:53.858949878Z stdout F  'exit\n',
+2026-07-16T11:26:53.858952512Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:53.858955488Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:53.858958654Z stdout F  '  network 10.244.1.5/32 \n'
+2026-07-16T11:26:53.858961469Z stdout F  ' exit\n'
+2026-07-16T11:26:53.858964515Z stdout F  'exit\n',
+2026-07-16T11:26:54.004017108Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:26:54.004033498Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.004037346Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004040431Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:54.004043557Z stdout F  ' exit\n'
+2026-07-16T11:26:54.004046683Z stdout F  'exit\n',
+2026-07-16T11:26:54.004059757Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.004062853Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004066019Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:54.004132584Z stdout F  ' exit\n'
+2026-07-16T11:26:54.004136431Z stdout F  'exit\n',
+2026-07-16T11:26:54.004139426Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.004142943Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004146209Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:54.004149164Z stdout F  ' exit\n'
+2026-07-16T11:26:54.00415202Z stdout F  'exit\n',
+2026-07-16T11:26:54.004155256Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.004158252Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004161127Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:54.004164032Z stdout F  ' exit\n'
+2026-07-16T11:26:54.004167188Z stdout F  'exit\n',
+2026-07-16T11:26:54.004170384Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.00417342Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004176385Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:54.004179231Z stdout F  ' exit\n'
+2026-07-16T11:26:54.004182056Z stdout F  'exit\n',
+2026-07-16T11:26:54.004185162Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.004188268Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004191273Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:54.004272645Z stdout F  ' exit\n'
+2026-07-16T11:26:54.004277163Z stdout F  'exit\n',
+2026-07-16T11:26:54.0042804Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.004283455Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.004286561Z stdout F  '  network fd00:10:244:1::5/128 \n'
+2026-07-16T11:26:54.004289497Z stdout F  ' exit\n'
+2026-07-16T11:26:54.004292482Z stdout F  'exit\n']
+2026-07-16T11:26:54.004295448Z stdout F [4471|mgmtd] sending configuration
+2026-07-16T11:26:54.004298473Z stdout F [4472|zebra] sending configuration
+2026-07-16T11:26:54.004301539Z stdout F [4478|bgpd] sending configuration
+2026-07-16T11:26:54.60671343Z stdout F [4486|watchfrr] sending configuration
+2026-07-16T11:26:54.606731214Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:26:54.606735161Z stdout F [4488|staticd] sending configuration
+2026-07-16T11:26:54.606738467Z stdout F [4489|bfdd] sending configuration
+2026-07-16T11:26:54.606764115Z stdout F [4471|mgmtd] done
+2026-07-16T11:26:54.606767321Z stdout F [4486|watchfrr] done
+2026-07-16T11:26:54.606770497Z stdout F [4488|staticd] done
+2026-07-16T11:26:54.606773643Z stdout F [4472|zebra] done
+2026-07-16T11:26:54.606776869Z stdout F [4478|bgpd] done
+2026-07-16T11:26:54.606779824Z stdout F [4489|bfdd] done
+2026-07-16T11:26:54.606783131Z stdout F 2026-07-16 11:26:54,290  INFO: Loading Config object from vtysh show running
+2026-07-16T11:26:54.606786096Z stdout F 2026-07-16 11:26:54,603  INFO: "frr version 9.1_git" cannot be removed
+2026-07-16T11:26:54.606792538Z stdout F 2026-07-16 11:26:54,603  INFO: "frr defaults traditional" cannot be removed
+2026-07-16T11:26:54.606796205Z stdout F 2026-07-16 11:26:54,603  INFO: "service integrated-vtysh-config" cannot be removed
+2026-07-16T11:26:54.606799381Z stdout F 2026-07-16 11:26:54,605  INFO: /var/run/frr/reload-M9BL11.txt content
+2026-07-16T11:26:54.606802547Z stdout F ['log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:54.606805863Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:54.60680934Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:54.606812555Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:54.606815852Z stdout F  'log file /etc/frr/frr.log debugging\n',
+2026-07-16T11:26:54.606818938Z stdout F  'debug bgp updates\n',
+2026-07-16T11:26:54.606822294Z stdout F  'ip nht resolve-via-default\n',
+2026-07-16T11:26:54.60682537Z stdout F  'ipv6 nht resolve-via-default\n',
+2026-07-16T11:26:54.606828786Z stdout F  'ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.5/32\n',
+2026-07-16T11:26:54.606843043Z stdout F  'ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any\n',
+2026-07-16T11:26:54.607602381Z stdout F  'route-map 192.169.10.1-out permit 1\nexit\n',
+2026-07-16T11:26:54.60761255Z stdout F  'route-map 192.169.10.1-out permit 1\n'
+2026-07-16T11:26:54.607616357Z stdout F  ' match ip address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:54.607619623Z stdout F  'exit\n',
+2026-07-16T11:26:54.60762302Z stdout F  'route-map 192.169.10.1-out permit 2\nexit\n',
+2026-07-16T11:26:54.607626426Z stdout F  'route-map 192.169.10.1-out permit 2\n'
+2026-07-16T11:26:54.607630013Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-pl-ipv4\n'
+2026-07-16T11:26:54.607633369Z stdout F  'exit\n',
+2026-07-16T11:26:54.607636785Z stdout F  'ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any\n',
+2026-07-16T11:26:54.607640252Z stdout F  'ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any\n',
+2026-07-16T11:26:54.607643928Z stdout F  'route-map 192.169.10.1-in permit 3\nexit\n',
+2026-07-16T11:26:54.607647525Z stdout F  'route-map 192.169.10.1-in permit 3\n'
+2026-07-16T11:26:54.607650731Z stdout F  ' match ip address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:54.607653917Z stdout F  'exit\n',
+2026-07-16T11:26:54.607657364Z stdout F  'route-map 192.169.10.1-in permit 4\nexit\n',
+2026-07-16T11:26:54.60766064Z stdout F  'route-map 192.169.10.1-in permit 4\n'
+2026-07-16T11:26:54.607663986Z stdout F  ' match ipv6 address prefix-list 192.169.10.1-inpl-ipv4\n'
+2026-07-16T11:26:54.607666951Z stdout F  'exit\n',
+2026-07-16T11:26:54.607670308Z stdout F  'ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::5/128\n',
+2026-07-16T11:26:54.607673394Z stdout F  'ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any\n',
+2026-07-16T11:26:54.607676399Z stdout F  'route-map 2001:db8:1::1-out permit 1\nexit\n',
+2026-07-16T11:26:54.607679635Z stdout F  'route-map 2001:db8:1::1-out permit 1\n'
+2026-07-16T11:26:54.607682751Z stdout F  ' match ip address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:54.607685977Z stdout F  'exit\n',
+2026-07-16T11:26:54.609841592Z stdout F  'route-map 2001:db8:1::1-out permit 2\nexit\n',
+2026-07-16T11:26:54.609852562Z stdout F  'route-map 2001:db8:1::1-out permit 2\n'
+2026-07-16T11:26:54.60985652Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-pl-ipv6\n'
+2026-07-16T11:26:54.609859746Z stdout F  'exit\n',
+2026-07-16T11:26:54.609862822Z stdout F  'ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any\n',
+2026-07-16T11:26:54.609866208Z stdout F  'ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any\n',
+2026-07-16T11:26:54.609869214Z stdout F  'route-map 2001:db8:1::1-in permit 3\nexit\n',
+2026-07-16T11:26:54.609872449Z stdout F  'route-map 2001:db8:1::1-in permit 3\n'
+2026-07-16T11:26:54.609875635Z stdout F  ' match ip address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:54.609878611Z stdout F  'exit\n',
+2026-07-16T11:26:54.609882218Z stdout F  'route-map 2001:db8:1::1-in permit 4\nexit\n',
+2026-07-16T11:26:54.609885714Z stdout F  'route-map 2001:db8:1::1-in permit 4\n'
+2026-07-16T11:26:54.60988877Z stdout F  ' match ipv6 address prefix-list 2001:db8:1::1-inpl-ipv6\n'
+2026-07-16T11:26:54.609891805Z stdout F  'exit\n',
+2026-07-16T11:26:54.609895052Z stdout F  'router bgp 64515\nexit\n',
+2026-07-16T11:26:54.609898328Z stdout F  'router bgp 64515\n no bgp ebgp-requires-policy\nexit\n',
+2026-07-16T11:26:54.609901634Z stdout F  'router bgp 64515\n no bgp network import-check\nexit\n',
+2026-07-16T11:26:54.60990478Z stdout F  'router bgp 64515\n no bgp default ipv4-unicast\nexit\n',
+2026-07-16T11:26:54.609908196Z stdout F  'router bgp 64515\n bgp graceful-restart preserve-fw-state\nexit\n',
+2026-07-16T11:26:54.609913496Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 remote-as 64514\nexit\n',
+2026-07-16T11:26:54.609916842Z stdout F  'router bgp 64515\n neighbor 192.169.10.1 timers connect 1\nexit\n',
+2026-07-16T11:26:54.609920209Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 remote-as 64514\nexit\n',
+2026-07-16T11:26:54.609931289Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 timers connect 1\nexit\n',
+2026-07-16T11:26:54.609934836Z stdout F  'router bgp 64515\n neighbor 2001:db8:1::1 disable-connected-check\nexit\n',
+2026-07-16T11:26:54.609938323Z stdout F  'router bgp 64515\n address-family ipv4 unicast\n exit\nexit\n',
+2026-07-16T11:26:54.609941739Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.609945035Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.609948191Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:54.609951147Z stdout F  ' exit\n'
+2026-07-16T11:26:54.609954362Z stdout F  'exit\n',
+2026-07-16T11:26:54.609957478Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.609960604Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.60996379Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:54.609967116Z stdout F  ' exit\n'
+2026-07-16T11:26:54.609970152Z stdout F  'exit\n',
+2026-07-16T11:26:54.609973939Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.609977345Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.609980291Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:54.609983336Z stdout F  ' exit\n'
+2026-07-16T11:26:54.609986533Z stdout F  'exit\n',
+2026-07-16T11:26:54.609989779Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.609993125Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.609996451Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:54.609999737Z stdout F  ' exit\n'
+2026-07-16T11:26:54.610002663Z stdout F  'exit\n',
+2026-07-16T11:26:54.610005388Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.610007942Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.610010688Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:54.610013463Z stdout F  ' exit\n'
+2026-07-16T11:26:54.610016258Z stdout F  'exit\n',
+2026-07-16T11:26:54.610019183Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.610022429Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.610025405Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:54.610028271Z stdout F  ' exit\n'
+2026-07-16T11:26:54.610031096Z stdout F  'exit\n',
+2026-07-16T11:26:54.610033831Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796268097Z stdout F  ' address-family ipv4 unicast\n'
+2026-07-16T11:26:54.796285529Z stdout F  '  network 10.244.1.5/32 \n'
+2026-07-16T11:26:54.7963393Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796344018Z stdout F  'exit\n',
+2026-07-16T11:26:54.796347856Z stdout F  'router bgp 64515\n address-family ipv6 unicast\n exit\nexit\n',
+2026-07-16T11:26:54.796351813Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796355179Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.796361571Z stdout F  '  neighbor 192.169.10.1 activate\n'
+2026-07-16T11:26:54.796365228Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796368504Z stdout F  'exit\n',
+2026-07-16T11:26:54.796371961Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796375016Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.796378603Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-in in\n'
+2026-07-16T11:26:54.796381939Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796384985Z stdout F  'exit\n',
+2026-07-16T11:26:54.796388031Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796391137Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.796393902Z stdout F  '  neighbor 192.169.10.1 route-map 192.169.10.1-out out\n'
+2026-07-16T11:26:54.796396637Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796399552Z stdout F  'exit\n',
+2026-07-16T11:26:54.796402508Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796405744Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.79640885Z stdout F  '  neighbor 2001:db8:1::1 activate\n'
+2026-07-16T11:26:54.796411705Z stdout F  ' exit\n'
+2026-07-16T11:26:54.79641446Z stdout F  'exit\n',
+2026-07-16T11:26:54.796417205Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796517222Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.796526349Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-in in\n'
+2026-07-16T11:26:54.796529776Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796532971Z stdout F  'exit\n',
+2026-07-16T11:26:54.796536027Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796539223Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.796542549Z stdout F  '  neighbor 2001:db8:1::1 route-map 2001:db8:1::1-out out\n'
+2026-07-16T11:26:54.796735921Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796740629Z stdout F  'exit\n',
+2026-07-16T11:26:54.796744016Z stdout F  'router bgp 64515\n'
+2026-07-16T11:26:54.796747302Z stdout F  ' address-family ipv6 unicast\n'
+2026-07-16T11:26:54.796750408Z stdout F  '  network fd00:10:244:1::5/128 \n'
+2026-07-16T11:26:54.796753594Z stdout F  ' exit\n'
+2026-07-16T11:26:54.796756699Z stdout F  'exit\n']
+2026-07-16T11:26:55.467247205Z stdout F [4496|mgmtd] sending configuration
+2026-07-16T11:26:55.467261812Z stdout F [4497|zebra] sending configuration
+2026-07-16T11:26:55.467265479Z stdout F [4503|bgpd] sending configuration
+2026-07-16T11:26:55.467268895Z stdout F [4511|watchfrr] sending configuration
+2026-07-16T11:26:55.467290074Z stdout F [4513|staticd] sending configuration
+2026-07-16T11:26:55.467293671Z stdout F [4514|bfdd] sending configuration
+2026-07-16T11:26:55.467297308Z stdout F Waiting for children to finish applying config...
+2026-07-16T11:26:55.467300875Z stdout F [4513|staticd] done
+2026-07-16T11:26:55.467303991Z stdout F [4497|zebra] done
+2026-07-16T11:26:55.467307036Z stdout F [4496|mgmtd] done
+2026-07-16T11:26:55.467310052Z stdout F [4511|watchfrr] done
+2026-07-16T11:26:55.467313137Z stdout F [4514|bfdd] done
+2026-07-16T11:26:55.467316314Z stdout F [4503|bgpd] done
+2026-07-16T11:26:55.596672061Z stdout F FRR reloaded successfully! 4 seconds
+2026-07-16T11:27:18.542710216Z stdout F Caught SIGHUP and acquired lock! Reloading FRR..
+2026-07-16T11:27:18.543533664Z stdout F Checking the configuration file syntax
+2026-07-16T11:27:19.357566564Z stdout F 
+2026-07-16T11:27:19.402257281Z stdout F Lines To Delete
+2026-07-16T11:27:19.402274073Z stdout F ===============
+2026-07-16T11:27:19.402302416Z stdout F no log file /etc/frr/frr.log
+2026-07-16T11:27:19.402310521Z stdout F no debug bgp updates in
+2026-07-16T11:27:19.40231541Z stdout F no debug bgp updates out
+2026-07-16T11:27:19.40232065Z stdout F no router bgp 64515
+2026-07-16T11:27:19.402327312Z stdout F no route-map 192.169.10.1-out permit 1
+2026-07-16T11:27:19.402332572Z stdout F no route-map 192.169.10.1-out permit 2
+2026-07-16T11:27:19.402337672Z stdout F no route-map 192.169.10.1-in permit 3
+2026-07-16T11:27:19.402343002Z stdout F no route-map 192.169.10.1-in permit 4
+2026-07-16T11:27:19.402347891Z stdout F no route-map 2001:db8:1::1-out permit 1
+2026-07-16T11:27:19.40235294Z stdout F no route-map 2001:db8:1::1-out permit 2
+2026-07-16T11:27:19.402357859Z stdout F no route-map 2001:db8:1::1-in permit 3
+2026-07-16T11:27:19.402362688Z stdout F no route-map 2001:db8:1::1-in permit 4
+2026-07-16T11:27:19.402367537Z stdout F 
+2026-07-16T11:27:19.402372857Z stdout F Lines To Add
+2026-07-16T11:27:19.402377877Z stdout F ============
+2026-07-16T11:27:19.402383477Z stdout F log file /etc/frr/frr.log debugging
+2026-07-16T11:27:19.402388406Z stdout F debug bgp updates
+2026-07-16T11:27:19.402393586Z stdout F ip nht resolve-via-default
+2026-07-16T11:27:19.402398916Z stdout F ipv6 nht resolve-via-default
+2026-07-16T11:27:19.402405408Z stdout F no ip prefix-list 192.169.10.1-pl-ipv4 seq 1 permit 10.244.1.5/32
+2026-07-16T11:27:19.40241212Z stdout F no ip prefix-list 192.169.10.1-inpl-ipv4 seq 1 permit any
+2026-07-16T11:27:19.40241717Z stdout F no ip prefix-list 2001:db8:1::1-pl-ipv6 seq 2 deny any
+2026-07-16T11:27:19.402422239Z stdout F no ip prefix-list 2001:db8:1::1-inpl-ipv6 seq 1 permit any
+2026-07-16T11:27:19.40242754Z stdout F no ipv6 prefix-list 192.169.10.1-pl-ipv4 seq 2 deny any
+2026-07-16T11:27:19.402432458Z stdout F no ipv6 prefix-list 192.169.10.1-inpl-ipv4 seq 2 permit any
+2026-07-16T11:27:19.402446234Z stdout F no ipv6 prefix-list 2001:db8:1::1-pl-ipv6 seq 1 permit fd00:10:244:1::5/128
+2026-07-16T11:27:19.402804504Z stdout F no ipv6 prefix-list 2001:db8:1::1-inpl-ipv6 seq 2 permit any
+2026-07-16T11:27:19.408744339Z stdout F Applying the configuration file
+2026-07-16T11:27:19.611384732Z stdout F 2026-07-16 11:27:19,609  INFO: Called via "Namespace(input=None, reload=True, test=False, debug=False, log_level='info', stdout=True, pathspace=None, filename='/etc/frr_reloader/frr.conf', overwrite=True, bindir='/usr/bin', confdir='/etc/frr', rundir='/var/run/frr', vty_socket=None, daemon='', test_reset=False)"

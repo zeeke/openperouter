@@ -1,0 +1,18 @@
+2026-07-16T11:03:36.920194029Z stderr F W0716 11:03:36.919991      99 main.go:165] 
+2026-07-16T11:03:36.920222703Z stderr F ==== Deprecation Warning ======================
+2026-07-16T11:03:36.920254983Z stderr F 
+2026-07-16T11:03:36.92025829Z stderr F Insecure listen address will be removed.
+2026-07-16T11:03:36.920261355Z stderr F Using --insecure-listen-address won't be possible!
+2026-07-16T11:03:36.92026379Z stderr F 
+2026-07-16T11:03:36.920266765Z stderr F The ability to run kube-rbac-proxy without TLS certificates will be removed.
+2026-07-16T11:03:36.920269801Z stderr F Not using --tls-cert-file and --tls-private-key-file won't be possible!
+2026-07-16T11:03:36.920272296Z stderr F 
+2026-07-16T11:03:36.920275462Z stderr F For more information, please go to https://github.com/brancz/kube-rbac-proxy/issues/187
+2026-07-16T11:03:36.920277976Z stderr F 
+2026-07-16T11:03:36.920280601Z stderr F ===============================================
+2026-07-16T11:03:36.920283276Z stderr F 
+2026-07-16T11:03:36.920285841Z stderr F 		
+2026-07-16T11:03:36.921297431Z stderr F I0716 11:03:36.921205      99 main.go:218] Valid token audiences: 
+2026-07-16T11:03:36.921551065Z stderr F I0716 11:03:36.921436      99 main.go:344] Generating self signed cert as no cert is provided
+2026-07-16T11:03:37.311953419Z stderr F I0716 11:03:37.311546      99 main.go:394] Starting TCP socket on 0.0.0.0:9141
+2026-07-16T11:03:37.312410233Z stderr F I0716 11:03:37.312342      99 main.go:401] Listening securely on 0.0.0.0:9141

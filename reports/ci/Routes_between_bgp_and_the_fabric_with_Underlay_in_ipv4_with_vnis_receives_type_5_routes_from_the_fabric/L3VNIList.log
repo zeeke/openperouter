@@ -1,0 +1,111 @@
+{
+    "metadata": {
+        "resourceVersion": "4078"
+    },
+    "items": [
+        {
+            "kind": "L3VNI",
+            "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+            "metadata": {
+                "name": "blue",
+                "namespace": "openperouter-system",
+                "uid": "f54bb97b-0980-44d1-9e2b-4963ac44de12",
+                "resourceVersion": "3500",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:19:52Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+                        "time": "2026-07-16T11:19:52Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:hostsession": {
+                                    ".": {},
+                                    "f:asn": {},
+                                    "f:hostasn": {},
+                                    "f:localcidr": {
+                                        ".": {},
+                                        "f:ipv4": {},
+                                        "f:ipv6": {}
+                                    }
+                                },
+                                "f:vni": {},
+                                "f:vrf": {},
+                                "f:vxlanport": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "vrf": "blue",
+                "vni": 200,
+                "vxlanport": 4789,
+                "hostsession": {
+                    "asn": 64514,
+                    "hostasn": 64515,
+                    "localcidr": {
+                        "ipv4": "192.169.11.0/24",
+                        "ipv6": "2001:db8:2::/64"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "L3VNI",
+            "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+            "metadata": {
+                "name": "red",
+                "namespace": "openperouter-system",
+                "uid": "1f3da05e-e5e7-4744-aa23-f2602efb9fb8",
+                "resourceVersion": "3499",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:19:52Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "openpe.openperouter.github.io/v1alpha1",
+                        "time": "2026-07-16T11:19:52Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:hostsession": {
+                                    ".": {},
+                                    "f:asn": {},
+                                    "f:hostasn": {},
+                                    "f:localcidr": {
+                                        ".": {},
+                                        "f:ipv4": {},
+                                        "f:ipv6": {}
+                                    }
+                                },
+                                "f:vni": {},
+                                "f:vrf": {},
+                                "f:vxlanport": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "vrf": "red",
+                "vni": 100,
+                "vxlanport": 4789,
+                "hostsession": {
+                    "asn": 64514,
+                    "hostasn": 64515,
+                    "localcidr": {
+                        "ipv4": "192.169.10.0/24",
+                        "ipv6": "2001:db8:1::/64"
+                    }
+                }
+            }
+        }
+    ]
+}

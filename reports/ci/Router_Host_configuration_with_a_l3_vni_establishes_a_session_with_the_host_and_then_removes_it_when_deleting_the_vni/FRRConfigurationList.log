@@ -1,0 +1,69 @@
+{
+    "metadata": {
+        "resourceVersion": "2247"
+    },
+    "items": [
+        {
+            "kind": "FRRConfiguration",
+            "apiVersion": "frrk8s.metallb.io/v1beta1",
+            "metadata": {
+                "name": "redipv4",
+                "namespace": "openperouter-system",
+                "uid": "de15595b-cd3b-4892-82ef-e5edd690622e",
+                "resourceVersion": "1348",
+                "generation": 1,
+                "creationTimestamp": "2026-07-16T11:07:43Z",
+                "managedFields": [
+                    {
+                        "manager": "suite.test",
+                        "operation": "Update",
+                        "apiVersion": "frrk8s.metallb.io/v1beta1",
+                        "time": "2026-07-16T11:07:43Z",
+                        "fieldsType": "FieldsV1",
+                        "fieldsV1": {
+                            "f:spec": {
+                                ".": {},
+                                "f:bgp": {
+                                    ".": {},
+                                    "f:routers": {}
+                                },
+                                "f:nodeSelector": {},
+                                "f:raw": {}
+                            }
+                        }
+                    }
+                ]
+            },
+            "spec": {
+                "bgp": {
+                    "routers": [
+                        {
+                            "asn": 64515,
+                            "neighbors": [
+                                {
+                                    "asn": 64514,
+                                    "address": "192.169.10.1",
+                                    "passwordSecret": {},
+                                    "connectTime": "1s",
+                                    "toAdvertise": {
+                                        "allowed": {
+                                            "mode": "filtered"
+                                        }
+                                    },
+                                    "toReceive": {
+                                        "allowed": {
+                                            "mode": "all"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "raw": {},
+                "nodeSelector": {}
+            },
+            "status": {}
+        }
+    ]
+}
