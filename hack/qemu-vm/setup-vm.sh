@@ -60,6 +60,7 @@ echo "VFs created successfully."
 echo "Binding VF to vfio-pci..."
 run_in_vm '
 modprobe vfio-pci
+echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode
 
 PF=""
 for dev in /sys/class/net/*/device/sriov_numvfs; do
@@ -148,6 +149,21 @@ cd "${SCRIPT_DIR}/../../"
 cd config/pods && ${KUSTOMIZE} edit set image router="${IMG}"
 cd ../../
 ${KUSTOMIZE} build "config/${KUSTOMIZE_LAYER}" | ${KUBECTL} apply -f -
+
+echo "Waiting for openperouter pods to appear..."
+RETRIES=30
+for i in $(seq 1 $RETRIES); do
+    POD_COUNT=$(${KUBECTL} -n "${NAMESPACE}" get pods --no-headers 2>/dev/null | wc -l)
+    if [[ "${POD_COUNT}" -gt 0 ]]; then
+        echo "Found ${POD_COUNT} pod(s)."
+        break
+    fi
+    if [[ "$i" -eq "$RETRIES" ]]; then
+        echo "WARNING: No pods found after $((RETRIES * 5))s, checking resources..."
+        ${KUBECTL} -n "${NAMESPACE}" get all
+    fi
+    sleep 5
+done
 
 echo "Waiting for openperouter pods to be ready..."
 ${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready --all pods --timeout=300s

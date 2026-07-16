@@ -30,7 +30,6 @@ write_files:
   - path: /etc/modules-load.d/vfio.conf
     content: |
       vfio-pci
-      vfio_iommu_type1
 
   - path: /etc/sysctl.d/99-hugepages.conf
     content: |
@@ -38,12 +37,11 @@ write_files:
 
   - path: /etc/default/grub.d/99-openperouter.cfg
     content: |
-      GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX intel_iommu=on iommu=pt hugepagesz=2M hugepages=512 default_hugepagesz=2M"
+      GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX hugepagesz=2M hugepages=512 default_hugepagesz=2M"
 
 runcmd:
   - grub2-mkconfig -o /boot/grub2/grub.cfg
   - modprobe vfio-pci || true
-  - modprobe vfio_iommu_type1 || true
   # Install k3s (but don't start it — setup-vm.sh starts it after image import)
   - "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 INSTALL_K3S_SKIP_START=true sh -"
   # Signal that cloud-init is done
