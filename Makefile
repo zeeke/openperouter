@@ -409,12 +409,12 @@ qemu-image: ## Prepare the QEMU VM image with cloud-init
 	hack/qemu-image/prepare-image.sh
 
 .PHONY: qemu-setup
-qemu-setup: qemu-image ## Launch the QEMU VM, FRR TOR, and bridge
+qemu-setup: ## Launch the QEMU VM, FRR TOR, and bridge (run qemu-image first)
 	hack/qemu-vm/launch-vm.sh
 	hack/qemu-vm/start-tor.sh
 
 .PHONY: qemu-deploy
-qemu-deploy: qemu-setup kustomize kubectl ## Deploy openperouter with grout inside the VM
+qemu-deploy: kustomize kubectl ## Deploy openperouter with grout inside the VM (run qemu-setup first)
 	KUSTOMIZE=$(KUSTOMIZE) KUBECTL=$(KUBECTL) hack/qemu-vm/setup-vm.sh
 
 .PHONY: qemu-e2etests
