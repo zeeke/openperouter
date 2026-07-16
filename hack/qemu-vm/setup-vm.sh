@@ -169,7 +169,12 @@ echo "Waiting for controller and nodemarker pods to be ready..."
 ${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready pods -l app=controller --timeout=300s
 ${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready pods -l app=nodemarker --timeout=300s
 
-echo "Checking router pod status (grout may not be ready in emulated env)..."
-${KUBECTL} -n "${NAMESPACE}" get pods -l app=router -o wide || true
+if [[ "${KUSTOMIZE_LAYER}" == "grout" ]]; then
+    echo "Checking router pod status (grout may not be ready in emulated env)..."
+    ${KUBECTL} -n "${NAMESPACE}" get pods -l app=router -o wide || true
+else
+    echo "Waiting for router pods to be ready..."
+    ${KUBECTL} -n "${NAMESPACE}" wait --for=condition=Ready pods -l app=router --timeout=300s
+fi
 
 echo "=== QEMU VM setup complete ==="
