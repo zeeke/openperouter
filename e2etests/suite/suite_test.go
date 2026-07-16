@@ -34,6 +34,7 @@ func handleFlags() {
 	flag.BoolVar(&tests.HostMode, "systemdmode", false, "tells if openperouter is running on the host")
 	flag.BoolVar(&tests.GroutMode, "groutmode", false, "tells if openperouter is running with grout dataplane")
 	flag.BoolVar(&tests.SkipUnderlayPassthrough, "skip-underlay-passthrough", false, "skip creating underlay in passthrough tests")
+	flag.BoolVar(&tests.QEMUMode, "qemu-mode", false, "running on a QEMU VM with SR-IOV hardware")
 	flag.Parse()
 }
 

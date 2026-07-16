@@ -34,3 +34,10 @@ go.work
 *.swo
 *~
 logs_*/
+
+# QEMU VM artifacts
+hack/qemu-vm/fedora-cloud.qcow2
+hack/qemu-vm/cloud-init.iso
+hack/qemu-vm/serial.log
+hack/qemu-vm/qemu.pid
+hack/qemu-vm/kubeconfig

@@ -14,7 +14,9 @@ var (
 	ReportPath              string
 	HostMode                bool
 	GroutMode               bool
+	QEMUMode                bool
 	SkipUnderlayPassthrough bool
 )
 
 var GroutSupport = ginkgo.Label("grout-support")
+var QEMUSupport = ginkgo.Label("qemu-support")
