@@ -58,12 +58,16 @@ func SetupL2VNI(ctx context.Context, client *Client, params hostnetwork.L2VNIPar
 		}
 	}()
 
-	if err := ensureTapPortInHostNamespace(ctx, client, linkPair.NamespaceSide, linkPair.HostSide, vrf, ns); err != nil {
+	if err := ensureTapPort(ctx, client, linkPair.NamespaceSide, linkPair.HostSide, vrf); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to create TAP port: %w", err)
 	}
 
 	if err := client.ensureBridgeMember(ctx, "port", bridgeName, linkPair.NamespaceSide); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to attach TAP %s to bridge %s: %w", linkPair.NamespaceSide, bridgeName, err)
+	}
+
+	if err := moveTapToHostNamespace(ctx, linkPair.HostSide, ns); err != nil {
+		return fmt.Errorf("SetupL2VNI: failed to move TAP to host namespace: %w", err)
 	}
 
 	hostTap, err := netlink.LinkByName(linkPair.HostSide)
