@@ -10,22 +10,30 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BRIDGE_NAME="${QEMU_BRIDGE:-br-underlay}"
 TAP_NAME="${QEMU_TAP:-vm-underlay}"
 PID_FILE="${SCRIPT_DIR}/qemu.pid"
+VM_IMAGE="${SCRIPT_DIR}/fedora-cloud.qcow2"
 FRR_CONTAINER_NAME="${QEMU_FRR_CONTAINER:-qemu-tor}"
 
 echo "Stopping QEMU VM..."
 
 # Stop the VM.
 if [[ -f "${PID_FILE}" ]]; then
-    PID=$(cat "${PID_FILE}")
+    PID=$(cat "${PID_FILE}" 2>/dev/null || sudo cat "${PID_FILE}")
     if sudo kill -0 "${PID}" 2>/dev/null; then
         sudo kill "${PID}"
         echo "QEMU process ${PID} killed."
     else
         echo "QEMU process ${PID} not running."
     fi
-    sudo rm -f "${PID_FILE}"
+    rm -f "${PID_FILE}" 2>/dev/null || sudo rm -f "${PID_FILE}"
 else
-    echo "No PID file found, skipping VM stop."
+    # Try to find and kill QEMU by process name as fallback.
+    QEMU_PID=$(pgrep -f "qemu-system-x86_64.*${VM_IMAGE##*/}" 2>/dev/null || true)
+    if [[ -n "${QEMU_PID}" ]]; then
+        sudo kill "${QEMU_PID}"
+        echo "QEMU process ${QEMU_PID} killed (found by process name)."
+    else
+        echo "No PID file found and no QEMU process detected, skipping VM stop."
+    fi
 fi
 
 # Stop the FRR TOR container.

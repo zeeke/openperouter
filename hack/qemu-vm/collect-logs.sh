@@ -13,7 +13,8 @@ FRR_CONTAINER_NAME="${QEMU_FRR_CONTAINER:-qemu-tor}"
 LOG_DIR="${KIND_EXPORT_LOGS:-/tmp/kind_logs}"
 KUBECONFIG="${SCRIPT_DIR}/kubeconfig"
 
-SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT} openperouter@localhost"
+SSH_KEY="${SCRIPT_DIR}/qemu-ssh-key"
+SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -p ${SSH_PORT} openperouter@localhost"
 
 mkdir -p "${LOG_DIR}/qemu-vm"
 

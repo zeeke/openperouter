@@ -41,3 +41,5 @@ hack/qemu-vm/cloud-init.iso
 hack/qemu-vm/serial.log
 hack/qemu-vm/qemu.pid
 hack/qemu-vm/kubeconfig
+hack/qemu-vm/qemu-ssh-key
+hack/qemu-vm/qemu-ssh-key.pub

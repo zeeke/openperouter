@@ -18,6 +18,7 @@ VM_CPUS="${QEMU_VM_CPUS:-4}"
 VM_MEM="${QEMU_VM_MEM:-4096}"
 PID_FILE="${SCRIPT_DIR}/qemu.pid"
 SERIAL_LOG="${SCRIPT_DIR}/serial.log"
+SSH_KEY="${SCRIPT_DIR}/qemu-ssh-key"
 
 if [[ ! -f "${VM_IMAGE}" ]]; then
     echo "ERROR: VM image not found at ${VM_IMAGE}. Run 'make qemu-image' first." >&2
@@ -28,6 +29,33 @@ if [[ ! -f "${CLOUD_INIT_ISO}" ]]; then
     echo "ERROR: cloud-init ISO not found at ${CLOUD_INIT_ISO}. Run 'make qemu-image' first." >&2
     exit 1
 fi
+
+# --- Generate SSH key if needed ---
+if [[ ! -f "${SSH_KEY}" ]]; then
+    echo "Generating SSH key pair..."
+    ssh-keygen -t ed25519 -f "${SSH_KEY}" -N "" -q
+fi
+SSH_PUBKEY=$(cat "${SSH_KEY}.pub")
+
+# --- Regenerate cloud-init ISO with the SSH key ---
+CLOUD_INIT_SRC="${SCRIPT_DIR}/../qemu-image/cloud-init"
+CLOUD_INIT_TMPDIR=$(mktemp -d)
+cp "${CLOUD_INIT_SRC}/meta-data" "${CLOUD_INIT_TMPDIR}/"
+sed "s|ssh_authorized_keys: \[\]|ssh_authorized_keys:\n      - ${SSH_PUBKEY}|" \
+    "${CLOUD_INIT_SRC}/user-data" > "${CLOUD_INIT_TMPDIR}/user-data"
+
+if command -v genisoimage &>/dev/null; then
+    genisoimage -output "${CLOUD_INIT_ISO}" -volid cidata -joliet -rock \
+        "${CLOUD_INIT_TMPDIR}/user-data" "${CLOUD_INIT_TMPDIR}/meta-data" 2>/dev/null
+elif command -v mkisofs &>/dev/null; then
+    mkisofs -output "${CLOUD_INIT_ISO}" -volid cidata -joliet -rock \
+        "${CLOUD_INIT_TMPDIR}/user-data" "${CLOUD_INIT_TMPDIR}/meta-data" 2>/dev/null
+elif command -v xorrisofs &>/dev/null; then
+    xorrisofs -output "${CLOUD_INIT_ISO}" -volid cidata -joliet -rock \
+        "${CLOUD_INIT_TMPDIR}/user-data" "${CLOUD_INIT_TMPDIR}/meta-data" 2>/dev/null
+fi
+rm -rf "${CLOUD_INIT_TMPDIR}"
+echo "cloud-init ISO regenerated with SSH key."
 
 # --- Networking setup ---
 echo "Setting up bridge ${BRIDGE_NAME} and TAP ${TAP_NAME}..."
@@ -49,6 +77,9 @@ fi
 # --- Launch QEMU ---
 echo "Launching QEMU VM..."
 
+# Pre-create files so they're owned by current user, not root.
+touch "${SERIAL_LOG}" "${PID_FILE}"
+
 sudo qemu-system-x86_64 \
     -enable-kvm \
     -cpu host \
@@ -65,19 +96,23 @@ sudo qemu-system-x86_64 \
     -pidfile "${PID_FILE}" \
     -daemonize
 
-echo "QEMU started (PID file: ${PID_FILE})"
+# Fix ownership of files created/overwritten by QEMU (running as root).
+sudo chown "$(id -u):$(id -g)" "${SERIAL_LOG}" "${PID_FILE}" 2>/dev/null || true
+
+echo "QEMU started (PID $(cat "${PID_FILE}"))"
 
 # --- Wait for SSH ---
 echo "Waiting for VM to become SSH-reachable (port ${SSH_PORT})..."
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -i ${SSH_KEY}"
 MAX_WAIT=300
 ELAPSED=0
-while ! ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    -o ConnectTimeout=5 -p "${SSH_PORT}" openperouter@localhost true 2>/dev/null; do
+while ! ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost true 2>/dev/null; do
     sleep 5
     ELAPSED=$((ELAPSED + 5))
     if [[ "${ELAPSED}" -ge "${MAX_WAIT}" ]]; then
         echo "ERROR: VM did not become SSH-reachable within ${MAX_WAIT}s." >&2
-        echo "Check serial log at ${SERIAL_LOG}" >&2
+        echo "--- Last 50 lines of serial log ---" >&2
+        tail -50 "${SERIAL_LOG}" >&2 || true
         exit 1
     fi
     echo "  still waiting... (${ELAPSED}s / ${MAX_WAIT}s)"
@@ -87,8 +122,7 @@ echo "VM is SSH-reachable."
 
 # --- Wait for cloud-init to finish ---
 echo "Waiting for cloud-init to complete..."
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    -p "${SSH_PORT}" openperouter@localhost \
+ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost \
     "sudo cloud-init status --wait" 2>/dev/null || true
 
 echo "VM is ready."

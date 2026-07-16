@@ -18,7 +18,8 @@ OPENPEROUTER_IMAGE_TAR="${OPENPEROUTER_IMAGE_TAR:-}"
 KUSTOMIZE_LAYER="${KUSTOMIZE_LAYER:-grout}"
 NAMESPACE="${NAMESPACE:-openperouter-system}"
 
-SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ${SSH_PORT} openperouter@localhost"
+SSH_KEY="${SCRIPT_DIR}/qemu-ssh-key"
+SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -p ${SSH_PORT} openperouter@localhost"
 
 run_in_vm() {
     ${SSH_CMD} "sudo bash -c '$*'"
@@ -118,7 +119,7 @@ done
 # --- Import the openperouter container image ---
 if [[ -n "${OPENPEROUTER_IMAGE_TAR}" && -f "${OPENPEROUTER_IMAGE_TAR}" ]]; then
     echo "Importing openperouter image into k3s..."
-    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "${SSH_KEY}" \
         -P "${SSH_PORT}" "${OPENPEROUTER_IMAGE_TAR}" openperouter@localhost:/tmp/openperouter.tar
     run_in_vm 'k3s ctr images import /tmp/openperouter.tar && rm -f /tmp/openperouter.tar'
     echo "Image imported."
