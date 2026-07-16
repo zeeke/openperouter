@@ -81,6 +81,7 @@ echo "Launching QEMU VM..."
 touch "${SERIAL_LOG}" "${PID_FILE}"
 
 sudo qemu-system-x86_64 \
+    -machine q35 \
     -enable-kvm \
     -cpu host \
     -smp "${VM_CPUS}" \
@@ -89,8 +90,9 @@ sudo qemu-system-x86_64 \
     -cdrom "${CLOUD_INIT_ISO}" \
     -netdev user,id=mgmt,hostfwd=tcp::${SSH_PORT}-:22,hostfwd=tcp::${K8S_PORT}-:6443 \
     -device virtio-net-pci,netdev=mgmt \
+    -device pcie-root-port,id=rp0,slot=0 \
     -netdev tap,id=underlay,ifname="${TAP_NAME}",script=no,downscript=no \
-    -device igb,netdev=underlay,mac=52:54:00:ab:cd:01 \
+    -device igb,bus=rp0,netdev=underlay,mac=52:54:00:ab:cd:01 \
     -display none \
     -serial file:"${SERIAL_LOG}" \
     -pidfile "${PID_FILE}" \
