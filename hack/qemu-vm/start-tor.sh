@@ -31,19 +31,21 @@ docker run -d \
 # Connect the container to br-underlay.
 # We create a veth pair: one end goes into the container, the other joins the bridge.
 VETH_HOST="veth-tor"
+VETH_PEER="veth-tor-c"
 VETH_CONTAINER="eth0"
 
 # Get the container's network namespace PID.
 TOR_PID=$(docker inspect -f '{{.State.Pid}}' "${FRR_CONTAINER_NAME}")
 
-# Create veth pair.
+# Create veth pair (use a temp name for the peer to avoid clashing with host eth0).
 if ip link show "${VETH_HOST}" &>/dev/null; then
     sudo ip link del "${VETH_HOST}"
 fi
-sudo ip link add "${VETH_HOST}" type veth peer name "${VETH_CONTAINER}"
+sudo ip link add "${VETH_HOST}" type veth peer name "${VETH_PEER}"
 
-# Move one end into the container's netns.
-sudo ip link set "${VETH_CONTAINER}" netns "${TOR_PID}"
+# Move the peer into the container's netns and rename it to eth0.
+sudo ip link set "${VETH_PEER}" netns "${TOR_PID}"
+sudo nsenter -t "${TOR_PID}" -n ip link set "${VETH_PEER}" name "${VETH_CONTAINER}"
 
 # Attach the host end to the bridge.
 sudo ip link set "${VETH_HOST}" master "${BRIDGE_NAME}"
