@@ -50,6 +50,7 @@ import (
 	periov1alpha1 "github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/internal/buildversion"
 	"github.com/openperouter/openperouter/internal/cni"
+	"github.com/openperouter/openperouter/internal/controller/nodeindex"
 	"github.com/openperouter/openperouter/internal/controller/routerconfiguration"
 	"github.com/openperouter/openperouter/internal/filewatcher"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
@@ -61,8 +62,10 @@ import (
 )
 
 const (
-	modeK8s  = "k8s"
-	modeHost = "host"
+	datapathKernel = "kernel"
+	datapathGrout  = "grout"
+	modeK8s        = "k8s"
+	modeHost       = "host"
 )
 
 var (
@@ -91,16 +94,18 @@ type k8sModeParameters struct {
 }
 
 type parameters struct {
-	probeAddr      string
-	frrConfigPath  string
-	reloaderSocket string
-	mode           string
-	ovsSocketPath  string
-	nodeName       string
-	namespace      string
-	logLevel       string
-	cniBinDir      string
-	cniCacheDir    string
+	probeAddr       string
+	frrConfigPath   string
+	reloaderSocket  string
+	mode            string
+	ovsSocketPath   string
+	nodeName        string
+	namespace       string
+	logLevel        string
+	cniBinDir       string
+	cniCacheDir     string
+	datapath        string
+	groutSocketPath string
 }
 
 func main() {
@@ -117,6 +122,9 @@ func main() {
 		"the OVS database socket path")
 
 	flag.StringVar(&args.mode, "mode", modeK8s, "the mode to run in (k8s or host)")
+
+	flag.StringVar(&args.datapath, "datapath", "kernel", "The datapath to use (kernel or grout)")
+	flag.StringVar(&args.groutSocketPath, "grout-socket", "/var/run/grout/grout.sock", "Path to the grout control socket")
 
 	flag.StringVar(&args.nodeName, "nodename", "", "The name of the node the controller runs on")
 	flag.StringVar(&args.namespace, "namespace", "", "The namespace the controller runs in")
@@ -260,6 +268,18 @@ func runHostMode(
 
 	logger.Info("kubernetes API is now available, stopping static reconciler and starting k8s reconciler")
 
+	k8sClientset, err := kubernetes.NewForConfig(k8sConfig)
+	if err != nil {
+		logger.Error("failed to create kubernetes clientset for node annotation", "error", err)
+		os.Exit(1)
+	}
+	if err := nodeindex.AnnotateNodeIndex(ctx, k8sClientset, args.nodeName, nodeConfig.NodeIndex.Index); err != nil {
+		logger.Error("failed to annotate node with node index", "error", err)
+		os.Exit(1)
+	}
+	logger.Info("successfully annotated node with node index",
+		"node", args.nodeName, "nodeIndex", nodeConfig.NodeIndex.Index)
+
 	stopStaticReconciler()
 	// Wait for the static reconciler to fully stop and release the health probe port
 	// before starting the K8s reconciler, which binds the same port.
@@ -292,7 +312,7 @@ func runK8sConfigReconcilerHostMode(ctx context.Context,
 	routerProvider := &routerconfiguration.RouterHostProvider{
 		FRRConfigPath:         args.frrConfigPath,
 		RouterPidFilePath:     hostModeParams.hostContainerPidPath,
-		CurrentNodeIndex:      nodeConfig.NodeIndex,
+		CurrentNodeIndex:      nodeConfig.NodeIndex.Index,
 		SystemdSocketPath:     hostModeParams.systemdSocketPath,
 		RouterHealthCheckPort: hostModeParams.routerHealthCheckPort,
 	}
@@ -301,19 +321,24 @@ func runK8sConfigReconcilerHostMode(ctx context.Context,
 	triggerChan := make(chan event.GenericEvent, 1)
 	mirrorTriggerChan := make(chan event.GenericEvent, 1)
 
+	var datapathConfigurator routerconfiguration.DatapathConfigurator = &routerconfiguration.KernelDatapathConfigurator{}
+	if args.datapath == datapathGrout {
+		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath)
+	}
 	apiReconciler := &routerconfiguration.PERouterReconciler{
-		Client:          mgr.GetClient(),
-		Scheme:          mgr.GetScheme(),
-		LogLevel:        args.logLevel,
-		Logger:          logger,
-		MyNode:          args.nodeName,
-		MyNamespace:     args.namespace,
-		FRRReloadSocket: args.reloaderSocket,
-		FRRConfigPath:   args.frrConfigPath,
-		RouterProvider:  routerProvider,
-		StaticConfigDir: hostModeParams.configurationDir,
-		NodeConfigPath:  hostModeParams.nodeConfigPath,
-		TriggerChan:     triggerChan,
+		Client:               mgr.GetClient(),
+		Scheme:               mgr.GetScheme(),
+		LogLevel:             args.logLevel,
+		Logger:               logger,
+		MyNode:               args.nodeName,
+		MyNamespace:          args.namespace,
+		FRRReloadSocket:      args.reloaderSocket,
+		FRRConfigPath:        args.frrConfigPath,
+		RouterProvider:       routerProvider,
+		StaticConfigDir:      hostModeParams.configurationDir,
+		NodeConfigPath:       hostModeParams.nodeConfigPath,
+		TriggerChan:          triggerChan,
+		DatapathConfigurator: datapathConfigurator,
 	}
 
 	if err := apiReconciler.SetupWithManager(mgr); err != nil {
@@ -392,16 +417,22 @@ func runK8sConfigReconciler(ctx context.Context,
 		Node:            args.nodeName,
 	}
 
+	var datapathConfigurator routerconfiguration.DatapathConfigurator = &routerconfiguration.KernelDatapathConfigurator{}
+	if args.datapath == datapathGrout {
+		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath)
+	}
+
 	apiReconciler := &routerconfiguration.PERouterReconciler{
-		Client:          mgr.GetClient(),
-		Scheme:          mgr.GetScheme(),
-		LogLevel:        args.logLevel,
-		Logger:          logger,
-		MyNode:          args.nodeName,
-		FRRReloadSocket: args.reloaderSocket,
-		FRRConfigPath:   args.frrConfigPath,
-		RouterProvider:  routerProvider,
-		MyNamespace:     args.namespace,
+		Client:               mgr.GetClient(),
+		Scheme:               mgr.GetScheme(),
+		LogLevel:             args.logLevel,
+		Logger:               logger,
+		MyNode:               args.nodeName,
+		FRRReloadSocket:      args.reloaderSocket,
+		FRRConfigPath:        args.frrConfigPath,
+		RouterProvider:       routerProvider,
+		MyNamespace:          args.namespace,
+		DatapathConfigurator: datapathConfigurator,
 	}
 
 	if err := apiReconciler.SetupWithManager(mgr); err != nil {
@@ -436,22 +467,28 @@ func runStaticConfigReconciler(ctx context.Context,
 	staticRouterProvider := &routerconfiguration.RouterHostProvider{
 		FRRConfigPath:         args.frrConfigPath,
 		RouterPidFilePath:     hostModeParams.hostContainerPidPath,
-		CurrentNodeIndex:      nodeConfig.NodeIndex,
+		CurrentNodeIndex:      nodeConfig.NodeIndex.Index,
 		SystemdSocketPath:     hostModeParams.systemdSocketPath,
 		RouterHealthCheckPort: hostModeParams.routerHealthCheckPort,
 	}
 
+	var datapathConfigurator routerconfiguration.DatapathConfigurator = &routerconfiguration.KernelDatapathConfigurator{}
+	if args.datapath == datapathGrout {
+		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath)
+	}
+
 	staticReconciler := &routerconfiguration.StaticConfigReconciler{
-		Scheme:          mgr.GetScheme(),
-		Logger:          logger,
-		NodeIndex:       nodeConfig.NodeIndex,
-		LogLevel:        args.logLevel,
-		FRRConfigPath:   args.frrConfigPath,
-		FRRReloadSocket: args.reloaderSocket,
-		RouterProvider:  staticRouterProvider,
-		ConfigDir:       hostModeParams.configurationDir,
-		MyNode:          args.nodeName,
-		MyNamespace:     args.namespace,
+		Scheme:               mgr.GetScheme(),
+		Logger:               logger,
+		NodeIndex:            nodeConfig.NodeIndex.Index,
+		LogLevel:             args.logLevel,
+		FRRConfigPath:        args.frrConfigPath,
+		FRRReloadSocket:      args.reloaderSocket,
+		RouterProvider:       staticRouterProvider,
+		ConfigDir:            hostModeParams.configurationDir,
+		MyNode:               args.nodeName,
+		MyNamespace:          args.namespace,
+		DatapathConfigurator: datapathConfigurator,
 	}
 	if err = staticReconciler.SetupWithManager(mgr); err != nil {
 		return fmt.Errorf("unable to create controller: %w", err)

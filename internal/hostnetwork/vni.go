@@ -34,16 +34,16 @@ type VNIParams struct {
 
 type L3VNIParams struct {
 	VNIParams `json:",inline"`
-	Name      string `json:"name"`
-	HostVeth  *Veth  `json:"veth"`
+	Name      string   `json:"name"`
+	LinkIPs   *LinkIPs `json:"link_ips"`
 }
 
 type L3PassthroughParams struct {
-	TargetNS string `json:"targetns"`
-	HostVeth Veth   `json:"veth"`
+	TargetNS string  `json:"targetns"`
+	LinkIPs  LinkIPs `json:"link_ips"`
 }
 
-type Veth struct {
+type LinkIPs struct {
 	HostIPv4 string `json:"hostipv4"`
 	NSIPv4   string `json:"nsipv4"`
 	HostIPv6 string `json:"hostipv6"`
@@ -78,18 +78,37 @@ func (e NotRouterInterfaceError) Error() string {
 	return fmt.Sprintf("interface %s is not a router interface", e.Name)
 }
 
+func setupVRFInNS(ctx context.Context, params VNIParams) error {
+	ns, err := netns.GetFromPath(params.TargetNS)
+	if err != nil {
+		return fmt.Errorf("failed to get network namespace %s: %w", params.TargetNS, err)
+	}
+	defer func() {
+		if err := ns.Close(); err != nil {
+			slog.Error("failed to close namespace", "namespace", params.TargetNS, "error", err)
+		}
+	}()
+	return netnamespace.In(ns, func() error {
+		slog.DebugContext(ctx, "setting up vrf", "vrf", params.VRF)
+		return setupVRF(params.VRF)
+	})
+}
+
 // SetupL3VNI sets up a Layer 3 VNI in the target namespace.
-// It uses setupVNI to create the necessary VRF, bridge, and
-// VXLan interface, and moves the veth to the VRF corresponding
+// It creates the VRF, then uses setupVNI to create the bridge
+// and VXLan interface, and moves the veth to the VRF corresponding
 // to the L3 routing domain, exposing it to the default host namespace.
 func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
+	if err := setupVRFInNS(ctx, params.VNIParams); err != nil {
+		return fmt.Errorf("SetupL3VNI: failed to setup VRF: %w", err)
+	}
 	if err := setupVNI(ctx, params.VNIParams, setAddrGenModeNone); err != nil {
 		return fmt.Errorf("SetupL3VNI: failed to setup VNI: %w", err)
 	}
 	slog.DebugContext(ctx, "setting up l3 VNI", "params", params)
 	defer slog.DebugContext(ctx, "end setting up l3 VNI", "params", params)
 
-	if params.HostVeth == nil {
+	if params.LinkIPs == nil {
 		slog.DebugContext(ctx, "no host veth configured, skipping setup")
 		return nil
 	}
@@ -98,7 +117,7 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 		ctx,
 		vethNamesFromVNI(params.VNI),
 		params.TargetNS,
-		params.HostVeth,
+		params.LinkIPs,
 		params.VRF,
 		VXLanOverhead); err != nil {
 		return fmt.Errorf("SetupL3VNI: failed to setup host veth pair: %w", err)
@@ -107,9 +126,11 @@ func SetupL3VNI(ctx context.Context, params L3VNIParams) error {
 }
 
 // SetupL2VNI sets up a Layer 2 VNI in the target namespace.
-// It uses setupVNI to create the necessary VRF, bridge, and
-// VXLan interface, and enslaves the veth leg to the bridge,
-// exposing the L2 domain to the default host namespace.
+// It uses setupVNI to create the bridge and VXLan interface,
+// and connects the veth leg to the bridge, exposing the L2
+// domain to the default host namespace.
+// The VRF must already exist (created by SetupL3VNI); setupBridge
+// looks it up and binds the bridge to it.
 func SetupL2VNI(ctx context.Context, params L2VNIParams) error {
 	if err := setupVNI(ctx, params.VNIParams); err != nil {
 		return fmt.Errorf("SetupL2VNI: failed to setup VNI: %w", err)
@@ -185,7 +206,7 @@ func setupL2VNIRouterSide(params L2VNIParams, vethName string, underlayMTU int) 
 	}
 	if len(params.L2GatewayIPs) > 0 {
 		for _, ip := range params.L2GatewayIPs {
-			if err := assignIPToInterface(bridge, ip); err != nil {
+			if err := AssignIPToInterface(bridge, ip); err != nil {
 				return fmt.Errorf("failed to assign L2 gateway IP %s to bridge %s: %w", ip, name, err)
 			}
 		}
@@ -225,10 +246,12 @@ func setupHostMaster(ctx context.Context, params L2VNIParams, hostVeth netlink.L
 
 // setupVNI sets up the configuration required by FRR to
 // serve a given VNI in the target namespace. This includes:
-// - a linux VRF (only when params.VRF is non-empty)
-// - a linux Bridge, enslaved to the VRF when one exists
+// - a linux Bridge, bound to the VRF when params.VRF is non-empty
 // - a VXLan interface
-func setupVNI(ctx context.Context, params VNIParams, options ...NetlinkOption) error {
+//
+// The VRF must already exist when params.VRF is set; setupBridge
+// looks it up and returns an error if it is missing.
+func setupVNI(ctx context.Context, params VNIParams, bridgeOptions ...NetlinkOption) error {
 	slog.DebugContext(ctx, "setting up VNI", "params", params)
 	defer slog.DebugContext(ctx, "end setting up VNI", "params", params)
 	ns, err := netns.GetFromPath(params.TargetNS)
@@ -242,18 +265,8 @@ func setupVNI(ctx context.Context, params VNIParams, options ...NetlinkOption) e
 	}()
 
 	return netnamespace.In(ns, func() error {
-		var vrf *netlink.Vrf
-		if params.VRF != "" {
-			slog.DebugContext(ctx, "setting up vrf", "vrf", params.VRF)
-			var err error
-			vrf, err = setupVRF(params.VRF)
-			if err != nil {
-				return err
-			}
-		}
-
 		slog.DebugContext(ctx, "setting up bridge")
-		bridge, err := setupBridge(params, vrf, options...)
+		bridge, err := setupBridge(params, bridgeOptions...)
 		if err != nil {
 			return err
 		}
@@ -277,7 +290,7 @@ func RemoveNonConfiguredVNIs(targetNS string, params []VNIParams) error {
 		vnis[p.VNI] = true
 	}
 
-	failedDeletes := removeHostSideVNIs(vnis)
+	errs := removeHostSideVNIs(vnis)
 
 	ns, err := netns.GetFromPath(targetNS)
 	if err != nil {
@@ -291,13 +304,15 @@ func RemoveNonConfiguredVNIs(targetNS string, params []VNIParams) error {
 
 	if err := netnamespace.In(ns, func() error {
 		nsErrors := removeNamespaceSideVNIs(vnis)
-		failedDeletes = append(failedDeletes, nsErrors...)
-		return errors.Join(failedDeletes...)
+		return errors.Join(nsErrors...)
 	}); err != nil {
-		return err
+		errs = append(errs, err)
 	}
 
-	return errors.Join(failedDeletes...)
+	if err := errors.Join(errs...); err != nil {
+		return fmt.Errorf("RemoveNonConfiguredVNIs: %w", err)
+	}
+	return nil
 }
 
 func removeHostSideVNIs(vnis map[int32]bool) []error {
