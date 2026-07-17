@@ -20,11 +20,11 @@ const (
 )
 
 type L3VPNParams struct {
-	Name             string `json:"name"`
-	HostVeth         *Veth  `json:"veth"`
-	VRF              string `json:"vrf"`
-	TargetNS         string `json:"targetns"`
-	RDAssignedNumber int32  `json:"rdassignednumber"`
+	Name             string   `json:"name"`
+	LinkIPs          *LinkIPs `json:"link_ips"`
+	VRF              string   `json:"vrf"`
+	TargetNS         string   `json:"targetns"`
+	RDAssignedNumber int32    `json:"rdassignednumber"`
 }
 
 // SetupL3VPN sets up a Layer 3 VPN in the target namespace.
@@ -39,7 +39,7 @@ func SetupL3VPN(ctx context.Context, params L3VPNParams) error {
 		return fmt.Errorf("SetupL3VPN: failed to setup L3VPN: %w", err)
 	}
 
-	if params.HostVeth == nil {
+	if params.LinkIPs == nil {
 		slog.DebugContext(ctx, "no host veth configured, skipping setup")
 		return nil
 	}
@@ -48,7 +48,7 @@ func SetupL3VPN(ctx context.Context, params L3VPNParams) error {
 		ctx,
 		vethNamesFromL3VPN(params.RDAssignedNumber),
 		params.TargetNS,
-		params.HostVeth,
+		params.LinkIPs,
 		params.VRF,
 		SRv6Overhead); err != nil {
 		return fmt.Errorf("SetupL3VPN: failed to setup host veth pair: %w", err)
@@ -73,8 +73,7 @@ func setupL3VPN(ctx context.Context, params L3VPNParams) error {
 
 	return netnamespace.In(ns, func() error {
 		slog.DebugContext(ctx, "setting up vrf", "vrf", params.VRF)
-		_, err := setupVRF(params.VRF, srv6VRF)
-		return err
+		return setupVRF(params.VRF, srv6VRF)
 	})
 }
 
@@ -96,7 +95,10 @@ func RemoveNonConfiguredL3VPNs(targetNS string, params []L3VPNParams) error {
 
 	hostLinks, err := netlink.LinkList()
 	if err != nil {
-		return fmt.Errorf("remove non configured l3vpns: failed to list links: %w", err)
+		return fmt.Errorf("RemoveNonConfiguredL3VPNs: failed to list links: %w", err)
 	}
-	return errors.Join(removeHostSideVeths(hostLinks, HostVethPrefix+SRv6Infix, rdAssignedNumbers)...)
+	if err := errors.Join(removeHostSideVeths(hostLinks, HostVethPrefix+SRv6Infix, rdAssignedNumbers)...); err != nil {
+		return fmt.Errorf("RemoveNonConfiguredL3VPNs: failed to remove veths: %w", err)
+	}
+	return nil
 }

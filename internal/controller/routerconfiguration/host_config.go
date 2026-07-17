@@ -24,17 +24,19 @@ type interfacesConfiguration struct {
 	conversion.APIConfigData
 }
 
-// HostConfigurator applies host-level network configuration (interfaces, VNIs, sysctls).
-// Injected into Reconcile so tests can substitute a no-op implementation.
-type HostConfigurator func(ctx context.Context, config interfacesConfiguration) error
+// KernelDatapathConfigurator configures the host via kernel netlink calls.
+// It supports the full API surface.
+type KernelDatapathConfigurator struct {
+	conversion.KernelDatapathConfigValidator
+}
 
-func configureInterfaces(ctx context.Context, config interfacesConfiguration) error { // nolint:gocognit
-	hasAlreadyUnderlay, err := hostnetwork.HasUnderlayInterface(config.targetNamespace)
+func (k *KernelDatapathConfigurator) Configure(ctx context.Context, config interfacesConfiguration) error { // nolint:gocognit
+	currentUnderlayIfaces, err := hostnetwork.UnderlayInterfaces(config.targetNamespace)
 	if err != nil {
 		return fmt.Errorf("failed to check if target namespace %s has underlay: %w", config.targetNamespace, err)
 	}
-	if hasAlreadyUnderlay && len(config.Underlays) == 0 {
-		restoreUnderlay(ctx, config.targetNamespace)
+	if len(currentUnderlayIfaces) > 0 && len(config.Underlays) == 0 {
+		restoreUnderlay(ctx, config.targetNamespace, indexInterfaces(currentUnderlayIfaces))
 		return nil
 	}
 
@@ -60,7 +62,22 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 		return err
 	}
 
+	removeAllVNIs, err := areAllUnderlayInterfacesToBeRemoved(ctx, config, hostConfig)
+	if err != nil {
+		return err
+	}
+	if removeAllVNIs {
+		// VXLAN tunnels are bound to the current underlay interfaces. If all underlay interfaces are being
+		// replaced, tear down the VNIs first so they don't reference stale interfaces; they'll be recreated
+		// on top of the new underlay.
+		if err := hostnetwork.RemoveAllVNIs(config.targetNamespace); err != nil {
+			slog.Warn("failed to remove vnis during underlay change", "err", err)
+		}
+		bridgerefresh.StopAllVNIs()
+	}
+
 	slog.InfoContext(ctx, "setting up underlay")
+
 	if err := hostnetwork.SetupUnderlay(ctx, hostConfig.Underlay); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
@@ -181,7 +198,7 @@ func configureInterfaces(ctx context.Context, config interfacesConfiguration) er
 	return errors.Join(resourceErrors...)
 }
 
-func restoreUnderlay(ctx context.Context, targetNamespace string) {
+func restoreUnderlay(ctx context.Context, targetNamespace string, currentUnderlayIfaces map[string]struct{}) {
 	slog.InfoContext(ctx, "underlay removed, cleaning up VNIs and underlay interfaces")
 	if err := hostnetwork.RemoveAllVNIs(targetNamespace); err != nil {
 		slog.Warn("failed to remove vnis after underlay removal", "err", err)
@@ -193,16 +210,9 @@ func restoreUnderlay(ctx context.Context, targetNamespace string) {
 		slog.Warn("failed to remove vrfs after underlay removal", "err", err)
 	}
 	bridgerefresh.StopAllVNIs()
-	if err := hostnetwork.RestoreUnderlay(ctx, targetNamespace); err != nil {
+	if err := hostnetwork.RestoreUnderlay(ctx, targetNamespace, currentUnderlayIfaces); err != nil {
 		slog.Warn("failed to remove underlay interfaces after underlay removal", "err", err)
 	}
-}
-
-// nonRecoverableHostError tells whether the router pod
-// should be restarted instead of being reconfigured.
-func nonRecoverableHostError(e error) bool {
-	underlayExistsError := hostnetwork.UnderlayExistsError("")
-	return errors.As(e, &underlayExistsError)
 }
 
 func ensureSysctlsForConfig(ctx context.Context, config interfacesConfiguration) error {
@@ -232,4 +242,33 @@ func ensureSysctlsForConfig(ctx context.Context, config interfacesConfiguration)
 
 func isSRV6(underlay v1alpha1.Underlay) bool {
 	return underlay.Spec.SRV6 != nil
+}
+
+func areAllUnderlayInterfacesToBeRemoved(
+	ctx context.Context,
+	config interfacesConfiguration,
+	hostConfig conversion.HostConfigData,
+) (bool, error) {
+	existing, err := hostnetwork.UnderlayInterfaces(config.targetNamespace)
+	if err != nil {
+		return false, fmt.Errorf("failed to list existing underlay interfaces: %w", err)
+	}
+
+	removedInterfaces := hostnetwork.UnderlayInterfacesToRemove(existing, hostConfig.Underlay.UnderlayInterfaces)
+	allRemoved := len(removedInterfaces) > 0 && len(removedInterfaces) == len(existing)
+	if allRemoved {
+		slog.InfoContext(ctx, "all underlay interfaces removed, cleaning up VNIs before interface swap",
+			"removed", removedInterfaces,
+			"requested", hostConfig.Underlay.UnderlayInterfaces,
+		)
+	}
+	return allRemoved, nil
+}
+
+func indexInterfaces(ifaces []string) map[string]struct{} {
+	indexedIfaces := make(map[string]struct{}, len(ifaces))
+	for _, iface := range ifaces {
+		indexedIfaces[iface] = struct{}{}
+	}
+	return indexedIfaces
 }
