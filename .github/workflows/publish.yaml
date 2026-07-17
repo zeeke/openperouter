@@ -159,6 +159,9 @@ jobs:
           echo "Disk space after cleanup:"
           df -h
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
       - name: Install Cosign
         uses: sigstore/cosign-installer@main
         with:
@@ -198,7 +201,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           file: Dockerfile.grout
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
