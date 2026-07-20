@@ -53,12 +53,16 @@ RUN dnf --nogpgcheck install --setopt=install_weak_deps=0 --nodocs -y \
   python3-devel readline-devel rpm-build numactl-devel \
   groff pam-devel systemd-devel openssl-devel libarchive-devel
 
+COPY openshift/nosystemd.patch /nosystemd.patch
 COPY openshift/grout /src
 COPY openshift/deps/dpdk /src/subprojects/dpdk-stable-25.11.2
 COPY openshift/deps/libecoli /src/subprojects/libecoli-0.11.3
 COPY openshift/deps/frr /src/subprojects/frr-frr-10.6.1
 
 WORKDIR /src
+
+# Apply nosystemd patch (fixes rpm build --without=systemd)
+RUN patch -p1 < /nosystemd.patch
 
 # Apply dpdk patches (meson skips diff_files for pre-existing directories)
 RUN for p in subprojects/packagefiles/dpdk/*.patch; do patch -d subprojects/dpdk-stable-25.11.2 -p1 < "$p"; done

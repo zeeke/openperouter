@@ -1,0 +1,32 @@
+From cd66b6d535e52b86daf4ddd781419940fdcc74d9 Mon Sep 17 00:00:00 2001
+From: Robin Jarry <rjarry@redhat.com>
+Date: Mon, 20 Jul 2026 14:16:35 +0200
+Subject: [PATCH] rpm: fix build without systemd
+
+Fix the following error when building --without=systemd:
+
+Processing files: grout-frr-0.16.1-20260720120706.local.el10.x86_64
+error: File not found: /BUILDROOT/.../usr/lib/systemd/system/frr.service.d/grout.conf
+
+Fixes: a6643d4302f5 ("frr: add systemd dropin to rpm/deb installed files")
+Signed-off-by: Robin Jarry <rjarry@redhat.com>
+Reviewed-by: Andrea Panattoni <apanatto@redhat.com>
+---
+ rpm/grout.spec | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/rpm/grout.spec b/rpm/grout.spec
+index 50a6863a3..f5df3b1c7 100644
+--- a/rpm/grout.spec
++++ b/rpm/grout.spec
+@@ -161,7 +161,9 @@ rm -rf %{buildroot}%{_sysconfdir} %{buildroot}%{_unitdir}
+ %doc README.md
+ %license licenses/GPL-2.0-or-later.txt
+ %attr(755, root, root) %{_libdir}/frr/modules/dplane_grout.so
++%if %{with systemd}
+ %attr(644, root, root) %{_unitdir}/frr.service.d/grout.conf
++%endif
+ %if %{with docs}
+ %attr(644, root, root) %{_mandir}/man7/grout-frr.7*
+ %endif
+ 
