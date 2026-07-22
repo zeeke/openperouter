@@ -65,17 +65,28 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 			if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, iface); err != nil {
 				return err
 			}
+			if err := netnamespace.In(perouterNetNS, func() error {
+				return configureUnderlayPort(ctx, client, iface.InterfaceName)
+			}); err != nil {
+				return err
+			}
 		case hostnetwork.UnderlayInterfaceCNIDev:
 			if err := hostnetwork.SetupUnderlayCNIDevInterface(ctx, params.TargetNS, iface); err != nil {
 				return err
 			}
+			if err := netnamespace.In(perouterNetNS, func() error {
+				return configureUnderlayPort(ctx, client, iface.InterfaceName)
+			}); err != nil {
+				return err
+			}
+		case hostnetwork.UnderlayInterfaceGroutPort:
+			if err := netnamespace.In(perouterNetNS, func() error {
+				return configureGroutPort(ctx, client, iface)
+			}); err != nil {
+				return err
+			}
 		default:
 			return fmt.Errorf("underlay interface %s has unsupported kind %q", iface.InterfaceName, iface.Kind)
-		}
-		if err := netnamespace.In(perouterNetNS, func() error {
-			return configureUnderlayPort(ctx, client, iface.InterfaceName)
-		}); err != nil {
-			return err
 		}
 	}
 
@@ -131,6 +142,7 @@ func RestoreUnderlay(
 		}
 	}()
 
+	var kernelInterfaces []hostnetwork.UnderlayInterface
 	for _, iface := range toRemove {
 		portName := UnderlayPortNamePrefix + iface.InterfaceName
 		if _, found := existingPorts[portName]; !found {
@@ -138,14 +150,23 @@ func RestoreUnderlay(
 			continue
 		}
 
-		if err := netnamespace.In(ns, func() error {
-			if err := migrateAddressesToKernel(ctx, client, portName); err != nil {
-				return fmt.Errorf("RestoreUnderlay: failed to migrate addresses back to kernel: %w", err)
+		if iface.Kind == hostnetwork.UnderlayInterfaceGroutPort {
+			// GroutPort: no kernel netdev to migrate addresses back to.
+			// Remove addresses from the grout port and delete it.
+			if err := removeGroutPortAddresses(ctx, client, ns, portName); err != nil {
+				return err
 			}
+		} else {
+			if err := netnamespace.In(ns, func() error {
+				if err := migrateAddressesToKernel(ctx, client, portName); err != nil {
+					return fmt.Errorf("RestoreUnderlay: failed to migrate addresses back to kernel: %w", err)
+				}
 
-			return nil
-		}); err != nil {
-			return err
+				return nil
+			}); err != nil {
+				return err
+			}
+			kernelInterfaces = append(kernelInterfaces, iface)
 		}
 
 		if err := client.deletePort(ctx, portName); err != nil {
@@ -153,11 +174,31 @@ func RestoreUnderlay(
 		}
 	}
 
-	if err := hostnetwork.RestoreUnderlay(ctx, targetNS, toRemove); err != nil {
-		return fmt.Errorf("RestoreUnderlay: failed to clean kernel underlay state: %w", err)
+	if len(kernelInterfaces) > 0 {
+		if err := hostnetwork.RestoreUnderlay(ctx, targetNS, kernelInterfaces); err != nil {
+			return fmt.Errorf("RestoreUnderlay: failed to clean kernel underlay state: %w", err)
+		}
 	}
 
 	return nil
+}
+
+func removeGroutPortAddresses(ctx context.Context, client *Client, ns netns.NsHandle, portName string) error {
+	return netnamespace.In(ns, func() error {
+		addrs, err := client.getAddresses(ctx, portName)
+		if err != nil {
+			return fmt.Errorf("RestoreUnderlay: failed to get addresses for grout port %s: %w", portName, err)
+		}
+		for _, addr := range addrs {
+			if err := removeKernelSubnetRoute("main", addr); err != nil {
+				return fmt.Errorf("RestoreUnderlay: failed to remove kernel route for %s: %w", addr, err)
+			}
+			if err := client.deleteAddress(ctx, portName, addr); err != nil {
+				return fmt.Errorf("RestoreUnderlay: failed to delete address %s from grout port %s: %w", addr, portName, err)
+			}
+		}
+		return nil
+	})
 }
 
 func configureUnderlayPort(ctx context.Context, client *Client, underlayInterface string) error {
@@ -173,6 +214,44 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 
 	if err := migrateAddressesToGrout(ctx, client, underlayInterface, underlayAddrs); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// configureGroutPort creates a DPDK port in grout directly from a PCI
+// device address, assigns the inline IPAM addresses, and sets up the
+// kernel routes needed by FRR.
+func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface) error {
+	if iface.GroutPort == nil {
+		return fmt.Errorf("groutPort params missing for interface %s", iface.InterfaceName)
+	}
+
+	portName := UnderlayPortNamePrefix + iface.InterfaceName
+	opts := PortOptions{
+		MTU:      iface.GroutPort.MTU,
+		RXQueues: iface.GroutPort.RXQueues,
+		QSize:    iface.GroutPort.QSize,
+	}
+
+	if err := client.ensurePortWithOptions(ctx, portName, iface.GroutPort.PCIAddress, opts); err != nil {
+		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
+	}
+
+	for _, addr := range iface.GroutPort.Addresses {
+		if err := client.ensureAddress(ctx, portName, addr); err != nil {
+			return fmt.Errorf("failed to assign address %s to grout port %s: %w", addr, portName, err)
+		}
+
+		if err := ensureKernelSubnetRoute("main", addr); err != nil {
+			return fmt.Errorf("failed to add kernel route for underlay subnet %s: %w", addr, err)
+		}
+
+		slog.InfoContext(ctx, "configured grout DPDK port address", "cidr", addr, "port", portName)
+	}
+
+	if err := sysctl.Ensure(sysctl.DisableRPFilter(portName)); err != nil {
+		return fmt.Errorf("failed to disable rp_filter on %s: %w", portName, err)
 	}
 
 	return nil

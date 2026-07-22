@@ -220,9 +220,22 @@ func interfaceTypesByName(interfaces []v1alpha1.UnderlayInterface) map[string]v1
 			if iface.CNIDevice != nil {
 				res[cniInterfaceName(iface)] = iface.Type
 			}
+		case v1alpha1.UnderlayInterfaceTypeGroutPort:
+			if iface.GroutPort != nil {
+				res[groutPortIdentifier(iface)] = iface.Type
+			}
 		}
 	}
 	return res
+}
+
+// groutPortIdentifier returns a stable identifier for a GroutPort interface
+// for immutability checks: the PCI address if set, otherwise pfName+vfIndex.
+func groutPortIdentifier(iface v1alpha1.UnderlayInterface) string {
+	if iface.GroutPort.PCIAddress != nil {
+		return *iface.GroutPort.PCIAddress
+	}
+	return fmt.Sprintf("%s/vf%d", ptr.Deref(iface.GroutPort.PFName, ""), ptr.Deref(iface.GroutPort.VFIndex, 0))
 }
 
 // cniDevicesByInterface indexes the cniDevice of every CNI interface by its
