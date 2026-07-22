@@ -136,6 +136,92 @@ spec:
                       - message: 'type/config mismatch: rawConfig must be set if and
                           only if type is ''RawConfig'''
                         rule: has(self.rawConfig) == (self.type == 'RawConfig')
+                    groutPort:
+                      description: |-
+                        groutPort binds an SR-IOV VF directly to grout as a DPDK port.
+                        The VF is identified by PCI address or PF name + VF index.
+                        IPAM is specified inline since DPDK-bound interfaces have no kernel
+                        netdev for CNI IPAM plugins to target. Only valid when grout is enabled.
+                        Must be set when type is "GroutPort".
+                      properties:
+                        ipam:
+                          description: ipam specifies the IP addresses to assign to
+                            the DPDK port.
+                          properties:
+                            addresses:
+                              description: |-
+                                addresses is a list of CIDRs to assign to the grout port.
+                                At most one IPv4 and one IPv6 address (dual-stack).
+                              items:
+                                type: string
+                              maxItems: 2
+                              minItems: 1
+                              type: array
+                              x-kubernetes-list-type: atomic
+                              x-kubernetes-validations:
+                              - message: all entries must be valid CIDRs
+                                rule: self.all(c, isCIDR(c))
+                              - message: at most one IPv4 address is allowed
+                                rule: self.filter(c, isCIDR(c) && cidr(c).ip().family()
+                                  == 4).size() <= 1
+                              - message: at most one IPv6 address is allowed
+                                rule: self.filter(c, isCIDR(c) && cidr(c).ip().family()
+                                  == 6).size() <= 1
+                          required:
+                          - addresses
+                          type: object
+                        pciAddress:
+                          description: |-
+                            pciAddress is the PCI Bus:Device.Function address of the VF to bind
+                            (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex.
+                          pattern: ^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$
+                          type: string
+                        pfName:
+                          description: |-
+                            pfName is the name of the Physical Function whose VF will be bound.
+                            Must be used together with vfIndex. Mutually exclusive with pciAddress.
+                          maxLength: 15
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
+                        portOptions:
+                          description: portOptions specifies optional DPDK port parameters.
+                          properties:
+                            mtu:
+                              description: mtu is the Maximum Transmission Unit for
+                                the DPDK port.
+                              maximum: 9702
+                              minimum: 68
+                              type: integer
+                            qSize:
+                              description: qSize is the size of each receive/transmit
+                                queue.
+                              maximum: 32768
+                              minimum: 64
+                              type: integer
+                            rxQueues:
+                              description: rxQueues is the number of receive queues
+                                for the DPDK port.
+                              maximum: 64
+                              minimum: 1
+                              type: integer
+                          type: object
+                        vfIndex:
+                          description: |-
+                            vfIndex is the index of the Virtual Function on the PF.
+                            Must be used together with pfName. Mutually exclusive with pciAddress.
+                          minimum: 0
+                          type: integer
+                      required:
+                      - ipam
+                      type: object
+                      x-kubernetes-validations:
+                      - message: specify either pciAddress or both pfName and vfIndex,
+                          not both
+                        rule: has(self.pciAddress) != (has(self.pfName) && has(self.vfIndex))
+                      - message: vfIndex is required when pfName is set
+                        rule: '!has(self.pfName) || has(self.vfIndex)'
+                      - message: pfName is required when vfIndex is set
+                        rule: '!has(self.vfIndex) || has(self.pfName)'
                     networkDevice:
                       description: |-
                         networkDevice moves an existing host network device into the router netns.
@@ -159,6 +245,7 @@ spec:
                       enum:
                       - NetworkDevice
                       - CNIDevice
+                      - GroutPort
                       type: string
                   required:
                   - type
@@ -170,6 +257,9 @@ spec:
                   - message: 'type/config mismatch: cniDevice must be set if and only
                       if type is ''CNIDevice'''
                     rule: has(self.cniDevice) == (self.type == 'CNIDevice')
+                  - message: 'type/config mismatch: groutPort must be set if and only
+                      if type is ''GroutPort'''
+                    rule: has(self.groutPort) == (self.type == 'GroutPort')
                 minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
