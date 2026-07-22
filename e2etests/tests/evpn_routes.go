@@ -97,6 +97,7 @@ var (
 // CNI plugins supported in the future (ipvlan, vlan, host-device, dhcp IPAM).
 var _ = DescribeTableSubtree("Routes between bgp and the fabric with Underlay in ipv4",
 	evpnRoutesOverUnderlay,
+	GroutSupport,
 	Entry("NetworkDevice", Ordered, networkDeviceUnderlay),
 	Entry("MacvlanStatic", Ordered, macvlanStaticUnderlay),
 )
@@ -482,7 +483,7 @@ func evpnRoutesOverUnderlay(params evpnUnderlayParams) {
 	})
 }
 
-var _ = Describe("Routes between bgp and the fabric with iBGP testing e2e integration between a pod and the red hosts", func() {
+var _ = Describe("Routes between bgp and the fabric with iBGP testing e2e integration between a pod and the red hosts", GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 	var nodes []corev1.Node
