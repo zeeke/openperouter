@@ -56,13 +56,13 @@ FROM quay.io/centos/centos:stream10
 
 WORKDIR /
 
-RUN dnf install -y iproute iproute-tc catatonit && dnf clean all
+RUN dnf install -y iproute iproute-tc catatonit tcpdump && dnf clean all
 RUN ln -s /usr/libexec/podman/catatonit /sbin/tini
 
 RUN mkdir /rpms
-ADD https://github.com/DPDK/grout/releases/download/v0.16.0/frr.x86_64.rpm /tmp/
-ADD https://github.com/DPDK/grout/releases/download/v0.16.0/grout-frr.x86_64.rpm /tmp/
-ADD https://github.com/DPDK/grout/releases/download/v0.16.0/grout.x86_64.rpm /tmp/
+ADD https://github.com/DPDK/grout/releases/download/v0.16.2/frr.x86_64.rpm /tmp/
+ADD https://github.com/DPDK/grout/releases/download/v0.16.2/grout-frr.x86_64.rpm /tmp/
+ADD https://github.com/DPDK/grout/releases/download/v0.16.2/grout.x86_64.rpm /tmp/
 
 RUN dnf install -y /tmp/*.rpm && dnf clean all && rm -rf /tmp/*.rpm
 
