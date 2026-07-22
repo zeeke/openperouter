@@ -4,6 +4,7 @@ package tests
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -53,9 +54,10 @@ for pci in /sys/bus/pci/drivers/igb/0000:*; do
 done`)
 		Expect(err).NotTo(HaveOccurred())
 
+		ifaceRe := regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9._-]*$`)
 		for line := range strings.SplitSeq(strings.TrimSpace(out), "\n") {
 			iface := strings.TrimSpace(line)
-			if iface != "" {
+			if ifaceRe.MatchString(iface) {
 				vfIfaces = append(vfIfaces, iface)
 			}
 		}

@@ -14,6 +14,14 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
+func lastLine(s string) string {
+	s = strings.TrimSpace(s)
+	if i := strings.LastIndex(s, "\n"); i >= 0 {
+		return strings.TrimSpace(s[i+1:])
+	}
+	return s
+}
+
 var _ = Describe("QEMU VF Setup Verification", QEMUSupport, Ordered, func() {
 	var cs clientset.Interface
 	var controllerPods []*corev1.Pod
@@ -38,16 +46,17 @@ var _ = Describe("QEMU VF Setup Verification", QEMUSupport, Ordered, func() {
 			`for pci in /sys/bus/pci/devices/0000:*; do
 				driver=$(basename "$(readlink "$pci/driver" 2>/dev/null)" 2>/dev/null)
 				vendor=$(cat "$pci/vendor" 2>/dev/null)
-				# 8086:10c9 is Intel 82576 (igb)
-				device=$(cat "$pci/device" 2>/dev/null)
 				if [ "$driver" = "vfio-pci" ] && [ "$vendor" = "0x8086" ]; then
-					echo "$(basename $pci)"
+					echo "RESULT:$(basename $pci)"
 					exit 0
 				fi
 			done
-			echo "NONE"`)
+			echo "RESULT:NONE"`)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(strings.TrimSpace(out)).NotTo(Equal("NONE"), "expected one igb NIC bound to vfio-pci")
+		result := lastLine(out)
+		Expect(result).To(HavePrefix("RESULT:"))
+		Expect(strings.TrimPrefix(result, "RESULT:")).NotTo(Equal("NONE"),
+			"expected one igb NIC bound to vfio-pci")
 	})
 
 	It("should have a kernel-bound igb NIC with a network interface", func() {
@@ -61,8 +70,11 @@ var _ = Describe("QEMU VF Setup Verification", QEMUSupport, Ordered, func() {
 					count=$((count + 1))
 				fi
 			done
-			echo "$count"`)
+			echo "RESULT:$count"`)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(strings.TrimSpace(out)).NotTo(Equal("0"), "expected at least one kernel-bound igb NIC with a net interface")
+		result := lastLine(out)
+		Expect(result).To(HavePrefix("RESULT:"))
+		Expect(strings.TrimPrefix(result, "RESULT:")).NotTo(Equal("0"),
+			"expected at least one kernel-bound igb NIC with a net interface")
 	})
 })
