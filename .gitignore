@@ -36,3 +36,11 @@ go.work
 logs_*/
 
 cmd/hostbridge/hostbridge
+# QEMU VM artifacts
+hack/qemu/vm/fedora-cloud.qcow2
+hack/qemu/vm/cloud-init.iso
+hack/qemu/vm/serial.log
+hack/qemu/vm/qemu.pid
+hack/qemu/vm/kubeconfig
+hack/qemu/vm/qemu-ssh-key
+hack/qemu/vm/qemu-ssh-key.pub
