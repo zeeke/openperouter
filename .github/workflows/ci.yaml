@@ -365,7 +365,6 @@ jobs:
           artifact-name: kind-logs-${{ matrix.deployment }}
 
   qemu-e2etests:
-    if: contains(github.event.pull_request.labels.*.name, 'run-qemu-tests')
     runs-on: ubuntu-24.04
     needs:
       - build-test-images
