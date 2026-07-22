@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Creates a Linux bridge + TAP device, launches a QEMU/KVM VM with an igb
-# SR-IOV NIC on the underlay, and waits for SSH to become reachable.
+# Creates a Linux bridge + TAP devices, launches a QEMU/KVM VM with 4 igb
+# NICs on the underlay, and waits for SSH to become reachable.
 
 set -euo pipefail
 
@@ -11,7 +11,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VM_IMAGE="${SCRIPT_DIR}/fedora-cloud.qcow2"
 CLOUD_INIT_ISO="${SCRIPT_DIR}/cloud-init.iso"
 BRIDGE_NAME="${QEMU_BRIDGE:-br-underlay}"
-TAP_NAME="${QEMU_TAP:-vm-underlay}"
+TAP_PREFIX="${QEMU_TAP_PREFIX:-vm-underlay}"
+NUM_NICS=4
 SSH_PORT="${QEMU_SSH_PORT:-2222}"
 K8S_PORT="${QEMU_K8S_PORT:-6443}"
 VM_CPUS="${QEMU_VM_CPUS:-4}"
@@ -58,7 +59,7 @@ rm -rf "${CLOUD_INIT_TMPDIR}"
 echo "cloud-init ISO regenerated with SSH key."
 
 # --- Networking setup ---
-echo "Setting up bridge ${BRIDGE_NAME} and TAP ${TAP_NAME}..."
+echo "Setting up bridge ${BRIDGE_NAME} and ${NUM_NICS} TAP devices..."
 
 # Create the bridge if it doesn't exist.
 if ! ip link show "${BRIDGE_NAME}" &>/dev/null; then
@@ -67,18 +68,30 @@ if ! ip link show "${BRIDGE_NAME}" &>/dev/null; then
     sudo ip addr add 192.168.100.254/24 dev "${BRIDGE_NAME}" 2>/dev/null || true
 fi
 
-# Create the TAP device for the VM's underlay NIC.
-if ! ip link show "${TAP_NAME}" &>/dev/null; then
-    sudo ip tuntap add dev "${TAP_NAME}" mode tap
-    sudo ip link set "${TAP_NAME}" master "${BRIDGE_NAME}"
-    sudo ip link set "${TAP_NAME}" up
-fi
+# Create TAP devices for the VM's underlay NICs (one per igb NIC).
+for i in $(seq 0 $((NUM_NICS - 1))); do
+    TAP="${TAP_PREFIX}-${i}"
+    if ! ip link show "${TAP}" &>/dev/null; then
+        sudo ip tuntap add dev "${TAP}" mode tap
+        sudo ip link set "${TAP}" master "${BRIDGE_NAME}"
+        sudo ip link set "${TAP}" up
+    fi
+done
 
 # --- Launch QEMU ---
 echo "Launching QEMU VM..."
 
 # Pre-create files so they're owned by current user, not root.
 touch "${SERIAL_LOG}" "${PID_FILE}"
+
+# Build NIC arguments: 4 igb NICs, each on its own PCIe root port and TAP.
+NIC_ARGS=""
+for i in $(seq 0 $((NUM_NICS - 1))); do
+    MAC=$(printf "52:54:00:ab:cd:%02x" $((i + 1)))
+    NIC_ARGS="${NIC_ARGS} -device pcie-root-port,id=rp${i},slot=${i}"
+    NIC_ARGS="${NIC_ARGS} -netdev tap,id=underlay${i},ifname=${TAP_PREFIX}-${i},script=no,downscript=no"
+    NIC_ARGS="${NIC_ARGS} -device igb,bus=rp${i},netdev=underlay${i},mac=${MAC}"
+done
 
 sudo qemu-system-x86_64 \
     -machine q35 \
@@ -90,9 +103,7 @@ sudo qemu-system-x86_64 \
     -cdrom "${CLOUD_INIT_ISO}" \
     -netdev user,id=mgmt,hostfwd=tcp::${SSH_PORT}-:22,hostfwd=tcp::${K8S_PORT}-:6443 \
     -device virtio-net-pci,netdev=mgmt \
-    -device pcie-root-port,id=rp0,slot=0 \
-    -netdev tap,id=underlay,ifname="${TAP_NAME}",script=no,downscript=no \
-    -device igb,bus=rp0,netdev=underlay,mac=52:54:00:ab:cd:01 \
+    ${NIC_ARGS} \
     -display none \
     -serial file:"${SERIAL_LOG}" \
     -pidfile "${PID_FILE}" \

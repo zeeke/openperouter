@@ -30,18 +30,6 @@ var _ = Describe("QEMU VF Setup Verification", QEMUSupport, Ordered, func() {
 		Expect(controllerPods).NotTo(BeEmpty(), "no controller pods found")
 	})
 
-	It("should have SR-IOV VFs created on the igb PF", func() {
-		pod := controllerPods[0]
-		exec := executor.ForPod(pod.Namespace, pod.Name, "controller")
-
-		out, err := exec.Exec("sh", "-c",
-			`for d in /sys/bus/pci/drivers/igb/0000:*; do
-				[ -f "$d/sriov_numvfs" ] && cat "$d/sriov_numvfs"
-			done`)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(strings.TrimSpace(out)).To(Equal("2"), "expected 2 VFs on the igb PF")
-	})
-
 	It("should have a VF bound to vfio-pci", func() {
 		pod := controllerPods[0]
 		exec := executor.ForPod(pod.Namespace, pod.Name, "controller")
