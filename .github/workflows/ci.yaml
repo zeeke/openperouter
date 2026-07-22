@@ -367,7 +367,7 @@ jobs:
   qemu-e2etests:
     runs-on: ubuntu-24.04
     needs:
-      - build-test-images
+      - build-grout-images
     steps:
       - name: Free Disk Space
         working-directory: ${{ github.workspace }}
@@ -407,12 +407,12 @@ jobs:
       - name: Download openperouter image
         uses: actions/download-artifact@v8
         with:
-          name: image-tar-openperouter
+          name: image-tar-openperouter-grout
           path: image
 
       - name: Load openperouter image
         run: |
-          docker load -i image/openperouter.tar
+          docker load -i image/openperouter-grout.tar
 
       - name: Prepare QEMU VM image
         run: |
@@ -424,9 +424,9 @@ jobs:
 
       - name: Deploy openperouter in QEMU VM
         run: |
-          OPENPEROUTER_IMAGE_TAR=image/openperouter.tar \
-          KUSTOMIZE_LAYER=default \
-            make qemu-deploy IMG_TAG=main
+          OPENPEROUTER_IMAGE_TAR=image/openperouter-grout.tar \
+          KUSTOMIZE_LAYER=grout \
+            make qemu-deploy IMG_TAG=main-grout
 
       - name: Run QEMU e2e tests
         run: |
