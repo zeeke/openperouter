@@ -4,6 +4,9 @@ package conversion
 
 import (
 	"errors"
+	"fmt"
+
+	"github.com/openperouter/openperouter/api/v1alpha1"
 )
 
 type DatapathConfigValidator interface {
@@ -32,6 +35,13 @@ func (g *GroutDatapathConfigValidator) Validate(apiConfig APIConfigData) error {
 
 type KernelDatapathConfigValidator struct{}
 
-func (k *KernelDatapathConfigValidator) Validate(_ APIConfigData) error {
+func (k *KernelDatapathConfigValidator) Validate(apiConfig APIConfigData) error {
+	for _, underlay := range apiConfig.Underlays {
+		for _, iface := range underlay.Spec.Interfaces {
+			if iface.Type == v1alpha1.UnderlayInterfaceTypeGroutPort {
+				return fmt.Errorf("GroutPort interface type requires grout datapath (--datapath=grout)")
+			}
+		}
+	}
 	return nil
 }

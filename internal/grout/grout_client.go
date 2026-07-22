@@ -42,7 +42,18 @@ func (c *Client) deleteAddress(ctx context.Context, iface, addr string) error {
 	return nil
 }
 
+// PortOptions holds optional parameters for DPDK port creation.
+type PortOptions struct {
+	MTU      *int
+	RXQueues *int
+	QSize    *int
+}
+
 func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
+	return c.ensurePortWithOptions(ctx, name, devargs, PortOptions{})
+}
+
+func (c *Client) ensurePortWithOptions(ctx context.Context, name, devargs string, opts PortOptions) error {
 	exists, err := c.portExists(ctx, name)
 	if err != nil {
 		return fmt.Errorf("checking if port %s exists: %w", name, err)
@@ -52,8 +63,19 @@ func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
 		return nil
 	}
 
-	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs)
-	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs); err != nil {
+	args := []string{"interface", "add", "port", name, "devargs", devargs}
+	if opts.MTU != nil {
+		args = append(args, "mtu", fmt.Sprintf("%d", *opts.MTU))
+	}
+	if opts.RXQueues != nil {
+		args = append(args, "rxqs", fmt.Sprintf("%d", *opts.RXQueues))
+	}
+	if opts.QSize != nil {
+		args = append(args, "qsize", fmt.Sprintf("%d", *opts.QSize))
+	}
+
+	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs, "opts", opts)
+	if err := c.run(ctx, args...); err != nil {
 		return fmt.Errorf("creating grout port %s: %w", name, err)
 	}
 	return nil
