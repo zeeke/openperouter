@@ -90,7 +90,7 @@ type UnderlaySpec struct {
 // UnderlayInterfaceType selects how the router obtains an underlay link.
 // It is the discriminator of the UnderlayInterface union and is designed to be
 // extended with future modes.
-// +kubebuilder:validation:Enum=NetworkDevice;CNIDevice
+// +kubebuilder:validation:Enum=NetworkDevice;CNIDevice;GroutPort
 type UnderlayInterfaceType string
 
 const (
@@ -101,6 +101,10 @@ const (
 	// UnderlayInterfaceTypeCNIDevice invokes a CNI plugin to provision an interface
 	// in the router netns.
 	UnderlayInterfaceTypeCNIDevice UnderlayInterfaceType = "CNIDevice"
+
+	// UnderlayInterfaceTypeGroutPort binds an SR-IOV VF directly to grout as a
+	// DPDK port, bypassing the kernel on the underlay fast path.
+	UnderlayInterfaceTypeGroutPort UnderlayInterfaceType = "GroutPort"
 )
 
 // UnderlayInterface defines how the router obtains a single underlay link.
@@ -111,6 +115,7 @@ const (
 // +union
 // +kubebuilder:validation:XValidation:rule="has(self.networkDevice) == (self.type == 'NetworkDevice')",message="type/config mismatch: networkDevice must be set if and only if type is 'NetworkDevice'"
 // +kubebuilder:validation:XValidation:rule="has(self.cniDevice) == (self.type == 'CNIDevice')",message="type/config mismatch: cniDevice must be set if and only if type is 'CNIDevice'"
+// +kubebuilder:validation:XValidation:rule="has(self.groutPort) == (self.type == 'GroutPort')",message="type/config mismatch: groutPort must be set if and only if type is 'GroutPort'"
 type UnderlayInterface struct {
 	// type selects how the router obtains this underlay link.
 	// +required
@@ -128,6 +133,14 @@ type UnderlayInterface struct {
 	// "CNIDevice".
 	// +optional
 	CNIDevice *CNIDevice `json:"cniDevice,omitempty"`
+
+	// groutPort binds an SR-IOV VF directly to grout as a DPDK port.
+	// The VF is identified by PCI address or PF name + VF index.
+	// IPAM is specified inline since DPDK-bound interfaces have no kernel
+	// netdev for CNI IPAM plugins to target. Only valid when grout is enabled.
+	// Must be set when type is "GroutPort".
+	// +optional
+	GroutPort *GroutPortConfig `json:"groutPort,omitempty"`
 }
 
 // NetworkDevice moves an existing host network device into the router netns.
@@ -197,6 +210,75 @@ type CNIDevice struct {
 	// +kubebuilder:validation:Type=object
 	// +optional
 	RuntimeConfig *apiextensionsv1.JSON `json:"runtimeConfig,omitempty"`
+}
+
+// GroutPortConfig specifies a VF to bind to grout as a DPDK port.
+// Exactly one selector must be used: either pciAddress alone, or pfName + vfIndex together.
+// +kubebuilder:validation:XValidation:rule="has(self.pciAddress) != (has(self.pfName) && has(self.vfIndex))",message="specify either pciAddress or both pfName and vfIndex, not both"
+// +kubebuilder:validation:XValidation:rule="!has(self.pfName) || has(self.vfIndex)",message="vfIndex is required when pfName is set"
+// +kubebuilder:validation:XValidation:rule="!has(self.vfIndex) || has(self.pfName)",message="pfName is required when vfIndex is set"
+type GroutPortConfig struct {
+	// pciAddress is the PCI Bus:Device.Function address of the VF to bind
+	// (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex.
+	// +kubebuilder:validation:Pattern=`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$`
+	// +optional
+	PCIAddress *string `json:"pciAddress,omitempty"`
+
+	// pfName is the name of the Physical Function whose VF will be bound.
+	// Must be used together with vfIndex. Mutually exclusive with pciAddress.
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
+	// +kubebuilder:validation:MaxLength=15
+	// +optional
+	PFName *string `json:"pfName,omitempty"`
+
+	// vfIndex is the index of the Virtual Function on the PF.
+	// Must be used together with pfName. Mutually exclusive with pciAddress.
+	// +kubebuilder:validation:Minimum=0
+	// +optional
+	VFIndex *int `json:"vfIndex,omitempty"`
+
+	// ipam specifies the IP addresses to assign to the DPDK port.
+	// +required
+	IPAM GroutPortIPAM `json:"ipam"`
+
+	// portOptions specifies optional DPDK port parameters.
+	// +optional
+	PortOptions *GroutPortOptions `json:"portOptions,omitempty"`
+}
+
+// GroutPortIPAM holds inline IPAM configuration for a DPDK-bound underlay port.
+type GroutPortIPAM struct {
+	// addresses is a list of CIDRs to assign to the grout port.
+	// At most one IPv4 and one IPv6 address (dual-stack).
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=2
+	// +kubebuilder:validation:XValidation:rule="self.all(c, isCIDR(c))",message="all entries must be valid CIDRs"
+	// +kubebuilder:validation:XValidation:rule="self.filter(c, isCIDR(c) && cidr(c).ip().family() == 4).size() <= 1",message="at most one IPv4 address is allowed"
+	// +kubebuilder:validation:XValidation:rule="self.filter(c, isCIDR(c) && cidr(c).ip().family() == 6).size() <= 1",message="at most one IPv6 address is allowed"
+	// +listType=atomic
+	// +required
+	Addresses []string `json:"addresses"`
+}
+
+// GroutPortOptions holds optional DPDK port parameters for grcli.
+type GroutPortOptions struct {
+	// mtu is the Maximum Transmission Unit for the DPDK port.
+	// +kubebuilder:validation:Minimum=68
+	// +kubebuilder:validation:Maximum=9702
+	// +optional
+	MTU *int `json:"mtu,omitempty"`
+
+	// rxQueues is the number of receive queues for the DPDK port.
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=64
+	// +optional
+	RXQueues *int `json:"rxQueues,omitempty"`
+
+	// qSize is the size of each receive/transmit queue.
+	// +kubebuilder:validation:Minimum=64
+	// +kubebuilder:validation:Maximum=32768
+	// +optional
+	QSize *int `json:"qSize,omitempty"`
 }
 
 // GracefulRestartConfig holds BGP Graceful Restart parameters.
