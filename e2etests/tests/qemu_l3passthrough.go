@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/e2etests/pkg/config"
+	"github.com/openperouter/openperouter/e2etests/pkg/executor"
 	"github.com/openperouter/openperouter/e2etests/pkg/frr"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
@@ -20,31 +21,54 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
-var _ = Describe("QEMU L3Passthrough with Underlay", QEMUSupport, Ordered, func() {
-	var cs clientset.Interface
-	var routerPods []*corev1.Pod
+func networkDeviceQEMUInterface(_ clientset.Interface) v1alpha1.UnderlayInterface {
+	return v1alpha1.UnderlayInterface{
+		Type:          "NetworkDevice",
+		NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "enp1s0"},
+	}
+}
 
-	qemuUnderlay := v1alpha1.Underlay{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "underlay",
-			Namespace: openperouter.Namespace,
-		},
-		Spec: v1alpha1.UnderlaySpec{
-			ASN: 64514,
-			Interfaces: []v1alpha1.UnderlayInterface{
-				{
-					Type:          "NetworkDevice",
-					NetworkDevice: &v1alpha1.NetworkDevice{InterfaceName: "enp1s0"},
-				},
-			},
-			Neighbors: []v1alpha1.Neighbor{
-				{
-					ASN:     new(int64(65000)),
-					Address: new("192.168.100.1"),
-				},
+func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
+	controllerPods, err := openperouter.ControllerPods(cs)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(controllerPods).NotTo(BeEmpty(), "no controller pods found")
+
+	exec := executor.ForPod(controllerPods[0].Namespace, controllerPods[0].Name, "controller")
+	out, err := exec.Exec("sh", "-c",
+		`for drv in /sys/class/net/*/device/driver; do `+
+			`[ "$(basename $(readlink "$drv"))" = igb ] && `+
+			`ADDR=$(basename $(readlink "$(dirname "$drv")")) && break; `+
+			`done && `+
+			`echo "$ADDR" > /sys/bus/pci/drivers/igb/unbind && `+
+			`echo vfio-pci > /sys/bus/pci/devices/"$ADDR"/driver_override && `+
+			`echo "$ADDR" > /sys/bus/pci/drivers_probe && `+
+			`echo "$ADDR"`)
+	Expect(err).NotTo(HaveOccurred())
+	pciAddr := strings.TrimSpace(out)
+	Expect(pciAddr).NotTo(BeEmpty(), "could not discover igb PCI address")
+
+	return v1alpha1.UnderlayInterface{
+		Type: "GroutPort",
+		GroutPort: &v1alpha1.GroutPortConfig{
+			PCIAddress: new(pciAddr),
+			IPAM: v1alpha1.GroutPortIPAM{
+				Addresses: []string{"192.168.100.10/24"},
 			},
 		},
 	}
+}
+
+var _ = DescribeTableSubtree("QEMU L3Passthrough with Underlay",
+	qemuL3PassthroughTests,
+	QEMUSupport,
+	XEntry("NetworkDevice", Ordered, networkDeviceQEMUInterface),
+	Entry("GroutPort", Ordered, groutPortQEMUInterface),
+)
+
+func qemuL3PassthroughTests(makeInterface func(clientset.Interface) v1alpha1.UnderlayInterface) {
+	var cs clientset.Interface
+	var routerPods []*corev1.Pod
+	var qemuUnderlay v1alpha1.Underlay
 
 	passthrough := v1alpha1.L3Passthrough{
 		ObjectMeta: metav1.ObjectMeta{
@@ -73,6 +97,24 @@ var _ = Describe("QEMU L3Passthrough with Underlay", QEMUSupport, Ordered, func(
 		Expect(err).NotTo(HaveOccurred())
 		Expect(routerPods).NotTo(BeEmpty(), "no router pods found")
 		DumpPods("Router pods", routerPods)
+
+		iface := makeInterface(cs)
+		qemuUnderlay = v1alpha1.Underlay{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "underlay",
+				Namespace: openperouter.Namespace,
+			},
+			Spec: v1alpha1.UnderlaySpec{
+				ASN:        64514,
+				Interfaces: []v1alpha1.UnderlayInterface{iface},
+				Neighbors: []v1alpha1.Neighbor{
+					{
+						ASN:     new(int64(65000)),
+						Address: new("192.168.100.1"),
+					},
+				},
+			},
+		}
 	})
 
 	AfterAll(func() {
@@ -143,4 +185,4 @@ var _ = Describe("QEMU L3Passthrough with Underlay", QEMUSupport, Ordered, func(
 			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
 		}
 	})
-})
+}
