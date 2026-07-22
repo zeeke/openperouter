@@ -51,6 +51,36 @@ ip addr add 192.168.100.10/24 dev $UNDERLAY 2>/dev/null || true
 ip link set $UNDERLAY up
 '
 
+# --- Bind the second igb NIC to vfio-pci (fake VF for DPDK) ---
+echo "Binding second igb NIC to vfio-pci..."
+run_in_vm '
+modprobe vfio-pci
+echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode
+
+UNDERLAY_PCI=""
+VFIO_PCI=""
+for pci in /sys/bus/pci/drivers/igb/0000:*; do
+    addr=$(basename "$pci")
+    if [ -z "$UNDERLAY_PCI" ]; then
+        UNDERLAY_PCI="$addr"
+        continue
+    fi
+    VFIO_PCI="$addr"
+    break
+done
+
+if [ -z "$VFIO_PCI" ]; then
+    echo "ERROR: Could not find second igb NIC for vfio-pci binding" >&2
+    exit 1
+fi
+
+echo "Binding $VFIO_PCI to vfio-pci (underlay PF is $UNDERLAY_PCI)"
+echo "$VFIO_PCI" > /sys/bus/pci/drivers/igb/unbind
+echo "vfio-pci" > "/sys/bus/pci/devices/$VFIO_PCI/driver_override"
+echo "$VFIO_PCI" > /sys/bus/pci/drivers/vfio-pci/bind
+echo "Done: $VFIO_PCI is now bound to vfio-pci"
+'
+
 # --- Start k3s ---
 echo "Starting k3s..."
 run_in_vm 'systemctl start k3s'

@@ -40,30 +40,29 @@ var _ = Describe("QEMU FakeVF Connectivity", QEMUSupport, Ordered, func() {
 
 		exec = executor.ForPod(controllerPods[0].Namespace, controllerPods[0].Name, "controller")
 
+		// Find kernel-bound igb NICs that are NOT the underlay (no IP assigned).
 		out, err := exec.Exec("sh", "-c", `
-for PF in /sys/bus/pci/drivers/igb/0000:*; do
-	for vf in "$PF"/virtfn*; do
-		[ -d "$vf" ] || continue
-		realvf=$(readlink -f "$vf")
-		# skip VFs bound to vfio-pci
-		driver=$(basename "$(readlink "$realvf/driver" 2>/dev/null)" 2>/dev/null)
-		[ "$driver" = "vfio-pci" ] && continue
-		iface=$(ls "$realvf/net/" 2>/dev/null | head -1)
-		[ -n "$iface" ] && echo "$iface"
-	done
+for pci in /sys/bus/pci/drivers/igb/0000:*; do
+	iface=$(ls "$pci/net/" 2>/dev/null | head -1)
+	[ -z "$iface" ] && continue
+	# skip interfaces with an IP address (the underlay NIC)
+	if ip -4 addr show "$iface" 2>/dev/null | grep -q "inet "; then
+		continue
+	fi
+	echo "$iface"
 done`)
 		Expect(err).NotTo(HaveOccurred())
 
-		for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
+		for line := range strings.SplitSeq(strings.TrimSpace(out), "\n") {
 			iface := strings.TrimSpace(line)
 			if iface != "" {
 				vfIfaces = append(vfIfaces, iface)
 			}
 		}
 		Expect(len(vfIfaces)).To(BeNumerically(">=", 2),
-			"need at least 2 kernel-bound VF interfaces, found: %v", vfIfaces)
+			"need at least 2 kernel-bound igb interfaces (excluding underlay), found: %v", vfIfaces)
 
-		GinkgoWriter.Printf("Using VF interfaces: %s and %s\n", vfIfaces[0], vfIfaces[1])
+		GinkgoWriter.Printf("Using fakeVF interfaces: %s and %s\n", vfIfaces[0], vfIfaces[1])
 	})
 
 	AfterAll(func() {

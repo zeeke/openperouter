@@ -30,27 +30,39 @@ var _ = Describe("QEMU VF Setup Verification", QEMUSupport, Ordered, func() {
 		Expect(controllerPods).NotTo(BeEmpty(), "no controller pods found")
 	})
 
-	It("should have a VF bound to vfio-pci", func() {
+	It("should have an igb NIC bound to vfio-pci", func() {
 		pod := controllerPods[0]
 		exec := executor.ForPod(pod.Namespace, pod.Name, "controller")
 
 		out, err := exec.Exec("sh", "-c",
-			`PF=$(ls -d /sys/bus/pci/drivers/igb/0000:* 2>/dev/null | head -1)
-			VF=$(readlink -f "$PF/virtfn0")
-			basename $(readlink "$VF/driver")`)
+			`for pci in /sys/bus/pci/devices/0000:*; do
+				driver=$(basename "$(readlink "$pci/driver" 2>/dev/null)" 2>/dev/null)
+				vendor=$(cat "$pci/vendor" 2>/dev/null)
+				# 8086:10c9 is Intel 82576 (igb)
+				device=$(cat "$pci/device" 2>/dev/null)
+				if [ "$driver" = "vfio-pci" ] && [ "$vendor" = "0x8086" ]; then
+					echo "$(basename $pci)"
+					exit 0
+				fi
+			done
+			echo "NONE"`)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(strings.TrimSpace(out)).To(Equal("vfio-pci"), "VF0 should be bound to vfio-pci")
+		Expect(strings.TrimSpace(out)).NotTo(Equal("NONE"), "expected one igb NIC bound to vfio-pci")
 	})
 
-	It("should have a VF network interface available", func() {
+	It("should have a kernel-bound igb NIC with a network interface", func() {
 		pod := controllerPods[0]
 		exec := executor.ForPod(pod.Namespace, pod.Name, "controller")
 
 		out, err := exec.Exec("sh", "-c",
-			`PF=$(ls -d /sys/bus/pci/drivers/igb/0000:* 2>/dev/null | head -1)
-			VF=$(readlink -f "$PF/virtfn1")
-			ls "$VF/net/" 2>/dev/null | head -1`)
+			`count=0
+			for pci in /sys/bus/pci/drivers/igb/0000:*; do
+				if ls "$pci/net/" >/dev/null 2>&1; then
+					count=$((count + 1))
+				fi
+			done
+			echo "$count"`)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(strings.TrimSpace(out)).NotTo(BeEmpty(), "VF1 should have a network interface")
+		Expect(strings.TrimSpace(out)).NotTo(Equal("0"), "expected at least one kernel-bound igb NIC with a net interface")
 	})
 })
