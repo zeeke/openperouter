@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Runs inside the QEMU VM (via SSH) to set up SR-IOV VFs, start k3s,
-# import the openperouter container image, and deploy openperouter.
+# Runs inside the QEMU VM (via SSH) to configure underlay networking,
+# start k3s, import the openperouter container image, and deploy openperouter.
 
 set -euo pipefail
 
@@ -27,77 +27,28 @@ run_in_vm() {
 
 echo "=== Setting up QEMU VM ==="
 
-# --- Create SR-IOV VFs on the igb PF ---
-echo "Creating SR-IOV VFs..."
+# --- Configure the first igb NIC with the underlay IP ---
+echo "Configuring underlay IP on first igb NIC..."
 run_in_vm '
-PF=""
-for dev in /sys/class/net/*/device/sriov_totalvfs; do
-    dir=$(dirname $(dirname "$dev"))
-    iface=$(basename "$dir")
-    total=$(cat "$dev")
-    if [ "$total" -gt 0 ]; then
-        PF="$iface"
+UNDERLAY=""
+for dev in /sys/class/net/*/device/driver; do
+    driver=$(basename $(readlink "$dev"))
+    if [ "$driver" = "igb" ]; then
+        dir=$(dirname $(dirname "$dev"))
+        UNDERLAY=$(basename "$dir")
         break
     fi
 done
 
-if [ -z "$PF" ]; then
-    echo "ERROR: No SR-IOV capable NIC found" >&2
+if [ -z "$UNDERLAY" ]; then
+    echo "ERROR: No igb NIC found" >&2
     exit 1
 fi
 
-echo "Found SR-IOV PF: $PF (total VFs: $total)"
-echo 2 > /sys/class/net/$PF/device/sriov_numvfs
-sleep 2
-ls /sys/class/net/$PF/device/virtfn* -d 2>/dev/null || {
-    echo "ERROR: VFs not created" >&2
-    exit 1
-}
-echo "VFs created successfully."
-'
-
-# --- Bind VF to vfio-pci ---
-echo "Binding VF to vfio-pci..."
-run_in_vm '
-modprobe vfio-pci
-echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode
-
-PF=""
-for dev in /sys/class/net/*/device/sriov_numvfs; do
-    numvfs=$(cat "$dev")
-    if [ "$numvfs" -gt 0 ]; then
-        dir=$(dirname $(dirname "$dev"))
-        PF=$(basename "$dir")
-        break
-    fi
-done
-
-VF_PCI=$(basename $(readlink /sys/class/net/$PF/device/virtfn0))
-echo "Binding VF $VF_PCI to vfio-pci..."
-
-if [ -e /sys/bus/pci/devices/$VF_PCI/driver ]; then
-    echo "$VF_PCI" > /sys/bus/pci/devices/$VF_PCI/driver/unbind
-fi
-echo "vfio-pci" > /sys/bus/pci/devices/$VF_PCI/driver_override
-echo "$VF_PCI" > /sys/bus/pci/drivers/vfio-pci/bind
-echo "VF $VF_PCI bound to vfio-pci."
-'
-
-# --- Configure the PF underlay IP ---
-echo "Configuring PF underlay IP..."
-run_in_vm '
-PF=""
-for dev in /sys/class/net/*/device/sriov_numvfs; do
-    numvfs=$(cat "$dev")
-    if [ "$numvfs" -gt 0 ]; then
-        dir=$(dirname $(dirname "$dev"))
-        PF=$(basename "$dir")
-        break
-    fi
-done
-nmcli device set $PF managed no 2>/dev/null || true
-ip addr add 192.168.100.10/24 dev $PF 2>/dev/null || true
-ip link set $PF up
+echo "Configuring underlay on $UNDERLAY"
+nmcli device set $UNDERLAY managed no 2>/dev/null || true
+ip addr add 192.168.100.10/24 dev $UNDERLAY 2>/dev/null || true
+ip link set $UNDERLAY up
 '
 
 # --- Start k3s ---

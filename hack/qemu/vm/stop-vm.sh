@@ -8,7 +8,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 BRIDGE_NAME="${QEMU_BRIDGE:-br-underlay}"
-TAP_NAME="${QEMU_TAP:-vm-underlay}"
+TAP_PREFIX="${QEMU_TAP_PREFIX:-vm-underlay}"
+NUM_NICS=4
 PID_FILE="${SCRIPT_DIR}/qemu.pid"
 VM_IMAGE="${SCRIPT_DIR}/fedora-cloud.qcow2"
 FRR_CONTAINER_NAME="${QEMU_FRR_CONTAINER:-qemu-tor}"
@@ -45,11 +46,14 @@ else
     echo "FRR container ${FRR_CONTAINER_NAME} not found, skipping."
 fi
 
-# Remove TAP device.
-if ip link show "${TAP_NAME}" &>/dev/null; then
-    sudo ip link del "${TAP_NAME}"
-    echo "TAP device ${TAP_NAME} removed."
-fi
+# Remove TAP devices.
+for i in $(seq 0 $((NUM_NICS - 1))); do
+    TAP="${TAP_PREFIX}-${i}"
+    if ip link show "${TAP}" &>/dev/null; then
+        sudo ip link del "${TAP}"
+        echo "TAP device ${TAP} removed."
+    fi
+done
 
 # Remove bridge.
 if ip link show "${BRIDGE_NAME}" &>/dev/null; then
