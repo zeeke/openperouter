@@ -250,11 +250,12 @@ type GroutPortConfig struct {
 type GroutPortIPAM struct {
 	// addresses is a list of CIDRs to assign to the grout port.
 	// At most one IPv4 and one IPv6 address (dual-stack).
+	// CIDR format and address-family uniqueness are enforced by the
+	// validation webhook; CEL rules are omitted here because the
+	// interfaces maxItems multiplier exhausts the per-rule cost budget.
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=2
-	// +kubebuilder:validation:XValidation:rule="self.all(c, isCIDR(c))",message="all entries must be valid CIDRs"
-	// +kubebuilder:validation:XValidation:rule="self.filter(c, isCIDR(c) && cidr(c).ip().family() == 4).size() <= 1",message="at most one IPv4 address is allowed"
-	// +kubebuilder:validation:XValidation:rule="self.filter(c, isCIDR(c) && cidr(c).ip().family() == 6).size() <= 1",message="at most one IPv6 address is allowed"
+	// +kubebuilder:validation:items:MaxLength=43
 	// +listType=atomic
 	// +required
 	Addresses []string `json:"addresses"`

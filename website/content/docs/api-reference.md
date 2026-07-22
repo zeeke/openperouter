@@ -163,6 +163,61 @@ _Appears in:_
 | `stalePathTimeSeconds` _integer_ | stalePathTimeSeconds is the time in seconds that stale paths from a<br />restarting peer are retained locally. | 360 | Maximum: 4095 <br />Minimum: 1 <br />Optional: \{\} <br /> |
 
 
+#### GroutPortConfig
+
+
+
+GroutPortConfig specifies a VF to bind to grout as a DPDK port.
+Exactly one selector must be used: either pciAddress alone, or pfName + vfIndex together.
+
+
+
+_Appears in:_
+- [UnderlayInterface](#underlayinterface)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `pciAddress` _string_ | pciAddress is the PCI Bus:Device.Function address of the VF to bind<br />(e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex. |  | Pattern: `^[0-9a-fA-F]\{4\}:[0-9a-fA-F]\{2\}:[0-9a-fA-F]\{2\}\.[0-7]$` <br />Optional: \{\} <br /> |
+| `pfName` _string_ | pfName is the name of the Physical Function whose VF will be bound.<br />Must be used together with vfIndex. Mutually exclusive with pciAddress. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
+| `vfIndex` _integer_ | vfIndex is the index of the Virtual Function on the PF.<br />Must be used together with pfName. Mutually exclusive with pciAddress. |  | Minimum: 0 <br />Optional: \{\} <br /> |
+| `ipam` _[GroutPortIPAM](#groutportipam)_ | ipam specifies the IP addresses to assign to the DPDK port. |  | Required: \{\} <br /> |
+| `portOptions` _[GroutPortOptions](#groutportoptions)_ | portOptions specifies optional DPDK port parameters. |  | Optional: \{\} <br /> |
+
+
+#### GroutPortIPAM
+
+
+
+GroutPortIPAM holds inline IPAM configuration for a DPDK-bound underlay port.
+
+
+
+_Appears in:_
+- [GroutPortConfig](#groutportconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `addresses` _string array_ | addresses is a list of CIDRs to assign to the grout port.<br />At most one IPv4 and one IPv6 address (dual-stack).<br />CIDR format and address-family uniqueness are enforced by the<br />validation webhook; CEL rules are omitted here because the<br />interfaces maxItems multiplier exhausts the per-rule cost budget. |  | MaxItems: 2 <br />MinItems: 1 <br />items:MaxLength: 43 <br />Required: \{\} <br /> |
+
+
+#### GroutPortOptions
+
+
+
+GroutPortOptions holds optional DPDK port parameters for grcli.
+
+
+
+_Appears in:_
+- [GroutPortConfig](#groutportconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mtu` _integer_ | mtu is the Maximum Transmission Unit for the DPDK port. |  | Maximum: 9702 <br />Minimum: 68 <br />Optional: \{\} <br /> |
+| `rxQueues` _integer_ | rxQueues is the number of receive queues for the DPDK port. |  | Maximum: 64 <br />Minimum: 1 <br />Optional: \{\} <br /> |
+| `qSize` _integer_ | qSize is the size of each receive/transmit queue. |  | Maximum: 32768 <br />Minimum: 64 <br />Optional: \{\} <br /> |
+
+
 #### HostMaster
 
 
@@ -870,9 +925,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[UnderlayInterfaceType](#underlayinterfacetype)_ | type selects how the router obtains this underlay link. |  | Enum: [NetworkDevice CNIDevice] <br />Required: \{\} <br /> |
+| `type` _[UnderlayInterfaceType](#underlayinterfacetype)_ | type selects how the router obtains this underlay link. |  | Enum: [NetworkDevice CNIDevice GroutPort] <br />Required: \{\} <br /> |
 | `networkDevice` _[NetworkDevice](#networkdevice)_ | networkDevice moves an existing host network device into the router netns.<br />The device can be of any kind (physical NIC, bridge, macvlan, etc.).<br />Must be set when type is "NetworkDevice". |  | Optional: \{\} <br /> |
 | `cniDevice` _[CNIDevice](#cnidevice)_ | cniDevice invokes a CNI plugin to provision an interface in the router<br />netns. IPAM is delegated to the CNI plugin. Must be set when type is<br />"CNIDevice". |  | Optional: \{\} <br /> |
+| `groutPort` _[GroutPortConfig](#groutportconfig)_ | groutPort binds an SR-IOV VF directly to grout as a DPDK port.<br />The VF is identified by PCI address or PF name + VF index.<br />IPAM is specified inline since DPDK-bound interfaces have no kernel<br />netdev for CNI IPAM plugins to target. Only valid when grout is enabled.<br />Must be set when type is "GroutPort". |  | Optional: \{\} <br /> |
 
 
 #### UnderlayInterfaceType
@@ -884,7 +940,7 @@ It is the discriminator of the UnderlayInterface union and is designed to be
 extended with future modes.
 
 _Validation:_
-- Enum: [NetworkDevice CNIDevice]
+- Enum: [NetworkDevice CNIDevice GroutPort]
 
 _Appears in:_
 - [UnderlayInterface](#underlayinterface)
@@ -893,6 +949,7 @@ _Appears in:_
 | --- | --- |
 | `NetworkDevice` | UnderlayInterfaceTypeNetworkDevice moves an existing host network device<br />into the router netns.<br /> |
 | `CNIDevice` | UnderlayInterfaceTypeCNIDevice invokes a CNI plugin to provision an interface<br />in the router netns.<br /> |
+| `GroutPort` | UnderlayInterfaceTypeGroutPort binds an SR-IOV VF directly to grout as a<br />DPDK port, bypassing the kernel on the underlay fast path.<br /> |
 
 
 #### UnderlaySpec
