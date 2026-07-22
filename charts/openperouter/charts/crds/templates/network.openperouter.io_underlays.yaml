@@ -152,21 +152,16 @@ spec:
                               description: |-
                                 addresses is a list of CIDRs to assign to the grout port.
                                 At most one IPv4 and one IPv6 address (dual-stack).
+                                CIDR format and address-family uniqueness are enforced by the
+                                validation webhook; CEL rules are omitted here because the
+                                interfaces maxItems multiplier exhausts the per-rule cost budget.
                               items:
+                                maxLength: 43
                                 type: string
                               maxItems: 2
                               minItems: 1
                               type: array
                               x-kubernetes-list-type: atomic
-                              x-kubernetes-validations:
-                              - message: all entries must be valid CIDRs
-                                rule: self.all(c, isCIDR(c))
-                              - message: at most one IPv4 address is allowed
-                                rule: self.filter(c, isCIDR(c) && cidr(c).ip().family()
-                                  == 4).size() <= 1
-                              - message: at most one IPv6 address is allowed
-                                rule: self.filter(c, isCIDR(c) && cidr(c).ip().family()
-                                  == 6).size() <= 1
                           required:
                           - addresses
                           type: object
