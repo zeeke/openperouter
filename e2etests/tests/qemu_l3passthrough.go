@@ -35,11 +35,17 @@ func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
 
 	exec := executor.ForPod(controllerPods[0].Namespace, controllerPods[0].Name, "controller")
 	out, err := exec.Exec("sh", "-c",
-		`PF=$(ls -d /sys/bus/pci/drivers/igb/0000:* 2>/dev/null | head -1) && `+
-			`basename $(readlink -f "$PF/virtfn0")`)
+		`for drv in /sys/class/net/*/device/driver; do `+
+			`[ "$(basename $(readlink "$drv"))" = igb ] && `+
+			`ADDR=$(basename $(readlink "$(dirname "$drv")")) && break; `+
+			`done && `+
+			`echo "$ADDR" > /sys/bus/pci/drivers/igb/unbind && `+
+			`echo vfio-pci > /sys/bus/pci/devices/"$ADDR"/driver_override && `+
+			`echo "$ADDR" > /sys/bus/pci/drivers_probe && `+
+			`echo "$ADDR"`)
 	Expect(err).NotTo(HaveOccurred())
 	pciAddr := strings.TrimSpace(out)
-	Expect(pciAddr).NotTo(BeEmpty(), "could not discover VF0 PCI address")
+	Expect(pciAddr).NotTo(BeEmpty(), "could not discover igb PCI address")
 
 	return v1alpha1.UnderlayInterface{
 		Type: "GroutPort",
@@ -56,7 +62,7 @@ var _ = DescribeTableSubtree("QEMU L3Passthrough with Underlay",
 	qemuL3PassthroughTests,
 	QEMUSupport,
 	Entry("NetworkDevice", Ordered, networkDeviceQEMUInterface),
-	Entry("GroutPort", Ordered, groutPortQEMUInterface),
+	FEntry("GroutPort", Ordered, groutPortQEMUInterface),
 )
 
 func qemuL3PassthroughTests(makeInterface func(clientset.Interface) v1alpha1.UnderlayInterface) {
@@ -99,7 +105,7 @@ func qemuL3PassthroughTests(makeInterface func(clientset.Interface) v1alpha1.Und
 				Namespace: openperouter.Namespace,
 			},
 			Spec: v1alpha1.UnderlaySpec{
-				ASN: 64514,
+				ASN:        64514,
 				Interfaces: []v1alpha1.UnderlayInterface{iface},
 				Neighbors: []v1alpha1.Neighbor{
 					{
