@@ -13,6 +13,7 @@ import (
 
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/netnamespace"
+	"github.com/openperouter/openperouter/internal/sriov"
 	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
@@ -80,6 +81,12 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 				return err
 			}
 		case hostnetwork.UnderlayInterfaceGroutPort:
+			if iface.GroutPort == nil {
+				return fmt.Errorf("groutPort params missing for interface %s", iface.InterfaceName)
+			}
+			if err := prepareGroutPortDriver(ctx, perouterNetNS, iface.GroutPort.PCIAddress); err != nil {
+				return fmt.Errorf("failed to prepare grout port driver for %s: %w", iface.GroutPort.PCIAddress, err)
+			}
 			if err := netnamespace.In(perouterNetNS, func() error {
 				return configureGroutPort(ctx, client, iface)
 			}); err != nil {
@@ -151,10 +158,14 @@ func RestoreUnderlay(
 		}
 
 		if iface.Kind == hostnetwork.UnderlayInterfaceGroutPort {
-			// GroutPort: no kernel netdev to migrate addresses back to.
-			// Remove addresses from the grout port and delete it.
 			if err := removeGroutPortAddresses(ctx, client, ns, portName); err != nil {
 				return err
+			}
+			if iface.GroutPort != nil && iface.GroutPort.NetlinkDevice != "" {
+				kernelInterfaces = append(kernelInterfaces, hostnetwork.UnderlayInterface{
+					InterfaceName: iface.GroutPort.NetlinkDevice,
+					Kind:          hostnetwork.UnderlayInterfaceNetDev,
+				})
 			}
 		} else {
 			if err := netnamespace.In(ns, func() error {
@@ -255,6 +266,50 @@ func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.U
 	}
 
 	return nil
+}
+
+// prepareGroutPortDriver inspects the driver bound to a PCI device and
+// takes the appropriate action:
+//   - Intel kernel drivers (igb, iavf, ice, i40e): rebind to vfio-pci
+//   - vfio-pci: already bound, nothing to do
+//   - mlx5_core: move the kernel netlink interface to the perouter namespace (bifurcated driver)
+//   - unknown/unbound: warn and proceed (let grout handle it)
+func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr string) error {
+	driver, err := sriov.GetPCIDriver(pciAddr)
+	if err != nil {
+		return fmt.Errorf("failed to get PCI driver for %s: %w", pciAddr, err)
+	}
+
+	switch {
+	case sriov.IntelKernelDrivers[driver]:
+		if err := sriov.BindVFIOPCI(pciAddr); err != nil {
+			return fmt.Errorf("failed to rebind PCI device %s from %s to vfio-pci: %w",
+				pciAddr, driver, err)
+		}
+		return nil
+
+	case driver == sriov.DriverVFIOPCI:
+		return nil
+
+	case driver == sriov.DriverMlx5Core:
+		netdev, err := sriov.GetPCINetDevice(pciAddr)
+		if err != nil {
+			return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
+		}
+
+		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
+			InterfaceName: netdev,
+			Kind:          hostnetwork.UnderlayInterfaceNetDev,
+		}); err != nil {
+			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", netdev, err)
+		}
+		return nil
+
+	default:
+		slog.Warn("unknown driver for GroutPort PCI device, proceeding with DPDK",
+			"pciAddress", pciAddr, "driver", driver)
+		return nil
+	}
 }
 
 func migrateAddressesToGrout(ctx context.Context, client *Client, underlayInterface string, addrs []netlink.Addr) error {

@@ -60,6 +60,12 @@ type GroutPortParams struct {
 	RXQueues *int `json:"rxQueues,omitempty"`
 	// QSize is the optional queue size.
 	QSize *int `json:"qSize,omitempty"`
+
+	// TODO - not here
+	// NetlinkDevice is the kernel network interface associated with the
+	// PCI device (set for mlx5 bifurcated driver). When non-empty the
+	// interface is moved to the perouter namespace during setup.
+	NetlinkDevice string `json:"netlinkDevice,omitempty"`
 }
 
 // CNIDeviceParams holds the data needed to provision an underlay interface
