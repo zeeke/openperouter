@@ -28,7 +28,7 @@ import (
 // are:
 // - This reduces the number of overall tests run (by just spotchecking that IPv6 and Unnumbered functionality work).
 // - It reduces the number of underlay creations and teardowns.
-var _ = Describe("Routes between bgp and the fabric", Ordered, func() {
+var _ = Describe("Routes between bgp and the fabric", Ordered, GroutSupport, func() {
 	DescribeTableSubtree("underlay address family", runUnderlayTests,
 		Entry("IPv6", ipfamily.IPv6, infra.UnderlayIPv6),
 		Entry("Unnumbered", ipfamily.Unnumbered, infra.UnderlayUnnumbered),

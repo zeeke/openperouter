@@ -27,7 +27,7 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-var _ = Describe("SRV6 routes between bgp and the fabric", Ordered, func() {
+var _ = Describe("SRV6 routes between bgp and the fabric", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 
@@ -412,7 +412,7 @@ var _ = Describe("SRV6 routes between bgp and the fabric", Ordered, func() {
 	})
 })
 
-var _ = Describe("SRV6 routes between bgp and the fabric with iBGP testing e2e integration between a pod and the red hosts", func() {
+var _ = Describe("SRV6 routes between bgp and the fabric with iBGP testing e2e integration between a pod and the red hosts", GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 
