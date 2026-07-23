@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -616,14 +617,9 @@ func resolveGroutPortPCI(config *v1alpha1.GroutPortConfig) (string, error) {
 
 // pciAddressToIfName converts a PCI BDF address to a valid interface name
 // by replacing punctuation and adding a prefix so it starts with a letter.
-// E.g. "0000:03:02.0" → "p0000_03_02_0".
+// E.g. "0000:03:02.0" → "p000003020".
 func pciAddressToIfName(pciAddr string) string {
-	r := []byte(pciAddr)
-	for i, c := range r {
-		if c == ':' || c == '.' {
-			r[i] = '_'
-		}
-	}
-
-	return "p" + string(r)
+	ret := strings.ReplaceAll(pciAddr, ":", "")
+	ret = strings.ReplaceAll(ret, ".", "")
+	return "p" + ret
 }
