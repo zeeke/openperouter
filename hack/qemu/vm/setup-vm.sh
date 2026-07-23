@@ -29,7 +29,7 @@ echo "=== Setting up QEMU VM ==="
 
 # --- Load vfio-pci for GroutPort tests ---
 echo "Loading vfio-pci module..."
-run_in_vm 'modprobe vfio-pci && echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode'
+run_in_vm 'modprobe vfio-pci'
 
 # --- Configure the first igb NIC with the underlay IP ---
 echo "Configuring underlay IP on first igb NIC..."
