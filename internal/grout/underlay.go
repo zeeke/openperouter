@@ -273,7 +273,7 @@ func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.U
 //   - Intel kernel drivers (igb, iavf, ice, i40e): rebind to vfio-pci
 //   - vfio-pci: already bound, nothing to do
 //   - mlx5_core: move the kernel netlink interface to the perouter namespace (bifurcated driver)
-//   - unknown/unbound: warn and proceed (let grout handle it)
+//   - unknown/unbound: bind to vfio-pci
 func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr string) error {
 	driver, err := sriov.GetPCIDriver(pciAddr)
 	if err != nil {
@@ -306,8 +306,11 @@ func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, p
 		return nil
 
 	default:
-		slog.Warn("unknown driver for GroutPort PCI device, proceeding with DPDK",
-			"pciAddress", pciAddr, "driver", driver)
+		slog.Info("binding GroutPort PCI device to vfio-pci",
+			"pciAddress", pciAddr, "currentDriver", driver)
+		if err := sriov.BindVFIOPCI(pciAddr); err != nil {
+			return fmt.Errorf("failed to bind PCI device %s to vfio-pci: %w", pciAddr, err)
+		}
 		return nil
 	}
 }
