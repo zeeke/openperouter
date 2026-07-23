@@ -94,7 +94,7 @@ RUN dnf install -y epel-release && \
 RUN git clone -b main --depth 1 http://github.com/DPDK/grout /src
 WORKDIR /src
 
-RUN make frr-rpm FRR=10.7
+RUN make frr-rpm FRR=10.6
 RUN dnf install -y --nodocs --setopt=install_weak_deps=0 ./frr-headers.noarch.rpm
 RUN make rpm FRR=10.6 WITH=download
 
