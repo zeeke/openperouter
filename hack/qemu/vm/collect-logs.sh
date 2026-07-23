@@ -66,6 +66,10 @@ if ${SSH_CMD} true 2>/dev/null; then
         echo "  kubectl describe pods..."
         ${KUBECTL} -n openperouter-system describe pods \
             > "${LOG_DIR}/qemu-vm/describe-pods.log" 2>/dev/null || true
+
+        echo "  cluster-info dump..."
+        ${KUBECTL} cluster-info dump --output-directory="${LOG_DIR}/qemu-vm/cluster-state" \
+            --all-namespaces 2>/dev/null || true
     fi
 else
     echo "  WARNING: VM not reachable via SSH, skipping in-VM log collection."
