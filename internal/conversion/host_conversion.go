@@ -615,7 +615,8 @@ func resolveGroutPortPCI(config *v1alpha1.GroutPortConfig) (string, error) {
 }
 
 // pciAddressToIfName converts a PCI BDF address to a valid interface name
-// by replacing punctuation. E.g. "0000:03:02.0" → "0000_03_02_0".
+// by replacing punctuation and adding a prefix so it starts with a letter.
+// E.g. "0000:03:02.0" → "p0000_03_02_0".
 func pciAddressToIfName(pciAddr string) string {
 	r := []byte(pciAddr)
 	for i, c := range r {
@@ -623,5 +624,6 @@ func pciAddressToIfName(pciAddr string) string {
 			r[i] = '_'
 		}
 	}
-	return string(r)
+
+	return "p" + string(r)
 }
