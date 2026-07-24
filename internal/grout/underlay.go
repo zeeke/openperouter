@@ -223,6 +223,15 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
 
+	// Disable SLAAC on the underlying netlink interface: once the intended
+	// addresses are migrated to the grout port, the kernel must not
+	// autoconfigure new ones from Router Advertisements. A SLAAC address
+	// on the netlink device would be picked up on the next reconcile and
+	// clash with the existing connected route in grout's RIB (EBUSY).
+	if err := sysctl.Ensure(sysctl.DisableAcceptRA(underlayInterface)); err != nil {
+		return fmt.Errorf("failed to disable accept_ra on underlay interface %s: %w", underlayInterface, err)
+	}
+
 	if err := migrateAddressesToGrout(ctx, client, underlayInterface, underlayAddrs); err != nil {
 		return err
 	}
