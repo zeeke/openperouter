@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/ipam"
 	"github.com/openperouter/openperouter/internal/ipfamily"
+	"github.com/openperouter/openperouter/internal/sriov"
 	"k8s.io/utils/ptr"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -514,6 +516,8 @@ func underlayInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Unde
 		return networkDeviceInterfaceToHost(iface)
 	case v1alpha1.UnderlayInterfaceTypeCNIDevice:
 		return cniDeviceInterfaceToHost(iface)
+	case v1alpha1.UnderlayInterfaceTypeGroutPort:
+		return groutPortInterfaceToHost(iface)
 	default:
 		return hostnetwork.UnderlayInterface{}, fmt.Errorf("unsupported underlay interface type %q", iface.Type)
 	}
@@ -564,4 +568,58 @@ func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 			CapabilityArgs: capabilityArgs,
 		},
 	}, nil
+}
+
+func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.UnderlayInterface, error) {
+	if iface.GroutPort == nil {
+		return hostnetwork.UnderlayInterface{},
+			fmt.Errorf("groutPort configuration is missing for interface type GroutPort")
+	}
+
+	pciAddr, err := resolveGroutPortPCI(iface.GroutPort)
+	if err != nil {
+		return hostnetwork.UnderlayInterface{}, err
+	}
+
+	ifName := pciAddressToIfName(pciAddr)
+
+	params := &hostnetwork.GroutPortParams{
+		PCIAddress: pciAddr,
+		Addresses:  iface.GroutPort.IPAM.Addresses,
+	}
+	if iface.GroutPort.PortOptions != nil {
+		params.MTU = iface.GroutPort.PortOptions.MTU
+		params.RXQueues = iface.GroutPort.PortOptions.RXQueues
+		params.QSize = iface.GroutPort.PortOptions.QSize
+	}
+
+	return hostnetwork.UnderlayInterface{
+		InterfaceName: ifName,
+		Kind:          hostnetwork.UnderlayInterfaceGroutPort,
+		GroutPort:     params,
+	}, nil
+}
+
+// resolveGroutPortPCI resolves the PCI address from either a direct
+// pciAddress or pfName+vfIndex selector.
+func resolveGroutPortPCI(config *v1alpha1.GroutPortConfig) (string, error) {
+	if config.PCIAddress != nil {
+		if err := sriov.ResolvePCIAddress(*config.PCIAddress); err != nil {
+			return "", err
+		}
+		return *config.PCIAddress, nil
+	}
+	if config.PFName != nil && config.VFIndex != nil {
+		return sriov.ResolvePFVFIndex(*config.PFName, *config.VFIndex)
+	}
+	return "", fmt.Errorf("groutPort must specify either pciAddress or pfName+vfIndex")
+}
+
+// pciAddressToIfName converts a PCI BDF address to a valid interface name
+// by replacing punctuation and adding a prefix so it starts with a letter.
+// E.g. "0000:03:02.0" → "p000003020".
+func pciAddressToIfName(pciAddr string) string {
+	ret := strings.ReplaceAll(pciAddr, ":", "")
+	ret = strings.ReplaceAll(ret, ".", "")
+	return "p" + ret
 }

@@ -42,6 +42,30 @@ type UnderlayInterface struct {
 	// CNI holds the CNI provisioning data; set when Kind is
 	// UnderlayInterfaceCNIDev.
 	CNI *CNIDeviceParams `json:"cni,omitempty"`
+	// GroutPort holds DPDK port provisioning data; set when Kind is
+	// UnderlayInterfaceGroutPort.
+	GroutPort *GroutPortParams `json:"groutPort,omitempty"`
+}
+
+// GroutPortParams holds the data needed to provision an underlay interface
+// as a DPDK port bound directly to grout.
+type GroutPortParams struct {
+	// PCIAddress is the resolved PCI BDF address of the VF.
+	PCIAddress string `json:"pciAddress"`
+	// Addresses is the list of CIDRs to assign to the grout port.
+	Addresses []string `json:"addresses"`
+	// MTU is the optional MTU for the DPDK port.
+	MTU *int `json:"mtu,omitempty"`
+	// RXQueues is the optional number of receive queues.
+	RXQueues *int `json:"rxQueues,omitempty"`
+	// QSize is the optional queue size.
+	QSize *int `json:"qSize,omitempty"`
+
+	// TODO - not here
+	// NetlinkDevice is the kernel network interface associated with the
+	// PCI device (set for mlx5 bifurcated driver). When non-empty the
+	// interface is moved to the perouter namespace during setup.
+	NetlinkDevice string `json:"netlinkDevice,omitempty"`
 }
 
 // CNIDeviceParams holds the data needed to provision an underlay interface
@@ -157,6 +181,9 @@ const (
 	// UnderlayInterfaceCNIDev is provisioned by a CNI plugin and recorded
 	// in the libcni result cache.
 	UnderlayInterfaceCNIDev UnderlayInterfaceKind = "cnidev"
+	// UnderlayInterfaceGroutPort is a DPDK port bound directly to grout
+	// via a PCI device address (SR-IOV VF).
+	UnderlayInterfaceGroutPort UnderlayInterfaceKind = "groutport"
 )
 
 // UnderlayInterfaces returns all the underlay interfaces currently
@@ -355,9 +382,9 @@ func FindInterfacesInGroup(ns netns.NsHandle, groupID uint32) ([]string, error) 
 	return result, err
 }
 
-// findUnderlayMTU retrieves the lowest MTU among all underlay interfaces.
+// FindUnderlayMTU retrieves the lowest MTU among all underlay interfaces.
 // This ensures that packets can traverse all underlay paths.
-func findUnderlayMTU(ns netns.NsHandle) (int, error) {
+func FindUnderlayMTU(ns netns.NsHandle) (int, error) {
 	underlayInterfaces, err := underlayInterfaces(ns)
 	if err != nil {
 		return 0, fmt.Errorf("failed finding underlay interfaces to calculate MTU: %w", err)

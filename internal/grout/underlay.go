@@ -13,6 +13,8 @@ import (
 
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/netnamespace"
+	"github.com/openperouter/openperouter/internal/sriov"
+	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 )
@@ -64,18 +66,50 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 			if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, iface); err != nil {
 				return err
 			}
+			if err := netnamespace.In(perouterNetNS, func() error {
+				return configureUnderlayPort(ctx, client, iface.InterfaceName)
+			}); err != nil {
+				return err
+			}
 		case hostnetwork.UnderlayInterfaceCNIDev:
 			if err := hostnetwork.SetupUnderlayCNIDevInterface(ctx, params.TargetNS, iface); err != nil {
+				return err
+			}
+			if err := netnamespace.In(perouterNetNS, func() error {
+				return configureUnderlayPort(ctx, client, iface.InterfaceName)
+			}); err != nil {
+				return err
+			}
+		case hostnetwork.UnderlayInterfaceGroutPort:
+			if iface.GroutPort == nil {
+				return fmt.Errorf("groutPort params missing for interface %s", iface.InterfaceName)
+			}
+			if err := prepareGroutPortDriver(ctx, perouterNetNS, iface.GroutPort.PCIAddress); err != nil {
+				return fmt.Errorf("failed to prepare grout port driver for %s: %w", iface.GroutPort.PCIAddress, err)
+			}
+			if err := netnamespace.In(perouterNetNS, func() error {
+				return configureGroutPort(ctx, client, iface)
+			}); err != nil {
 				return err
 			}
 		default:
 			return fmt.Errorf("underlay interface %s has unsupported kind %q", iface.InterfaceName, iface.Kind)
 		}
-		if err := netnamespace.In(perouterNetNS, func() error {
-			return configureUnderlayPort(ctx, client, iface.InterfaceName)
-		}); err != nil {
+	}
+
+	if params.TunnelEndpoint != nil {
+		if err := setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
+	if err := assignIPsToGroutPort(ctx, client, "main",
+		ep.IPv4CIDR, ep.IPv6CIDR); err != nil {
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
 	}
 
 	return nil
@@ -115,6 +149,7 @@ func RestoreUnderlay(
 		}
 	}()
 
+	var kernelInterfaces []hostnetwork.UnderlayInterface
 	for _, iface := range toRemove {
 		portName := UnderlayPortNamePrefix + iface.InterfaceName
 		if _, found := existingPorts[portName]; !found {
@@ -122,14 +157,27 @@ func RestoreUnderlay(
 			continue
 		}
 
-		if err := netnamespace.In(ns, func() error {
-			if err := migrateAddressesToKernel(ctx, client, portName); err != nil {
-				return fmt.Errorf("RestoreUnderlay: failed to migrate addresses back to kernel: %w", err)
+		if iface.Kind == hostnetwork.UnderlayInterfaceGroutPort {
+			if err := removeGroutPortAddresses(ctx, client, ns, portName); err != nil {
+				return err
 			}
+			if iface.GroutPort != nil && iface.GroutPort.NetlinkDevice != "" {
+				kernelInterfaces = append(kernelInterfaces, hostnetwork.UnderlayInterface{
+					InterfaceName: iface.GroutPort.NetlinkDevice,
+					Kind:          hostnetwork.UnderlayInterfaceNetDev,
+				})
+			}
+		} else {
+			if err := netnamespace.In(ns, func() error {
+				if err := migrateAddressesToKernel(ctx, client, portName); err != nil {
+					return fmt.Errorf("RestoreUnderlay: failed to migrate addresses back to kernel: %w", err)
+				}
 
-			return nil
-		}); err != nil {
-			return err
+				return nil
+			}); err != nil {
+				return err
+			}
+			kernelInterfaces = append(kernelInterfaces, iface)
 		}
 
 		if err := client.deletePort(ctx, portName); err != nil {
@@ -137,11 +185,31 @@ func RestoreUnderlay(
 		}
 	}
 
-	if err := hostnetwork.RestoreUnderlay(ctx, targetNS, toRemove); err != nil {
-		return fmt.Errorf("RestoreUnderlay: failed to clean kernel underlay state: %w", err)
+	if len(kernelInterfaces) > 0 {
+		if err := hostnetwork.RestoreUnderlay(ctx, targetNS, kernelInterfaces); err != nil {
+			return fmt.Errorf("RestoreUnderlay: failed to clean kernel underlay state: %w", err)
+		}
 	}
 
 	return nil
+}
+
+func removeGroutPortAddresses(ctx context.Context, client *Client, ns netns.NsHandle, portName string) error {
+	return netnamespace.In(ns, func() error {
+		addrs, err := client.getAddresses(ctx, portName)
+		if err != nil {
+			return fmt.Errorf("RestoreUnderlay: failed to get addresses for grout port %s: %w", portName, err)
+		}
+		for _, addr := range addrs {
+			if err := removeKernelSubnetRoute("main", addr); err != nil {
+				return fmt.Errorf("RestoreUnderlay: failed to remove kernel route for %s: %w", addr, err)
+			}
+			if err := client.deleteAddress(ctx, portName, addr); err != nil {
+				return fmt.Errorf("RestoreUnderlay: failed to delete address %s from grout port %s: %w", addr, portName, err)
+			}
+		}
+		return nil
+	})
 }
 
 func configureUnderlayPort(ctx context.Context, client *Client, underlayInterface string) error {
@@ -162,6 +230,91 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 	return nil
 }
 
+// configureGroutPort creates a DPDK port in grout directly from a PCI
+// device address, assigns the inline IPAM addresses, and sets up the
+// kernel routes needed by FRR.
+func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface) error {
+	if iface.GroutPort == nil {
+		return fmt.Errorf("groutPort params missing for interface %s", iface.InterfaceName)
+	}
+
+	portName := UnderlayPortNamePrefix + iface.InterfaceName
+	opts := PortOptions{
+		MTU:      iface.GroutPort.MTU,
+		RXQueues: iface.GroutPort.RXQueues,
+		QSize:    iface.GroutPort.QSize,
+	}
+
+	if err := client.ensurePortWithOptions(ctx, portName, iface.GroutPort.PCIAddress, opts); err != nil {
+		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
+	}
+
+	for _, addr := range iface.GroutPort.Addresses {
+		if err := client.ensureAddress(ctx, portName, addr); err != nil {
+			return fmt.Errorf("failed to assign address %s to grout port %s: %w", addr, portName, err)
+		}
+
+		if err := ensureKernelSubnetRoute("main", addr); err != nil {
+			return fmt.Errorf("failed to add kernel route for underlay subnet %s: %w", addr, err)
+		}
+
+		slog.InfoContext(ctx, "configured grout DPDK port address", "cidr", addr, "port", portName)
+	}
+
+	if err := sysctl.Ensure(sysctl.DisableRPFilter(portName)); err != nil {
+		return fmt.Errorf("failed to disable rp_filter on %s: %w", portName, err)
+	}
+
+	return nil
+}
+
+// prepareGroutPortDriver inspects the driver bound to a PCI device and
+// takes the appropriate action:
+//   - Intel kernel drivers (igb, iavf, ice, i40e): rebind to vfio-pci
+//   - vfio-pci: already bound, nothing to do
+//   - mlx5_core: move the kernel netlink interface to the perouter namespace (bifurcated driver)
+//   - unknown/unbound: bind to vfio-pci
+func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr string) error {
+	driver, err := sriov.GetPCIDriver(pciAddr)
+	if err != nil {
+		return fmt.Errorf("failed to get PCI driver for %s: %w", pciAddr, err)
+	}
+
+	switch {
+	case sriov.IntelKernelDrivers[driver]:
+		if err := sriov.BindVFIOPCI(pciAddr); err != nil {
+			return fmt.Errorf("failed to rebind PCI device %s from %s to vfio-pci: %w",
+				pciAddr, driver, err)
+		}
+		return nil
+
+	case driver == sriov.DriverVFIOPCI:
+		return nil
+
+	case driver == sriov.DriverMlx5Core:
+		netdev, err := sriov.GetPCINetDevice(pciAddr)
+		if err != nil {
+			return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
+		}
+
+		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
+			InterfaceName: netdev,
+			Kind:          hostnetwork.UnderlayInterfaceNetDev,
+		}); err != nil {
+			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", netdev, err)
+		}
+		return nil
+
+	default:
+		slog.Info("binding GroutPort PCI device to vfio-pci",
+			"pciAddress", pciAddr, "currentDriver", driver)
+		if err := sriov.BindVFIOPCI(pciAddr); err != nil {
+			return fmt.Errorf("failed to bind PCI device %s to vfio-pci: %w", pciAddr, err)
+		}
+		return nil
+	}
+}
+
 func migrateAddressesToGrout(ctx context.Context, client *Client, underlayInterface string, addrs []netlink.Addr) error {
 	for _, addr := range addrs {
 		cidr := addr.IPNet.String()
@@ -176,13 +329,25 @@ func migrateAddressesToGrout(ctx context.Context, client *Client, underlayInterf
 		}
 
 		// FRR needs kernel routes to enstabilish BGP connections. Grout requires that all the kernel
-		// traffic must enter/leave grout via the `main` TAP device.
+		// traffic must enter grout via the `main` TAP device.
 		if err := ensureKernelSubnetRoute("main", addr.IPNet.String()); err != nil {
 			return fmt.Errorf("failed to add kernel route for underlay subnet %s: %w", addr, err)
 		}
 
 		slog.InfoContext(ctx, "migrated underlay address to grout", "cidr", cidr, "iface", UnderlayPortNamePrefix+underlayInterface)
 	}
+
+	// for each port, grout creates a NOARP kernel interface to make FRR zebra daemon work.
+	// 5: u_enp3s0: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+	//    link/ether 00:09:a8:38:8e:3b brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65521
+	//    tun type tap ...
+	//    alias Grout control plane interface
+	// bgpd packets will leave through the `main` intrerface and will come back on the `u_xxx` interface, hence the
+	// need to disable rp_filter on the `u_xxx` interface.
+	if err := sysctl.Ensure(sysctl.DisableRPFilter(UnderlayPortNamePrefix + underlayInterface)); err != nil {
+		return fmt.Errorf("failed to disable rp_filter on underlay interface %s: %w", UnderlayPortNamePrefix+underlayInterface, err)
+	}
+
 	return nil
 }
 
@@ -272,6 +437,24 @@ func removeKernelSubnetRoute(ifaceName, addr string) error {
 	}
 
 	slog.Info("removed kernel route for subnet", "cidr", addr, "src", route.Src, "ipnet", route.Dst, "iface", ifaceName)
+	return nil
+}
+
+// assignIPsToGroutPort assigns IPv4 and IPv6 addresses to a grout port via grcli.
+func assignIPsToGroutPort(ctx context.Context, client *Client, portName string, ipv4, ipv6 string) error {
+	if ipv4 == "" && ipv6 == "" {
+		return fmt.Errorf("at least one IP address must be provided (IPv4 or IPv6)")
+	}
+
+	for _, addr := range []string{ipv4, ipv6} {
+		if addr == "" {
+			continue
+		}
+		slog.DebugContext(ctx, "assigning IP to grout port", "port", portName, "addr", addr)
+		if err := client.ensureAddress(ctx, portName, addr); err != nil {
+			return fmt.Errorf("failed to assign address %s to grout port %s: %w", addr, portName, err)
+		}
+	}
 	return nil
 }
 

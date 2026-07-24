@@ -39,6 +39,7 @@ func InitReporter(kubeconfig, path string, namespaces ...string) (*k8sreporter.K
 		{Cr: &v1alpha1.UnderlayList{}},
 		{Cr: &v1alpha1.L3VNIList{}},
 		{Cr: &v1alpha1.L2VNIList{}},
+		{Cr: &v1alpha1.L3VPNList{}},
 		{Cr: &frrk8sv1beta1.FRRConfigurationList{}},
 	}
 
