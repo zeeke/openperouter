@@ -9,10 +9,10 @@ toc: true
 --- # API Reference
 
 ## Packages
-- [openpe.openperouter.github.io/v1alpha1](#openpeopenperoutergithubiov1alpha1)
+- [network.openperouter.io/v1alpha1](#networkopenperouteriov1alpha1)
 
 
-## openpe.openperouter.github.io/v1alpha1
+## network.openperouter.io/v1alpha1
 
 Package v1alpha1 contains API Schema definitions for the openpe v1alpha1 API group.
 
@@ -47,6 +47,47 @@ _Appears in:_
 | `echoMode` _boolean_ | echoMode enables or disables the echo transmission mode.<br />This mode is disabled by default, and not supported on multi<br />hops setups. |  | Optional: \{\} <br /> |
 | `passiveMode` _boolean_ | passiveMode marks session as passive: a passive session will not<br />attempt to start the connection and will wait for control packets<br />from peer before it begins replying. |  | Optional: \{\} <br /> |
 | `minimumTTL` _integer_ | minimumTTL configures, for multi hop sessions only, the minimum<br />expected TTL for an incoming BFD control packet. |  | Maximum: 254 <br />Minimum: 1 <br />Optional: \{\} <br /> |
+
+
+#### CNIConfigType
+
+_Underlying type:_ _string_
+
+CNIConfigType selects the source of the CNI configuration.
+It is the discriminator of the CNIDevice union and is designed to be
+extended with future config sources (e.g. a NetworkAttachmentDefinition
+reference or a filesystem path).
+
+_Validation:_
+- Enum: [RawConfig]
+
+_Appears in:_
+- [CNIDevice](#cnidevice)
+
+| Field | Description |
+| --- | --- |
+| `RawConfig` | CNIConfigTypeRawConfig embeds the CNI config JSON directly in the spec.<br /> |
+
+
+#### CNIDevice
+
+
+
+CNIDevice invokes a CNI plugin to provision an interface in the router
+netns. The config source is a discriminated union — additional source
+variants can be added later if a concrete user need emerges.
+
+
+
+_Appears in:_
+- [UnderlayInterface](#underlayinterface)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _[CNIConfigType](#cniconfigtype)_ | type selects the source of the CNI configuration. |  | Enum: [RawConfig] <br />Required: \{\} <br /> |
+| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#json-v1-apiextensions-k8s-io)_ | rawConfig embeds a CNI conflist JSON blob directly in this spec.<br />Only CNI spec >= 1.0.0 configurations are accepted. Immutable once<br />set: to change it, delete and recreate the<br />Underlay. Immutability is enforced by the validation webhook because<br />CEL transition rules cannot be evaluated inside atomic lists. |  | Type: object <br />Optional: \{\} <br /> |
+| `interfaceName` _string_ | interfaceName is the name of the interface the CNI plugin creates<br />inside the router netns (passed as CNI_IFNAME). Defaults to "net1". | net1 | MaxLength: 15 <br />MinLength: 1 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
+| `runtimeConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#json-v1-apiextensions-k8s-io)_ | runtimeConfig is an opaque JSON object mapping CNI capability names<br />to the payloads passed as capability arguments to the CNI<br />invocation. Only keys that the plugin declares in its<br />"capabilities" config block are forwarded; undeclared keys are<br />silently stripped. Well-known capabilities include ips, mac,<br />bandwidth, portMappings, ipRanges and deviceID. Immutable once<br />set: to change it, delete and recreate the Underlay. Immutability<br />is enforced by the validation webhook because CEL transition rules<br />cannot be evaluated inside atomic lists. |  | Type: object <br />Optional: \{\} <br /> |
 
 
 #### FailedResource
@@ -280,7 +321,7 @@ from.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `L2VNI` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional: \{\} <br /> |
 | `spec` _[L2VNISpec](#l2vnispec)_ | spec defines the desired state of L2VNI. |  | Required: \{\} <br /> |
@@ -301,12 +342,12 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `nodeSelector` _[LabelSelector](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#labelselector-v1-meta)_ | nodeSelector specifies which nodes this L2VNI applies to.<br />If empty or not specified, applies to all nodes.<br />Multiple L2VNIs can match the same node. |  | Optional: \{\} <br /> |
-| `vrf` _string_ | vrf is the name of the linux VRF to be used inside the PERouter namespace.<br />The field is optional, if not set it the name of the VNI instance will be used. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9_-]*$` <br />Optional: \{\} <br /> |
+| `routingDomain` _[RoutingDomain](#routingdomain)_ | routingDomain optionally attaches this L2VNI to a routing domain<br />provided by a backing resource (L3VNI or L3VPN). When omitted, the<br />L2VNI is a disconnected overlay (east-west L2 only, no VRF, no<br />gateway). |  | Optional: \{\} <br /> |
 | `vni` _integer_ | vni is the VXLan VNI to be used |  | Maximum: 1.6777215e+07 <br />Minimum: 1 <br />Required: \{\} <br /> |
 | `vxlanport` _integer_ | vxlanport is the port to be used for VXLan encapsulation. | 4789 | Optional: \{\} <br /> |
 | `underlayAddressFamily` _string_ | underlayAddressFamily selects which VTEP address family to use for this VNI's<br />VXLAN interface. When omitted, defaults to the available family in the underlay<br />(IPv4 preferred in dual-stack). |  | Enum: [ipv4 ipv6] <br />Optional: \{\} <br /> |
-| `hostmaster` _[HostMaster](#hostmaster)_ | hostmaster is the interface on the host the veth should be enslaved to.<br />If not set, the host veth will not be enslaved to any interface and it must be<br />enslaved manually (or by some other means). This is useful if another controller<br />is leveraging the host interface for the VNI. |  | Optional: \{\} <br /> |
-| `l2gatewayips` _string array_ | l2gatewayips is a list of IP addresses in CIDR notation to be used for the L2 gateway. When this is set, the<br />bridge the veths are enslaved to will be configured with these IP addresses, effectively<br />acting as a distributed gateway for the VNI. This allows for dual-stack (IPv4 and IPv6) support.<br />Maximum of 2 addresses are allowed. If 2 addresses are provided, one must be IPv4 and one must be IPv6. |  | MaxItems: 2 <br />Optional: \{\} <br /> |
+| `hostmaster` _[HostMaster](#hostmaster)_ | hostmaster is the interface on the host the veth should be attached to.<br />If not set, the host veth will not be attached to any interface and it must be<br />attached manually (or by some other means). This is useful if another controller<br />is leveraging the host interface for the VNI. |  | Optional: \{\} <br /> |
+| `gatewayIPs` _string array_ | gatewayIPs is a list of IP addresses in CIDR notation for the<br />distributed anycast gateway on this L2 segment's bridge<br />(Integrated Routing and Bridging interface). It is a property of<br />the L2 segment itself, so it lives on the L2VNI rather than<br />inside the routing-domain reference.<br />Maximum of 2 addresses are allowed. If 2 addresses are provided, one must be IPv4 and one must be IPv6. |  | MaxItems: 2 <br />Optional: \{\} <br /> |
 
 
 #### L2VNIStatus
@@ -335,7 +376,7 @@ takes part to the bgp fabric.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `L3Passthrough` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional: \{\} <br /> |
 | `spec` _[L3PassthroughSpec](#l3passthroughspec)_ | spec defines the desired state of L3Passthrough. |  | Required: \{\} <br /> |
@@ -385,11 +426,27 @@ from.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `L3VNI` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional: \{\} <br /> |
 | `spec` _[L3VNISpec](#l3vnispec)_ | spec defines the desired state of L3VNI. |  | Required: \{\} <br /> |
 | `status` _[L3VNIStatus](#l3vnistatus)_ | status defines the observed state of L3VNI. |  | Optional: \{\} <br /> |
+
+
+#### L3VNIReference
+
+
+
+L3VNIReference references an L3VNI by name.
+
+
+
+_Appears in:_
+- [RoutingDomain](#routingdomain)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | name is the metadata.name of the L3VNI in the same namespace. |  | MinLength: 1 <br />Required: \{\} <br /> |
 
 
 #### L3VNISpec
@@ -440,11 +497,27 @@ L3VPN represents an SRv6 IP VPN.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `L3VPN` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional: \{\} <br /> |
 | `spec` _[L3VPNSpec](#l3vpnspec)_ | spec defines the desired state of L3VPN. |  | Required: \{\} <br /> |
 | `status` _[L3VPNStatus](#l3vpnstatus)_ | status defines the observed state of L3VPN. |  | Optional: \{\} <br /> |
+
+
+#### L3VPNReference
+
+
+
+L3VPNReference references an L3VPN by name.
+
+
+
+_Appears in:_
+- [RoutingDomain](#routingdomain)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | name is the metadata.name of the L3VPN in the same namespace. |  | MinLength: 1 <br />Required: \{\} <br /> |
 
 
 #### L3VPNSpec
@@ -533,7 +606,7 @@ _Appears in:_
 | `address` _string_ | address is the IP address to establish the session with. The IP address<br />can be either IPv4 or IPv6. |  | MaxLength: 39 <br />MinLength: 1 <br />Optional: \{\} <br /> |
 | `interface` _string_ | interface is the interface name for BGP unnumbered sessions. The session will be established via IPv6 link locals. |  | MaxLength: 15 <br />MinLength: 1 <br />Optional: \{\} <br /> |
 | `port` _integer_ | port is the port to dial when establishing the session.<br />Defaults to 179. |  | Maximum: 16384 <br />Minimum: 0 <br />Optional: \{\} <br /> |
-| `password` _string_ | password to be used for establishing the BGP session.<br />Password and PasswordSecret are mutually exclusive. |  | Optional: \{\} <br /> |
+| `password` _string_ | password to be used for establishing the BGP session.<br />Password and PasswordSecret are mutually exclusive. |  | MaxLength: 128 <br />Pattern: `^\S+$` <br />Optional: \{\} <br /> |
 | `passwordSecret` _string_ | passwordSecret is name of the authentication secret for the neighbor.<br />the secret must be of type "kubernetes.io/basic-auth", and created in the<br />same namespace as the perouter daemon. The password is stored in the<br />secret as the key "password".<br />Password and PasswordSecret are mutually exclusive. |  | Optional: \{\} <br /> |
 | `holdTimeSeconds` _integer_ | holdTimeSeconds is the requested BGP hold time in seconds, per RFC4271.<br />Defaults to 180. |  | Optional: \{\} <br /> |
 | `keepaliveTimeSeconds` _integer_ | keepaliveTimeSeconds is the requested BGP keepalive time in seconds, per RFC4271.<br />Defaults to 60. |  | Optional: \{\} <br /> |
@@ -605,7 +678,7 @@ RawFRRConfig is the Schema for the rawfrrconfigs API.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `RawFRRConfig` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional: \{\} <br /> |
 | `spec` _[RawFRRConfigSpec](#rawfrrconfigspec)_ | spec defines the desired state of RawFRRConfig. |  | Required: \{\} <br /> |
@@ -670,7 +743,7 @@ RouterNodeConfigurationStatus describes a node router state.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `RouterNodeConfigurationStatus` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `status` _[RouterNodeConfigurationStatusStatus](#routernodeconfigurationstatusstatus)_ | status node router configuration status. |  | Optional: \{\} <br /> |
@@ -693,6 +766,26 @@ _Appears in:_
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | conditions list of conditions. |  | Optional: \{\} <br /> |
 
 
+#### RoutingDomain
+
+
+
+RoutingDomain is a discriminated union over the resource kinds that can
+provide a routing domain. Exactly one sub-struct must match the type
+discriminator.
+
+
+
+_Appears in:_
+- [L2VNISpec](#l2vnispec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _string_ | type selects the kind of resource that provides this routing domain. |  | Enum: [L3VNI L3VPN] <br />Required: \{\} <br /> |
+| `l3vni` _[L3VNIReference](#l3vnireference)_ | l3vni references the L3VNI (metadata.name) in the same namespace that<br />provides the routing domain for this L2VNI. |  | Optional: \{\} <br /> |
+| `l3vpn` _[L3VPNReference](#l3vpnreference)_ | l3vpn references the L3VPN (metadata.name) in the same namespace that<br />provides the routing domain for this L2VNI. |  | Optional: \{\} <br /> |
+
+
 #### SRV6Config
 
 
@@ -706,7 +799,29 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `encapBehavior` _[SRV6EncapBehavior](#srv6encapbehavior)_ | encapBehavior defines the behavior for SRv6 encapsulation as specified<br />in RFC 8986 sections 5.1 and 5.2.<br />If unset, defaults to H.Encaps. |  | Enum: [H.Encaps H.Encaps.Red] <br />MaxLength: 12 <br />MinLength: 1 <br />Optional: \{\} <br /> |
 | `locator` _[SRV6Locator](#srv6locator)_ | locator defines the locator for this SRv6 VPN. |  | Required: \{\} <br /> |
+
+
+#### SRV6EncapBehavior
+
+_Underlying type:_ _string_
+
+SRV6EncapBehavior defines the behavior for SRv6 encapsulation as specified
+in RFC 8986 sections 5.1 and 5.2.
+
+_Validation:_
+- Enum: [H.Encaps H.Encaps.Red]
+- MaxLength: 12
+- MinLength: 1
+
+_Appears in:_
+- [SRV6Config](#srv6config)
+
+| Field | Description |
+| --- | --- |
+| `H.Encaps` | HEncaps always adds an SRH to SRv6 encapsulated packets. For more details,<br />see RFC 8986 section 5.1.<br /> |
+| `H.Encaps.Red` | HEncapsRed is an optimization of the H.Encaps behavior and reduces the<br />length of the SRH by excluding the first SID in the SRH of the pushed<br />IPv6 header. The SRH is omitted when the SRv6 Policy only contains one<br />segment and there is no need to use any flag, tag or TLV. For more<br />details, see RFC 8986 section 5.2.<br /> |
 
 
 #### SRV6Locator
@@ -754,7 +869,7 @@ Underlay is the Schema for the underlays API.
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `apiVersion` _string_ | `openpe.openperouter.github.io/v1alpha1` | | |
+| `apiVersion` _string_ | `network.openperouter.io/v1alpha1` | | |
 | `kind` _string_ | `Underlay` | | |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional: \{\} <br /> |
 | `spec` _[UnderlaySpec](#underlayspec)_ | spec defines the desired state of Underlay. |  | Required: \{\} <br /> |
@@ -767,7 +882,7 @@ Underlay is the Schema for the underlays API.
 
 UnderlayInterface defines how the router obtains a single underlay link.
 Exactly one of the sub-structs must match the type field.
-The union is designed to be extended with future modes (e.g. cni)
+The union is designed to be extended with future modes
 for controller-provisioned interfaces.
 
 
@@ -777,8 +892,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[UnderlayInterfaceType](#underlayinterfacetype)_ | type selects how the router obtains this underlay link. |  | Enum: [NetworkDevice] <br />Required: \{\} <br /> |
+| `type` _[UnderlayInterfaceType](#underlayinterfacetype)_ | type selects how the router obtains this underlay link. |  | Enum: [NetworkDevice CNIDevice] <br />Required: \{\} <br /> |
 | `networkDevice` _[NetworkDevice](#networkdevice)_ | networkDevice moves an existing host network device into the router netns.<br />The device can be of any kind (physical NIC, bridge, macvlan, etc.).<br />Must be set when type is "NetworkDevice". |  | Optional: \{\} <br /> |
+| `cniDevice` _[CNIDevice](#cnidevice)_ | cniDevice invokes a CNI plugin to provision an interface in the router<br />netns. IPAM is delegated to the CNI plugin. Must be set when type is<br />"CNIDevice". |  | Optional: \{\} <br /> |
 
 
 #### UnderlayInterfaceType
@@ -787,10 +903,10 @@ _Underlying type:_ _string_
 
 UnderlayInterfaceType selects how the router obtains an underlay link.
 It is the discriminator of the UnderlayInterface union and is designed to be
-extended with future modes (e.g. cni).
+extended with future modes.
 
 _Validation:_
-- Enum: [NetworkDevice]
+- Enum: [NetworkDevice CNIDevice]
 
 _Appears in:_
 - [UnderlayInterface](#underlayinterface)
@@ -798,6 +914,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `NetworkDevice` | UnderlayInterfaceTypeNetworkDevice moves an existing host network device<br />into the router netns.<br /> |
+| `CNIDevice` | UnderlayInterfaceTypeCNIDevice invokes a CNI plugin to provision an interface<br />in the router netns.<br /> |
 
 
 #### UnderlaySpec
@@ -817,7 +934,7 @@ _Appears in:_
 | `asn` _integer_ | asn is the local AS number to use for the session with the TOR switch. |  | Maximum: 4.294967295e+09 <br />Minimum: 1 <br />Required: \{\} <br /> |
 | `routeridcidr` _string_ | routeridcidr is the ipv4 cidr to be used to assign a different routerID on each node. | 10.0.0.0/24 | Optional: \{\} <br /> |
 | `neighbors` _[Neighbor](#neighbor) array_ | neighbors is the list of external BGP neighbors to peer with.<br />Multiple neighbors are supported for connecting to multiple TOR switches<br />or establishing redundant BGP sessions. Each neighbor address must be unique.<br />At least one neighbor is required. |  | MaxItems: 128 <br />MinItems: 1 <br />Required: \{\} <br /> |
-| `interfaces` _[UnderlayInterface](#underlayinterface) array_ | interfaces is the list of interfaces the router uses for underlay<br />connectivity. Each entry is a discriminated union describing how the<br />interface is obtained. At least one interface is required. |  | MinItems: 1 <br />Required: \{\} <br /> |
+| `interfaces` _[UnderlayInterface](#underlayinterface) array_ | interfaces is the list of interfaces the router uses for underlay<br />connectivity. Each entry is a discriminated union describing how the<br />interface is obtained. At least one interface is required. All the<br />entries must be of the same type: mixing NetworkDevice and CNIDevice<br />interfaces is not supported. |  | MinItems: 1 <br />Required: \{\} <br /> |
 | `tunnelEndpoint` _[TunnelEndpointConfig](#tunnelendpointconfig)_ | tunnelEndpoint contains tunnel endpoint configuration for the underlay. |  | Optional: \{\} <br /> |
 | `gracefulRestart` _[GracefulRestartConfig](#gracefulrestartconfig)_ | gracefulRestart configures BGP Graceful Restart behaviour.<br />When set, FRR advertises GR capability and preserves forwarding<br />state across restarts so that peers keep stale routes active.<br />Omit to disable graceful restart. |  | Optional: \{\} <br /> |
 | `isis` _[ISISConfig](#isisconfig)_ | isis holds the ISIS configuration for the underlay. |  | Optional: \{\} <br /> |

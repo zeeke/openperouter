@@ -13,7 +13,7 @@ toc: true
 In addition to the configuration described in the [underlay configuration section]({{< ref "configuration/#underlay-configuration" >}}), the VTEP (Virtual Tunnel End Point) source must be configured via the `evpn.vtepCIDR` field.
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: Underlay
 metadata:
   name: underlay
@@ -60,7 +60,7 @@ When both IPv4 and IPv6 CIDRs are specified, individual VNIs can select which ad
 |-------|------|-------------|----------|
 | `asn` | integer | Local ASN for BGP sessions | Yes |
 | `evpn.vtepCIDR` | string | CIDR block for VTEP IP allocation | Yes |
-| `interfaces` | array | List of underlay interfaces to use for connectivity. Each entry is a discriminated union; today only the `NetworkDevice` type is supported, which moves an existing host network device into the router namespace | Yes |
+| `interfaces` | array | List of underlay interfaces to use for connectivity. Each entry is a discriminated union; the `NetworkDevice` type moves an existing host network device into the router namespace, while the `CNIDevice` type provisions an interface inside the router namespace via a CNI plugin. All entries must use the same type: mixing `NetworkDevice` and `CNIDevice` interfaces is rejected | Yes |
 | `neighbors` | array | List of BGP neighbors to peer with | Yes |
 | `nodeSelector` | object | Label selector to target specific nodes (applies to all nodes if omitted) | No |
 | `gracefulRestart` | object | Enables BGP Graceful Restart when present. See [Graceful Restart]({{< ref "graceful-restart" >}}). | No |
@@ -72,7 +72,7 @@ L3 VNI (Virtual Network Identifier) configurations define EVPN L3 overlays. Each
 ### Basic L3VNI Configuration
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VNI
 metadata:
   name: blue
@@ -106,7 +106,7 @@ You can create multiple VNIs for different network segments:
 
 ```yaml
 # Production VNI
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VNI
 metadata:
   name: signal
@@ -121,7 +121,7 @@ spec:
       ipv4: 192.168.10.0/24
 ---
 # Development VNI
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VNI
 metadata:
   name: oam
@@ -157,7 +157,11 @@ L2VNIs provide Layer 2 connectivity across nodes using EVPN tunnels. Unlike L3VN
 | Field | Type | Description | Required |
 |-------|------|-------------|----------|
 | `vni` | integer | Virtual Network Identifier for the EVPN tunnel | Yes |
-| `vrf` | string | Name of the VRF to associate with this L2VNI | Yes |
+| `routingDomain` | object | Attaches this L2VNI to a routing domain provided by an L3VNI or L3VPN. When omitted, the L2VNI is a disconnected overlay (east-west L2 only, no VRF, no gateway). | No |
+| `routingDomain.type` | string | Type of routing domain provider (`L3VNI` or `L3VPN`) | Yes (when routingDomain is set) |
+| `routingDomain.l3vni.name` | string | metadata.name of the L3VNI that provides the routing domain | Yes (when type is `L3VNI`) |
+| `routingDomain.l3vpn.name` | string | metadata.name of the L3VPN that provides the routing domain | Yes (when type is `L3VPN`) |
+| `gatewayIPs` | string array | IP addresses in CIDR notation for the distributed anycast gateway. Cannot be set without routingDomain. Max 2 (one IPv4, one IPv6). | No |
 | `underlayAddressFamily` | string | VTEP address family for this VNI (`ipv4` or `ipv6`). Defaults to available family (IPv4 preferred in dual-stack). | No |
 | `hostmaster.type` | string | Type of host interface management (`linux-bridge` or `ovs-bridge`) | Yes |
 | `hostmaster.linuxBridge.autoCreate` | boolean | Whether to automatically create a Linux bridge | No |
@@ -169,14 +173,17 @@ L2VNIs provide Layer 2 connectivity across nodes using EVPN tunnels. Unlike L3VN
 ### L2VNI Example
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L2VNI
 metadata:
   name: l2red
   namespace: openperouter-system
 spec:
   vni: 210
-  vrf: red
+  routingDomain:
+    type: L3VNI
+    l3vni:
+      name: red
   hostmaster:
     type: linux-bridge
     linuxBridge:
@@ -187,7 +194,7 @@ spec:
 
 When you create or update VNI configurations, OpenPERouter automatically:
 
-1. **Creates Network Interfaces**: Sets up VXLAN interface and Linux VRF named after the VNI
+1. **Creates Network Interfaces**: Sets up VXLAN interface, and a Linux VRF named after the VNI only when `routingDomain` is configured
 2. **Establishes Connectivity**: Creates veth pair and moves one end to the router's namespace
 3. **Adjusts Veth MTU**: Sets the MTU on both veth legs to the underlay NIC's MTU minus 50 bytes to account for VXLan encapsulation overhead
 4. **Enslaves the veth**: the veth is connected to the bridge corresponding to the l2 domain

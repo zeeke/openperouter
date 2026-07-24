@@ -1,4 +1,4 @@
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VNI
 metadata:
   name: red
@@ -12,7 +12,7 @@ spec:
       ipv4: 192.169.10.0/24
   vni: 100
 ---
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L2VNI
 metadata:
   name: layer2
@@ -22,12 +22,15 @@ spec:
     type: linux-bridge
     linuxBridge:
       autoCreate: true
-  l2gatewayips: ["192.170.1.1/24"]
+  gatewayIPs: ["192.170.1.1/24"]
   vni: 110
-  vrf: red
+  routingDomain:
+    type: L3VNI
+    l3vni:
+      name: red
   vxlanport: 4789
 ---
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: Underlay
 metadata:
   name: underlay

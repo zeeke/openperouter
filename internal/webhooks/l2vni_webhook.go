@@ -93,12 +93,12 @@ func validateL2VNICreate(l2vni *v1alpha1.L2VNI) error {
 	return validateL2VNI(l2vni)
 }
 
-func validateL2VNIUpdate(l2vni *v1alpha1.L2VNI, oldL2VNI *v1alpha1.L2VNI) error {
+func validateL2VNIUpdate(oldL2VNI, l2vni *v1alpha1.L2VNI) error {
 	Logger.Debug("webhook l2vni", "action", "update", "name", l2vni.Name, "namespace", l2vni.Namespace)
 	defer Logger.Debug("webhook l2vni", "action", "end update", "name", l2vni.Name, "namespace", l2vni.Namespace)
 
-	if !slices.Equal(oldL2VNI.Spec.L2GatewayIPs, l2vni.Spec.L2GatewayIPs) {
-		return errors.New("L2GatewayIPs cannot be changed")
+	if !slices.Equal(oldL2VNI.Spec.GatewayIPs, l2vni.Spec.GatewayIPs) {
+		return errors.New("GatewayIPs cannot be changed")
 	}
 
 	return validateL2VNI(l2vni)

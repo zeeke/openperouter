@@ -61,7 +61,7 @@ reachable from the broader L3 domain.
 Create the L3VNI and L2VNI resources (in **each** cluster):
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VNI
 metadata:
   name: red
@@ -70,7 +70,7 @@ spec:
   vni: 100
   vrf: red
 ---
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L2VNI
 metadata:
   name: layer2
@@ -80,16 +80,19 @@ spec:
     type: linux-bridge
     linuxBridge:
       autoCreate: true
-  l2gatewayips: ["192.170.1.1/24"]
+  gatewayIPs: ["192.170.1.1/24"]
   vni: 110
-  vrf: red
+  routingDomain:
+    type: L3VNI
+    l3vni:
+      name: red
 ```
 
 **Key Configuration Points:**
 
-- The L2VNI references the L3VNI via the `vrf: red` field, enabling routed traffic
+- The L2VNI references the L3VNI via the `routingDomain` field, enabling routed traffic
 - `hostmaster.autocreate: true` creates a `br-hs-110` bridge on the host
-- `l2gatewayip` defines the gateway IP for the VM subnet
+- `gatewayIPs` defines the gateway IP for the VM subnet
 
 ### 2. Network Attachment Definition
 
@@ -299,7 +302,7 @@ We see that the packet comes from the veth interface towards the bridge associat
 ### Common Issues
 
 1. **Bridge not created**: Verify the L2VNI has `hostmaster.autocreate: true`
-2. **VM cannot reach gateway**: Check that the VM's IP is in the same subnet as `l2gatewayip`
+2. **VM cannot reach gateway**: Check that the VM's IP is in the same subnet as `gatewayIPs`
 3. **No VM-to-VM connectivity**: Ensure both VMs are connected to the same bridge (`br-hs-110`)
 
 ### Debug Commands

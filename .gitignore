@@ -36,3 +36,5 @@ go.work
 
 !vendor/**
 logs_*/
+
+cmd/hostbridge/hostbridge

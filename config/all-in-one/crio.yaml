@@ -13,9 +13,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: l2vnis.openpe.openperouter.github.io
+  name: l2vnis.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: L2VNI
     listKind: L2VNIList
@@ -50,11 +50,27 @@ spec:
           spec:
             description: spec defines the desired state of L2VNI.
             properties:
+              gatewayIPs:
+                description: |-
+                  gatewayIPs is a list of IP addresses in CIDR notation for the
+                  distributed anycast gateway on this L2 segment's bridge
+                  (Integrated Routing and Bridging interface). It is a property of
+                  the L2 segment itself, so it lives on the L2VNI rather than
+                  inside the routing-domain reference.
+                  Maximum of 2 addresses are allowed. If 2 addresses are provided, one must be IPv4 and one must be IPv6.
+                items:
+                  type: string
+                maxItems: 2
+                type: array
+                x-kubernetes-list-type: atomic
+                x-kubernetes-validations:
+                - message: GatewayIPs cannot be changed
+                  rule: self == oldSelf
               hostmaster:
                 description: |-
-                  hostmaster is the interface on the host the veth should be enslaved to.
-                  If not set, the host veth will not be enslaved to any interface and it must be
-                  enslaved manually (or by some other means). This is useful if another controller
+                  hostmaster is the interface on the host the veth should be attached to.
+                  If not set, the host veth will not be attached to any interface and it must be
+                  attached manually (or by some other means). This is useful if another controller
                   is leveraging the host interface for the VNI.
                 properties:
                   linuxBridge:
@@ -112,20 +128,6 @@ spec:
                     field, ''ovs-bridge'' requires ovsBridge field'
                   rule: (self.type == 'linux-bridge' && has(self.linuxBridge) && !has(self.ovsBridge))
                     || (self.type == 'ovs-bridge' && has(self.ovsBridge) && !has(self.linuxBridge))
-              l2gatewayips:
-                description: |-
-                  l2gatewayips is a list of IP addresses in CIDR notation to be used for the L2 gateway. When this is set, the
-                  bridge the veths are enslaved to will be configured with these IP addresses, effectively
-                  acting as a distributed gateway for the VNI. This allows for dual-stack (IPv4 and IPv6) support.
-                  Maximum of 2 addresses are allowed. If 2 addresses are provided, one must be IPv4 and one must be IPv6.
-                items:
-                  type: string
-                maxItems: 2
-                type: array
-                x-kubernetes-list-type: atomic
-                x-kubernetes-validations:
-                - message: L2GatewayIPs cannot be changed
-                  rule: self == oldSelf
               nodeSelector:
                 description: |-
                   nodeSelector specifies which nodes this L2VNI applies to.
@@ -175,6 +177,54 @@ spec:
                     type: object
                 type: object
                 x-kubernetes-map-type: atomic
+              routingDomain:
+                description: |-
+                  routingDomain optionally attaches this L2VNI to a routing domain
+                  provided by a backing resource (L3VNI or L3VPN). When omitted, the
+                  L2VNI is a disconnected overlay (east-west L2 only, no VRF, no
+                  gateway).
+                properties:
+                  l3vni:
+                    description: |-
+                      l3vni references the L3VNI (metadata.name) in the same namespace that
+                      provides the routing domain for this L2VNI.
+                    properties:
+                      name:
+                        description: name is the metadata.name of the L3VNI in the
+                          same namespace.
+                        minLength: 1
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  l3vpn:
+                    description: |-
+                      l3vpn references the L3VPN (metadata.name) in the same namespace that
+                      provides the routing domain for this L2VNI.
+                    properties:
+                      name:
+                        description: name is the metadata.name of the L3VPN in the
+                          same namespace.
+                        minLength: 1
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  type:
+                    description: type selects the kind of resource that provides this
+                      routing domain.
+                    enum:
+                    - L3VNI
+                    - L3VPN
+                    type: string
+                required:
+                - type
+                type: object
+                x-kubernetes-validations:
+                - message: type L3VNI requires l3vni to be set and l3vpn to be unset
+                  rule: self.type != 'L3VNI' || (has(self.l3vni) && !has(self.l3vpn))
+                - message: type L3VPN requires l3vpn to be set and l3vni to be unset
+                  rule: self.type != 'L3VPN' || (has(self.l3vpn) && !has(self.l3vni))
               underlayAddressFamily:
                 description: |-
                   underlayAddressFamily selects which VTEP address family to use for this VNI's
@@ -190,13 +240,6 @@ spec:
                 maximum: 16777215
                 minimum: 1
                 type: integer
-              vrf:
-                description: |-
-                  vrf is the name of the linux VRF to be used inside the PERouter namespace.
-                  The field is optional, if not set it the name of the VNI instance will be used.
-                maxLength: 15
-                pattern: ^[a-zA-Z][a-zA-Z0-9_-]*$
-                type: string
               vxlanport:
                 default: 4789
                 description: vxlanport is the port to be used for VXLan encapsulation.
@@ -205,6 +248,9 @@ spec:
             required:
             - vni
             type: object
+            x-kubernetes-validations:
+            - message: gatewayIPs cannot be set without routingDomain
+              rule: '!has(self.gatewayIPs) || size(self.gatewayIPs) == 0 || has(self.routingDomain)'
           status:
             description: status defines the observed state of L2VNI.
             type: object
@@ -221,9 +267,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: l3passthroughs.openpe.openperouter.github.io
+  name: l3passthroughs.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: L3Passthrough
     listKind: L3PassthroughList
@@ -387,9 +433,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: l3vnis.openpe.openperouter.github.io
+  name: l3vnis.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: L3VNI
     listKind: L3VNIList
@@ -609,9 +655,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: l3vpns.openpe.openperouter.github.io
+  name: l3vpns.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: L3VPN
     listKind: L3VPNList
@@ -820,9 +866,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: rawfrrconfigs.openpe.openperouter.github.io
+  name: rawfrrconfigs.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: RawFRRConfig
     listKind: RawFRRConfigList
@@ -937,9 +983,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: routernodeconfigurationstatuses.openpe.openperouter.github.io
+  name: routernodeconfigurationstatuses.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: RouterNodeConfigurationStatus
     listKind: RouterNodeConfigurationStatusList
@@ -1099,9 +1145,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.19.0
-  name: underlays.openpe.openperouter.github.io
+  name: underlays.network.openperouter.io
 spec:
-  group: openpe.openperouter.github.io
+  group: network.openperouter.io
   names:
     kind: Underlay
     listKind: UnderlayList
@@ -1172,14 +1218,65 @@ spec:
                 description: |-
                   interfaces is the list of interfaces the router uses for underlay
                   connectivity. Each entry is a discriminated union describing how the
-                  interface is obtained. At least one interface is required.
+                  interface is obtained. At least one interface is required. All the
+                  entries must be of the same type: mixing NetworkDevice and CNIDevice
+                  interfaces is not supported.
                 items:
                   description: |-
                     UnderlayInterface defines how the router obtains a single underlay link.
                     Exactly one of the sub-structs must match the type field.
-                    The union is designed to be extended with future modes (e.g. cni)
+                    The union is designed to be extended with future modes
                     for controller-provisioned interfaces.
                   properties:
+                    cniDevice:
+                      description: |-
+                        cniDevice invokes a CNI plugin to provision an interface in the router
+                        netns. IPAM is delegated to the CNI plugin. Must be set when type is
+                        "CNIDevice".
+                      properties:
+                        interfaceName:
+                          default: net1
+                          description: |-
+                            interfaceName is the name of the interface the CNI plugin creates
+                            inside the router netns (passed as CNI_IFNAME). Defaults to "net1".
+                          maxLength: 15
+                          minLength: 1
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
+                        rawConfig:
+                          description: |-
+                            rawConfig embeds a CNI conflist JSON blob directly in this spec.
+                            Only CNI spec >= 1.0.0 configurations are accepted. Immutable once
+                            set: to change it, delete and recreate the
+                            Underlay. Immutability is enforced by the validation webhook because
+                            CEL transition rules cannot be evaluated inside atomic lists.
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                        runtimeConfig:
+                          description: |-
+                            runtimeConfig is an opaque JSON object mapping CNI capability names
+                            to the payloads passed as capability arguments to the CNI
+                            invocation. Only keys that the plugin declares in its
+                            "capabilities" config block are forwarded; undeclared keys are
+                            silently stripped. Well-known capabilities include ips, mac,
+                            bandwidth, portMappings, ipRanges and deviceID. Immutable once
+                            set: to change it, delete and recreate the Underlay. Immutability
+                            is enforced by the validation webhook because CEL transition rules
+                            cannot be evaluated inside atomic lists.
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                        type:
+                          description: type selects the source of the CNI configuration.
+                          enum:
+                          - RawConfig
+                          type: string
+                      required:
+                      - type
+                      type: object
+                      x-kubernetes-validations:
+                      - message: 'type/config mismatch: rawConfig must be set if and
+                          only if type is ''RawConfig'''
+                        rule: has(self.rawConfig) == (self.type == 'RawConfig')
                     networkDevice:
                       description: |-
                         networkDevice moves an existing host network device into the router netns.
@@ -1202,6 +1299,7 @@ spec:
                         link.
                       enum:
                       - NetworkDevice
+                      - CNIDevice
                       type: string
                   required:
                   - type
@@ -1210,9 +1308,16 @@ spec:
                   - message: 'type/config mismatch: networkDevice must be set if and
                       only if type is ''NetworkDevice'''
                     rule: has(self.networkDevice) == (self.type == 'NetworkDevice')
+                  - message: 'type/config mismatch: cniDevice must be set if and only
+                      if type is ''CNIDevice'''
+                    rule: has(self.cniDevice) == (self.type == 'CNIDevice')
                 minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic
+                x-kubernetes-validations:
+                - message: all interfaces must be of the same type, mixing NetworkDevice
+                    and CNIDevice is not supported
+                  rule: self.all(i, i.type == self[0].type)
               isis:
                 description: isis holds the ISIS configuration for the underlay.
                 properties:
@@ -1481,6 +1586,8 @@ spec:
                       description: |-
                         password to be used for establishing the BGP session.
                         Password and PasswordSecret are mutually exclusive.
+                      maxLength: 128
+                      pattern: ^\S+$
                       type: string
                     passwordSecret:
                       description: |-
@@ -1596,6 +1703,17 @@ spec:
                 description: srv6 holds the SRv6 configuration. Requires ISIS or Neighbors
                   configuration.
                 properties:
+                  encapBehavior:
+                    description: |-
+                      encapBehavior defines the behavior for SRv6 encapsulation as specified
+                      in RFC 8986 sections 5.1 and 5.2.
+                      If unset, defaults to H.Encaps.
+                    enum:
+                    - H.Encaps
+                    - H.Encaps.Red
+                    maxLength: 12
+                    minLength: 1
+                    type: string
                   locator:
                     description: locator defines the locator for this SRv6 VPN.
                     properties:
@@ -1774,7 +1892,7 @@ rules:
   verbs:
   - update
 - apiGroups:
-  - openpe.openperouter.github.io
+  - network.openperouter.io
   resources:
   - l2vnis
   - l3passthroughs
@@ -1792,7 +1910,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - openpe.openperouter.github.io
+  - network.openperouter.io
   resources:
   - l2vnis/finalizers
   - l3passthroughs/finalizers
@@ -1803,7 +1921,7 @@ rules:
   verbs:
   - update
 - apiGroups:
-  - openpe.openperouter.github.io
+  - network.openperouter.io
   resources:
   - l2vnis/status
   - l3passthroughs/status
@@ -2255,12 +2373,21 @@ spec:
           timeoutSeconds: 10
         name: frr
         securityContext:
+          allowPrivilegeEscalation: false
           capabilities:
             add:
             - NET_ADMIN
             - NET_RAW
             - SYS_ADMIN
             - NET_BIND_SERVICE
+            - SETUID
+            - SETGID
+            - CHOWN
+            - DAC_OVERRIDE
+            drop:
+            - ALL
+          seccompProfile:
+            type: Unconfined
         volumeMounts:
         - mountPath: /var/run/frr
           name: frr-sockets
@@ -2269,6 +2396,7 @@ spec:
         - mountPath: /var/run/netns
           mountPropagation: HostToContainer
           name: netns
+          readOnly: true
       - args:
         - --frrconfig=/etc/perouter/frr.conf
         - --loglevel=debug
@@ -2299,8 +2427,14 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 10
         securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
           seLinuxOptions:
             type: spc_t
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - mountPath: /etc/frr
           name: frrconfig
@@ -2317,11 +2451,22 @@ spec:
         image: quay.io/openperouter/router:main
         imagePullPolicy: IfNotPresent
         name: cp-frr-files
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - mountPath: /tmp/frr
           name: frr-startup
         - mountPath: /etc/frr
           name: frrconfig
+      securityContext:
+        supplementalGroups:
+        - 92
+        - 102
       serviceAccountName: perouter
       shareProcessNamespace: true
       terminationGracePeriodSeconds: 10
@@ -2364,7 +2509,7 @@ webhooks:
   name: l2vnivalidationwebhook.openperouter.io
   rules:
   - apiGroups:
-    - openpe.openperouter.github.io
+    - network.openperouter.io
     apiVersions:
     - v1alpha1
     operations:
@@ -2384,7 +2529,7 @@ webhooks:
   name: l3passthroughvalidationwebhook.openperouter.io
   rules:
   - apiGroups:
-    - openpe.openperouter.github.io
+    - network.openperouter.io
     apiVersions:
     - v1alpha1
     operations:
@@ -2404,7 +2549,7 @@ webhooks:
   name: l3vnivalidationwebhook.openperouter.io
   rules:
   - apiGroups:
-    - openpe.openperouter.github.io
+    - network.openperouter.io
     apiVersions:
     - v1alpha1
     operations:
@@ -2424,7 +2569,7 @@ webhooks:
   name: l3vpnsvalidationwebhook.openperouter.io
   rules:
   - apiGroups:
-    - openpe.openperouter.github.io
+    - network.openperouter.io
     apiVersions:
     - v1alpha1
     operations:
@@ -2444,7 +2589,7 @@ webhooks:
   name: rawfrrconfigvalidationwebhook.openperouter.io
   rules:
   - apiGroups:
-    - openpe.openperouter.github.io
+    - network.openperouter.io
     apiVersions:
     - v1alpha1
     operations:
@@ -2464,7 +2609,7 @@ webhooks:
   name: underlayvalidationwebhook.openperouter.io
   rules:
   - apiGroups:
-    - openpe.openperouter.github.io
+    - network.openperouter.io
     apiVersions:
     - v1alpha1
     operations:

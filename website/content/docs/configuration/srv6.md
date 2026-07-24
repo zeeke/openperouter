@@ -16,7 +16,7 @@ the SRv6 underlay requires IS-IS, an SRv6 locator, and at least one IPv6
 tunnel endpoint CIDR.
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: Underlay
 metadata:
   name: underlay
@@ -44,6 +44,7 @@ spec:
     features:
     - "advertisePassiveOnly"
   srv6:
+    encapBehavior: "H.Encaps.Red"
     locator:
       basePrefix: "fd00:0:32::/48"
       format: "usid-f3216"
@@ -92,11 +93,12 @@ For the full list of IS-IS configuration fields, see the
 
 ### SRv6 Configuration
 
-The `srv6` section configures the SRv6 locator. SRv6 can only be enabled
-when IS-IS is also configured.
+The `srv6` section configures the SRv6 locator and encapsulation
+behavior. SRv6 can only be enabled when IS-IS is also configured.
 
 ```yaml
   srv6:
+    encapBehavior: "H.Encaps.Red"
     locator:
       basePrefix: "fd00:0:32::/48"
       format: "usid-f3216"
@@ -138,7 +140,7 @@ targets.
 ### Basic L3VPN Configuration
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VPN
 metadata:
   name: red
@@ -166,7 +168,7 @@ You can create multiple L3VPNs for different network segments:
 
 ```yaml
 # Signal VPN
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VPN
 metadata:
   name: signal
@@ -185,7 +187,7 @@ spec:
       ipv4: 192.168.10.0/24
 ---
 # OAM VPN
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L3VPN
 metadata:
   name: oam
@@ -233,18 +235,22 @@ For the full list of L2VNI configuration fields, see the
 ### L2VNI Example
 
 ```yaml
-apiVersion: openpe.openperouter.github.io/v1alpha1
+apiVersion: network.openperouter.io/v1alpha1
 kind: L2VNI
 metadata:
   name: l2red
   namespace: openperouter-system
 spec:
   vni: 210
-  vrf: red
+  routingDomain:
+    type: L3VPN
+    l3vpn:
+      name: red
   hostmaster:
     type: linux-bridge
     linuxBridge:
       autoCreate: true
+  gatewayIPs: ["192.170.1.1/24"]
 ```
 
 ## Validation Rules

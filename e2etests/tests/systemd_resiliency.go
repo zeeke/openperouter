@@ -19,6 +19,7 @@ import (
 	"github.com/openperouter/openperouter/e2etests/pkg/k8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
+	"github.com/openperouter/openperouter/e2etests/pkg/systemd"
 	"github.com/openperouter/openperouter/e2etests/pkg/url"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -91,31 +92,7 @@ var _ = Describe("Systemd Router Restart Resiliency", Label("systemdmode"), Orde
 	restartRouterOnNode := func(node corev1.Node) {
 		By("restarting FRR container via systemd on node " + node.Name)
 		nodeExec := executor.ForContainer(node.Name)
-
-		pidBefore, err := nodeExec.Exec("systemctl", "show", "--property=MainPID", "--value", "routerpod-pod.service")
-		Expect(err).NotTo(HaveOccurred())
-		pidBefore = strings.TrimSpace(pidBefore)
-
-		_, err = nodeExec.Exec("systemctl", "restart", "routerpod-pod.service")
-		Expect(err).NotTo(HaveOccurred())
-
-		Eventually(func() error {
-			output, err := nodeExec.Exec("systemctl", "is-active", "routerpod-pod.service")
-			if err != nil {
-				return err
-			}
-			if strings.TrimSpace(output) != "active" {
-				return fmt.Errorf("service is not active: %s", output)
-			}
-			pidAfter, err := nodeExec.Exec("systemctl", "show", "--property=MainPID", "--value", "routerpod-pod.service")
-			if err != nil {
-				return err
-			}
-			if strings.TrimSpace(pidAfter) == pidBefore {
-				return fmt.Errorf("PID has not changed, still %s", pidBefore)
-			}
-			return nil
-		}, 30*time.Second, time.Second).Should(Succeed())
+		Expect(systemd.RestartSystemdUnit(nodeExec, "routerpod-pod.service")).To(Succeed())
 	}
 
 	It("recovers BGP sessions after FRR restart", func() {
@@ -145,8 +122,8 @@ var _ = Describe("Systemd: Named netns and kernel objects survive FRR container 
 	l2VniRed := v1alpha1.L2VNI{
 		ObjectMeta: metav1.ObjectMeta{Name: "red110", Namespace: openperouter.Namespace},
 		Spec: v1alpha1.L2VNISpec{
-			VRF: new("red"),
-			VNI: 110,
+			RoutingDomain: l3vniRoutingDomain("red"),
+			VNI:           110,
 			HostMaster: &v1alpha1.HostMaster{
 				Type:        "linux-bridge",
 				LinuxBridge: &v1alpha1.LinuxBridgeConfig{AutoCreate: new(true)},
@@ -370,10 +347,10 @@ var _ = Describe("Systemd: Data plane continuity during FRR restart", Label("sys
 		l2VniRedWithGateway := v1alpha1.L2VNI{
 			ObjectMeta: metav1.ObjectMeta{Name: "red110", Namespace: openperouter.Namespace},
 			Spec: v1alpha1.L2VNISpec{
-				VRF:          new("red"),
-				VNI:          110,
-				L2GatewayIPs: []string{"192.171.24.1/24"},
-				HostMaster:   &v1alpha1.HostMaster{Type: "linux-bridge", LinuxBridge: &v1alpha1.LinuxBridgeConfig{AutoCreate: new(true)}},
+				RoutingDomain: l3vniRoutingDomain("red"),
+				VNI:           110,
+				GatewayIPs:    []string{"192.171.24.1/24"},
+				HostMaster:    &v1alpha1.HostMaster{Type: "linux-bridge", LinuxBridge: &v1alpha1.LinuxBridgeConfig{AutoCreate: new(true)}},
 			},
 		}
 
