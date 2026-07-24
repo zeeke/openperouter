@@ -17,6 +17,8 @@ IMG="${IMG_REPO}/${IMG_NAME}:${IMG_TAG}"
 OPENPEROUTER_IMAGE_TAR="${OPENPEROUTER_IMAGE_TAR:-}"
 KUSTOMIZE_LAYER="${KUSTOMIZE_LAYER:-grout}"
 NAMESPACE="${NAMESPACE:-openperouter-system}"
+MULTUS_VERSION="${MULTUS_VERSION:-v4.2.1}"
+CNI_PLUGINS_VERSION="${CNI_PLUGINS_VERSION:-v1.7.1}"
 
 SSH_KEY="${SCRIPT_DIR}/qemu-ssh-key"
 SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -p ${SSH_PORT} openperouter@localhost"
@@ -91,19 +93,49 @@ ${SSH_CMD} "sudo cat /etc/rancher/k3s/k3s.yaml" 2>/dev/null \
     > "${SCRIPT_DIR}/kubeconfig"
 echo "Kubeconfig saved to ${SCRIPT_DIR}/kubeconfig"
 
-# --- Deploy openperouter ---
-echo "Deploying openperouter with kustomize layer '${KUSTOMIZE_LAYER}'..."
 export KUBECONFIG="${SCRIPT_DIR}/kubeconfig"
 
 KUSTOMIZE="${KUSTOMIZE:-kustomize}"
 KUBECTL="${KUBECTL:-kubectl}"
 
+# --- Deploy FRR-K8s ---
+echo "Deploying FRR-K8s..."
+REPO_ROOT="${SCRIPT_DIR}/../../../"
+${KUSTOMIZE} build "${REPO_ROOT}/clab/kind/frr-k8s" | ${KUBECTL} apply -f -
+
+echo "Deploying Multus CNI..."
+${KUBECTL} apply -f "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/refs/tags/${MULTUS_VERSION}/deployments/multus-daemonset.yml"
+
+echo "Waiting for FRR-K8s pods to be ready..."
+${KUBECTL} -n frr-k8s-system wait --for=condition=Ready --all pods --timeout=300s
+
+#echo "Waiting for Multus pods to be ready..."
+#${KUBECTL} -n kube-system wait --for=condition=Ready pods -l app=multus --timeout=300s
+
+# --- Install CNI plugins on the VM node ---
+#echo "Building CNI plugins (macvlan, bridge, static)..."
+#TEMP_GOBIN=$(mktemp -d)
+#GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/macvlan@${CNI_PLUGINS_VERSION}"
+#GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/bridge@${CNI_PLUGINS_VERSION}"
+#GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/ipam/static@${CNI_PLUGINS_VERSION}"
+#
+#SCP_CMD="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -P ${SSH_PORT}"
+#
+#echo "Copying CNI plugins to VM..."
+#for bin in macvlan bridge static; do
+#    ${SCP_CMD} "${TEMP_GOBIN}/${bin}" "openperouter@localhost:/tmp/${bin}"
+#    run_in_vm "mv /tmp/${bin} /opt/cni/bin/${bin} && chmod 755 /opt/cni/bin/${bin}"
+#done
+#rm -rf "${TEMP_GOBIN}"
+
+# --- Deploy openperouter ---
+echo "Deploying openperouter with kustomize layer '${KUSTOMIZE_LAYER}'..."
+
 ${KUBECTL} create ns "${NAMESPACE}" 2>/dev/null || true
 ${KUBECTL} label ns "${NAMESPACE}" pod-security.kubernetes.io/enforce=privileged --overwrite
 
-cd "${SCRIPT_DIR}/../../../"
-cd config/pods && ${KUSTOMIZE} edit set image router="${IMG}"
-cd ../../
+cd "${REPO_ROOT}/config/pods" && ${KUSTOMIZE} edit set image router="${IMG}"
+cd "${REPO_ROOT}"
 ${KUSTOMIZE} build "config/${KUSTOMIZE_LAYER}" | ${KUBECTL} apply -f -
 
 echo "Waiting for openperouter pods to appear..."

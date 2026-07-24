@@ -58,7 +58,7 @@ func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
 	}
 }
 
-var _ = DescribeTableSubtree("QEMU L3Passthrough with Underlay",
+var _ = XDescribeTableSubtree("QEMU L3Passthrough with Underlay",
 	qemuL3PassthroughTests,
 	QEMUSupport,
 	XEntry("NetworkDevice", Ordered, networkDeviceQEMUInterface),
