@@ -89,6 +89,11 @@ var _ = ginkgo.BeforeSuite(func() {
 	Eventually(func(g Gomega) {
 		tests.ValidateCNIBinaries(g, cs)
 	}).WithTimeout(30 * time.Second).WithPolling(2 * time.Second).Should(Succeed())
+
+	if tests.GroutMode {
+		infra.UnderlaySRv6.Spec.ISIS.Interfaces[0].Name = "u_" + infra.UnderlaySRv6.Spec.ISIS.Interfaces[0].Name
+		infra.UnderlayEVPNandSRv6.Spec.ISIS.Interfaces[0].Name = "u_" + infra.UnderlayEVPNandSRv6.Spec.ISIS.Interfaces[0].Name
+	}
 })
 
 var _ = ginkgo.AfterSuite(func() {
