@@ -5,6 +5,7 @@ package tests
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -116,6 +117,9 @@ var runUnderlayTests = func(af ipfamily.Family, underlay v1alpha1.Underlay) {
 		if GroutMode {
 			for i := range underlay.Spec.Neighbors {
 				if underlay.Spec.Neighbors[i].Interface != nil {
+					if strings.HasPrefix(*underlay.Spec.Neighbors[i].Interface, "u_") {
+						continue
+					}
 					iface := "u_" + *underlay.Spec.Neighbors[i].Interface
 					underlay.Spec.Neighbors[i].Interface = &iface
 				}
