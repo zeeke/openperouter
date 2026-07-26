@@ -93,7 +93,6 @@ var _ = ginkgo.BeforeSuite(func() {
 	if tests.GroutMode {
 		infra.UnderlaySRv6.Spec.ISIS.Interfaces[0].Name = "u_" + infra.UnderlaySRv6.Spec.ISIS.Interfaces[0].Name
 		infra.UnderlayEVPNandSRv6.Spec.ISIS.Interfaces[0].Name = "u_" + infra.UnderlayEVPNandSRv6.Spec.ISIS.Interfaces[0].Name
-		infra.UnderlayUnnumbered.Spec.Neighbors[0].Interface = new("u_" + *infra.UnderlayUnnumbered.Spec.Neighbors[0].Interface)
 	}
 })
 

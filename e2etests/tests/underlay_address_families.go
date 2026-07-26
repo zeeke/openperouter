@@ -113,6 +113,15 @@ var runUnderlayTests = func(af ipfamily.Family, underlay v1alpha1.Underlay) {
 		Expect(err).NotTo(HaveOccurred())
 		routers.Dump(GinkgoWriter)
 
+		if GroutMode {
+			for i := range underlay.Spec.Neighbors {
+				if underlay.Spec.Neighbors[i].Interface != nil {
+					iface := "u_" + *underlay.Spec.Neighbors[i].Interface
+					underlay.Spec.Neighbors[i].Interface = &iface
+				}
+			}
+		}
+
 		err = Updater.Update(config.Resources{
 			Underlays: []v1alpha1.Underlay{
 				underlay,
