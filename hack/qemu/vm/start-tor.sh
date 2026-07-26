@@ -90,7 +90,7 @@ in_tor_ns sysctl -qw net.ipv6.conf.lo.seg6_enabled=1
 in_tor_ns sysctl -qw net.ipv6.conf.sr0.seg6_enabled=1
 
 # --- VRFs ---
-#in_tor_ns sysctl -qw net.vrf.strict_mode=1 2>/dev/null || true
+in_tor_ns sysctl -qw net.vrf.strict_mode=1 2>/dev/null || true
 in_tor_ns ip link add red type vrf table 1100
 in_tor_ns ip link set red up
 in_tor_ns ip link add blue type vrf table 1200

@@ -398,6 +398,11 @@ jobs:
           go-version-file: "go.mod"
           cache: true
 
+      - name: Install kernel modules
+        run: |
+          sudo apt-get update
+          sudo apt-get install linux-modules-extra-$(uname -r)
+
       - name: Install QEMU and dependencies
         run: |
           sudo apt-get update
