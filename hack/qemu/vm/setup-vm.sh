@@ -104,29 +104,48 @@ REPO_ROOT="${SCRIPT_DIR}/../../../"
 ${KUSTOMIZE} build "${REPO_ROOT}/clab/kind/frr-k8s" | ${KUBECTL} apply -f -
 
 echo "Deploying Multus CNI..."
-${KUBECTL} apply -f "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/refs/tags/${MULTUS_VERSION}/deployments/multus-daemonset.yml"
+${KUBECTL} apply -f <<EOF
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: multus
+  namespace: kube-system
+spec:
+  repo: https://rke2-charts.rancher.io
+  chart: rke2-multus
+  targetNamespace: kube-system
+  valuesContent: |-
+    config:
+      fullnameOverride: multus
+      cni_conf:
+        confDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
+        binDir: /var/lib/rancher/k3s/data/cni/
+        kubeconfig: /var/lib/rancher/k3s/agent/etc/cni/net.d/multus.d/multus.kubeconfig
+        # Comment the following line when using rke2-multus < v4.2.202
+        multusAutoconfigDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
+EOF
 
 echo "Waiting for FRR-K8s pods to be ready..."
 ${KUBECTL} -n frr-k8s-system wait --for=condition=Ready --all pods --timeout=300s
 
-#echo "Waiting for Multus pods to be ready..."
-#${KUBECTL} -n kube-system wait --for=condition=Ready pods -l app=multus --timeout=300s
+echo "Waiting for Multus pods to be ready..."
+${KUBECTL} -n kube-system wait --for=condition=Ready pods -l app=multus --timeout=300s
 
 # --- Install CNI plugins on the VM node ---
-#echo "Building CNI plugins (macvlan, bridge, static)..."
-#TEMP_GOBIN=$(mktemp -d)
-#GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/macvlan@${CNI_PLUGINS_VERSION}"
-#GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/bridge@${CNI_PLUGINS_VERSION}"
-#GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/ipam/static@${CNI_PLUGINS_VERSION}"
-#
-#SCP_CMD="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -P ${SSH_PORT}"
-#
-#echo "Copying CNI plugins to VM..."
-#for bin in macvlan bridge static; do
-#    ${SCP_CMD} "${TEMP_GOBIN}/${bin}" "openperouter@localhost:/tmp/${bin}"
-#    run_in_vm "mv /tmp/${bin} /opt/cni/bin/${bin} && chmod 755 /opt/cni/bin/${bin}"
-#done
-#rm -rf "${TEMP_GOBIN}"
+echo "Building CNI plugins (macvlan, bridge, static)..."
+TEMP_GOBIN=$(mktemp -d)
+GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/macvlan@${CNI_PLUGINS_VERSION}"
+GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/bridge@${CNI_PLUGINS_VERSION}"
+GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/ipam/static@${CNI_PLUGINS_VERSION}"
+
+SCP_CMD="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -P ${SSH_PORT}"
+
+echo "Copying CNI plugins to VM..."
+for bin in macvlan bridge static; do
+    ${SCP_CMD} "${TEMP_GOBIN}/${bin}" "openperouter@localhost:/tmp/${bin}"
+    run_in_vm "mv /tmp/${bin} /opt/cni/bin/${bin} && chmod 755 /opt/cni/bin/${bin}"
+done
+rm -rf "${TEMP_GOBIN}"
 
 # --- Deploy openperouter ---
 echo "Deploying openperouter with kustomize layer '${KUSTOMIZE_LAYER}'..."
