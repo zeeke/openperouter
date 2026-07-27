@@ -211,6 +211,12 @@ func (o Updater) Namespace() string {
 
 func fixUnderlayForGrout(u v1alpha1.Underlay) *v1alpha1.Underlay {
 	res := u.DeepCopy()
+	for _, iface := range res.Spec.Interfaces {
+		if iface.Type == v1alpha1.UnderlayInterfaceTypeGroutPort {
+			return res
+		}
+	}
+
 	for i := range res.Spec.Neighbors {
 		if res.Spec.Neighbors[i].Interface != nil && !strings.HasPrefix(*res.Spec.Neighbors[i].Interface, "u_") {
 			iface := "u_" + *res.Spec.Neighbors[i].Interface
