@@ -202,16 +202,19 @@ var _ = Describe("QEMU EVPN scenarios", Ordered, QEMUSupport, func() {
 			L2VNIs: []v1alpha1.L2VNI{l2vni},
 		})).To(Succeed())
 
-		By("Verifying L2VNI configuration in FRR running config")
+		By("Verifying VNI 110 is provisioned in EVPN with tenant VRF red")
 		for _, pod := range routerPods {
 			exec := openperouter.ExecutorForPod(pod)
 			Eventually(func() error {
-				cfg, err := frr.RunningConfig(exec)
+				vniInfo, err := frr.EVPNVNIStatus(exec, 110)
 				if err != nil {
-					return err
+					return fmt.Errorf("failed to query EVPN VNI 110 on %s: %v", pod.Name, err)
 				}
-				if !strings.Contains(cfg, "vni 110") {
-					return fmt.Errorf("FRR config on %s does not contain vni 110:\n%s", pod.Name, cfg)
+				if vniInfo == nil {
+					return fmt.Errorf("VNI 110 not yet provisioned on %s", pod.Name)
+				}
+				if vniInfo.TenantVrf != "red" {
+					return fmt.Errorf("VNI 110 on %s has tenant VRF %q, expected %q", pod.Name, vniInfo.TenantVrf, "red")
 				}
 				return nil
 			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
