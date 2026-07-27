@@ -75,10 +75,11 @@ func (o Updater) Update(r Resources) error {
 	for _, underlay := range r.Underlays {
 		if o.groutMode {
 			objects[key] = fixUnderlayForGrout(underlay)
+			oldValues[key] = fixUnderlayForGrout(underlay)
 		} else {
 			objects[key] = underlay.DeepCopy()
+			oldValues[key] = underlay.DeepCopy()
 		}
-		oldValues[key] = underlay.DeepCopy()
 		key++
 	}
 	for _, vni := range r.L3VNIs {
@@ -210,7 +211,12 @@ func (o Updater) Namespace() string {
 
 func fixUnderlayForGrout(u v1alpha1.Underlay) *v1alpha1.Underlay {
 	res := u.DeepCopy()
-	fmt.Println("fixUnderlayForGrout", res)
+	for _, iface := range res.Spec.Interfaces {
+		if iface.Type == v1alpha1.UnderlayInterfaceTypeGroutPort {
+			return res
+		}
+	}
+
 	for i := range res.Spec.Neighbors {
 		if res.Spec.Neighbors[i].Interface != nil && !strings.HasPrefix(*res.Spec.Neighbors[i].Interface, "u_") {
 			iface := "u_" + *res.Spec.Neighbors[i].Interface
@@ -224,6 +230,5 @@ func fixUnderlayForGrout(u v1alpha1.Underlay) *v1alpha1.Underlay {
 			}
 		}
 	}
-	fmt.Println("fixUnderlayForGrout", res)
 	return res
 }
