@@ -68,7 +68,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	log.SetLogger(zap.New(zap.WriteTo(ginkgo.GinkgoWriter), zap.UseDevMode(true)))
 	clientconfig, err := k8sclient.RestConfig()
 	Expect(err).NotTo(HaveOccurred(), "failed to load kubeconfig (KUBECONFIG=%s)", os.Getenv("KUBECONFIG"))
-	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace)
+	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace, tests.GroutMode)
 	Expect(err).NotTo(HaveOccurred())
 	tests.Updater = updater
 	kubeconfig := os.Getenv("KUBECONFIG")
@@ -90,10 +90,6 @@ var _ = ginkgo.BeforeSuite(func() {
 		tests.ValidateCNIBinaries(g, cs)
 	}).WithTimeout(30 * time.Second).WithPolling(2 * time.Second).Should(Succeed())
 
-	if tests.GroutMode {
-		infra.UnderlaySRv6.Spec.ISIS.Interfaces[0].Name = "u_" + infra.UnderlaySRv6.Spec.ISIS.Interfaces[0].Name
-		infra.UnderlayEVPNandSRv6.Spec.ISIS.Interfaces[0].Name = "u_" + infra.UnderlayEVPNandSRv6.Spec.ISIS.Interfaces[0].Name
-	}
 })
 
 var _ = ginkgo.AfterSuite(func() {

@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
@@ -486,18 +485,6 @@ var _ = Describe("SRV6 routes between bgp and the fabric with iBGP testing e2e i
 		Expect(err).NotTo(HaveOccurred())
 
 		routers.Dump(ginkgo.GinkgoWriter)
-
-		if GroutMode {
-			for i := range underlay.Spec.Neighbors {
-				if underlay.Spec.Neighbors[i].Interface != nil {
-					if strings.HasPrefix(*underlay.Spec.Neighbors[i].Interface, "u_") {
-						continue
-					}
-					iface := "u_" + *underlay.Spec.Neighbors[i].Interface
-					underlay.Spec.Neighbors[i].Interface = &iface
-				}
-			}
-		}
 
 		Expect(Updater.Update(config.Resources{
 			Underlays: []v1alpha1.Underlay{
