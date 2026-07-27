@@ -76,10 +76,11 @@ func (o Updater) Update(r Resources) error {
 	for _, underlay := range r.Underlays {
 		if o.groutMode {
 			objects[key] = fixUnderlayForGrout(underlay)
+			oldValues[key] = fixUnderlayForGrout(underlay)
 		} else {
 			objects[key] = underlay.DeepCopy()
+			oldValues[key] = underlay.DeepCopy()
 		}
-		oldValues[key] = underlay.DeepCopy()
 		key++
 	}
 	for _, vni := range r.L3VNIs {
