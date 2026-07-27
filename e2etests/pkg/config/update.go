@@ -4,7 +4,6 @@ package config
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -212,8 +211,6 @@ func (o Updater) Namespace() string {
 
 func fixUnderlayForGrout(u v1alpha1.Underlay) *v1alpha1.Underlay {
 	res := u.DeepCopy()
-	dump, _ := json.MarshalIndent(res, "", "  ")
-	fmt.Println("fixUnderlayForGrout before:", string(dump))
 	for i := range res.Spec.Neighbors {
 		if res.Spec.Neighbors[i].Interface != nil && !strings.HasPrefix(*res.Spec.Neighbors[i].Interface, "u_") {
 			iface := "u_" + *res.Spec.Neighbors[i].Interface
@@ -227,7 +224,5 @@ func fixUnderlayForGrout(u v1alpha1.Underlay) *v1alpha1.Underlay {
 			}
 		}
 	}
-	dump, _ = json.MarshalIndent(res, "", "  ")
-	fmt.Println("fixUnderlayForGrout after:", string(dump))
 	return res
 }
