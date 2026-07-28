@@ -12,7 +12,9 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/e2etests/pkg/config"
+	"github.com/openperouter/openperouter/e2etests/pkg/executor"
 	"github.com/openperouter/openperouter/e2etests/pkg/frr"
+	"github.com/openperouter/openperouter/e2etests/pkg/k8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
 	corev1 "k8s.io/api/core/v1"
@@ -84,7 +86,7 @@ func qemuSRv6Underlay() v1alpha1.Underlay {
 				BaseNet: "49.0001.0002.0003.0004.00",
 				Level:   new(int32(1)),
 				Interfaces: []v1alpha1.ISISInterface{{
-					Name:     "u_p000001000",
+					Name:     "p000001000",
 					IPFamily: new(v1alpha1.IPFamilyIPv6),
 				}},
 			},
@@ -170,7 +172,7 @@ var _ = Describe("QEMU EVPN scenarios", Ordered, QEMUSupport, func() {
 		dumpIfFails(cs)
 	})
 
-	It("should receive EVPN Type-5 routes via L3VNI", func() {
+	It("should route between L2VNIs in the same L3VNI routing domain", func() {
 		By("Creating L3VNI red")
 		Expect(Updater.Update(config.Resources{
 			L3VNIs: []v1alpha1.L3VNI{l3vniRed},
@@ -181,44 +183,79 @@ var _ = Describe("QEMU EVPN scenarios", Ordered, QEMUSupport, func() {
 			exec := openperouter.ExecutorForPod(pod)
 			waitForType5Route(exec, "192.168.20.0/24")
 		}
-	})
 
-	It("should create L2VNI with L3VNI routing domain", func() {
-		l2vni := v1alpha1.L2VNI{
+		const testNamespace = "test-qemu-inter-vni"
+
+		l2red110 := v1alpha1.L2VNI{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "red110",
 				Namespace: openperouter.Namespace,
 			},
 			Spec: v1alpha1.L2VNISpec{
 				VNI:           110,
+				GatewayIPs:    []string{"192.171.10.1/24"},
 				RoutingDomain: l3vniRoutingDomain("red"),
 				HostMaster: &v1alpha1.HostMaster{
-					Type:        v1alpha1.LinuxBridge,
-					LinuxBridge: &v1alpha1.LinuxBridgeConfig{AutoCreate: new(true)},
+					Type: v1alpha1.LinuxBridge,
+					LinuxBridge: &v1alpha1.LinuxBridgeConfig{
+						Lifecycle: v1alpha1.BridgeLifecycleManaged,
+					},
 				},
 			},
 		}
+		l2red120 := v1alpha1.L2VNI{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "red120",
+				Namespace: openperouter.Namespace,
+			},
+			Spec: v1alpha1.L2VNISpec{
+				VNI:           120,
+				GatewayIPs:    []string{"192.171.20.1/24"},
+				RoutingDomain: l3vniRoutingDomain("red"),
+				HostMaster: &v1alpha1.HostMaster{
+					Type: v1alpha1.LinuxBridge,
+					LinuxBridge: &v1alpha1.LinuxBridgeConfig{
+						Lifecycle: v1alpha1.BridgeLifecycleManaged,
+					},
+				},
+			},
+		}
+
+		By("Creating L2VNIs with L3VNI routing domain")
 		Expect(Updater.Update(config.Resources{
-			L2VNIs: []v1alpha1.L2VNI{l2vni},
+			L2VNIs: []v1alpha1.L2VNI{l2red110, l2red120},
 		})).To(Succeed())
 
-		By("Verifying VNI 110 is provisioned in EVPN with tenant VRF red")
-		for _, pod := range routerPods {
-			exec := openperouter.ExecutorForPod(pod)
-			Eventually(func() error {
-				vniInfo, err := frr.EVPNVNIStatus(exec, 110)
-				if err != nil {
-					return fmt.Errorf("failed to query EVPN VNI 110 on %s: %v", pod.Name, err)
-				}
-				if vniInfo == nil {
-					return fmt.Errorf("VNI 110 not yet provisioned on %s", pod.Name)
-				}
-				if vniInfo.TenantVrf != "red" {
-					return fmt.Errorf("VNI 110 on %s has tenant VRF %q, expected %q", pod.Name, vniInfo.TenantVrf, "red")
-				}
-				return nil
-			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
-		}
+		_, err := k8s.CreateNamespace(cs, testNamespace)
+		Expect(err).NotTo(HaveOccurred())
+		defer func() {
+			err := k8s.DeleteNamespace(cs, testNamespace)
+			Expect(err).NotTo(HaveOccurred())
+		}()
+
+		By("Creating NADs for both L2VNIs")
+		nad110, err := k8s.CreateMacvlanNad("nad-110", testNamespace, "br-hs-110", []string{"192.171.10.1/24"})
+		Expect(err).NotTo(HaveOccurred())
+		nad120, err := k8s.CreateMacvlanNad("nad-120", testNamespace, "br-hs-120", []string{"192.171.20.1/24"})
+		Expect(err).NotTo(HaveOccurred())
+
+		By("Creating pods on different L2VNIs")
+		pod110, err := k8s.CreateAgnhostPod(cs, "pod-vni110", testNamespace,
+			k8s.WithNad(nad110.Name, testNamespace, []string{"192.171.10.2/24"}))
+		Expect(err).NotTo(HaveOccurred())
+		pod120, err := k8s.CreateAgnhostPod(cs, "pod-vni120", testNamespace,
+			k8s.WithNad(nad120.Name, testNamespace, []string{"192.171.20.2/24"}))
+		Expect(err).NotTo(HaveOccurred())
+
+		By("Removing the default gateway via the primary interface")
+		Expect(removeGatewayFromPod(pod110)).To(Succeed())
+		Expect(removeGatewayFromPod(pod120)).To(Succeed())
+
+		By("Checking inter-VNI reachability via VRF red")
+		exec110 := executor.ForPod(pod110.Namespace, pod110.Name, "agnhost")
+		exec120 := executor.ForPod(pod120.Namespace, pod120.Name, "agnhost")
+		canPingFromPod(exec110, "192.171.20.2")
+		canPingFromPod(exec120, "192.171.10.2")
 	})
 })
 
@@ -350,8 +387,10 @@ var _ = Describe("QEMU SRv6 scenarios", Ordered, QEMUSupport, func() {
 				VNI:           110,
 				RoutingDomain: l3vpnRoutingDomain("red"),
 				HostMaster: &v1alpha1.HostMaster{
-					Type:        v1alpha1.LinuxBridge,
-					LinuxBridge: &v1alpha1.LinuxBridgeConfig{AutoCreate: new(true)},
+					Type: v1alpha1.LinuxBridge,
+					LinuxBridge: &v1alpha1.LinuxBridgeConfig{
+						Lifecycle: v1alpha1.BridgeLifecycleManaged,
+					},
 				},
 			},
 		}
