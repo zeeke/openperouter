@@ -53,9 +53,19 @@ type LinkIPs struct {
 
 type L2VNIParams struct {
 	VNIParams    `json:",inline"`
-	Name         string      `json:"name"`
-	L2GatewayIPs []string    `json:"l2gatewayips"`
-	HostMaster   *HostMaster `json:"hostMaster"`
+	Name         string        `json:"name"`
+	L2GatewayIPs []string      `json:"l2gatewayips"`
+	HostMaster   *HostMaster   `json:"hostmaster"`
+	VFPair       *VFPairParams `json:"vfPair,omitempty"`
+}
+
+type VFPairParams struct {
+	PCIAddress    string `json:"pciAddress"`
+	VLAN          int32  `json:"vlan"`
+	TrunkPortName string `json:"trunkPortName"`
+	MTU           *int   `json:"mtu,omitempty"`
+	RXQueues      *int   `json:"rxQueues,omitempty"`
+	QSize         *int   `json:"qSize,omitempty"`
 }
 
 type HostMaster struct {

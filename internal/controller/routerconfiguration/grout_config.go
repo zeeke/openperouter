@@ -165,6 +165,11 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	}
 	bridgerefresh.StopForRemovedVNIs(configuredL2VNIs)
 
+	slog.InfoContext(ctx, "removing stale VF-pair resources")
+	if err := grout.RemoveStaleVFPairResources(ctx, groutClient, configuredL2VNIs); err != nil {
+		return fmt.Errorf("failed to remove stale VF-pair resources: %w", err)
+	}
+
 	slog.InfoContext(ctx, "removing deleted l3vpns")
 	if err := grout.RemoveNonConfiguredL3VPNs(ctx, groutClient, config.targetNamespace, configuredL3VPNs); err != nil {
 		return fmt.Errorf("failed to remove deleted l3vpns: %w", err)

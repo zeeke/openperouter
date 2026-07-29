@@ -324,6 +324,26 @@ func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, p
 	}
 }
 
+// PrepareAndBindTrunkVF prepares the DPDK driver for a trunk VF and creates
+// the grout port. It is idempotent: calling it for a PCI address that is
+// already bound is a no-op.
+func PrepareAndBindTrunkVF(ctx context.Context, client *Client, targetNS, pciAddr, portName string, opts PortOptions) error {
+	perouterNetNS, err := netns.GetFromPath(targetNS)
+	if err != nil {
+		return fmt.Errorf("failed to get namespace %s: %w", targetNS, err)
+	}
+	defer func() {
+		if err := perouterNetNS.Close(); err != nil {
+			slog.Error("failed to close namespace", "namespace", targetNS, "error", err)
+		}
+	}()
+	if err := prepareGroutPortDriver(ctx, perouterNetNS, pciAddr); err != nil {
+		return fmt.Errorf("failed to prepare trunk VF driver for %s: %w", pciAddr, err)
+	}
+
+	return client.ensurePortWithOptions(ctx, portName, pciAddr, opts)
+}
+
 func migrateAddressesToGrout(ctx context.Context, client *Client, underlayInterface string, addrs []netlink.Addr) error {
 	for _, addr := range addrs {
 		cidr := addr.IPNet.String()

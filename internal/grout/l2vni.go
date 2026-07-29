@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"strings"
 
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/vishvananda/netlink"
@@ -47,6 +48,13 @@ func SetupL2VNI(ctx context.Context, client *Client, params hostnetwork.L2VNIPar
 		return fmt.Errorf("SetupL2VNI: failed to attach VXLAN %s to bridge %s: %w", vxlanName, bridgeName, err)
 	}
 
+	if params.VFPair != nil {
+		return setupL2VNIVFPair(ctx, client, params, bridgeName)
+	}
+	return setupL2VNITAP(ctx, client, params, vrf, bridgeName)
+}
+
+func setupL2VNITAP(ctx context.Context, client *Client, params hostnetwork.L2VNIParams, vrf, bridgeName string) error {
 	linkPair := linkPairFromVNI(params.VNI)
 	ns, err := netns.GetFromPath(params.TargetNS)
 	if err != nil {
@@ -83,6 +91,86 @@ func SetupL2VNI(ctx context.Context, client *Client, params hostnetwork.L2VNIPar
 		}
 	}
 
+	return nil
+}
+
+func setupL2VNIVFPair(ctx context.Context, client *Client, params hostnetwork.L2VNIParams, bridgeName string) error {
+	vfPair := params.VFPair
+
+	opts := PortOptions{
+		MTU:      vfPair.MTU,
+		RXQueues: vfPair.RXQueues,
+		QSize:    vfPair.QSize,
+	}
+	if err := PrepareAndBindTrunkVF(ctx, client, params.TargetNS, vfPair.PCIAddress, vfPair.TrunkPortName, opts); err != nil {
+		return fmt.Errorf("SetupL2VNI VF-pair: failed to prepare trunk VF %s: %w", vfPair.PCIAddress, err)
+	}
+
+	vlanIfName := VLANSubInterfaceName(vfPair.VLAN, vfPair.TrunkPortName)
+	if err := client.ensureVLANSubInterface(ctx, vlanIfName, vfPair.TrunkPortName, vfPair.VLAN); err != nil {
+		return fmt.Errorf("SetupL2VNI VF-pair: failed to create VLAN sub-interface: %w", err)
+	}
+
+	if err := client.ensureBridgeMember(ctx, "vlan", bridgeName, vlanIfName); err != nil {
+		return fmt.Errorf("SetupL2VNI VF-pair: failed to attach VLAN %s to bridge %s: %w",
+			vlanIfName, bridgeName, err)
+	}
+
+	if len(params.L2GatewayIPs) > 0 {
+		if err := setupL2Gateway(ctx, client, bridgeName, params); err != nil {
+			return fmt.Errorf("SetupL2VNI VF-pair: failed to setup L2 gateway: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// VLANSubInterfaceName returns the grout VLAN sub-interface name for a given
+// VLAN ID and trunk port name.
+func VLANSubInterfaceName(vlan int32, trunkPortName string) string {
+	return fmt.Sprintf("%s.%d", trunkPortName, vlan)
+}
+
+// RemoveStaleVFPairResources removes VLAN sub-interfaces and trunk ports
+// that are not referenced by any configured L2VNI.
+func RemoveStaleVFPairResources(ctx context.Context, client *Client, configuredL2VNIs []hostnetwork.L2VNIParams) error {
+	expectedVLANIfs := map[string]bool{}
+	referencedTrunks := map[string]bool{}
+	for _, l2 := range configuredL2VNIs {
+		if l2.VFPair == nil {
+			continue
+		}
+		vlanIfName := VLANSubInterfaceName(l2.VFPair.VLAN, l2.VFPair.TrunkPortName)
+		expectedVLANIfs[vlanIfName] = true
+		referencedTrunks[l2.VFPair.TrunkPortName] = true
+	}
+
+	ifaces, err := client.listInterfaces(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to list interfaces for VF-pair cleanup: %w", err)
+	}
+
+	for _, iface := range ifaces {
+		if strings.HasPrefix(iface.Name, "vlan") && strings.Contains(iface.Name, ".trunk-") {
+			if !expectedVLANIfs[iface.Name] {
+				slog.InfoContext(ctx, "removing stale VLAN sub-interface", "name", iface.Name)
+				if err := client.deleteInterface(ctx, iface.Name); err != nil {
+					return fmt.Errorf("failed to delete stale VLAN sub-interface %s: %w", iface.Name, err)
+				}
+			}
+		}
+	}
+
+	for _, iface := range ifaces {
+		if strings.HasPrefix(iface.Name, "trunk-") {
+			if !referencedTrunks[iface.Name] {
+				slog.InfoContext(ctx, "removing stale trunk port", "name", iface.Name)
+				if err := client.deletePort(ctx, iface.Name); err != nil {
+					return fmt.Errorf("failed to delete stale trunk port %s: %w", iface.Name, err)
+				}
+			}
+		}
+	}
 	return nil
 }
 

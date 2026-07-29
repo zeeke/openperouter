@@ -140,6 +140,45 @@ func TestEnsureAddress(t *testing.T) {
 
 }
 
+func TestEnsureVLANSubInterface(t *testing.T) {
+	t.Run("creates VLAN sub-interface when none exists", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface show name vlan10.trunk-p000003020",
+				err: fmt.Errorf("error: command failed: No such device (ENODEV)"),
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface add vlan vlan10.trunk-p000003020 parent trunk-p000003020 vlan_id 10",
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensureVLANSubInterface(
+				context.Background(),
+				"vlan10.trunk-p000003020",
+				"trunk-p000003020",
+				10,
+			),
+		)
+	})
+
+	t.Run("no-op when VLAN sub-interface already exists", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name vlan10.trunk-p000003020",
+				output: `{"name": "vlan10.trunk-p000003020", "type": "vlan"}`,
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensureVLANSubInterface(
+				context.Background(),
+				"vlan10.trunk-p000003020",
+				"trunk-p000003020",
+				10,
+			),
+		)
+	})
+}
+
 func TestGetAddresses(t *testing.T) {
 	t.Run("returns addresses for interface", func(t *testing.T) {
 		defer mockCmdExec(
