@@ -43,5 +43,10 @@ func (k *KernelDatapathConfigValidator) Validate(apiConfig APIConfigData) error 
 			}
 		}
 	}
+	for _, l2vni := range apiConfig.L2VNIs {
+		if l2vni.Spec.SRIOVVFPair != nil {
+			return fmt.Errorf("sriovVFPair requires grout datapath (--datapath=grout)")
+		}
+	}
 	return nil
 }

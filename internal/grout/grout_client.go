@@ -237,6 +237,28 @@ func (c *Client) ensureBridgeMember(ctx context.Context, portType, bridgeName, m
 	return nil
 }
 
+func (c *Client) ensureVLANSubInterface(ctx context.Context, name, parentPort string, vlanID int32) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if VLAN sub-interface %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout VLAN sub-interface already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "creating grout VLAN sub-interface",
+		"name", name, "parent", parentPort, "vlan", vlanID)
+	if err := c.run(ctx,
+		"interface", "add", "vlan", name,
+		"parent", parentPort,
+		"vlan_id", fmt.Sprintf("%d", vlanID),
+	); err != nil {
+		return fmt.Errorf("creating VLAN sub-interface %s on %s: %w", name, parentPort, err)
+	}
+	return nil
+}
+
 func (c *Client) ensureVRF(ctx context.Context, name string) error {
 	exists, err := c.portExists(ctx, name)
 	if err != nil {
