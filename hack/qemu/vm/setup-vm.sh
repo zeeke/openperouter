@@ -104,7 +104,7 @@ REPO_ROOT="${SCRIPT_DIR}/../../../"
 ${KUSTOMIZE} build "${REPO_ROOT}/clab/kind/frr-k8s" | ${KUBECTL} apply -f -
 
 echo "Deploying Multus CNI..."
-${KUBECTL} apply -f <<EOF
+cat <<EOF | ${KUBECTL} apply -f -
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
