@@ -505,3 +505,188 @@ var _ = Describe("QEMU RawFRRConfig", Ordered, QEMUSupport, func() {
 		}
 	})
 })
+
+// --- VF-to-VF scenarios ---
+
+const (
+	// 2nd igb NIC in the QEMU VM, used as the trunk VF that grout binds.
+	qemuTrunkVFPCI = "0000:02:00.0"
+
+	// PCI addresses of the fake workload VFs inside the QEMU VM.
+	// Their TAP ports on the host bridge are configured as VLAN access
+	// ports in launch-vm.sh.
+	qemuFakeVF_A_PCI = "0000:03:00.0"
+	qemuFakeVF_B_PCI = "0000:04:00.0"
+
+	// VLAN IDs matching the bridge access-port config in launch-vm.sh.
+	// NIC 0000:03:00.0 is on VLAN 33, NIC 0000:04:00.0 is on VLAN 44.
+	qemuVFPairVLAN_A = int32(33)
+	qemuVFPairVLAN_B = int32(44)
+)
+
+func pciNetlinkName(exec executor.Executor, pciAddr string) string {
+	GinkgoHelper()
+	out, err := exec.Exec("ls", "/sys/bus/pci/devices/"+pciAddr+"/net/")
+	Expect(err).NotTo(HaveOccurred(), "failed to resolve PCI %s to netlink name: %s", pciAddr, out)
+	name := strings.TrimSpace(strings.Split(out, "\n")[0])
+	Expect(name).NotTo(BeEmpty(), "PCI %s has no network interface", pciAddr)
+	return name
+}
+
+var _ = Describe("QEMU VF-to-VF scenarios", Ordered, QEMUSupport, func() {
+	var cs clientset.Interface
+	var routerPods []*corev1.Pod
+
+	l3vniRed := v1alpha1.L3VNI{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "red",
+			Namespace: openperouter.Namespace,
+		},
+		Spec: v1alpha1.L3VNISpec{
+			VRF: "red",
+			VNI: 100,
+			HostSession: &v1alpha1.HostSession{
+				ASN:     qemuVMASN,
+				HostASN: new(int64(64515)),
+				LocalCIDR: v1alpha1.LocalCIDRConfig{
+					IPv4: new("192.169.10.0/24"),
+				},
+			},
+		},
+	}
+
+	BeforeAll(func() {
+		if !QEMUMode {
+			Skip("QEMU mode not enabled")
+		}
+		Expect(Updater.CleanAll()).To(Succeed())
+		cs = k8sclient.New()
+
+		var err error
+		routerPods, err = openperouter.RouterPods(cs)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(routerPods).NotTo(BeEmpty())
+		DumpPods("Router pods", routerPods)
+
+		By("Creating EVPN underlay")
+		Expect(Updater.Update(config.Resources{
+			Underlays: []v1alpha1.Underlay{qemuEVPNUnderlay()},
+		})).To(Succeed())
+
+		By("Verifying BGP session with TOR")
+		for _, pod := range routerPods {
+			exec := openperouter.ExecutorForPod(pod)
+			validateSessionWithNeighbor(exec, validationParameters{
+				fromName:    pod.Name,
+				toName:      "qemu-tor",
+				neighborIP:  qemuTORIP,
+				established: Established,
+			})
+		}
+	})
+
+	AfterAll(func() {
+		if !QEMUMode {
+			return
+		}
+		Expect(Updater.CleanAll()).To(Succeed())
+		Eventually(func() error {
+			routers, err := openperouter.Get(cs, HostMode)
+			if err != nil {
+				return err
+			}
+			return openperouter.AreReady(routers)
+		}, 2*time.Minute, time.Second).ShouldNot(HaveOccurred())
+	})
+
+	AfterEach(func() {
+		dumpIfFails(cs)
+	})
+
+	It("should route between L2VNIs using VF-to-VF data path", func() {
+		By("Creating L3VNI red")
+		Expect(Updater.Update(config.Resources{
+			L3VNIs: []v1alpha1.L3VNI{l3vniRed},
+		})).To(Succeed())
+
+		By("Verifying Type-5 route for 192.168.20.0/24 is received")
+		for _, pod := range routerPods {
+			exec := openperouter.ExecutorForPod(pod)
+			waitForType5Route(exec, "192.168.20.0/24")
+		}
+
+		const testNamespace = "test-qemu-vfpair"
+
+		l2vf33 := v1alpha1.L2VNI{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "red-vf33",
+				Namespace: openperouter.Namespace,
+			},
+			Spec: v1alpha1.L2VNISpec{
+				VNI:           130,
+				GatewayIPs:    []string{"192.172.33.1/24"},
+				RoutingDomain: l3vniRoutingDomain("red"),
+				SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{
+					PCIAddress: new(qemuTrunkVFPCI),
+					VLAN:       qemuVFPairVLAN_A,
+				},
+			},
+		}
+		l2vf44 := v1alpha1.L2VNI{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "red-vf44",
+				Namespace: openperouter.Namespace,
+			},
+			Spec: v1alpha1.L2VNISpec{
+				VNI:           140,
+				GatewayIPs:    []string{"192.172.44.1/24"},
+				RoutingDomain: l3vniRoutingDomain("red"),
+				SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{
+					PCIAddress: new(qemuTrunkVFPCI),
+					VLAN:       qemuVFPairVLAN_B,
+				},
+			},
+		}
+
+		By("Creating L2VNIs with VF-pair data path")
+		Expect(Updater.Update(config.Resources{
+			L2VNIs: []v1alpha1.L2VNI{l2vf33, l2vf44},
+		})).To(Succeed())
+
+		_, err := k8s.CreateNamespace(cs, testNamespace)
+		Expect(err).NotTo(HaveOccurred())
+		defer func() {
+			err := k8s.DeleteNamespace(cs, testNamespace)
+			Expect(err).NotTo(HaveOccurred())
+		}()
+
+		By("Resolving fake VF interface names from PCI addresses")
+		routerExec := executor.ForPod(routerPods[0].Namespace, routerPods[0].Name, "frr")
+		fakeVF33 := pciNetlinkName(routerExec, qemuFakeVF_A_PCI)
+		fakeVF44 := pciNetlinkName(routerExec, qemuFakeVF_B_PCI)
+
+		By("Creating NADs on fake VF interfaces")
+		nad33, err := k8s.CreateMacvlanNad("nad-vf33", testNamespace, fakeVF33, []string{"192.172.33.1/24"})
+		Expect(err).NotTo(HaveOccurred())
+		nad44, err := k8s.CreateMacvlanNad("nad-vf44", testNamespace, fakeVF44, []string{"192.172.44.1/24"})
+		Expect(err).NotTo(HaveOccurred())
+
+		By("Creating pods on different VF-pair L2VNIs")
+		pod33, err := k8s.CreateAgnhostPod(cs, "pod-vf33", testNamespace,
+			k8s.WithNad(nad33.Name, testNamespace, []string{"192.172.33.2/24"}))
+		Expect(err).NotTo(HaveOccurred())
+		pod44, err := k8s.CreateAgnhostPod(cs, "pod-vf44", testNamespace,
+			k8s.WithNad(nad44.Name, testNamespace, []string{"192.172.44.2/24"}))
+		Expect(err).NotTo(HaveOccurred())
+
+		By("Removing the default gateway via the primary interface")
+		Expect(removeGatewayFromPod(pod33)).To(Succeed())
+		Expect(removeGatewayFromPod(pod44)).To(Succeed())
+
+		By("Checking inter-VNI reachability via VRF red")
+		exec33 := executor.ForPod(pod33.Namespace, pod33.Name, "agnhost")
+		exec44 := executor.ForPod(pod44.Namespace, pod44.Name, "agnhost")
+		canPingFromPod(exec33, "192.172.44.2")
+		canPingFromPod(exec44, "192.172.33.2")
+	})
+})

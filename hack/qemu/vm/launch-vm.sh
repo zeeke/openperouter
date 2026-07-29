@@ -78,6 +78,30 @@ for i in $(seq 0 $((NUM_NICS - 1))); do
     fi
 done
 
+# Enable VLAN filtering on the bridge so TAPs 2 and 3 can act as
+# access ports for the VF-to-VF fake-VF simulation.
+#sudo ip link set "${BRIDGE_NAME}" type bridge vlan_filtering 1
+
+# TAPs 0 and 1 (underlay + trunk VF): keep default PVID 1 for untagged
+# underlay traffic, add VLANs 33 and 44 as tagged so VLAN-tagged frames
+# from the access ports can reach the trunk VF.
+for i in 0 1; do
+    sudo bridge vlan add vid 33 dev "${TAP_PREFIX}-${i}"
+    sudo bridge vlan add vid 44 dev "${TAP_PREFIX}-${i}"
+done
+
+# TAP 2 (fake VF for VLAN 33): access port, PVID 33, untagged egress.
+#sudo bridge vlan del vid 1 dev "${TAP_PREFIX}-2"
+sudo bridge vlan add vid 33 dev "${TAP_PREFIX}-2" pvid untagged
+
+# TAP 3 (fake VF for VLAN 44): access port, PVID 44, untagged egress.
+#sudo bridge vlan del vid 1 dev "${TAP_PREFIX}-3"
+sudo bridge vlan add vid 44 dev "${TAP_PREFIX}-3" pvid untagged
+
+# Allow VLANs 33 and 44 on the bridge itself.
+sudo bridge vlan add vid 33 dev "${BRIDGE_NAME}" self
+sudo bridge vlan add vid 44 dev "${BRIDGE_NAME}" self
+
 # --- Launch QEMU ---
 echo "Launching QEMU VM..."
 
