@@ -129,23 +129,7 @@ echo "Waiting for FRR-K8s pods to be ready..."
 ${KUBECTL} -n frr-k8s-system wait --for=condition=Ready --all pods --timeout=300s
 
 echo "Waiting for Multus pods to be ready..."
-${KUBECTL} -n kube-system wait --for=condition=Ready pods -l app=multus --timeout=300s
-
-# --- Install CNI plugins on the VM node ---
-echo "Building CNI plugins (macvlan, bridge, static)..."
-TEMP_GOBIN=$(mktemp -d)
-GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/macvlan@${CNI_PLUGINS_VERSION}"
-GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/main/bridge@${CNI_PLUGINS_VERSION}"
-GOBIN=$TEMP_GOBIN go install "github.com/containernetworking/plugins/plugins/ipam/static@${CNI_PLUGINS_VERSION}"
-
-SCP_CMD="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -P ${SSH_PORT}"
-
-echo "Copying CNI plugins to VM..."
-for bin in macvlan bridge static; do
-    ${SCP_CMD} "${TEMP_GOBIN}/${bin}" "openperouter@localhost:/tmp/${bin}"
-    run_in_vm "mv /tmp/${bin} /opt/cni/bin/${bin} && chmod 755 /opt/cni/bin/${bin}"
-done
-rm -rf "${TEMP_GOBIN}"
+${KUBECTL} -n kube-system wait --for=condition=Ready pods -l app=rke2-multus --timeout=300s
 
 # --- Deploy openperouter ---
 echo "Deploying openperouter with kustomize layer '${KUSTOMIZE_LAYER}'..."
