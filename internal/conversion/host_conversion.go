@@ -747,7 +747,7 @@ func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) (*hostnetwork.VFPairPar
 	if err != nil {
 		return nil, err
 	}
-	trunkPortName := "trunk-" + pciAddressToIfName(pciAddr)
+	trunkPortName := "t_" + pciAddressToIfName(pciAddr)
 	params := &hostnetwork.VFPairParams{
 		PCIAddress:    pciAddr,
 		VLAN:          cfg.VLAN,
