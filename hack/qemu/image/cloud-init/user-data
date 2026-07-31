@@ -1,0 +1,50 @@
+#cloud-config
+
+users:
+  - name: openperouter
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: false
+    # password: openperouter (hashed)
+    passwd: $6$rounds=4096$saltsalt$oBm8JQR0cXK0r3.ZxfI9fXHxBBr7JHQO.RGUfNn7qXKLlSLCKnV5h5kWoYk5C6NOVwx3hW6NFGHH7RLI0XR./
+    ssh_authorized_keys: []
+
+ssh_pwauth: true
+
+package_update: true
+package_upgrade: false
+
+packages:
+  - iproute
+  - pciutils
+  - numactl
+  - numactl-libs
+  - dpdk
+  - dpdk-tools
+  - kernel-modules-extra
+  - jq
+  - curl
+  - tar
+
+write_files:
+  - path: /etc/modules-load.d/vfio.conf
+    content: |
+      vfio-pci
+
+  - path: /etc/sysctl.d/99-hugepages.conf
+    content: |
+      vm.nr_hugepages=512
+
+  - path: /etc/default/grub.d/99-openperouter.cfg
+    content: |
+      GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX hugepagesz=2M hugepages=512 default_hugepagesz=2M"
+
+runcmd:
+  - grub2-mkconfig -o /boot/grub2/grub.cfg
+  - modprobe vfio-pci || true
+  # Install k3s (but don't start it — setup-vm.sh starts it after image import)
+  - "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 INSTALL_K3S_SKIP_START=true sh -"
+  # Signal that cloud-init is done
+  - touch /var/lib/cloud/instance/boot-finished-signal
+
+final_message: "cloud-init completed in $UPTIME seconds"

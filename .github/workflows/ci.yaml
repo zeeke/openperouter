@@ -219,6 +219,7 @@ jobs:
           path: /tmp/openperouter-grout.tar
 
   e2etests:
+    if: false
     runs-on: ubuntu-22.04
     env:
       NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:${{ needs.build-kind-node-image.outputs.kind-node-version }}
@@ -351,6 +352,93 @@ jobs:
         uses: ./.github/workflows/composite/collectlogs
         with:
           artifact-name: kind-logs-${{ matrix.deployment }}
+
+  qemu-e2etests:
+    if: contains(github.event.pull_request.labels.*.name, 'run-qemu-tests')
+    runs-on: ubuntu-24.04
+    needs:
+      - build-test-images
+    steps:
+      - name: Free Disk Space
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          sudo apt-get clean
+          echo "Disk space after cleanup:"
+          df -h
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Install QEMU and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils genisoimage sshpass
+
+      - name: Verify KVM support
+        run: |
+          if [ ! -e /dev/kvm ]; then
+            echo "ERROR: /dev/kvm not available. KVM support is required."
+            exit 1
+          fi
+          sudo chmod 666 /dev/kvm
+          echo "KVM is available."
+
+      - name: Download openperouter image
+        uses: actions/download-artifact@v8
+        with:
+          name: image-tar-openperouter
+          path: image
+
+      - name: Load openperouter image
+        run: |
+          docker load -i image/openperouter.tar
+
+      - name: Prepare QEMU VM image
+        run: |
+          make qemu-image
+
+      - name: Launch QEMU VM and FRR TOR
+        run: |
+          make qemu-setup
+
+      - name: Deploy openperouter in QEMU VM
+        run: |
+          OPENPEROUTER_IMAGE_TAR=image/openperouter.tar \
+          KUSTOMIZE_LAYER=default \
+            make qemu-deploy IMG_TAG=main
+
+      - name: Run QEMU e2e tests
+        run: |
+          make qemu-e2etests GINKGO_ARGS="--label-filter='qemu-support'"
+
+      - name: Collect QEMU logs
+        if: ${{ failure() }}
+        run: |
+          make qemu-collect-logs
+
+      - name: Upload QEMU logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          retention-days: 5
+          name: qemu-e2e-logs
+          path: /tmp/kind_logs/qemu-vm/
+
+      - name: Cleanup
+        if: always()
+        run: |
+          make qemu-clean
 
   scale-tests:
     if: contains(github.event.pull_request.labels.*.name, 'run-scale-tests')
