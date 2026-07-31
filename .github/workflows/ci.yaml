@@ -456,7 +456,7 @@ jobs:
         with:
           retention-days: 5
           name: qemu-e2e-logs
-          path: /tmp/kind_logs/qemu-vm/
+          path: /tmp/kind_logs/
 
       - name: Cleanup
         if: always()
