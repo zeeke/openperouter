@@ -538,6 +538,7 @@ func pciNetlinkName(exec executor.Executor, pciAddr string) string {
 var _ = Describe("QEMU VF-to-VF scenarios", Ordered, QEMUSupport, func() {
 	var cs clientset.Interface
 	var routerPods []*corev1.Pod
+	const testNamespace = "test-qemu-vfpair"
 
 	l3vniRed := v1alpha1.L3VNI{
 		ObjectMeta: metav1.ObjectMeta{
@@ -602,7 +603,7 @@ var _ = Describe("QEMU VF-to-VF scenarios", Ordered, QEMUSupport, func() {
 	})
 
 	AfterEach(func() {
-		dumpIfFails(cs)
+		dumpIfFails(cs, testNamespace)
 	})
 
 	It("should route between L2VNIs using VF-to-VF data path", func() {
@@ -616,8 +617,6 @@ var _ = Describe("QEMU VF-to-VF scenarios", Ordered, QEMUSupport, func() {
 			exec := openperouter.ExecutorForPod(pod)
 			waitForType5Route(exec, "192.168.20.0/24")
 		}
-
-		const testNamespace = "test-qemu-vfpair"
 
 		l2vf33 := v1alpha1.L2VNI{
 			ObjectMeta: metav1.ObjectMeta{
