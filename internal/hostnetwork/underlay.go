@@ -51,7 +51,13 @@ type UnderlayInterface struct {
 // as a DPDK port bound directly to grout.
 type GroutPortParams struct {
 	// PCIAddress is the resolved PCI BDF address of the VF.
-	PCIAddress string `json:"pciAddress"`
+	PCIAddress string `json:"pciAddress,omitempty"`
+	// PFName is the PF name when the pfName+vfIndex selector was used.
+	PFName string `json:"pfName,omitempty"`
+	// VFIndex is the VF index when the pfName+vfIndex selector was used.
+	VFIndex *int `json:"vfIndex,omitempty"`
+	// Name is the port name when the name selector was used.
+	Name string `json:"name,omitempty"`
 	// Addresses is the list of CIDRs to assign to the grout port.
 	Addresses []string `json:"addresses"`
 	// MTU is the optional MTU for the DPDK port.

@@ -36,6 +36,25 @@ func TestPCIAddressToIfName(t *testing.T) {
 	}
 }
 
+func TestPCIAddressToBDF(t *testing.T) {
+	tests := []struct {
+		pciAddr string
+		want    string
+	}{
+		{"0000:03:02.0", "03020"},
+		{"0000:00:00.0", "00000"},
+		{"0000:af:1f.5", "af1f5"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.pciAddr, func(t *testing.T) {
+			got := pciAddressToBDF(tt.pciAddr)
+			if got != tt.want {
+				t.Errorf("pciAddressToBDF(%q) = %q, want %q", tt.pciAddr, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestAPItoHostConfig(t *testing.T) {
 	tests := []struct {
 		name            string
