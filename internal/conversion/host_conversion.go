@@ -9,6 +9,7 @@ import (
 	"hash/fnv"
 	"net"
 	"strconv"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -691,21 +692,41 @@ func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 			fmt.Errorf("groutPort configuration is missing for interface type GroutPort")
 	}
 
-	pciAddr, err := resolveGroutPortPCI(iface.GroutPort)
-	if err != nil {
-		return hostnetwork.UnderlayInterface{}, err
-	}
-
-	ifName := "p" + pciAddressToIfName(pciAddr)
-
 	params := &hostnetwork.GroutPortParams{
-		PCIAddress: pciAddr,
-		Addresses:  iface.GroutPort.IPAM.Addresses,
+		Addresses: iface.GroutPort.IPAM.Addresses,
 	}
 	if iface.GroutPort.PortOptions != nil {
 		params.MTU = iface.GroutPort.PortOptions.MTU
 		params.RXQueues = iface.GroutPort.PortOptions.RXQueues
 		params.QSize = iface.GroutPort.PortOptions.QSize
+	}
+
+	var ifName string
+	switch {
+	case iface.GroutPort.Name != nil:
+		ifName = *iface.GroutPort.Name
+		params.Name = *iface.GroutPort.Name
+
+	case iface.GroutPort.PFName != nil && iface.GroutPort.VFIndex != nil:
+		pciAddr, err := sriov.ResolvePFVFIndex(*iface.GroutPort.PFName, *iface.GroutPort.VFIndex)
+		if err != nil {
+			return hostnetwork.UnderlayInterface{}, err
+		}
+		ifName = fmt.Sprintf("%s_%d", *iface.GroutPort.PFName, *iface.GroutPort.VFIndex)
+		params.PCIAddress = pciAddr
+		params.PFName = *iface.GroutPort.PFName
+		params.VFIndex = iface.GroutPort.VFIndex
+
+	case iface.GroutPort.PCIAddress != nil:
+		if err := sriov.ResolvePCIAddress(*iface.GroutPort.PCIAddress); err != nil {
+			return hostnetwork.UnderlayInterface{}, err
+		}
+		ifName = "p" + pciAddressToBDF(*iface.GroutPort.PCIAddress)
+		params.PCIAddress = *iface.GroutPort.PCIAddress
+
+	default:
+		return hostnetwork.UnderlayInterface{},
+			fmt.Errorf("groutPort must specify one of name, pciAddress, or pfName+vfIndex")
 	}
 
 	return hostnetwork.UnderlayInterface{
@@ -715,23 +736,18 @@ func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 	}, nil
 }
 
-// resolveGroutPortPCI resolves the PCI address from either a direct
-// pciAddress or pfName+vfIndex selector.
-func resolveGroutPortPCI(config *v1alpha1.GroutPortConfig) (string, error) {
-	if config.PCIAddress != nil {
-		if err := sriov.ResolvePCIAddress(*config.PCIAddress); err != nil {
-			return "", err
-		}
-		return *config.PCIAddress, nil
+// pciAddressToBDF strips the domain part, colons, and dot from a PCI address,
+// returning only the Bus-Device-Function digits (e.g. "0000:03:02.0" → "03020").
+func pciAddressToBDF(pciAddr string) string {
+	// Strip domain (everything up to and including the first colon).
+	if i := strings.IndexByte(pciAddr, ':'); i >= 0 {
+		pciAddr = pciAddr[i+1:]
 	}
-	if config.PFName != nil && config.VFIndex != nil {
-		return sriov.ResolvePFVFIndex(*config.PFName, *config.VFIndex)
-	}
-	return "", fmt.Errorf("groutPort must specify either pciAddress or pfName+vfIndex")
+	return strings.NewReplacer(":", "", ".", "").Replace(pciAddr)
 }
 
 // pciAddressToIfName returns a 6-character hash of the PCI address using
-// FNV-1a, encoded in base-36 (0-9a-z).
+// FNV-1a, encoded in base-36 (0-9a-z). Used for VF pair trunk port names.
 func pciAddressToIfName(pciAddr string) string {
 	h := fnv.New32a()
 	h.Write([]byte(pciAddr))
