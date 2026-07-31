@@ -88,7 +88,7 @@ func qemuSRv6Underlay() v1alpha1.Underlay {
 				BaseNet: "49.0001.0002.0003.0004.00",
 				Level:   new(int32(1)),
 				Interfaces: []v1alpha1.ISISInterface{{
-					Name:     "p000001000",
+					Name:     "gund",
 					IPFamily: new(v1alpha1.IPFamilyIPv6),
 				}},
 			},
