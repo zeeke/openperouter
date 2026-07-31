@@ -241,30 +241,37 @@ type RouteReflectorConfig struct {
 	ClusterID *string `json:"clusterID,omitempty"`
 }
 
-// GroutPortConfig specifies a VF to bind to grout as a DPDK port.
-// Exactly one selector must be used: either pciAddress alone, or pfName + vfIndex together.
-// +kubebuilder:validation:XValidation:rule="has(self.pciAddress) != (has(self.pfName) && has(self.vfIndex))",message="specify either pciAddress or both pfName and vfIndex, not both"
+// GroutPortConfig specifies a port to bind to grout.
+// Exactly one selector must be used: pciAddress alone, pfName + vfIndex together, or name alone.
+// +kubebuilder:validation:XValidation:rule="[has(self.pciAddress), has(self.pfName) && has(self.vfIndex), has(self.name)].exists_one(x, x)",message="specify exactly one of pciAddress, pfName+vfIndex, or name"
 // +kubebuilder:validation:XValidation:rule="!has(self.pfName) || has(self.vfIndex)",message="vfIndex is required when pfName is set"
 // +kubebuilder:validation:XValidation:rule="!has(self.vfIndex) || has(self.pfName)",message="pfName is required when vfIndex is set"
 type GroutPortConfig struct {
 	// pciAddress is the PCI Bus:Device.Function address of the VF to bind
-	// (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex.
+	// (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex and name.
 	// +kubebuilder:validation:Pattern=`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$`
 	// +optional
 	PCIAddress *string `json:"pciAddress,omitempty"`
 
 	// pfName is the name of the Physical Function whose VF will be bound.
-	// Must be used together with vfIndex. Mutually exclusive with pciAddress.
+	// Must be used together with vfIndex. Mutually exclusive with pciAddress and name.
 	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
 	// +kubebuilder:validation:MaxLength=15
 	// +optional
 	PFName *string `json:"pfName,omitempty"`
 
 	// vfIndex is the index of the Virtual Function on the PF.
-	// Must be used together with pfName. Mutually exclusive with pciAddress.
+	// Must be used together with pfName. Mutually exclusive with pciAddress and name.
 	// +kubebuilder:validation:Minimum=0
 	// +optional
 	VFIndex *int `json:"vfIndex,omitempty"`
+
+	// name identifies a grout port by name directly.
+	// Mutually exclusive with pciAddress and pfName/vfIndex.
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
+	// +kubebuilder:validation:MaxLength=15
+	// +optional
+	Name *string `json:"name,omitempty"`
 
 	// ipam specifies the IP addresses to assign to the DPDK port.
 	// +required
