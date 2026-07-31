@@ -6,8 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"net"
-	"strings"
+	"strconv"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -729,13 +730,16 @@ func resolveGroutPortPCI(config *v1alpha1.GroutPortConfig) (string, error) {
 	return "", fmt.Errorf("groutPort must specify either pciAddress or pfName+vfIndex")
 }
 
-// pciAddressToIfName converts a PCI BDF address to a valid interface name
-// by replacing punctuation and adding a prefix so it starts with a letter.
-// E.g. "0000:03:02.0" → "p000003020".
+// pciAddressToIfName returns a 6-character hash of the PCI address using
+// FNV-1a, encoded in base-36 (0-9a-z).
 func pciAddressToIfName(pciAddr string) string {
-	ret := strings.ReplaceAll(pciAddr, ":", "")
-	ret = strings.ReplaceAll(ret, ".", "")
-	return "p" + ret
+	h := fnv.New32a()
+	h.Write([]byte(pciAddr))
+	s := strconv.FormatUint(uint64(h.Sum32()), 36)
+	for len(s) < 6 {
+		s = "0" + s
+	}
+	return s[len(s)-6:]
 }
 
 func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) (*hostnetwork.VFPairParams, error) {
