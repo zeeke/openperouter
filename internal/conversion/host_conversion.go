@@ -696,7 +696,7 @@ func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 		return hostnetwork.UnderlayInterface{}, err
 	}
 
-	ifName := pciAddressToIfName(pciAddr)
+	ifName := "p" + pciAddressToIfName(pciAddr)
 
 	params := &hostnetwork.GroutPortParams{
 		PCIAddress: pciAddr,
