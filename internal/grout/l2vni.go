@@ -151,7 +151,7 @@ func RemoveStaleVFPairResources(ctx context.Context, client *Client, configuredL
 	}
 
 	for _, iface := range ifaces {
-		if strings.HasPrefix(iface.Name, "vlan") && strings.Contains(iface.Name, ".trunk-") {
+		if strings.HasPrefix(iface.Name, "t_") && strings.Contains(iface.Name, ".") {
 			if !expectedVLANIfs[iface.Name] {
 				slog.InfoContext(ctx, "removing stale VLAN sub-interface", "name", iface.Name)
 				if err := client.deleteInterface(ctx, iface.Name); err != nil {
@@ -162,7 +162,7 @@ func RemoveStaleVFPairResources(ctx context.Context, client *Client, configuredL
 	}
 
 	for _, iface := range ifaces {
-		if strings.HasPrefix(iface.Name, "trunk-") {
+		if strings.HasPrefix(iface.Name, "t_") && !strings.Contains(iface.Name, ".") {
 			if !referencedTrunks[iface.Name] {
 				slog.InfoContext(ctx, "removing stale trunk port", "name", iface.Name)
 				if err := client.deletePort(ctx, iface.Name); err != nil {
