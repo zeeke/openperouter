@@ -91,11 +91,11 @@ for i in 0 1; do
 done
 
 # TAP 2 (fake VF for VLAN 33): access port, PVID 33, untagged egress.
-#sudo bridge vlan del vid 1 dev "${TAP_PREFIX}-2"
+sudo bridge vlan del vid 1 dev "${TAP_PREFIX}-2"
 sudo bridge vlan add vid 33 dev "${TAP_PREFIX}-2" pvid untagged
 
 # TAP 3 (fake VF for VLAN 44): access port, PVID 44, untagged egress.
-#sudo bridge vlan del vid 1 dev "${TAP_PREFIX}-3"
+sudo bridge vlan del vid 1 dev "${TAP_PREFIX}-3"
 sudo bridge vlan add vid 44 dev "${TAP_PREFIX}-3" pvid untagged
 
 # Allow VLANs 33 and 44 on the bridge itself.

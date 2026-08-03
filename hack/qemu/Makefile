@@ -30,5 +30,9 @@ qemu-collect-logs: create-export-logs ## Collect QEMU VM and FRR TOR logs
 	hack/qemu/vm/collect-logs.sh
 
 .PHONY: qemu-clean
-qemu-clean: ## Tear down the QEMU VM and FRR TOR
+qemu-clean: ## Tear down the QEMU VM and FRR TOR (preserves disk image)
 	hack/qemu/vm/stop-vm.sh
+
+.PHONY: qemu-destroy
+qemu-destroy: ## Fully destroy the VM, disk image, and SSH keys (requires qemu-image to rebuild)
+	hack/qemu/vm/stop-vm.sh --destroy

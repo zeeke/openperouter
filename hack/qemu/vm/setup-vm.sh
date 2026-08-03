@@ -18,7 +18,7 @@ OPENPEROUTER_IMAGE_TAR="${OPENPEROUTER_IMAGE_TAR:-}"
 KUSTOMIZE_LAYER="${KUSTOMIZE_LAYER:-grout}"
 NAMESPACE="${NAMESPACE:-openperouter-system}"
 MULTUS_VERSION="${MULTUS_VERSION:-v4.2.1}"
-CNI_PLUGINS_VERSION="${CNI_PLUGINS_VERSION:-v1.7.1}"
+CNI_PLUGINS_VERSION=${CNI_PLUGINS_VERSION:-"v1.7.1"}
 
 SSH_KEY="${SCRIPT_DIR}/qemu-ssh-key"
 SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} -p ${SSH_PORT} openperouter@localhost"
@@ -103,33 +103,26 @@ echo "Deploying FRR-K8s..."
 REPO_ROOT="${SCRIPT_DIR}/../../../"
 ${KUSTOMIZE} build "${REPO_ROOT}/clab/kind/frr-k8s" | ${KUBECTL} apply -f -
 
+echo "Creating CNI symlinks for standard paths..."
+run_in_vm 'mkdir -p /etc/cni /opt/cni'
+run_in_vm 'ln -sfn /var/lib/rancher/k3s/agent/etc/cni/net.d /etc/cni/net.d'
+run_in_vm 'ln -sfn /var/lib/rancher/k3s/data/cni /opt/cni/bin'
+
 echo "Deploying Multus CNI..."
-cat <<EOF | ${KUBECTL} apply -f -
-apiVersion: helm.cattle.io/v1
-kind: HelmChart
-metadata:
-  name: multus
-  namespace: kube-system
-spec:
-  repo: https://rke2-charts.rancher.io
-  chart: rke2-multus
-  targetNamespace: kube-system
-  valuesContent: |-
-    config:
-      fullnameOverride: multus
-      cni_conf:
-        confDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
-        binDir: /var/lib/rancher/k3s/data/cni/
-        kubeconfig: /var/lib/rancher/k3s/agent/etc/cni/net.d/multus.d/multus.kubeconfig
-        # Comment the following line when using rke2-multus < v4.2.202
-        multusAutoconfigDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
-EOF
+curl -sL "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/refs/tags/${MULTUS_VERSION}/deployments/multus-daemonset.yml" \
+  | sed "s|multus-cni:snapshot|multus-cni:${MULTUS_VERSION}|g" \
+  | ${KUBECTL} apply -f -
+
+run_in_vm '
+  curl -sL "https://github.com/containernetworking/plugins/releases/download/v1.9.1/cni-plugins-linux-amd64-v1.9.1.tgz" \
+    | tar -xz -C /opt/cni/bin
+' 
 
 echo "Waiting for FRR-K8s pods to be ready..."
 ${KUBECTL} -n frr-k8s-system wait --for=condition=Ready --all pods --timeout=300s
 
 echo "Waiting for Multus pods to be ready..."
-${KUBECTL} -n kube-system wait --for=condition=Ready pods -l app=rke2-multus --timeout=300s
+${KUBECTL} -n kube-system wait --for=condition=Ready pods -l name=multus --timeout=300s
 
 # --- Deploy openperouter ---
 echo "Deploying openperouter with kustomize layer '${KUSTOMIZE_LAYER}'..."

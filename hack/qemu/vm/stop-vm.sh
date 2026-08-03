@@ -65,4 +65,15 @@ fi
 rm -f "${SCRIPT_DIR}/serial.log"
 rm -f "${SCRIPT_DIR}/kubeconfig"
 
-echo "Cleanup complete."
+# If --destroy was passed, remove the disk image and cloud-init ISO
+# so the next 'make qemu-image' starts from scratch.
+if [[ "${1:-}" == "--destroy" ]]; then
+    echo "Destroying VM disk image and cloud-init ISO..."
+    rm -f "${VM_IMAGE}"
+    rm -f "${SCRIPT_DIR}/cloud-init.iso"
+    rm -f "${SCRIPT_DIR}/qemu-ssh-key" "${SCRIPT_DIR}/qemu-ssh-key.pub"
+    echo "VM fully destroyed — run 'make qemu-image' to rebuild."
+else
+    echo "Cleanup complete. Disk image preserved — rerun 'make qemu-setup' to restart the same VM."
+    echo "To fully destroy, run 'make qemu-destroy'."
+fi
