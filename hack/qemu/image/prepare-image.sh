@@ -25,9 +25,9 @@ mkdir -p "${IMAGE_DIR}"
 
 # Download the base image if not already present.
 if [[ ! -f "${VM_IMAGE}" ]]; then
-    echo "Downloading Fedora Cloud ${FEDORA_VERSION} base image..."
+    echo "Downloading Fedora Cloud ${FEDORA_VERSION} base image... (${FEDORA_IMAGE_URL})"
     if ! curl -fSL -o "${VM_IMAGE}.tmp" "${FEDORA_IMAGE_URL}"; then
-        echo "Primary URL failed, trying archive mirror..."
+        echo "Primary URL failed, trying archive mirror... (${FEDORA_ARCHIVE_URL})"
         curl -fSL -o "${VM_IMAGE}.tmp" "${FEDORA_ARCHIVE_URL}"
     fi
     mv "${VM_IMAGE}.tmp" "${VM_IMAGE}"
