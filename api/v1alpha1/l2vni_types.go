@@ -33,7 +33,7 @@ const (
 
 // L2VNISpec defines the desired state of VNI.
 // +kubebuilder:validation:XValidation:rule="!has(self.gatewayIPs) || size(self.gatewayIPs) == 0 || has(self.routingDomain)",message="gatewayIPs cannot be set without routingDomain"
-// +kubebuilder:validation:XValidation:rule="!(has(self.hostmaster) && has(self.sriovVFPair))",message="hostmaster and sriovVFPair are mutually exclusive"
+// +kubebuilder:validation:XValidation:rule="!(has(self.hostMaster) && has(self.sriovVFPair))",message="hostMaster and sriovVFPair are mutually exclusive"
 type L2VNISpec struct {
 	// nodeSelector specifies which nodes this L2VNI applies to.
 	// If empty or not specified, applies to all nodes.
@@ -231,7 +231,7 @@ type SRIOVVFPairConfig struct {
 	// Mutually exclusive with pciAddress.
 	// +kubebuilder:validation:Minimum=0
 	// +optional
-	VFIndex *int `json:"vfIndex,omitempty"`
+	VFIndex *int32 `json:"vfIndex,omitempty"`
 
 	// vlan is the 802.1Q VLAN ID that maps to this L2VNI. Workload VFs
 	// on the same PF configured with this VLAN ID will participate in
@@ -239,7 +239,7 @@ type SRIOVVFPairConfig struct {
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=4094
 	// +required
-	VLAN int32 `json:"vlan"`
+	VLAN int32 `json:"vlan,omitempty"`
 
 	// portOptions specifies optional DPDK port parameters for the trunk VF.
 	// +optional

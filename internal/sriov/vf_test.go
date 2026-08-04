@@ -8,12 +8,17 @@ import (
 	"testing"
 )
 
+const (
+	testPCIAddress = "0000:03:02.0"
+	testPFName     = "enp3s0f0"
+)
+
 func TestResolvePCIAddress(t *testing.T) {
 	origRoot := SysfsRoot
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	if err := os.MkdirAll(deviceDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -35,7 +40,7 @@ func TestResolvePCIAddress_DeviceNotFound(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	if err := ResolvePCIAddress("0000:03:02.0"); err == nil {
+	if err := ResolvePCIAddress(testPCIAddress); err == nil {
 		t.Fatal("expected error for missing PCI device")
 	}
 }
@@ -45,7 +50,7 @@ func TestResolvePFVFIndex(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pfName := "enp3s0f0"
+	pfName := testPFName
 	vfIndex := 2
 	expectedPCI := "0000:03:0a.0"
 
@@ -72,7 +77,7 @@ func TestResolvePFVFIndex_MissingVF(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pfName := "enp3s0f0"
+	pfName := testPFName
 	virtfnDir := filepath.Join(SysfsRoot, "class", "net", pfName, "device")
 	if err := os.MkdirAll(virtfnDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -88,7 +93,7 @@ func TestResolvePFVFIndex_InvalidTarget(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pfName := "enp3s0f0"
+	pfName := testPFName
 	virtfnDir := filepath.Join(SysfsRoot, "class", "net", pfName, "device")
 	if err := os.MkdirAll(virtfnDir, 0o755); err != nil {
 		t.Fatal(err)

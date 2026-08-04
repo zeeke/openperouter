@@ -51,9 +51,6 @@ func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
 		Type: "GroutPort",
 		GroutPort: &v1alpha1.GroutPortConfig{
 			PCIAddress: new(pciAddr),
-			IPAM: v1alpha1.GroutPortIPAM{
-				Addresses: []string{"192.168.100.10/24"},
-			},
 		},
 	}
 }

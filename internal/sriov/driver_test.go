@@ -13,7 +13,7 @@ func TestGetPCIDriver_Bound(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	driverDir := filepath.Join(SysfsRoot, "bus", "pci", "drivers", "iavf")
 	if err := os.MkdirAll(driverDir, 0o755); err != nil {
@@ -40,7 +40,7 @@ func TestGetPCIDriver_VFIOPCI(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	driverDir := filepath.Join(SysfsRoot, "bus", "pci", "drivers", "vfio-pci")
 	if err := os.MkdirAll(driverDir, 0o755); err != nil {
@@ -67,7 +67,7 @@ func TestGetPCIDriver_Unbound(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	if err := os.MkdirAll(deviceDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -87,7 +87,7 @@ func TestGetPCINetDevice(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	netDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr, "net", "enp3s0f0v0")
 	if err := os.MkdirAll(netDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -107,7 +107,7 @@ func TestGetPCINetDevice_NoNetDir(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	if err := os.MkdirAll(deviceDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -123,7 +123,7 @@ func TestGetPCINetDevice_EmptyNetDir(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	netDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr, "net")
 	if err := os.MkdirAll(netDir, 0o755); err != nil {
 		t.Fatal(err)
@@ -143,7 +143,7 @@ func TestBindVFIOPCI_AlreadyBound(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	driverDir := filepath.Join(SysfsRoot, "bus", "pci", "drivers", "vfio-pci")
 	if err := os.MkdirAll(driverDir, 0o755); err != nil {
@@ -166,7 +166,7 @@ func TestBindVFIOPCI_Rebind(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	driverDir := filepath.Join(SysfsRoot, "bus", "pci", "drivers", "iavf")
 	if err := os.MkdirAll(driverDir, 0o755); err != nil {
@@ -225,7 +225,7 @@ func TestBindVFIOPCI_Unbound(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	pciAddr := "0000:03:02.0"
+	pciAddr := testPCIAddress
 	deviceDir := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
 	if err := os.MkdirAll(deviceDir, 0o755); err != nil {
 		t.Fatal(err)

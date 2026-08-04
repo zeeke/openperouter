@@ -151,24 +151,28 @@ func RemoveStaleVFPairResources(ctx context.Context, client *Client, configuredL
 	}
 
 	for _, iface := range ifaces {
-		if strings.HasPrefix(iface.Name, "t_") && strings.Contains(iface.Name, ".") {
-			if !expectedVLANIfs[iface.Name] {
-				slog.InfoContext(ctx, "removing stale VLAN sub-interface", "name", iface.Name)
-				if err := client.deleteInterface(ctx, iface.Name); err != nil {
-					return fmt.Errorf("failed to delete stale VLAN sub-interface %s: %w", iface.Name, err)
-				}
-			}
+		if !strings.HasPrefix(iface.Name, "t_") || !strings.Contains(iface.Name, ".") {
+			continue
+		}
+		if expectedVLANIfs[iface.Name] {
+			continue
+		}
+		slog.InfoContext(ctx, "removing stale VLAN sub-interface", "name", iface.Name)
+		if err := client.deleteInterface(ctx, iface.Name); err != nil {
+			return fmt.Errorf("failed to delete stale VLAN sub-interface %s: %w", iface.Name, err)
 		}
 	}
 
 	for _, iface := range ifaces {
-		if strings.HasPrefix(iface.Name, "t_") && !strings.Contains(iface.Name, ".") {
-			if !referencedTrunks[iface.Name] {
-				slog.InfoContext(ctx, "removing stale trunk port", "name", iface.Name)
-				if err := client.deletePort(ctx, iface.Name); err != nil {
-					return fmt.Errorf("failed to delete stale trunk port %s: %w", iface.Name, err)
-				}
-			}
+		if !strings.HasPrefix(iface.Name, "t_") || strings.Contains(iface.Name, ".") {
+			continue
+		}
+		if referencedTrunks[iface.Name] {
+			continue
+		}
+		slog.InfoContext(ctx, "removing stale trunk port", "name", iface.Name)
+		if err := client.deletePort(ctx, iface.Name); err != nil {
+			return fmt.Errorf("failed to delete stale trunk port %s: %w", iface.Name, err)
 		}
 	}
 	return nil

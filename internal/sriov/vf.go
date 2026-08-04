@@ -14,6 +14,22 @@ var pciAddressRegex = regexp.MustCompile(`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-f
 // SysfsRoot can be overridden in tests.
 var SysfsRoot = "/sys"
 
+// ResolveNetlinkName resolves a kernel netlink device name to its PCI
+// address by reading the "device" symlink under the device's sysfs
+// class/net directory.
+func ResolveNetlinkName(name string) (string, error) {
+	deviceLink := filepath.Join(SysfsRoot, "class", "net", name, "device")
+	target, err := os.Readlink(deviceLink)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve netlink device %q to PCI address: %w", name, err)
+	}
+	pciAddr := filepath.Base(target)
+	if !pciAddressRegex.MatchString(pciAddr) {
+		return "", fmt.Errorf("resolved device symlink target %q for %q does not look like a PCI address", pciAddr, name)
+	}
+	return pciAddr, nil
+}
+
 // ResolvePCIAddress validates the PCI address format and checks that the
 // device exists in sysfs.
 func ResolvePCIAddress(pciAddr string) error {
