@@ -80,7 +80,7 @@ done
 
 # Enable VLAN filtering on the bridge so TAPs 2 and 3 can act as
 # access ports for the VF-to-VF fake-VF simulation.
-#sudo ip link set "${BRIDGE_NAME}" type bridge vlan_filtering 1
+sudo ip link set "${BRIDGE_NAME}" type bridge vlan_filtering 1
 
 # TAPs 0 and 1 (underlay + trunk VF): keep default PVID 1 for untagged
 # underlay traffic, add VLANs 33 and 44 as tagged so VLAN-tagged frames
