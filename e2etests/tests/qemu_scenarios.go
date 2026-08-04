@@ -40,11 +40,8 @@ func qemuEVPNUnderlay() v1alpha1.Underlay {
 			Interfaces: []v1alpha1.UnderlayInterface{{
 				Type: v1alpha1.UnderlayInterfaceTypeGroutPort,
 				GroutPort: &v1alpha1.GroutPortConfig{
-					Name:       new("gund"),
+					PortName:   new("gund"),
 					PCIAddress: new("0000:01:00.0"),
-					IPAM: v1alpha1.GroutPortIPAM{
-						Addresses: []string{"192.168.100.10/24"},
-					},
 				},
 			}},
 			Neighbors: []v1alpha1.Neighbor{{
@@ -69,11 +66,8 @@ func qemuSRv6Underlay() v1alpha1.Underlay {
 			Interfaces: []v1alpha1.UnderlayInterface{{
 				Type: v1alpha1.UnderlayInterfaceTypeGroutPort,
 				GroutPort: &v1alpha1.GroutPortConfig{
-					Name:       new("gund"),
+					PortName:   new("gund"),
 					PCIAddress: new("0000:01:00.0"),
-					IPAM: v1alpha1.GroutPortIPAM{
-						Addresses: []string{"192.168.100.10/24"},
-					},
 				},
 			}},
 			Neighbors: []v1alpha1.Neighbor{{

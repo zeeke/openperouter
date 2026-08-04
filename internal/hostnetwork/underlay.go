@@ -55,19 +55,18 @@ type GroutPortParams struct {
 	// PFName is the PF name when the pfName+vfIndex selector was used.
 	PFName string `json:"pfName,omitempty"`
 	// VFIndex is the VF index when the pfName+vfIndex selector was used.
-	VFIndex *int `json:"vfIndex,omitempty"`
-	// Name is the port name when the name selector was used.
-	Name string `json:"name,omitempty"`
-	// Addresses is the list of CIDRs to assign to the grout port.
-	Addresses []string `json:"addresses"`
+	VFIndex *int32 `json:"vfIndex,omitempty"`
+	// NetlinkName is the kernel netlink device name when the netlinkName
+	// selector was used. Resolved to a PCI address at setup time.
+	NetlinkName string `json:"netlinkName,omitempty"`
+	// PortName is the explicit grout interface name (from portName field).
+	PortName string `json:"portName,omitempty"`
 	// MTU is the optional MTU for the DPDK port.
-	MTU *int `json:"mtu,omitempty"`
+	MTU *int32 `json:"mtu,omitempty"`
 	// RXQueues is the optional number of receive queues.
-	RXQueues *int `json:"rxQueues,omitempty"`
+	RXQueues *int32 `json:"rxQueues,omitempty"`
 	// QSize is the optional queue size.
-	QSize *int `json:"qSize,omitempty"`
-
-	// TODO - not here
+	QSize *int32 `json:"qSize,omitempty"`
 	// NetlinkDevice is the kernel network interface associated with the
 	// PCI device (set for mlx5 bifurcated driver). When non-empty the
 	// interface is moved to the perouter namespace during setup.

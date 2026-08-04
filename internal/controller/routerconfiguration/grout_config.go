@@ -145,6 +145,17 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		slog.Error("configuration failed", "errors", resourceErrors)
 	}
 
+	if err := removeStaleResources(ctx, groutClient, config.targetNamespace,
+		configuredL3VNIs, configuredL2VNIs, configuredL3VPNs, len(apiConfig.L3Passthrough) == 0); err != nil {
+		return err
+	}
+
+	return errors.Join(resourceErrors...)
+}
+
+func removeStaleResources(ctx context.Context, groutClient *grout.Client, targetNamespace string,
+	configuredL3VNIs []hostnetwork.L3VNIParams, configuredL2VNIs []hostnetwork.L2VNIParams,
+	configuredL3VPNs []hostnetwork.L3VPNParams, removePassthrough bool) error {
 	configuredVNIs := make([]hostnetwork.VNIParams, 0, len(configuredL3VNIs)+len(configuredL2VNIs))
 	configuredVRFs := map[string]bool{}
 	for _, vni := range configuredL3VNIs {
@@ -160,7 +171,7 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	}
 
 	slog.InfoContext(ctx, "removing deleted vnis")
-	if err := grout.RemoveNonConfiguredVNIs(ctx, groutClient, config.targetNamespace, configuredVNIs); err != nil {
+	if err := grout.RemoveNonConfiguredVNIs(ctx, groutClient, targetNamespace, configuredVNIs); err != nil {
 		return fmt.Errorf("failed to remove deleted vnis: %w", err)
 	}
 	bridgerefresh.StopForRemovedVNIs(configuredL2VNIs)
@@ -171,22 +182,22 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	}
 
 	slog.InfoContext(ctx, "removing deleted l3vpns")
-	if err := grout.RemoveNonConfiguredL3VPNs(ctx, groutClient, config.targetNamespace, configuredL3VPNs); err != nil {
+	if err := grout.RemoveNonConfiguredL3VPNs(ctx, groutClient, targetNamespace, configuredL3VPNs); err != nil {
 		return fmt.Errorf("failed to remove deleted l3vpns: %w", err)
 	}
 
 	slog.InfoContext(ctx, "removing deleted vrfs")
-	if err := grout.RemoveNonConfiguredVRFs(ctx, groutClient, config.targetNamespace, configuredVRFs); err != nil {
+	if err := grout.RemoveNonConfiguredVRFs(ctx, groutClient, targetNamespace, configuredVRFs); err != nil {
 		return fmt.Errorf("failed to remove deleted vrfs: %w", err)
 	}
 
-	if len(apiConfig.L3Passthrough) == 0 {
+	if removePassthrough {
 		if err := grout.RemovePassthrough(ctx, groutClient); err != nil {
 			return fmt.Errorf("failed to remove passthrough: %w", err)
 		}
 	}
 
-	return errors.Join(resourceErrors...)
+	return nil
 }
 
 func restoreUnderlayGrout(ctx context.Context, groutClient *grout.Client, targetNamespace string, currentUnderlayIfaces []hostnetwork.UnderlayInterface) {

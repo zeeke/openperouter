@@ -44,9 +44,9 @@ func (c *Client) deleteAddress(ctx context.Context, iface, addr string) error {
 
 // PortOptions holds optional parameters for DPDK port creation.
 type PortOptions struct {
-	MTU      *int
-	RXQueues *int
-	QSize    *int
+	MTU      *int32
+	RXQueues *int32
+	QSize    *int32
 }
 
 func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {

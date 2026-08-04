@@ -266,17 +266,20 @@ spec:
                       mtu:
                         description: mtu is the Maximum Transmission Unit for the
                           DPDK port.
+                        format: int32
                         maximum: 9702
                         minimum: 68
                         type: integer
                       qSize:
                         description: qSize is the size of each receive/transmit queue.
+                        format: int32
                         maximum: 32768
                         minimum: 64
                         type: integer
                       rxQueues:
                         description: rxQueues is the number of receive queues for
                           the DPDK port.
+                        format: int32
                         maximum: 64
                         minimum: 1
                         type: integer
@@ -286,6 +289,7 @@ spec:
                       vfIndex is the index of the Virtual Function on the PF to use as
                       the trunk port. Must be used together with pfName.
                       Mutually exclusive with pciAddress.
+                    format: int32
                     minimum: 0
                     type: integer
                   vlan:
@@ -334,8 +338,8 @@ spec:
             x-kubernetes-validations:
             - message: gatewayIPs cannot be set without routingDomain
               rule: '!has(self.gatewayIPs) || size(self.gatewayIPs) == 0 || has(self.routingDomain)'
-            - message: hostmaster and sriovVFPair are mutually exclusive
-              rule: '!(has(self.hostmaster) && has(self.sriovVFPair))'
+            - message: hostMaster and sriovVFPair are mutually exclusive
+              rule: '!(has(self.hostMaster) && has(self.sriovVFPair))'
           status:
             description: status defines the observed state of L2VNI.
             type: object

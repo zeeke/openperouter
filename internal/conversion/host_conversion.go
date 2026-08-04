@@ -647,10 +647,16 @@ func networkDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork
 	if iface.NetworkDevice.InterfaceName == "" {
 		return hostnetwork.UnderlayInterface{}, fmt.Errorf("interfaceName is empty for networkDevice")
 	}
-	return hostnetwork.UnderlayInterface{
+	res := hostnetwork.UnderlayInterface{
 		InterfaceName: iface.NetworkDevice.InterfaceName,
 		Kind:          hostnetwork.UnderlayInterfaceNetDev,
-	}, nil
+	}
+	if iface.GroutPort != nil && iface.GroutPort.PortName != nil {
+		res.GroutPort = &hostnetwork.GroutPortParams{
+			PortName: *iface.GroutPort.PortName,
+		}
+	}
+	return res, nil
 }
 
 func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.UnderlayInterface, error) {
@@ -676,14 +682,20 @@ func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 		}
 	}
 
-	return hostnetwork.UnderlayInterface{
+	res := hostnetwork.UnderlayInterface{
 		InterfaceName: ifName,
 		Kind:          hostnetwork.UnderlayInterfaceCNIDev,
 		CNI: &hostnetwork.CNIDeviceParams{
 			Config:         iface.CNIDevice.RawConfig.Raw,
 			CapabilityArgs: capabilityArgs,
 		},
-	}, nil
+	}
+	if iface.GroutPort != nil && iface.GroutPort.PortName != nil {
+		res.GroutPort = &hostnetwork.GroutPortParams{
+			PortName: *iface.GroutPort.PortName,
+		}
+	}
+	return res, nil
 }
 
 func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.UnderlayInterface, error) {
@@ -692,9 +704,7 @@ func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 			fmt.Errorf("groutPort configuration is missing for interface type GroutPort")
 	}
 
-	params := &hostnetwork.GroutPortParams{
-		Addresses: iface.GroutPort.IPAM.Addresses,
-	}
+	params := &hostnetwork.GroutPortParams{}
 	if iface.GroutPort.PortOptions != nil {
 		params.MTU = iface.GroutPort.PortOptions.MTU
 		params.RXQueues = iface.GroutPort.PortOptions.RXQueues
@@ -703,30 +713,27 @@ func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 
 	var ifName string
 	switch {
-	case iface.GroutPort.Name != nil:
-		ifName = *iface.GroutPort.Name
-		params.Name = *iface.GroutPort.Name
+	case iface.GroutPort.NetlinkName != nil:
+		ifName = *iface.GroutPort.NetlinkName
+		params.NetlinkName = *iface.GroutPort.NetlinkName
 
 	case iface.GroutPort.PFName != nil && iface.GroutPort.VFIndex != nil:
-		pciAddr, err := sriov.ResolvePFVFIndex(*iface.GroutPort.PFName, *iface.GroutPort.VFIndex)
-		if err != nil {
-			return hostnetwork.UnderlayInterface{}, err
-		}
 		ifName = fmt.Sprintf("%s_%d", *iface.GroutPort.PFName, *iface.GroutPort.VFIndex)
-		params.PCIAddress = pciAddr
 		params.PFName = *iface.GroutPort.PFName
 		params.VFIndex = iface.GroutPort.VFIndex
 
 	case iface.GroutPort.PCIAddress != nil:
-		if err := sriov.ResolvePCIAddress(*iface.GroutPort.PCIAddress); err != nil {
-			return hostnetwork.UnderlayInterface{}, err
-		}
 		ifName = "p" + pciAddressToBDF(*iface.GroutPort.PCIAddress)
 		params.PCIAddress = *iface.GroutPort.PCIAddress
 
 	default:
 		return hostnetwork.UnderlayInterface{},
-			fmt.Errorf("groutPort must specify one of name, pciAddress, or pfName+vfIndex")
+			fmt.Errorf("groutPort must specify one of netlinkName, pciAddress, or pfName+vfIndex")
+	}
+
+	if iface.GroutPort.PortName != nil {
+		ifName = *iface.GroutPort.PortName
+		params.PortName = *iface.GroutPort.PortName
 	}
 
 	return hostnetwork.UnderlayInterface{
@@ -757,7 +764,6 @@ func pciAddressToIfName(pciAddr string) string {
 	}
 	return s[len(s)-6:]
 }
-
 func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) (*hostnetwork.VFPairParams, error) {
 	pciAddr, err := resolveVFPairPCI(cfg)
 	if err != nil {
@@ -785,7 +791,7 @@ func resolveVFPairPCI(cfg *v1alpha1.SRIOVVFPairConfig) (string, error) {
 		return *cfg.PCIAddress, nil
 	}
 	if cfg.PFName != nil && cfg.VFIndex != nil {
-		return sriov.ResolvePFVFIndex(*cfg.PFName, *cfg.VFIndex)
+		return sriov.ResolvePFVFIndex(*cfg.PFName, int(*cfg.VFIndex))
 	}
 	return "", fmt.Errorf("sriovVFPair must specify either pciAddress or pfName+vfIndex")
 }

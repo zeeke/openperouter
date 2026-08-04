@@ -53,6 +53,40 @@ func GetPCINetDevice(pciAddr string) (string, error) {
 	return "", fmt.Errorf("no kernel net device found under %s", netDir)
 }
 
+// RestoreDriver rebinds a PCI device from vfio-pci back to its original
+// kernel driver. It clears the driver_override, unbinds from vfio-pci,
+// and triggers driver probing to let the original driver claim the device.
+func RestoreDriver(pciAddr, originalDriver string) error {
+	current, err := GetPCIDriver(pciAddr)
+	if err != nil {
+		return err
+	}
+	if current == originalDriver {
+		return nil
+	}
+
+	devicePath := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
+
+	if err := os.WriteFile(filepath.Join(devicePath, "driver_override"),
+		[]byte(""), 0o644); err != nil {
+		return fmt.Errorf("failed to clear driver_override for %s: %w", pciAddr, err)
+	}
+
+	if current != "" {
+		unbindPath := filepath.Join(devicePath, "driver", "unbind")
+		if err := os.WriteFile(unbindPath, []byte(pciAddr), 0o644); err != nil {
+			return fmt.Errorf("failed to unbind driver %s from %s: %w", current, pciAddr, err)
+		}
+	}
+
+	bindPath := filepath.Join(SysfsRoot, "bus", "pci", "drivers", originalDriver, "bind")
+	if err := os.WriteFile(bindPath, []byte(pciAddr), 0o644); err != nil {
+		return fmt.Errorf("failed to bind %s to driver %s: %w", pciAddr, originalDriver, err)
+	}
+
+	return nil
+}
+
 // BindVFIOPCI rebinds a PCI device to the vfio-pci driver.
 // It is a no-op if the device is already bound to vfio-pci.
 func BindVFIOPCI(pciAddr string) error {

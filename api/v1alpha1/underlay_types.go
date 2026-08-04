@@ -242,59 +242,49 @@ type RouteReflectorConfig struct {
 }
 
 // GroutPortConfig specifies a port to bind to grout.
-// Exactly one selector must be used: pciAddress alone, pfName + vfIndex together, or name alone.
-// +kubebuilder:validation:XValidation:rule="[has(self.pciAddress), has(self.pfName) && has(self.vfIndex), has(self.name)].exists_one(x, x)",message="specify exactly one of pciAddress, pfName+vfIndex, or name"
+// Exactly one device selector must be used: pciAddress, pfName + vfIndex, or netlinkName.
+// +kubebuilder:validation:XValidation:rule="(has(self.pciAddress) ? 1 : 0) + ((has(self.pfName) && has(self.vfIndex)) ? 1 : 0) + (has(self.netlinkName) ? 1 : 0) == 1",message="specify exactly one of pciAddress, pfName+vfIndex, or netlinkName"
 // +kubebuilder:validation:XValidation:rule="!has(self.pfName) || has(self.vfIndex)",message="vfIndex is required when pfName is set"
 // +kubebuilder:validation:XValidation:rule="!has(self.vfIndex) || has(self.pfName)",message="pfName is required when vfIndex is set"
 type GroutPortConfig struct {
 	// pciAddress is the PCI Bus:Device.Function address of the VF to bind
-	// (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex and name.
+	// (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex and netlinkName.
 	// +kubebuilder:validation:Pattern=`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$`
 	// +optional
 	PCIAddress *string `json:"pciAddress,omitempty"`
 
 	// pfName is the name of the Physical Function whose VF will be bound.
-	// Must be used together with vfIndex. Mutually exclusive with pciAddress and name.
+	// Must be used together with vfIndex. Mutually exclusive with pciAddress and netlinkName.
 	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
 	// +kubebuilder:validation:MaxLength=15
 	// +optional
 	PFName *string `json:"pfName,omitempty"`
 
 	// vfIndex is the index of the Virtual Function on the PF.
-	// Must be used together with pfName. Mutually exclusive with pciAddress and name.
+	// Must be used together with pfName. Mutually exclusive with pciAddress and netlinkName.
 	// +kubebuilder:validation:Minimum=0
 	// +optional
-	VFIndex *int `json:"vfIndex,omitempty"`
+	VFIndex *int32 `json:"vfIndex,omitempty"`
 
-	// name identifies a grout port by name directly.
+	// netlinkName is the kernel netlink device name of the VF (e.g. "enp3s0f0v0").
+	// The controller resolves the PCI address via sysfs and reads existing
+	// IP addresses from the device before binding the DPDK driver.
 	// Mutually exclusive with pciAddress and pfName/vfIndex.
 	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
 	// +kubebuilder:validation:MaxLength=15
 	// +optional
-	Name *string `json:"name,omitempty"`
+	NetlinkName *string `json:"netlinkName,omitempty"`
 
-	// ipam specifies the IP addresses to assign to the DPDK port.
-	// +required
-	IPAM GroutPortIPAM `json:"ipam"`
+	// portName overrides the grout interface name. When omitted, the
+	// controller derives a name from the device selector.
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
+	// +kubebuilder:validation:MaxLength=15
+	// +optional
+	PortName *string `json:"portName,omitempty"`
 
 	// portOptions specifies optional DPDK port parameters.
 	// +optional
 	PortOptions *GroutPortOptions `json:"portOptions,omitempty"`
-}
-
-// GroutPortIPAM holds inline IPAM configuration for a DPDK-bound underlay port.
-type GroutPortIPAM struct {
-	// addresses is a list of CIDRs to assign to the grout port.
-	// At most one IPv4 and one IPv6 address (dual-stack).
-	// CIDR format and address-family uniqueness are enforced by the
-	// validation webhook; CEL rules are omitted here because the
-	// interfaces maxItems multiplier exhausts the per-rule cost budget.
-	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=2
-	// +kubebuilder:validation:items:MaxLength=43
-	// +listType=atomic
-	// +required
-	Addresses []string `json:"addresses"`
 }
 
 // GroutPortOptions holds optional DPDK port parameters for grcli.
@@ -303,19 +293,19 @@ type GroutPortOptions struct {
 	// +kubebuilder:validation:Minimum=68
 	// +kubebuilder:validation:Maximum=9702
 	// +optional
-	MTU *int `json:"mtu,omitempty"`
+	MTU *int32 `json:"mtu,omitempty"`
 
 	// rxQueues is the number of receive queues for the DPDK port.
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=64
 	// +optional
-	RXQueues *int `json:"rxQueues,omitempty"`
+	RXQueues *int32 `json:"rxQueues,omitempty"`
 
 	// qSize is the size of each receive/transmit queue.
 	// +kubebuilder:validation:Minimum=64
 	// +kubebuilder:validation:Maximum=32768
 	// +optional
-	QSize *int `json:"qSize,omitempty"`
+	QSize *int32 `json:"qSize,omitempty"`
 }
 
 // GracefulRestartConfig holds BGP Graceful Restart parameters.

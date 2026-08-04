@@ -144,37 +144,32 @@ spec:
                         netdev for CNI IPAM plugins to target. Only valid when grout is enabled.
                         Must be set when type is "GroutPort".
                       properties:
-                        ipam:
-                          description: ipam specifies the IP addresses to assign to
-                            the DPDK port.
-                          properties:
-                            addresses:
-                              description: |-
-                                addresses is a list of CIDRs to assign to the grout port.
-                                At most one IPv4 and one IPv6 address (dual-stack).
-                                CIDR format and address-family uniqueness are enforced by the
-                                validation webhook; CEL rules are omitted here because the
-                                interfaces maxItems multiplier exhausts the per-rule cost budget.
-                              items:
-                                maxLength: 43
-                                type: string
-                              maxItems: 2
-                              minItems: 1
-                              type: array
-                              x-kubernetes-list-type: atomic
-                          required:
-                          - addresses
-                          type: object
+                        netlinkName:
+                          description: |-
+                            netlinkName is the kernel netlink device name of the VF (e.g. "enp3s0f0v0").
+                            The controller resolves the PCI address via sysfs and reads existing
+                            IP addresses from the device before binding the DPDK driver.
+                            Mutually exclusive with pciAddress and pfName/vfIndex.
+                          maxLength: 15
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
                         pciAddress:
                           description: |-
                             pciAddress is the PCI Bus:Device.Function address of the VF to bind
-                            (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex.
+                            (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex and netlinkName.
                           pattern: ^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$
                           type: string
                         pfName:
                           description: |-
                             pfName is the name of the Physical Function whose VF will be bound.
-                            Must be used together with vfIndex. Mutually exclusive with pciAddress.
+                            Must be used together with vfIndex. Mutually exclusive with pciAddress and netlinkName.
+                          maxLength: 15
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
+                        portName:
+                          description: |-
+                            portName overrides the grout interface name. When omitted, the
+                            controller derives a name from the device selector.
                           maxLength: 15
                           pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
                           type: string
@@ -184,18 +179,21 @@ spec:
                             mtu:
                               description: mtu is the Maximum Transmission Unit for
                                 the DPDK port.
+                              format: int32
                               maximum: 9702
                               minimum: 68
                               type: integer
                             qSize:
                               description: qSize is the size of each receive/transmit
                                 queue.
+                              format: int32
                               maximum: 32768
                               minimum: 64
                               type: integer
                             rxQueues:
                               description: rxQueues is the number of receive queues
                                 for the DPDK port.
+                              format: int32
                               maximum: 64
                               minimum: 1
                               type: integer
@@ -203,16 +201,17 @@ spec:
                         vfIndex:
                           description: |-
                             vfIndex is the index of the Virtual Function on the PF.
-                            Must be used together with pfName. Mutually exclusive with pciAddress.
+                            Must be used together with pfName. Mutually exclusive with pciAddress and netlinkName.
+                          format: int32
                           minimum: 0
                           type: integer
-                      required:
-                      - ipam
                       type: object
                       x-kubernetes-validations:
-                      - message: specify either pciAddress or both pfName and vfIndex,
-                          not both
-                        rule: has(self.pciAddress) != (has(self.pfName) && has(self.vfIndex))
+                      - message: specify exactly one of pciAddress, pfName+vfIndex,
+                          or netlinkName
+                        rule: '(has(self.pciAddress) ? 1 : 0) + ((has(self.pfName)
+                          && has(self.vfIndex)) ? 1 : 0) + (has(self.netlinkName)
+                          ? 1 : 0) == 1'
                       - message: vfIndex is required when pfName is set
                         rule: '!has(self.pfName) || has(self.vfIndex)'
                       - message: pfName is required when vfIndex is set

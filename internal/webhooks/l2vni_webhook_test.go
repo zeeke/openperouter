@@ -525,7 +525,7 @@ func TestValidateL2VNIUpdate(t *testing.T) {
 func TestValidateVLANUniquenessPerTrunk(t *testing.T) {
 	pci := func(s string) *string { return &s }
 	pf := func(s string) *string { return &s }
-	vfIdx := func(i int) *int { return &i }
+	vfIdx := func(i int32) *int32 { return &i }
 
 	tcs := []struct {
 		name        string
