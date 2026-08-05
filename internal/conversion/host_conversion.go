@@ -647,10 +647,16 @@ func networkDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork
 	if iface.NetworkDevice.InterfaceName == "" {
 		return hostnetwork.UnderlayInterface{}, fmt.Errorf("interfaceName is empty for networkDevice")
 	}
-	return hostnetwork.UnderlayInterface{
+	res := hostnetwork.UnderlayInterface{
 		InterfaceName: iface.NetworkDevice.InterfaceName,
 		Kind:          hostnetwork.UnderlayInterfaceNetDev,
-	}, nil
+	}
+	if iface.GroutPort != nil && iface.GroutPort.PortName != nil {
+		res.GroutPort = &hostnetwork.GroutPortParams{
+			PortName: *iface.GroutPort.PortName,
+		}
+	}
+	return res, nil
 }
 
 func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.UnderlayInterface, error) {
@@ -676,14 +682,20 @@ func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 		}
 	}
 
-	return hostnetwork.UnderlayInterface{
+	res := hostnetwork.UnderlayInterface{
 		InterfaceName: ifName,
 		Kind:          hostnetwork.UnderlayInterfaceCNIDev,
 		CNI: &hostnetwork.CNIDeviceParams{
 			Config:         iface.CNIDevice.RawConfig.Raw,
 			CapabilityArgs: capabilityArgs,
 		},
-	}, nil
+	}
+	if iface.GroutPort != nil && iface.GroutPort.PortName != nil {
+		res.GroutPort = &hostnetwork.GroutPortParams{
+			PortName: *iface.GroutPort.PortName,
+		}
+	}
+	return res, nil
 }
 
 func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.UnderlayInterface, error) {
