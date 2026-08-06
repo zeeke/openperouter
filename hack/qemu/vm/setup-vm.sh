@@ -36,21 +36,7 @@ run_in_vm 'modprobe vfio-pci'
 # --- Configure the first igb NIC with the underlay IP ---
 echo "Configuring underlay IP on first igb NIC..."
 run_in_vm '
-UNDERLAY=""
-for dev in /sys/class/net/*/device/driver; do
-    driver=$(basename $(readlink "$dev"))
-    if [ "$driver" = "igb" ]; then
-        dir=$(dirname $(dirname "$dev"))
-        UNDERLAY=$(basename "$dir")
-        break
-    fi
-done
-
-if [ -z "$UNDERLAY" ]; then
-    echo "ERROR: No igb NIC found" >&2
-    exit 1
-fi
-
+UNDERLAY="enp1s0"
 echo "Configuring underlay on $UNDERLAY"
 nmcli device set $UNDERLAY managed no 2>/dev/null || true
 ip addr add 192.168.100.10/24 dev $UNDERLAY 2>/dev/null || true
