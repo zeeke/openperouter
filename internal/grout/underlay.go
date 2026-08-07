@@ -463,9 +463,10 @@ func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.U
 
 	portName := PortName(iface)
 	opts := PortOptions{
-		MTU:      iface.GroutPort.MTU,
-		RXQueues: iface.GroutPort.RXQueues,
-		QSize:    iface.GroutPort.QSize,
+		MTU:         iface.GroutPort.MTU,
+		RXQueues:    iface.GroutPort.RXQueues,
+		QSize:       iface.GroutPort.QSize,
+		Description: UnderlayInterfaceDescriptionMarker,
 	}
 
 	if err := client.ensurePortWithOptions(ctx, portName, iface.GroutPort.PCIAddress, opts); err != nil {
