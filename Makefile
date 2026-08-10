@@ -457,7 +457,7 @@ bump-go-version: ## Bump Go version across the project (GO_VERSION=1.25.7 or omi
 .PHONY: kind-export-logs
 kind-export-logs: create-export-logs
 	$(LOCALBIN)/kind export logs --name ${KIND_CLUSTER_NAME} ${KIND_EXPORT_LOGS}
-	$(KUBECTL) -n "openperouter-system" describe  daemonset
+	$(KUBECTL) cluster-info dump --namespaces "openperouter-system"
 
 .PHONY: generate-all
 generate-all: generate manifests generate-all-in-one helm-docs api-docs bundle ## Generate all code, manifests, and documentation.
