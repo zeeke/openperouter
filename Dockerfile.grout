@@ -158,7 +158,7 @@ RUN chmod +x /usr/lib/frr/docker-start
 # Hack for https://github.com/FRRouting/frr/issues/20355
 #          https://github.com/FRRouting/frr/pull/20378 
 COPY 0001-Revert-tools-Allow-deleting-of-interfaces.patch .
-RUN yum install -y patch
+RUN dnf install -y patch
 RUN patch /usr/lib/frr/frr-reload.py 0001-Revert-tools-Allow-deleting-of-interfaces.patch
 
 ENTRYPOINT ["/controller"]
