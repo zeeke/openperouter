@@ -154,4 +154,10 @@ RUN ln -s /usr/libexec/frr /usr/lib/frr
 ADD https://raw.githubusercontent.com/FRRouting/frr/refs/tags/frr-10.6.0/docker/ubi8-minimal/docker-start /usr/lib/frr/docker-start
 RUN chmod +x /usr/lib/frr/docker-start
 
+# Hack for https://github.com/FRRouting/frr/issues/20355
+#          https://github.com/FRRouting/frr/pull/20378 
+COPY 0001-Revert-tools-Allow-deleting-of-interfaces.patch .
+RUN yum install -y patch
+RUN patch /usr/lib/frr/frr-reload.py 0001-Revert-tools-Allow-deleting-of-interfaces.patch
+
 ENTRYPOINT ["/controller"]
