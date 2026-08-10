@@ -94,7 +94,7 @@ RUN dnf install -y epel-release && \
             systemd \
             systemd-devel
 
-RUN echo "20260810" > /src/version.txt
+RUN echo "20260810" > /version.txt
 RUN git clone -b main --depth 1 http://github.com/DPDK/grout /src
 WORKDIR /src
 
