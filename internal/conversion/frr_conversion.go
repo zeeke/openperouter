@@ -391,6 +391,11 @@ func underlayISISToFRR(isisConfig *v1alpha1.ISISConfig, interfaces []string, nod
 			IPv6:      true,
 			IsPassive: true,
 		},
+		"main": {
+			Name:      "main",
+			IPv6:      true,
+			IsPassive: true,
+		},
 	}
 
 	// When no explicit ISIS interfaces are configured, add all underlay
