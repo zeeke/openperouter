@@ -629,7 +629,11 @@ func checkHostRouteEncap(routers openperouter.Routers, l3vpn v1alpha1.L3VPN, pre
 	Eventually(func() error {
 		for exec := range routers.GetExecutors() {
 			for _, prefix := range prefixes {
-				rt, err := frr.GetKernelRoute(exec, l3vpn.Spec.VRF, prefix)
+				getRoute := frr.GetKernelRoute
+				if GroutMode {
+					getRoute = frr.GetGroutRoute
+				}
+				rt, err := getRoute(exec, l3vpn.Spec.VRF, prefix)
 				if err != nil {
 					return err
 				}
