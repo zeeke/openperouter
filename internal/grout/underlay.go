@@ -291,7 +291,7 @@ func teardownGroutPortUnderlay(ctx context.Context, client *Client, ns netns.NsH
 	}
 
 	pciAddr := iface.GroutPort.PCIAddress
-	state, err := loadDeviceState(pciAddr)
+	state, err := loadDeviceState(SavedDeviceState{PCIAddress: pciAddr})
 	if err != nil {
 		slog.WarnContext(ctx, "no saved device state, cannot restore driver/IPs",
 			"pciAddress", pciAddr, "error", err)
@@ -309,7 +309,7 @@ func teardownGroutPortUnderlay(ctx context.Context, client *Client, ns netns.NsH
 
 	restoreIPAddresses(ctx, *state)
 
-	if err := deleteDeviceState(pciAddr); err != nil {
+	if err := deleteDeviceState(SavedDeviceState{PCIAddress: pciAddr}); err != nil {
 		slog.WarnContext(ctx, "failed to delete device state file",
 			"pciAddress", pciAddr, "error", err)
 	}
@@ -331,6 +331,14 @@ func teardownTapUnderlay(ctx context.Context, client *Client, targetNS string, n
 
 	if err := hostnetwork.RestoreUnderlay(ctx, targetNS, []hostnetwork.UnderlayInterface{iface}); err != nil {
 		return fmt.Errorf("RestoreUnderlay: failed to clean kernel underlay state: %w", err)
+	}
+
+	// Clean up the saved device state now that addresses have been
+	// successfully restored to the kernel interface and the underlay is
+	// fully torn down.
+	if err := deleteDeviceState(SavedDeviceState{NetlinkName: iface.InterfaceName}); err != nil {
+		slog.WarnContext(ctx, "failed to delete saved device state",
+			"interface", iface.InterfaceName, "error", err)
 	}
 
 	return nil
@@ -360,6 +368,40 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 	underlayAddrs, err := hostnetwork.AddressesForInterface(underlayInterface, hostnetwork.ExcludeLinkLocal())
 	if err != nil {
 		return fmt.Errorf("failed to read underlay interface addresses: %w", err)
+	}
+
+	// If the kernel interface has global addresses, save them to a state
+	// file before migration. If it doesn't (addresses were already
+	// migrated to grout and then lost due to a grout crash), fall back to
+	// restoring addresses from the saved state file and re-assigning them
+	// to the kernel interface so they can be migrated again.
+	if len(underlayAddrs) > 0 {
+		var addrStrings []string
+		for _, a := range underlayAddrs {
+			addrStrings = append(addrStrings, a.IPNet.String())
+		}
+		if err := saveDeviceState(SavedDeviceState{
+			NetlinkName: underlayInterface,
+			Addresses:   addrStrings,
+		}); err != nil {
+			return fmt.Errorf("failed to save device state for %s: %w", underlayInterface, err)
+		}
+	} else {
+		saved, err := loadDeviceState(SavedDeviceState{NetlinkName: underlayInterface})
+		if err == nil && len(saved.Addresses) > 0 {
+			slog.InfoContext(ctx, "kernel interface has no global addresses, "+
+				"but there are saved addresses",
+				"interface", underlayInterface, "addresses", saved.Addresses)
+
+			underlayAddrs = make([]netlink.Addr, len(saved.Addresses))
+			for i, addr := range saved.Addresses {
+				parsed, err := netlink.ParseAddr(addr)
+				if err != nil {
+					return fmt.Errorf("failed to parse saved address %s: %w", addr, err)
+				}
+				underlayAddrs[i] = *parsed
+			}
+		}
 	}
 
 	link, err := netlink.LinkByName(underlayInterface)
@@ -480,7 +522,7 @@ func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.U
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
 	}
 
-	state, err := loadDeviceState(iface.GroutPort.PCIAddress)
+	state, err := loadDeviceState(SavedDeviceState{PCIAddress: iface.GroutPort.PCIAddress})
 	if err != nil {
 		return fmt.Errorf("failed to load device state for %s: %w", iface.GroutPort.PCIAddress, err)
 	}
@@ -580,7 +622,7 @@ func migrateAddressesToGrout(ctx context.Context, client *Client, kernelDevice, 
 		}
 
 		if err := hostnetwork.DeleteAddressFromInterface(kernelDevice, addr); err != nil {
-			return fmt.Errorf("failed to remove address %s from underlay interface: %w", cidr, err)
+			slog.WarnContext(ctx, "failed to remove address from underlay interface", "cidr", cidr, "iface", kernelDevice, "error", err)
 		}
 
 		if err := ensureKernelSubnetRoute(defaultVRFName, addr.IPNet.String()); err != nil {
