@@ -63,6 +63,7 @@ spec:
                   If not set, the host veth will not be attached to any interface and it must be
                   attached manually (or by some other means). This is useful if another controller
                   is leveraging the host interface for the VNI.
+                  Mutually exclusive with sriovVFPair.
                 properties:
                   linuxBridge:
                     description: linuxBridge configuration. Must be set when Type
@@ -232,6 +233,85 @@ spec:
                   rule: self.type != 'L3VNI' || (has(self.l3vni) && !has(self.l3vpn))
                 - message: type L3VPN requires l3vpn to be set and l3vni to be unset
                   rule: self.type != 'L3VPN' || (has(self.l3vpn) && !has(self.l3vni))
+              sriovVFPair:
+                description: |-
+                  sriovVFPair enables SR-IOV VF-to-VF communication for this L2VNI,
+                  replacing the host bridge and TAP/veth pair with direct VF binding.
+                  The specified trunk VF is bound to grout as a DPDK port. Workloads
+                  connect via other VFs on the same PF, tagged with the specified VLAN.
+                  The NIC's embedded switch handles local VF-to-VF forwarding; grout
+                  handles VXLAN encap/decap for remote nodes.
+                  Only valid when grout is enabled. Mutually exclusive with hostmaster.
+                properties:
+                  pciAddress:
+                    description: |-
+                      pciAddress is the PCI Bus:Device.Function address of the trunk VF to
+                      bind to grout (e.g. "0000:03:02.0"). The trunk VF must have no VLAN
+                      configured (VLAN 0) so it receives all tagged frames from other VFs.
+                      Mutually exclusive with pfName/vfIndex.
+                    pattern: ^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$
+                    type: string
+                  pfName:
+                    description: |-
+                      pfName is the name of the Physical Function whose VF will be the
+                      trunk port. Must be used together with vfIndex.
+                      Mutually exclusive with pciAddress.
+                    maxLength: 15
+                    pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                    type: string
+                  portOptions:
+                    description: portOptions specifies optional DPDK port parameters
+                      for the trunk VF.
+                    properties:
+                      mtu:
+                        description: mtu is the Maximum Transmission Unit for the
+                          DPDK port.
+                        format: int32
+                        maximum: 9702
+                        minimum: 68
+                        type: integer
+                      qSize:
+                        description: qSize is the size of each receive/transmit queue.
+                        format: int32
+                        maximum: 32768
+                        minimum: 64
+                        type: integer
+                      rxQueues:
+                        description: rxQueues is the number of receive queues for
+                          the DPDK port.
+                        format: int32
+                        maximum: 64
+                        minimum: 1
+                        type: integer
+                    type: object
+                  vfIndex:
+                    description: |-
+                      vfIndex is the index of the Virtual Function on the PF to use as
+                      the trunk port. Must be used together with pfName.
+                      Mutually exclusive with pciAddress.
+                    format: int32
+                    minimum: 0
+                    type: integer
+                  vlan:
+                    description: |-
+                      vlan is the 802.1Q VLAN ID that maps to this L2VNI. Workload VFs
+                      on the same PF configured with this VLAN ID will participate in
+                      this L2VNI's VXLAN overlay.
+                    format: int32
+                    maximum: 4094
+                    minimum: 1
+                    type: integer
+                required:
+                - vlan
+                type: object
+                x-kubernetes-validations:
+                - message: specify either pciAddress or both pfName and vfIndex, not
+                    both
+                  rule: has(self.pciAddress) != (has(self.pfName) && has(self.vfIndex))
+                - message: vfIndex is required when pfName is set
+                  rule: '!has(self.pfName) || has(self.vfIndex)'
+                - message: pfName is required when vfIndex is set
+                  rule: '!has(self.vfIndex) || has(self.pfName)'
               underlayAddressFamily:
                 description: |-
                   underlayAddressFamily selects which VTEP address family to use for this VNI's
@@ -258,6 +338,8 @@ spec:
             x-kubernetes-validations:
             - message: gatewayIPs cannot be set without routingDomain
               rule: '!has(self.gatewayIPs) || size(self.gatewayIPs) == 0 || has(self.routingDomain)'
+            - message: hostMaster and sriovVFPair are mutually exclusive
+              rule: '!(has(self.hostMaster) && has(self.sriovVFPair))'
           status:
             description: status defines the observed state of L2VNI.
             type: object
