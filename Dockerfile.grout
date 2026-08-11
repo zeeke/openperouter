@@ -98,7 +98,7 @@ RUN echo "20260810" > /version.txt
 RUN git init /src && \
     cd /src && \
     git remote add origin http://github.com/DPDK/grout && \
-    git fetch --depth 1 origin 3f769f442204844ed174acdd1b637df263ea0ef4 && \
+    git fetch --depth 1 origin a98c302fa88c66a02aa5ec97f73e67ea09b344bf && \
     git checkout FETCH_HEAD
 WORKDIR /src
 
