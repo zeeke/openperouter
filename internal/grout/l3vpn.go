@@ -61,6 +61,10 @@ func SetupL3VPN(ctx context.Context, client *Client, params hostnetwork.L3VPNPar
 		return fmt.Errorf("failed to assign IPs to grout port: %w", err)
 	}
 
+	if err := client.setPortUp(ctx, linkPair.NamespaceSide); err != nil {
+		return fmt.Errorf("failed to set grout port up: %w", err)
+	}
+
 	return nil
 }
 

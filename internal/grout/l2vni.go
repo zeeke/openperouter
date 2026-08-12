@@ -74,6 +74,10 @@ func setupL2VNITAP(ctx context.Context, client *Client, params hostnetwork.L2VNI
 		return fmt.Errorf("SetupL2VNI: failed to attach TAP %s to bridge %s: %w", linkPair.NamespaceSide, bridgeName, err)
 	}
 
+	if err := client.setPortUp(ctx, linkPair.NamespaceSide); err != nil {
+		return fmt.Errorf("SetupL2VNI: failed to set grout port up: %w", err)
+	}
+
 	hostTap, err := netlink.LinkByName(linkPair.HostSide)
 	if err != nil {
 		return fmt.Errorf("SetupL2VNI: host TAP %s not found after move: %w", linkPair.HostSide, err)
