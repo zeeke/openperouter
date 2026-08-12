@@ -304,6 +304,7 @@ spec:
             GROUT_ARGS="${GROUT_ARGS} --verbose"
             GROUT_ARGS="${GROUT_ARGS} --trace-packets"
             {{- end }}
+            date
             exec nsenter --net=/var/run/netns/perouter grout ${GROUT_ARGS}
 
         volumeMounts:
