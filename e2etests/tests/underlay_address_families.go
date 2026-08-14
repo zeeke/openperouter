@@ -179,6 +179,9 @@ var runUnderlayTests = func(af ipfamily.Family, underlay v1alpha1.Underlay) {
 			for _, leaf := range leaves {
 				neighbor, err := infra.NeighborForFamily(node.Name, leaf, af)
 				Expect(err).NotTo(HaveOccurred())
+				if GroutMode && neighbor.IsInterface {
+					neighbor.ID = "u_" + neighbor.ID
+				}
 				validateSessionWithNeighbor(
 					exec,
 					validationParameters{
