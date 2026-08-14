@@ -326,6 +326,11 @@ jobs:
           fi
 
 
+      - name: Start grout memory monitor
+        if: ${{ contains(matrix.deployment, 'grout') }}
+        run: |
+          hack/monitor-grout-memory.sh start
+
       - name: Run e2e tests
         run: |
           if [ ${{ matrix.deployment }} = "systemdmode" ]; then
@@ -340,6 +345,20 @@ jobs:
             export GINKGO_ARGS="--label-filter='!systemdmode'"
             make e2etests
           fi
+
+      - name: Stop grout memory monitor
+        if: ${{ always() && contains(matrix.deployment, 'grout') }}
+        run: |
+          hack/monitor-grout-memory.sh stop
+
+      - name: Upload grout memory logs
+        if: ${{ always() && contains(matrix.deployment, 'grout') }}
+        uses: actions/upload-artifact@v7
+        with:
+          retention-days: 5
+          name: grout-memory-${{ matrix.deployment }}
+          path: /tmp/kind_logs/grout-memory-*.log
+          if-no-files-found: ignore
 
       - name: Upload e2e test reports
         if: ${{ always() }}
