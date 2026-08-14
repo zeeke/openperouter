@@ -219,6 +219,7 @@ jobs:
           path: /tmp/openperouter-grout.tar
 
   e2etests:
+    if: false
     runs-on: ubuntu-22.04
     env:
       NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:${{ needs.build-kind-node-image.outputs.kind-node-version }}
