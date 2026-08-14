@@ -554,6 +554,11 @@ demo-metallb-passthrough:
 .PHONY: demo-multi-cluster
 demo-multi-cluster:
 	examples/evpn/multi-cluster/prepare.sh
+
+.PHONY: demo-grout-metallb
+demo-grout-metallb:
+	examples/grout/metallb/prepare.sh
+
 #
 # Operator specifics, copied from a Makefile generated on a clean folder by operator-sdk, then modified.
 #

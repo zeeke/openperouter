@@ -311,7 +311,7 @@ spec:
             done
             GROUT_ARGS="--test-mode --socket-mode 0666"
             {{- if eq .Values.openperouter.logLevel "debug" }}
-            GROUT_ARGS="${GROUT_ARGS} --verbose"
+            GROUT_ARGS="${GROUT_ARGS} --verbose --trace"
             {{- end }}
             exec nsenter --net=/var/run/netns/perouter grout ${GROUT_ARGS}
 
