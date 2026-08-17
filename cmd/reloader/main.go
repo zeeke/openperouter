@@ -86,8 +86,9 @@ func serveReload(args Args) error {
 		return fmt.Errorf("failed to listen on unix socket %s: %w", args.unixSocket, err)
 	}
 
+	frrCli := vtysh.NewCLI()
 	unixServer := newServer(
-		[]handlerConfig{{pattern: "/", handler: reloadHandler(args.frrConfigPath)}},
+		[]handlerConfig{{pattern: "/", handler: reloadHandler(args.frrConfigPath, frrCli)}},
 	)
 
 	healthHandler := health(vtysh.NewCLIWithTimeout(args.vtyshTimeout))
@@ -144,7 +145,7 @@ func serveReload(args Args) error {
 
 var updateConfig = frrconfig.Update
 
-func reloadHandler(frrConfigPath string) func(w http.ResponseWriter, req *http.Request) {
+func reloadHandler(frrConfigPath string, frrCli vtysh.Cli) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodPost {
 			http.Error(w, "invalid method", http.StatusBadRequest)
@@ -155,6 +156,13 @@ func reloadHandler(frrConfigPath string) func(w http.ResponseWriter, req *http.R
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
+		}
+		// frr-reload.py applies config incrementally — neighbor creation
+		// lands before address-family activation. A zebra event during
+		// that window puts the peer FSM in a suppressed state that never
+		// recovers. Reset all sessions so peers re-evaluate cleanly.
+		if _, err := frrCli("clear bgp *"); err != nil {
+			slog.Error("failed to clear BGP after reload", "error", err)
 		}
 		w.WriteHeader(http.StatusOK)
 		slog.Info("reload handler", "event", "reload successful")

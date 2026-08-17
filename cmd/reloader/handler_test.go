@@ -20,6 +20,8 @@ func TestHandler(t *testing.T) {
 		return errors.New("failed")
 	}
 
+	noopCli := func(_ string) (string, error) { return "", nil }
+
 	tests := []struct {
 		name       string
 		reloadMock func(string) error
@@ -54,7 +56,7 @@ func TestHandler(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest(tc.method, "/", nil)
-			handler := http.HandlerFunc(reloadHandler("/etc/frr/frr.conf"))
+			handler := http.HandlerFunc(reloadHandler("/etc/frr/frr.conf", noopCli))
 
 			handler.ServeHTTP(w, req)
 			res := w.Result()
