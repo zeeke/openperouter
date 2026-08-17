@@ -97,8 +97,8 @@ RUN dnf install -y epel-release && \
 RUN echo "20260810" > /version.txt
 RUN git init /src && \
     cd /src && \
-    git remote add origin http://github.com/DPDK/grout && \
-    git fetch --depth 1 origin b3f38f593b1935d5d942f1b977e07674a15e8cf3 && \
+    git remote add origin http://github.com/rjarry/grout && \
+    git fetch --depth 1 origin ea3c2531ea7fa1931a245c4de510108cd820723c && \
     git checkout FETCH_HEAD
 WORKDIR /src
 
