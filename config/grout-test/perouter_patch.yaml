@@ -37,7 +37,7 @@ spec:
             memory: "1Gi"
             hugepages-2Mi: null
           limits:
-            memory: "3Gi"
+            memory: "2Gi"
             hugepages-2Mi: null
         command:
         - /bin/sh
