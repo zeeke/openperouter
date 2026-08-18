@@ -11,6 +11,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/openperouter/openperouter/internal/sriov"
@@ -26,40 +27,13 @@ const (
 )
 
 // PortName returns the grout port name for the given underlay interface.
-// NetDev/CNIDev → "u_<InterfaceName>"; GroutPort → "p<BDF>" (from
-// PCIAddress), netlinkName, or pfName_vfIndex. An explicit
-// GroutPort.PortName overrides in all cases.
+// If the interface has an AcceleratedConfig with a PortName override, that
+// value is used directly; otherwise the name is "u_<InterfaceName>".
 func PortName(iface hostnetwork.UnderlayInterface) string {
-	if iface.GroutPort != nil && iface.GroutPort.PortName != "" {
-		return iface.GroutPort.PortName
+	if iface.AcceleratedConfig != nil && iface.AcceleratedConfig.PortName != nil {
+		return *iface.AcceleratedConfig.PortName
 	}
-	switch iface.Kind {
-	case hostnetwork.UnderlayInterfaceNetDev, hostnetwork.UnderlayInterfaceCNIDev:
-		return UnderlayPortNamePrefix + iface.InterfaceName
-	case hostnetwork.UnderlayInterfaceGroutPort:
-		if iface.GroutPort == nil {
-			return BadConfigurationPortName
-		}
-		switch {
-		case iface.GroutPort.PCIAddress != "":
-			return "p" + pciAddressToBDF(iface.GroutPort.PCIAddress)
-		case iface.GroutPort.NetlinkName != "":
-			return iface.GroutPort.NetlinkName
-		case iface.GroutPort.PFName != "" && iface.GroutPort.VFIndex != nil:
-			return fmt.Sprintf("%s_%d", iface.GroutPort.PFName, *iface.GroutPort.VFIndex)
-		default:
-			return BadConfigurationPortName
-		}
-	default:
-		return BadConfigurationPortName
-	}
-}
-
-func pciAddressToBDF(pciAddr string) string {
-	if i := strings.IndexByte(pciAddr, ':'); i >= 0 {
-		pciAddr = pciAddr[i+1:]
-	}
-	return strings.NewReplacer(":", "", ".", "").Replace(pciAddr)
+	return UnderlayPortNamePrefix + iface.InterfaceName
 }
 
 // SetupUnderlay configures the underlay interfaces via the grout dataplane.
@@ -102,15 +76,13 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	for _, iface := range params.UnderlayInterfaces {
 		switch iface.Kind {
 		case hostnetwork.UnderlayInterfaceNetDev:
-			if err := setupTapUnderlay(ctx, client, perouterNetNS, params.TargetNS, iface); err != nil {
-				return err
+			if iface.AcceleratedConfig == nil {
+				return setupTapUnderlay(ctx, client, perouterNetNS, params.TargetNS, iface)
+			} else {
+				return setupGroutPortUnderlay(ctx, client, perouterNetNS, iface)
 			}
 		case hostnetwork.UnderlayInterfaceCNIDev:
 			if err := setupTapUnderlay(ctx, client, perouterNetNS, params.TargetNS, iface); err != nil {
-				return err
-			}
-		case hostnetwork.UnderlayInterfaceGroutPort:
-			if err := setupGroutPortUnderlay(ctx, client, perouterNetNS, iface); err != nil {
 				return err
 			}
 		default:
@@ -144,20 +116,43 @@ func setupTapUnderlay(ctx context.Context, client *Client, perouterNetNS netns.N
 }
 
 func setupGroutPortUnderlay(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, iface hostnetwork.UnderlayInterface) error {
-	if iface.GroutPort == nil {
-		return fmt.Errorf("groutPort params missing for interface: %+v", iface)
+	netlinkName := iface.InterfaceName
+
+	devState, err := devicestate.Load(devicestate.Entry{NetlinkName: netlinkName})
+	if err != nil {
+		return fmt.Errorf("failed to load device state for %s: %w", netlinkName, err)
 	}
-	if err := resolveGroutPortPCIAddress(iface.GroutPort); err != nil {
-		return fmt.Errorf("failed to resolve PCI address for interface: %+v: %w", iface, err)
+
+	if devState.PCIAddress == "" {
+		devState.PCIAddress, err = sriov.ResolveNetlinkName(netlinkName)
+		if err != nil {
+			return fmt.Errorf("failed to resolve PCI address for %s: %w", netlinkName, err)
+		}
+		if err := devicestate.Save(*devState); err != nil {
+			return fmt.Errorf("failed to save device state for %s: %w", netlinkName, err)
+		}
+		devState.OriginalDriver, err = sriov.GetPCIDriver(devState.PCIAddress)
+		if err != nil {
+			return fmt.Errorf("failed to read driver for %s: %w", devState.PCIAddress, err)
+		}
+
+		netlinkAddrs, err := hostnetwork.AddressesForInterface(netlinkName, hostnetwork.ExcludeLinkLocal())
+		if err != nil {
+			return fmt.Errorf("failed to read addresses from %s: %w", netlinkName, err)
+		}
+		for _, a := range netlinkAddrs {
+			devState.Addresses = append(devState.Addresses, a.IPNet.String())
+		}
+		if err := devicestate.Save(*devState); err != nil {
+			return fmt.Errorf("failed to save device state for %s: %w", netlinkName, err)
+		}
 	}
-	if err := scrapeAndSaveDeviceState(ctx, iface.GroutPort.PCIAddress); err != nil {
-		return fmt.Errorf("failed to save device state for %s: %w", iface.GroutPort.PCIAddress, err)
-	}
-	if err := prepareGroutPortDriver(ctx, perouterNetNS, iface.GroutPort.PCIAddress); err != nil {
-		return fmt.Errorf("failed to prepare grout port driver for %s: %w", iface.GroutPort.PCIAddress, err)
+
+	if err := prepareGroutPortDriver(ctx, perouterNetNS, devState.PCIAddress, devState.NetlinkName); err != nil {
+		return fmt.Errorf("failed to prepare grout port driver for %s: %w", devState.PCIAddress, err)
 	}
 	return netnamespace.In(perouterNetNS, func() error {
-		return configureGroutPort(ctx, client, iface)
+		return configureGroutPort(ctx, client, iface, devState.PCIAddress)
 	})
 }
 
@@ -189,16 +184,42 @@ func UnderlayInterfaces(ctx context.Context, client *Client, namespace string) (
 		if !strings.Contains(details.Description, UnderlayInterfaceDescriptionMarker) {
 			continue
 		}
-		ret = append(ret,
-			hostnetwork.UnderlayInterface{
-				InterfaceName: groutIface.Name,
-				Kind:          hostnetwork.UnderlayInterfaceGroutPort,
-				GroutPort: &hostnetwork.GroutPortParams{
-					PCIAddress: details.Devargs,
-				},
-			})
+		iface, err := groutPortToUnderlayInterface(groutIface, details)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, iface)
 	}
 	return ret, nil
+}
+
+// groutPortToUnderlayInterface reconstructs the host underlay interface
+// from a grout port. PCI-backed (DPDK) ports store the original netlink
+// name in the device state file; TAP ports encode it in the grout name
+// as "u_<InterfaceName>".
+func groutPortToUnderlayInterface(groutIface groutInterface, details *groutInterfaceDetails) (hostnetwork.UnderlayInterface, error) {
+	if !sriov.IsPCIAddress(details.Devargs) {
+		return hostnetwork.UnderlayInterface{
+			InterfaceName: strings.TrimPrefix(groutIface.Name, UnderlayPortNamePrefix),
+			Kind:          hostnetwork.UnderlayInterfaceNetDev,
+		}, nil
+	}
+
+	state, err := devicestate.LoadByPCI(details.Devargs)
+	if err != nil {
+		return hostnetwork.UnderlayInterface{}, fmt.Errorf("failed to load device state for grout port %s: %w", groutIface.Name, err)
+	}
+	if state.NetlinkName == "" {
+		return hostnetwork.UnderlayInterface{}, fmt.Errorf("device state for grout port %s has no netlink name", groutIface.Name)
+	}
+	portName := groutIface.Name
+	return hostnetwork.UnderlayInterface{
+		InterfaceName: state.NetlinkName,
+		Kind:          hostnetwork.UnderlayInterfaceNetDev,
+		AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{
+			PortName: &portName,
+		},
+	}, nil
 }
 
 // RestoreUnderlay removes the given underlay interfaces: it tears
@@ -244,15 +265,17 @@ func RestoreUnderlay(
 
 		switch iface.Kind {
 		case hostnetwork.UnderlayInterfaceNetDev:
+			if iface.AcceleratedConfig != nil {
+				if err := teardownGroutPortUnderlay(ctx, client, ns, iface); err != nil {
+					return err
+				}
+				continue
+			}
 			if err := teardownTapUnderlay(ctx, client, targetNS, ns, iface); err != nil {
 				return err
 			}
 		case hostnetwork.UnderlayInterfaceCNIDev:
 			if err := teardownTapUnderlay(ctx, client, targetNS, ns, iface); err != nil {
-				return err
-			}
-		case hostnetwork.UnderlayInterfaceGroutPort:
-			if err := teardownGroutPortUnderlay(ctx, client, ns, iface); err != nil {
 				return err
 			}
 		default:
@@ -282,36 +305,38 @@ func removeGroutPortAddresses(ctx context.Context, client *Client, ns netns.NsHa
 }
 
 func teardownGroutPortUnderlay(ctx context.Context, client *Client, ns netns.NsHandle, iface hostnetwork.UnderlayInterface) error {
-	if err := removeGroutPortAddresses(ctx, client, ns, iface.InterfaceName); err != nil {
+	portName := PortName(iface)
+	if err := removeGroutPortAddresses(ctx, client, ns, portName); err != nil {
 		return err
 	}
 
-	if err := client.deletePort(ctx, iface.InterfaceName); err != nil {
-		slog.ErrorContext(ctx, "failed to delete grout port", "port", PortName(iface), "error", err)
+	if err := client.deletePort(ctx, portName); err != nil {
+		slog.ErrorContext(ctx, "failed to delete grout port", "port", portName, "error", err)
 	}
 
-	pciAddr := iface.GroutPort.PCIAddress
-	state, err := loadDeviceState(SavedDeviceState{PCIAddress: pciAddr})
+	netlinkName := iface.InterfaceName
+	state, err := devicestate.Load(devicestate.Entry{NetlinkName: netlinkName})
 	if err != nil {
 		slog.WarnContext(ctx, "no saved device state, cannot restore driver/IPs",
-			"pciAddress", pciAddr, "error", err)
+			"netlinkName", netlinkName, "error", err)
 		return nil
 	}
 
-	if state.OriginalDriver != "" && state.OriginalDriver != sriov.DriverVFIOPCI {
-		if err := sriov.RestoreDriver(pciAddr, state.OriginalDriver); err != nil {
+	if state.PCIAddress != "" && state.OriginalDriver != "" && state.OriginalDriver != sriov.DriverVFIOPCI {
+		if err := sriov.RestoreDriver(state.PCIAddress, state.OriginalDriver); err != nil {
 			return fmt.Errorf("failed to restore driver %s on %s: %w",
-				state.OriginalDriver, pciAddr, err)
+				state.OriginalDriver, state.PCIAddress, err)
 		}
 		slog.InfoContext(ctx, "restored original driver",
-			"pciAddress", pciAddr, "driver", state.OriginalDriver)
+			"pciAddress", state.PCIAddress, "driver", state.OriginalDriver)
 	}
 
-	restoreIPAddresses(ctx, *state)
+	if err := restoreIPAddresses(ctx, *state); err != nil {
+		return err
+	}
 
-	if err := deleteDeviceState(SavedDeviceState{PCIAddress: pciAddr}); err != nil {
-		slog.WarnContext(ctx, "failed to delete device state file",
-			"pciAddress", pciAddr, "error", err)
+	if err := devicestate.Delete(devicestate.Entry{NetlinkName: netlinkName}); err != nil {
+		return fmt.Errorf("failed to delete device state file for %s: %w", netlinkName, err)
 	}
 
 	return nil
@@ -336,7 +361,7 @@ func teardownTapUnderlay(ctx context.Context, client *Client, targetNS string, n
 	// Clean up the saved device state now that addresses have been
 	// successfully restored to the kernel interface and the underlay is
 	// fully torn down.
-	if err := deleteDeviceState(SavedDeviceState{NetlinkName: iface.InterfaceName}); err != nil {
+	if err := devicestate.Delete(devicestate.Entry{NetlinkName: iface.InterfaceName}); err != nil {
 		slog.WarnContext(ctx, "failed to delete saved device state",
 			"interface", iface.InterfaceName, "error", err)
 	}
@@ -344,24 +369,22 @@ func teardownTapUnderlay(ctx context.Context, client *Client, targetNS string, n
 	return nil
 }
 
-func restoreIPAddresses(ctx context.Context, state SavedDeviceState) {
+func restoreIPAddresses(ctx context.Context, state devicestate.Entry) error {
 	if state.NetlinkName == "" || len(state.Addresses) == 0 {
-		return
+		return nil
 	}
 	link, err := netlink.LinkByName(state.NetlinkName)
 	if err != nil {
-		slog.WarnContext(ctx, "kernel netdev not found after driver restore, cannot re-apply IPs",
-			"netlinkName", state.NetlinkName, "error", err)
-		return
+		return fmt.Errorf("kernel netdev [%s] not found, cannot re-apply IPs: %w", state.NetlinkName, err)
 	}
 	for _, addr := range state.Addresses {
 		if err := hostnetwork.AssignIPToInterface(link, addr); err != nil {
-			slog.ErrorContext(ctx, "failed to restore IP address",
-				"address", addr, "netlinkName", state.NetlinkName, "error", err)
+			return fmt.Errorf("failed to restore IP address %s to kernel netdev [%s]: %w", addr, state.NetlinkName, err)
 		}
+		slog.InfoContext(ctx, "restored IP addresses to kernel netdev",
+			"netlinkName", state.NetlinkName, "addresses", addr)
 	}
-	slog.InfoContext(ctx, "restored IP addresses to kernel netdev",
-		"netlinkName", state.NetlinkName, "addresses", state.Addresses)
+	return nil
 }
 
 func configureUnderlayPort(ctx context.Context, client *Client, underlayInterface, portName string) error {
@@ -380,14 +403,14 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 		for _, a := range underlayAddrs {
 			addrStrings = append(addrStrings, a.IPNet.String())
 		}
-		if err := saveDeviceState(SavedDeviceState{
+		if err := devicestate.Save(devicestate.Entry{
 			NetlinkName: underlayInterface,
 			Addresses:   addrStrings,
 		}); err != nil {
 			return fmt.Errorf("failed to save device state for %s: %w", underlayInterface, err)
 		}
 	} else {
-		saved, err := loadDeviceState(SavedDeviceState{NetlinkName: underlayInterface})
+		saved, err := devicestate.Load(devicestate.Entry{NetlinkName: underlayInterface})
 		if err == nil && len(saved.Addresses) > 0 {
 			slog.InfoContext(ctx, "kernel interface has no global addresses, "+
 				"but there are saved addresses",
@@ -411,7 +434,7 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 	mtu := int32(link.Attrs().MTU)
 
 	devargs := fmt.Sprintf("net_tap%s,remote=%s,iface=%s", makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
-	opts := PortOptions{MTU: &mtu}
+	opts := PortOptions{MTU: &mtu, Description: UnderlayInterfaceDescriptionMarker}
 	if err := client.ensurePortWithOptions(ctx, portName, devargs, opts); err != nil {
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
@@ -432,99 +455,26 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 	return nil
 }
 
-// resolveGroutPortPCIAddress resolves the PCI address from whichever
-// device selector was set on the GroutPortParams. This runs on the node
-// where sysfs is available, not in the controller.
-func resolveGroutPortPCIAddress(params *hostnetwork.GroutPortParams) error {
-	switch {
-	case params.NetlinkName != "":
-		pciAddr, err := sriov.ResolveNetlinkName(params.NetlinkName)
-		if err != nil {
-			return err
-		}
-		params.PCIAddress = pciAddr
-	case params.PFName != "" && params.VFIndex != nil:
-		pciAddr, err := sriov.ResolvePFVFIndex(params.PFName, int(*params.VFIndex))
-		if err != nil {
-			return err
-		}
-		params.PCIAddress = pciAddr
-	case params.PCIAddress != "":
-		if err := sriov.ResolvePCIAddress(params.PCIAddress); err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("no device selector set (need pciAddress, pfName+vfIndex, or netlinkName)")
-	}
-	return nil
-}
-
-// scrapeAndSaveDeviceState reads the kernel netdev name, IP addresses,
-// and current driver from a PCI device before the DPDK driver is bound,
-// and persists them to a state file for teardown restoration.
-func scrapeAndSaveDeviceState(ctx context.Context, pciAddr string) error {
-	netlinkName, err := sriov.GetPCINetDevice(pciAddr)
-	if err != nil {
-		slog.WarnContext(ctx, "no kernel netdev for PCI device, saving state without netlink name",
-			"pciAddress", pciAddr, "error", err)
-		netlinkName = ""
-	}
-
-	var addrs []string
-	if netlinkName != "" {
-		netlinkAddrs, err := hostnetwork.AddressesForInterface(netlinkName, hostnetwork.ExcludeLinkLocal())
-		if err != nil {
-			return fmt.Errorf("failed to read addresses from %s: %w", netlinkName, err)
-		}
-		for _, a := range netlinkAddrs {
-			addrs = append(addrs, a.IPNet.String())
-		}
-	}
-
-	driver, err := sriov.GetPCIDriver(pciAddr)
-	if err != nil {
-		return fmt.Errorf("failed to read driver for %s: %w", pciAddr, err)
-	}
-
-	state := SavedDeviceState{
-		PCIAddress:     pciAddr,
-		NetlinkName:    netlinkName,
-		OriginalDriver: driver,
-		Addresses:      addrs,
-	}
-	if err := saveDeviceState(state); err != nil {
-		return err
-	}
-
-	slog.InfoContext(ctx, "saved device state before DPDK binding",
-		"pciAddress", pciAddr, "netlinkName", netlinkName,
-		"driver", driver, "addresses", addrs)
-	return nil
-}
-
 // configureGroutPort creates a DPDK port in grout directly from a PCI
 // device address, loads the scraped IP addresses from the saved device
 // state, and sets up the kernel routes needed by FRR.
-func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface) error {
-	if iface.GroutPort == nil {
-		return fmt.Errorf("groutPort params missing for interface %s", iface.InterfaceName)
-	}
-
+func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface, pciAddr string) error {
 	portName := PortName(iface)
 	opts := PortOptions{
-		MTU:         iface.GroutPort.MTU,
-		RXQueues:    iface.GroutPort.RXQueues,
-		QSize:       iface.GroutPort.QSize,
+		RXQueues:    iface.AcceleratedConfig.RXQueues,
+		QSize:       iface.AcceleratedConfig.QSize,
+		Promiscuous: iface.AcceleratedConfig.Promiscuous,
+		MAC:         iface.AcceleratedConfig.MAC,
 		Description: UnderlayInterfaceDescriptionMarker,
 	}
 
-	if err := client.ensurePortWithOptions(ctx, portName, iface.GroutPort.PCIAddress, opts); err != nil {
+	if err := client.ensurePortWithOptions(ctx, portName, pciAddr, opts); err != nil {
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
 	}
 
-	state, err := loadDeviceState(SavedDeviceState{PCIAddress: iface.GroutPort.PCIAddress})
+	state, err := devicestate.Load(devicestate.Entry{NetlinkName: iface.InterfaceName})
 	if err != nil {
-		return fmt.Errorf("failed to load device state for %s: %w", iface.GroutPort.PCIAddress, err)
+		return fmt.Errorf("failed to load device state for %s: %w", iface.InterfaceName, err)
 	}
 
 	for _, addr := range state.Addresses {
@@ -552,7 +502,7 @@ func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.U
 //   - vfio-pci: already bound, nothing to do
 //   - mlx5_core: move the kernel netlink interface to the perouter namespace (bifurcated driver)
 //   - unknown/unbound: bind to vfio-pci
-func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr string) error {
+func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr, netlinkName string) error {
 	driver, err := sriov.GetPCIDriver(pciAddr)
 	if err != nil {
 		return fmt.Errorf("failed to get PCI driver for %s: %w", pciAddr, err)
@@ -570,16 +520,18 @@ func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, p
 		return nil
 
 	case driver == sriov.DriverMlx5Core:
-		netdev, err := sriov.GetPCINetDevice(pciAddr)
-		if err != nil {
-			return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
+		name := netlinkName
+		if name == "" {
+			name, err = sriov.GetPCINetDevice(pciAddr)
+			if err != nil {
+				return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
+			}
 		}
-
 		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
-			InterfaceName: netdev,
+			InterfaceName: name,
 			Kind:          hostnetwork.UnderlayInterfaceNetDev,
 		}); err != nil {
-			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", netdev, err)
+			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", name, err)
 		}
 		return nil
 
@@ -606,7 +558,7 @@ func PrepareAndBindTrunkVF(ctx context.Context, client *Client, targetNS, pciAdd
 			slog.Error("failed to close namespace", "namespace", targetNS, "error", err)
 		}
 	}()
-	if err := prepareGroutPortDriver(ctx, perouterNetNS, pciAddr); err != nil {
+	if err := prepareGroutPortDriver(ctx, perouterNetNS, pciAddr, ""); err != nil {
 		return fmt.Errorf("failed to prepare trunk VF driver for %s: %w", pciAddr, err)
 	}
 

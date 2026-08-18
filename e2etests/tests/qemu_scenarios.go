@@ -38,10 +38,10 @@ func qemuEVPNUnderlay() v1alpha1.Underlay {
 		Spec: v1alpha1.UnderlaySpec{
 			ASN: qemuVMASN,
 			Interfaces: []v1alpha1.UnderlayInterface{{
-				Type: v1alpha1.UnderlayInterfaceTypeGroutPort,
-				GroutPort: &v1alpha1.GroutPortConfig{
-					PortName:   new("gund"),
-					PCIAddress: new("0000:01:00.0"),
+				Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
+				NetworkDevice: &v1alpha1.NetworkDevice{
+					InterfaceName:     "enp1s0",
+					AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
 				},
 			}},
 			Neighbors: []v1alpha1.Neighbor{{
@@ -64,10 +64,10 @@ func qemuSRv6Underlay() v1alpha1.Underlay {
 		Spec: v1alpha1.UnderlaySpec{
 			ASN: qemuVMASN,
 			Interfaces: []v1alpha1.UnderlayInterface{{
-				Type: v1alpha1.UnderlayInterfaceTypeGroutPort,
-				GroutPort: &v1alpha1.GroutPortConfig{
-					PortName:   new("gund"),
-					PCIAddress: new("0000:01:00.0"),
+				Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
+				NetworkDevice: &v1alpha1.NetworkDevice{
+					InterfaceName:     "enp1s0",
+					AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
 				},
 			}},
 			Neighbors: []v1alpha1.Neighbor{{
@@ -82,7 +82,7 @@ func qemuSRv6Underlay() v1alpha1.Underlay {
 				BaseNet: "49.0001.0002.0003.0004.00",
 				Level:   new(int32(1)),
 				Interfaces: []v1alpha1.ISISInterface{{
-					Name:     "gund",
+					Name:     "u_enp1s0",
 					IPFamily: new(v1alpha1.IPFamilyIPv6),
 				}},
 			},

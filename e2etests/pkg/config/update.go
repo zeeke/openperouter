@@ -211,10 +211,16 @@ func (o Updater) Namespace() string {
 
 func fixUnderlayForGrout(u v1alpha1.Underlay) *v1alpha1.Underlay {
 	res := u.DeepCopy()
+	hasAccelerated := false
 	for _, iface := range res.Spec.Interfaces {
-		if iface.Type == v1alpha1.UnderlayInterfaceTypeGroutPort {
-			return res
+		if iface.Type == v1alpha1.UnderlayInterfaceTypeNetworkDevice &&
+			iface.NetworkDevice != nil && iface.NetworkDevice.AcceleratedConfig != nil {
+			hasAccelerated = true
+			break
 		}
+	}
+	if hasAccelerated {
+		return res
 	}
 
 	for i := range res.Spec.Neighbors {

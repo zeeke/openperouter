@@ -53,6 +53,8 @@ type PortOptions struct {
 	MTU         *int32
 	RXQueues    *int32
 	QSize       *int32
+	Promiscuous *bool
+	MAC         *string
 	Description string
 }
 
@@ -79,6 +81,16 @@ func (c *Client) ensurePortWithOptions(ctx context.Context, name, devargs string
 	}
 	if opts.QSize != nil {
 		args = append(args, "qsize", fmt.Sprintf("%d", *opts.QSize))
+	}
+	if opts.Promiscuous != nil {
+		if *opts.Promiscuous {
+			args = append(args, "promisc", "on")
+		} else {
+			args = append(args, "promisc", "off")
+		}
+	}
+	if opts.MAC != nil {
+		args = append(args, "mac", *opts.MAC)
 	}
 	if opts.Description != "" {
 		args = append(args, "description", opts.Description)

@@ -29,6 +29,27 @@ func TestResolvePCIAddress(t *testing.T) {
 	}
 }
 
+func TestIsPCIAddress(t *testing.T) {
+	tests := []struct {
+		s    string
+		want bool
+	}{
+		{s: "0000:01:00.0", want: true},
+		{s: "0000:03:02.7", want: true},
+		{s: "ffff:ff:ff.7", want: true},
+		{s: "invalid", want: false},
+		{s: "net_tap0,remote=eth0,iface=tap_eth0", want: false},
+		{s: "0000:01:00.8", want: false},
+		{s: "00:01:00.0", want: false},
+		{s: "", want: false},
+	}
+	for _, tt := range tests {
+		if got := IsPCIAddress(tt.s); got != tt.want {
+			t.Errorf("IsPCIAddress(%q) = %v, want %v", tt.s, got, tt.want)
+		}
+	}
+}
+
 func TestResolvePCIAddress_InvalidFormat(t *testing.T) {
 	if err := ResolvePCIAddress("invalid"); err == nil {
 		t.Fatal("expected error for invalid PCI address format")

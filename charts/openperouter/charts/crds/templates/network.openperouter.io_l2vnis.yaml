@@ -243,6 +243,38 @@ spec:
                   handles VXLAN encap/decap for remote nodes.
                   Only valid when grout is enabled. Mutually exclusive with hostmaster.
                 properties:
+                  acceleratedConfig:
+                    description: acceleratedConfig specifies optional DPDK port parameters
+                      for the trunk VF.
+                    properties:
+                      mac:
+                        description: |-
+                          mac overrides the MAC address on the DPDK port. When unset, the
+                          port inherits the NIC's hardware MAC address.
+                        pattern: ^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$
+                        type: string
+                      promiscuous:
+                        description: |-
+                          promiscuous enables promiscuous mode on the DPDK port.
+                          When true, the NIC accepts all incoming frames regardless of
+                          destination MAC address. Defaults to false.
+                        type: boolean
+                      qSize:
+                        description: |-
+                          qSize is the descriptor ring size for each receive queue. Larger
+                          rings absorb traffic bursts at the cost of memory.
+                        format: int32
+                        maximum: 32768
+                        minimum: 64
+                        type: integer
+                      rxQueues:
+                        description: rxQueues is the number of receive queues to allocate
+                          on the DPDK port.
+                        format: int32
+                        maximum: 64
+                        minimum: 1
+                        type: integer
+                    type: object
                   pciAddress:
                     description: |-
                       pciAddress is the PCI Bus:Device.Function address of the trunk VF to
@@ -259,31 +291,6 @@ spec:
                     maxLength: 15
                     pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
                     type: string
-                  portOptions:
-                    description: portOptions specifies optional DPDK port parameters
-                      for the trunk VF.
-                    properties:
-                      mtu:
-                        description: mtu is the Maximum Transmission Unit for the
-                          DPDK port.
-                        format: int32
-                        maximum: 9702
-                        minimum: 68
-                        type: integer
-                      qSize:
-                        description: qSize is the size of each receive/transmit queue.
-                        format: int32
-                        maximum: 32768
-                        minimum: 64
-                        type: integer
-                      rxQueues:
-                        description: rxQueues is the number of receive queues for
-                          the DPDK port.
-                        format: int32
-                        maximum: 64
-                        minimum: 1
-                        type: integer
-                    type: object
                   vfIndex:
                     description: |-
                       vfIndex is the index of the Virtual Function on the PF to use as

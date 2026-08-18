@@ -12,7 +12,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/e2etests/pkg/config"
-	"github.com/openperouter/openperouter/e2etests/pkg/executor"
 	"github.com/openperouter/openperouter/e2etests/pkg/frr"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
@@ -29,28 +28,12 @@ func networkDeviceQEMUInterface(_ clientset.Interface) v1alpha1.UnderlayInterfac
 }
 
 func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
-	controllerPods, err := openperouter.ControllerPods(cs)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(controllerPods).NotTo(BeEmpty(), "no controller pods found")
-
-	exec := executor.ForPod(controllerPods[0].Namespace, controllerPods[0].Name, "controller")
-	out, err := exec.Exec("sh", "-c",
-		`for drv in /sys/class/net/*/device/driver; do `+
-			`[ "$(basename $(readlink "$drv"))" = igb ] && `+
-			`ADDR=$(basename $(readlink "$(dirname "$drv")")) && break; `+
-			`done && `+
-			`echo "$ADDR" > /sys/bus/pci/drivers/igb/unbind && `+
-			`echo vfio-pci > /sys/bus/pci/devices/"$ADDR"/driver_override && `+
-			`echo "$ADDR" > /sys/bus/pci/drivers_probe && `+
-			`echo "$ADDR"`)
-	Expect(err).NotTo(HaveOccurred())
-	pciAddr := strings.TrimSpace(out)
-	Expect(pciAddr).NotTo(BeEmpty(), "could not discover igb PCI address")
 
 	return v1alpha1.UnderlayInterface{
-		Type: "GroutPort",
-		GroutPort: &v1alpha1.GroutPortConfig{
-			PCIAddress: new(pciAddr),
+		Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
+		NetworkDevice: &v1alpha1.NetworkDevice{
+			InterfaceName:     "enp1s0",
+			AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
 		},
 	}
 }
