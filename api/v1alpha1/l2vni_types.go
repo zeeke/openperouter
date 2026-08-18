@@ -241,9 +241,9 @@ type SRIOVVFPairConfig struct {
 	// +required
 	VLAN int32 `json:"vlan,omitempty"`
 
-	// portOptions specifies optional DPDK port parameters for the trunk VF.
+	// acceleratedConfig specifies optional DPDK port parameters for the trunk VF.
 	// +optional
-	PortOptions *GroutPortOptions `json:"portOptions,omitempty"`
+	AcceleratedConfig *AcceleratedConfig `json:"acceleratedConfig,omitempty"`
 }
 
 // VNIStatus defines the observed state of VNI.

@@ -38,8 +38,9 @@ type KernelDatapathConfigValidator struct{}
 func (k *KernelDatapathConfigValidator) Validate(apiConfig APIConfigData) error {
 	for _, underlay := range apiConfig.Underlays {
 		for _, iface := range underlay.Spec.Interfaces {
-			if iface.Type == v1alpha1.UnderlayInterfaceTypeGroutPort {
-				return fmt.Errorf("GroutPort interface type requires grout datapath (--datapath=grout)")
+			if iface.Type == v1alpha1.UnderlayInterfaceTypeNetworkDevice &&
+				iface.NetworkDevice != nil && iface.NetworkDevice.AcceleratedConfig != nil {
+				return fmt.Errorf("acceleratedConfig requires grout datapath (--datapath=grout)")
 			}
 		}
 	}

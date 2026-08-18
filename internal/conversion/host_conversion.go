@@ -9,7 +9,6 @@ import (
 	"hash/fnv"
 	"net"
 	"strconv"
-	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -632,8 +631,6 @@ func underlayInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Unde
 		return networkDeviceInterfaceToHost(iface)
 	case v1alpha1.UnderlayInterfaceTypeCNIDevice:
 		return cniDeviceInterfaceToHost(iface)
-	case v1alpha1.UnderlayInterfaceTypeGroutPort:
-		return groutPortInterfaceToHost(iface)
 	default:
 		return hostnetwork.UnderlayInterface{}, fmt.Errorf("unsupported underlay interface type %q", iface.Type)
 	}
@@ -651,9 +648,13 @@ func networkDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork
 		InterfaceName: iface.NetworkDevice.InterfaceName,
 		Kind:          hostnetwork.UnderlayInterfaceNetDev,
 	}
-	if iface.GroutPort != nil && iface.GroutPort.PortName != nil {
-		res.GroutPort = &hostnetwork.GroutPortParams{
-			PortName: *iface.GroutPort.PortName,
+	if iface.NetworkDevice.AcceleratedConfig != nil {
+		res.AcceleratedConfig = &hostnetwork.AcceleratedConfigParams{
+			RXQueues:    iface.NetworkDevice.AcceleratedConfig.RXQueues,
+			QSize:       iface.NetworkDevice.AcceleratedConfig.QSize,
+			Promiscuous: iface.NetworkDevice.AcceleratedConfig.Promiscuous,
+			MAC:         iface.NetworkDevice.AcceleratedConfig.MAC,
+			PortName:    iface.NetworkDevice.AcceleratedConfig.PortName,
 		}
 	}
 	return res, nil
@@ -682,75 +683,14 @@ func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 		}
 	}
 
-	res := hostnetwork.UnderlayInterface{
+	return hostnetwork.UnderlayInterface{
 		InterfaceName: ifName,
 		Kind:          hostnetwork.UnderlayInterfaceCNIDev,
 		CNI: &hostnetwork.CNIDeviceParams{
 			Config:         iface.CNIDevice.RawConfig.Raw,
 			CapabilityArgs: capabilityArgs,
 		},
-	}
-	if iface.GroutPort != nil && iface.GroutPort.PortName != nil {
-		res.GroutPort = &hostnetwork.GroutPortParams{
-			PortName: *iface.GroutPort.PortName,
-		}
-	}
-	return res, nil
-}
-
-func groutPortInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.UnderlayInterface, error) {
-	if iface.GroutPort == nil {
-		return hostnetwork.UnderlayInterface{},
-			fmt.Errorf("groutPort configuration is missing for interface type GroutPort")
-	}
-
-	params := &hostnetwork.GroutPortParams{}
-	if iface.GroutPort.PortOptions != nil {
-		params.MTU = iface.GroutPort.PortOptions.MTU
-		params.RXQueues = iface.GroutPort.PortOptions.RXQueues
-		params.QSize = iface.GroutPort.PortOptions.QSize
-	}
-
-	var ifName string
-	switch {
-	case iface.GroutPort.NetlinkName != nil:
-		ifName = *iface.GroutPort.NetlinkName
-		params.NetlinkName = *iface.GroutPort.NetlinkName
-
-	case iface.GroutPort.PFName != nil && iface.GroutPort.VFIndex != nil:
-		ifName = fmt.Sprintf("%s_%d", *iface.GroutPort.PFName, *iface.GroutPort.VFIndex)
-		params.PFName = *iface.GroutPort.PFName
-		params.VFIndex = iface.GroutPort.VFIndex
-
-	case iface.GroutPort.PCIAddress != nil:
-		ifName = "p" + pciAddressToBDF(*iface.GroutPort.PCIAddress)
-		params.PCIAddress = *iface.GroutPort.PCIAddress
-
-	default:
-		return hostnetwork.UnderlayInterface{},
-			fmt.Errorf("groutPort must specify one of netlinkName, pciAddress, or pfName+vfIndex")
-	}
-
-	if iface.GroutPort.PortName != nil {
-		ifName = *iface.GroutPort.PortName
-		params.PortName = *iface.GroutPort.PortName
-	}
-
-	return hostnetwork.UnderlayInterface{
-		InterfaceName: ifName,
-		Kind:          hostnetwork.UnderlayInterfaceGroutPort,
-		GroutPort:     params,
 	}, nil
-}
-
-// pciAddressToBDF strips the domain part, colons, and dot from a PCI address,
-// returning only the Bus-Device-Function digits (e.g. "0000:03:02.0" → "03020").
-func pciAddressToBDF(pciAddr string) string {
-	// Strip domain (everything up to and including the first colon).
-	if i := strings.IndexByte(pciAddr, ':'); i >= 0 {
-		pciAddr = pciAddr[i+1:]
-	}
-	return strings.NewReplacer(":", "", ".", "").Replace(pciAddr)
 }
 
 // pciAddressToIfName returns a 6-character hash of the PCI address using
@@ -764,6 +704,7 @@ func pciAddressToIfName(pciAddr string) string {
 	}
 	return s[len(s)-6:]
 }
+
 func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) (*hostnetwork.VFPairParams, error) {
 	pciAddr, err := resolveVFPairPCI(cfg)
 	if err != nil {
@@ -775,10 +716,9 @@ func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) (*hostnetwork.VFPairPar
 		VLAN:          cfg.VLAN,
 		TrunkPortName: trunkPortName,
 	}
-	if cfg.PortOptions != nil {
-		params.MTU = cfg.PortOptions.MTU
-		params.RXQueues = cfg.PortOptions.RXQueues
-		params.QSize = cfg.PortOptions.QSize
+	if cfg.AcceleratedConfig != nil {
+		params.RXQueues = cfg.AcceleratedConfig.RXQueues
+		params.QSize = cfg.AcceleratedConfig.QSize
 	}
 	return params, nil
 }

@@ -5,6 +5,7 @@ package sriov
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 )
@@ -62,6 +63,7 @@ func RestoreDriver(pciAddr, originalDriver string) error {
 		return err
 	}
 	if current == originalDriver {
+		slog.Debug("driver already bound to original driver", "pciAddr", pciAddr, "originalDriver", originalDriver)
 		return nil
 	}
 

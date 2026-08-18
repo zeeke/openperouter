@@ -63,7 +63,6 @@ type VFPairParams struct {
 	PCIAddress    string `json:"pciAddress"`
 	VLAN          int32  `json:"vlan"`
 	TrunkPortName string `json:"trunkPortName"`
-	MTU           *int32 `json:"mtu,omitempty"`
 	RXQueues      *int32 `json:"rxQueues,omitempty"`
 	QSize         *int32 `json:"qSize,omitempty"`
 }

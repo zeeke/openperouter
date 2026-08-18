@@ -102,7 +102,6 @@ func setupL2VNIVFPair(ctx context.Context, client *Client, params hostnetwork.L2
 	vfPair := params.VFPair
 
 	opts := PortOptions{
-		MTU:      vfPair.MTU,
 		RXQueues: vfPair.RXQueues,
 		QSize:    vfPair.QSize,
 	}

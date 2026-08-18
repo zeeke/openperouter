@@ -42,35 +42,24 @@ type UnderlayInterface struct {
 	// CNI holds the CNI provisioning data; set when Kind is
 	// UnderlayInterfaceCNIDev.
 	CNI *CNIDeviceParams `json:"cni,omitempty"`
-	// GroutPort holds DPDK port provisioning data; set when Kind is
+	// AcceleratedConfig holds DPDK port provisioning data; set when Kind is
 	// UnderlayInterfaceGroutPort.
-	GroutPort *GroutPortParams `json:"groutPort,omitempty"`
+	AcceleratedConfig *AcceleratedConfigParams `json:"acceleratedConfig,omitempty"`
 }
 
-// GroutPortParams holds the data needed to provision an underlay interface
-// as a DPDK port bound directly to grout.
-type GroutPortParams struct {
-	// PCIAddress is the resolved PCI BDF address of the VF.
-	PCIAddress string `json:"pciAddress,omitempty"`
-	// PFName is the PF name when the pfName+vfIndex selector was used.
-	PFName string `json:"pfName,omitempty"`
-	// VFIndex is the VF index when the pfName+vfIndex selector was used.
-	VFIndex *int32 `json:"vfIndex,omitempty"`
-	// NetlinkName is the kernel netlink device name when the netlinkName
-	// selector was used. Resolved to a PCI address at setup time.
-	NetlinkName string `json:"netlinkName,omitempty"`
-	// PortName is the explicit grout interface name (from portName field).
-	PortName string `json:"portName,omitempty"`
-	// MTU is the optional MTU for the DPDK port.
-	MTU *int32 `json:"mtu,omitempty"`
+// AcceleratedConfigParams holds the data needed to provision an underlay
+// interface as a DPDK port bound directly to grout.
+type AcceleratedConfigParams struct {
 	// RXQueues is the optional number of receive queues.
 	RXQueues *int32 `json:"rxQueues,omitempty"`
 	// QSize is the optional queue size.
 	QSize *int32 `json:"qSize,omitempty"`
-	// NetlinkDevice is the kernel network interface associated with the
-	// PCI device (set for mlx5 bifurcated driver). When non-empty the
-	// interface is moved to the perouter namespace during setup.
-	NetlinkDevice string `json:"netlinkDevice,omitempty"`
+	// Promiscuous enables promiscuous mode on the DPDK port.
+	Promiscuous *bool `json:"promiscuous,omitempty"`
+	// MAC overrides the MAC address on the DPDK port.
+	MAC *string `json:"mac,omitempty"`
+	// PortName overrides the grout port name.
+	PortName *string `json:"portName,omitempty"`
 }
 
 // CNIDeviceParams holds the data needed to provision an underlay interface
@@ -196,9 +185,6 @@ const (
 	// UnderlayInterfaceCNIDev is provisioned by a CNI plugin and recorded
 	// in the libcni result cache.
 	UnderlayInterfaceCNIDev UnderlayInterfaceKind = "cnidev"
-	// UnderlayInterfaceGroutPort is a DPDK port bound directly to grout
-	// via a PCI device address (SR-IOV VF).
-	UnderlayInterfaceGroutPort UnderlayInterfaceKind = "groutport"
 )
 
 // UnderlayInterfaces returns all the underlay interfaces currently

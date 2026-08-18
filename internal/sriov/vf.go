@@ -14,6 +14,11 @@ var pciAddressRegex = regexp.MustCompile(`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-f
 // SysfsRoot can be overridden in tests.
 var SysfsRoot = "/sys"
 
+// IsPCIAddress reports whether s is a PCI BDF address (DDDD:BB:DD.F).
+func IsPCIAddress(s string) bool {
+	return pciAddressRegex.MatchString(s)
+}
+
 // ResolveNetlinkName resolves a kernel netlink device name to its PCI
 // address by reading the "device" symlink under the device's sysfs
 // class/net directory.
@@ -24,7 +29,7 @@ func ResolveNetlinkName(name string) (string, error) {
 		return "", fmt.Errorf("failed to resolve netlink device %q to PCI address: %w", name, err)
 	}
 	pciAddr := filepath.Base(target)
-	if !pciAddressRegex.MatchString(pciAddr) {
+	if !IsPCIAddress(pciAddr) {
 		return "", fmt.Errorf("resolved device symlink target %q for %q does not look like a PCI address", pciAddr, name)
 	}
 	return pciAddr, nil
@@ -33,7 +38,7 @@ func ResolveNetlinkName(name string) (string, error) {
 // ResolvePCIAddress validates the PCI address format and checks that the
 // device exists in sysfs.
 func ResolvePCIAddress(pciAddr string) error {
-	if !pciAddressRegex.MatchString(pciAddr) {
+	if !IsPCIAddress(pciAddr) {
 		return fmt.Errorf("invalid PCI address format %q, expected DDDD:BB:DD.F", pciAddr)
 	}
 	devicePath := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr)
@@ -52,7 +57,7 @@ func ResolvePFVFIndex(pfName string, vfIndex int) (string, error) {
 		return "", fmt.Errorf("failed to resolve VF %d on PF %q: %w", vfIndex, pfName, err)
 	}
 	pciAddr := filepath.Base(target)
-	if !pciAddressRegex.MatchString(pciAddr) {
+	if !IsPCIAddress(pciAddr) {
 		return "", fmt.Errorf("resolved VF symlink target %q does not look like a PCI address", pciAddr)
 	}
 	return pciAddr, nil
