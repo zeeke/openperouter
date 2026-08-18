@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net"
 	"regexp"
 	"strings"
 	"text/template"
@@ -269,7 +270,15 @@ func templateConfig(data any) (string, error) {
 				if addr == "" {
 					return false
 				}
-				// Return true only if neighbor establishes an IPv6 eBGP session.
+				// disable-connected-check is only needed when the BGP TCP session
+				// runs over IPv6, because global-scope IPv6 addresses may not live
+				// on a directly connected subnet. IPv4-addressed neighbors that
+				// carry IPv6 unicast routes via multiprotocol BGP don't need it:
+				// the connected check uses the TCP session's address family.
+				ip := net.ParseIP(addr)
+				if ip == nil || ip.To4() != nil {
+					return false
+				}
 				return networklayerprotocol.HasUnicastFamily(nlps, networklayerprotocol.IPv6) &&
 					!eBGPMultiHop && peerASN.IsExternalTo(myASN)
 			},
