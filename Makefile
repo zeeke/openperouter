@@ -404,7 +404,7 @@ load-on-multi-cluster: ## Load the docker image into both kind clusters.
 	KIND=$(KIND) KUBECTL=$(KUBECTL) bash -c 'export KIND_CLUSTER_NAME=pe-kind-a && source clab/common.sh && load_local_image_to_kind ${IMG} router-a'
 	KIND=$(KIND) KUBECTL=$(KUBECTL) bash -c 'export KIND_CLUSTER_NAME=pe-kind-b && source clab/common.sh && load_local_image_to_kind ${IMG} router-b'
 
-include hack/qemu/Makefile
+include clab/qemu/Makefile
 
 ##@ Kind Node Image
 
