@@ -413,7 +413,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: "go.mod"
           cache: true
@@ -427,6 +427,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-system-x86 qemu-utils genisoimage sshpass
+
+      - name: Install containerlab
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)"
 
       - name: Verify KVM support
         run: |
@@ -451,13 +455,20 @@ jobs:
         run: |
           make qemu-image
 
-      - name: Launch QEMU VM and FRR TOR
+      - name: Deploy containerlab topology
+        run: |
+          make qemu-clab
+
+      - name: Launch QEMU VM
+        run: |
+          make qemu-launch
+
+      - name: Bootstrap k3s cluster
         run: |
           make qemu-setup
 
       - name: Deploy openperouter in QEMU VM
         run: |
-          OPENPEROUTER_IMAGE_TAR=image/openperouter-grout.tar \
           KUSTOMIZE_LAYER=grout \
             make qemu-deploy IMG_TAG=main-grout
 

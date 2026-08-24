@@ -1,0 +1,60 @@
+#cloud-config
+
+users:
+  - name: openperouter
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: false
+    # password: openperouter (hashed)
+    passwd: $6$rounds=4096$saltsalt$oBm8JQR0cXK0r3.ZxfI9fXHxBBr7JHQO.RGUfNn7qXKLlSLCKnV5h5kWoYk5C6NOVwx3hW6NFGHH7RLI0XR./
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINcvLCZmwtW+onAtf4ege+BTaZbvRrRzFneBBP6IXhb2 openperouter-qemu-vm
+
+ssh_pwauth: true
+
+package_update: true
+package_upgrade: false
+
+packages:
+  - iproute
+  - pciutils
+  - numactl
+  - numactl-libs
+  - dpdk
+  - dpdk-tools
+  - kernel-modules-extra
+  - jq
+  - curl
+  - tar
+
+write_files:
+  - path: /etc/udev/rules.d/70-persistent-net.rules
+    content: |
+      # toleafkind1 PF (TAPs 0-3)
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toleafkind1v0"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toleafkind1v1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toleafkind1v2"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toleafkind1v3"
+      # toswitch1 PF (TAPs 4-7)
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:05", NAME="toswitch1v0"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:06", NAME="toswitch1v1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:07", NAME="toswitch1v2"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:08", NAME="toswitch1v3"
+
+  - path: /etc/modules-load.d/vfio.conf
+    content: |
+      vfio-pci
+
+  - path: /etc/sysctl.d/99-hugepages.conf
+    content: |
+      vm.nr_hugepages=1024
+
+runcmd:
+  - grubby --update-kernel=DEFAULT --args="intel_iommu=on iommu=pt hugepagesz=2M hugepages=1024 default_hugepagesz=2M"
+  # - modprobe vfio-pci || true TODO: remove this
+  # Install k3s (but don't start it — setup.sh starts it after image import)
+  - "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 INSTALL_K3S_SKIP_START=true sh -"
+  # Signal that cloud-init is done
+  - touch /var/lib/cloud/instance/boot-finished-signal
+
+final_message: "cloud-init completed in $UPTIME seconds"
