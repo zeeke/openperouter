@@ -8,7 +8,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SSH_PORT="${QEMU_SSH_PORT:-2222}"
-CLAB_NAME="${CLAB_NAME:-qemu}"
+CLAB_NAME="${CLAB_NAME:-kind}"
 LOG_DIR="${KIND_EXPORT_LOGS:-/tmp/kind_logs}"
 KUBECONFIG="${SCRIPT_DIR}/kubeconfig"
 

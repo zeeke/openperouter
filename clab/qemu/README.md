@@ -9,7 +9,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the topology diagram and link map.
 ./clab/singlecluster/qemu/deploy-all.sh
 
 # Or manual steps:
-sudo containerlab deploy -t clab/singlecluster/qemu.clab.yml
+sudo containerlab deploy -t clab/singlecluster/kind.clab.yml
 ./clab/singlecluster/qemu/launch-vm-clab.sh
 make qemu-deploy
 make qemu-e2etests
