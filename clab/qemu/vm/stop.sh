@@ -7,7 +7,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAB_NAME="${CLAB_NAME:-qemu}"
+CLAB_NAME="${CLAB_NAME:-kind}"
 
 DESTROY_IMAGE=false
 if [[ "${1:-}" == "--destroy" ]]; then

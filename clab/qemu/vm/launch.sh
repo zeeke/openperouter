@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 VM_IMAGE="${SCRIPT_DIR}/fedora-cloud.qcow2"
 CLOUD_INIT_ISO="${SCRIPT_DIR}/cloud-init.iso"
-CLAB_NAME="${CLAB_NAME:-qemu}"
+CLAB_NAME="${CLAB_NAME:-kind}"
 NUM_NICS=8  # 2 fake PFs × 4 NICs each
 SSH_PORT="${QEMU_SSH_PORT:-2222}"
 K8S_PORT="${QEMU_K8S_PORT:-6443}"

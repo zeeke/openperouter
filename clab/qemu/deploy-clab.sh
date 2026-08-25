@@ -10,7 +10,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAB_DIR="${SCRIPT_DIR}/.."
-CLAB_NAME="${CLAB_NAME:-qemu}"
+CLAB_NAME="${CLAB_NAME:-kind}"
 
 # Skip if topology is already deployed and all containers are running
 if sudo containerlab inspect --name "${CLAB_NAME}" &>/dev/null 2>&1; then
@@ -36,5 +36,5 @@ done
 "${CLAB_DIR}/scripts/02-leaf-configs.sh"
 
 # Deploy containerlab topology
-export CLAB_TOPOLOGY="qemu/qemu.clab.yml"
+export CLAB_TOPOLOGY="qemu/kind.clab.yml"
 "${CLAB_DIR}/scripts/04-containerlab-deploy.sh"

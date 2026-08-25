@@ -5,4 +5,4 @@ vm/serial.log
 vm/qemu.pid
 
 # Containerlab state
-clab-qemu/
+clab-kind/
