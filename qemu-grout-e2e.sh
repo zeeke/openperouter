@@ -24,3 +24,6 @@ make qemu-e2etests GINKGO_ARGS="-failFast --label-filter=grout-support" TEST_ARG
 docker exec -it clab-kind-leafkind1 bash -xc "ip route; ip link; vtysh -c 'show running-config'; cat /etc/frr/frr.log" > /tmp/kind_logs/leafkind1.log;
 
 mv kind_logs.out/* $t; rm reports/latest.out; ln -s ../$t reports/latest.out;
+
+
+# check folder reports/latest.out. console.log has the test output. subfolders contains logs and details for each test failure. analyze the first test failure in the console.log and create a file analysis.md in that folder with your findings. go deep in the analysis and spawn as many agents as needed to fully analyze the failure.
