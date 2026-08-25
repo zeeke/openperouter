@@ -58,6 +58,8 @@ type AcceleratedConfigParams struct {
 	Promiscuous *bool `json:"promiscuous,omitempty"`
 	// MAC overrides the MAC address on the DPDK port.
 	MAC *string `json:"mac,omitempty"`
+	// PortName overrides the grout port name.
+	PortName *string `json:"portName,omitempty"`
 }
 
 // CNIDeviceParams holds the data needed to provision an underlay interface

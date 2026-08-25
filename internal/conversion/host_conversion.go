@@ -644,6 +644,7 @@ func networkDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork
 			QSize:       iface.NetworkDevice.AcceleratedConfig.QSize,
 			Promiscuous: iface.NetworkDevice.AcceleratedConfig.Promiscuous,
 			MAC:         iface.NetworkDevice.AcceleratedConfig.MAC,
+			PortName:    iface.NetworkDevice.AcceleratedConfig.PortName,
 		}
 	}
 	return res, nil

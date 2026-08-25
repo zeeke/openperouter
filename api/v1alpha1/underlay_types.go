@@ -179,6 +179,10 @@ type AcceleratedConfig struct {
 	// +kubebuilder:validation:Pattern=`^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$`
 	// +optional
 	MAC *string `json:"mac,omitempty"`
+	// portName overrides the grout port name. When unset, the port is
+	// named "u_<interfaceName>".
+	// +optional
+	PortName *string `json:"portName,omitempty"`
 }
 
 // CNIConfigType selects the source of the CNI configuration.

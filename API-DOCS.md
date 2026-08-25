@@ -37,6 +37,7 @@ _Appears in:_
 | `qSize` _integer_ | qSize is the descriptor ring size for each receive queue. Larger<br />rings absorb traffic bursts at the cost of memory. |  | Maximum: 32768 <br />Minimum: 64 <br />Optional: \{\} <br /> |
 | `promiscuous` _boolean_ | promiscuous enables promiscuous mode on the DPDK port.<br />When true, the NIC accepts all incoming frames regardless of<br />destination MAC address. Defaults to false. |  | Optional: \{\} <br /> |
 | `mac` _string_ | mac overrides the MAC address on the DPDK port. When unset, the<br />port inherits the NIC's hardware MAC address. |  | Pattern: `^([0-9a-fA-F]\{2\}:)\{5\}[0-9a-fA-F]\{2\}$` <br />Optional: \{\} <br /> |
+| `portName` _string_ | portName overrides the grout port name. When unset, the port is<br />named "u_<interfaceName>". |  | Optional: \{\} <br /> |
 
 
 #### AddressFamilyProperty
