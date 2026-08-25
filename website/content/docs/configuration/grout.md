@@ -187,7 +187,8 @@ spec:
 
 All `acceleratedConfig` fields are optional. `acceleratedConfig: {}` enables
 DPDK attachment with grout defaults. `promiscuous` defaults to false. `mac`
-overrides the NIC hardware address when set.
+overrides the NIC hardware address when set. `portName` overrides the grout
+port name (`u_<interfaceName>` when unset).
 
 ## Verification
 
