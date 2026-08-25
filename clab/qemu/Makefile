@@ -25,7 +25,7 @@ qemu-deploy: qemu-image qemu-clab qemu-launch qemu-setup qemu-load-image deploy-
 
 .PHONY: qemu-e2etests
 qemu-e2etests: ginkgo kubectl create-export-logs ## Run QEMU e2e tests (VM must be running)
-	$(GINKGO) -v $(GINKGO_ARGS) --label-filter='qemu-support' --timeout=1h \
+	$(GINKGO) -v $(GINKGO_ARGS) --timeout=1h \
 	  ./e2etests/suite -- \
 	  --kubectl=$(KUBECTL) --groutmode --qemu-mode \
 	  --reporterpath=$(KIND_EXPORT_LOGS) \
