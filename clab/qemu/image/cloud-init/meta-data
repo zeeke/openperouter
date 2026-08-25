@@ -1,2 +1,2 @@
-instance-id: openperouter-qemu
-local-hostname: openperouter-qemu
+instance-id: pe-kind-control-plane
+local-hostname: pe-kind-control-plane

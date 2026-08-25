@@ -3,10 +3,17 @@
 QEMU_SSH_PORT ?= 2222
 QEMU_K8S_PORT ?= 6443
 QEMU_DIR := clab/qemu
+QEMU_VM_IMAGE := $(QEMU_DIR)/vm/fedora-cloud.qcow2
+QEMU_CLOUD_INIT_ISO := $(QEMU_DIR)/vm/cloud-init.iso
 
 .PHONY: qemu-image
-qemu-image: ## Prepare the QEMU VM image with cloud-init
-	$(QEMU_DIR)/image/prepare.sh
+qemu-image: $(QEMU_VM_IMAGE) $(QEMU_CLOUD_INIT_ISO) ## Prepare the QEMU VM image with cloud-init
+
+$(QEMU_VM_IMAGE):
+	$(QEMU_DIR)/image/prepare.sh image
+
+$(QEMU_CLOUD_INIT_ISO):
+	$(QEMU_DIR)/image/prepare.sh iso
 
 .PHONY: qemu-launch
 qemu-launch: ## Launch the QEMU VM (run qemu-image and clab-qemu first)
@@ -27,7 +34,7 @@ qemu-deploy: qemu-image qemu-clab qemu-launch qemu-setup qemu-load-image deploy-
 qemu-e2etests: ginkgo kubectl create-export-logs ## Run QEMU e2e tests (VM must be running)
 	$(GINKGO) -v $(GINKGO_ARGS) --timeout=1h \
 	  ./e2etests/suite -- \
-	  --kubectl=$(KUBECTL) --groutmode --qemu-mode \
+	  --kubectl=$(KUBECTL) --qemu-mode \
 	  --reporterpath=$(KIND_EXPORT_LOGS) \
 	  $(TEST_ARGS)
 
