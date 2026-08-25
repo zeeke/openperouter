@@ -358,4 +358,28 @@ func TestMatchesRequested(t *testing.T) {
 	t.Run("unspecified fields are ignored", func(t *testing.T) {
 		assert.True(t, matching.matchesRequested("0000:03:02.0", PortOptions{Description: "underlay"}))
 	})
+
+	t.Run("tap devargs with random suffix still match", func(t *testing.T) {
+		tap := groutInterfaceDetails{
+			Devargs:     "net_tapabc123,remote=eth0,iface=tap_eth0",
+			Description: "underlay",
+			MTU:         1500,
+		}
+		mtu := int32(1500)
+		assert.True(t, tap.matchesRequested("net_tapxyz789,remote=eth0,iface=tap_eth0", PortOptions{
+			MTU:         &mtu,
+			Description: "underlay",
+		}))
+	})
+
+	t.Run("tap vs pci is a mismatch", func(t *testing.T) {
+		assert.False(t, matching.matchesRequested("net_tap0,remote=eth0,iface=tap_eth0", opts))
+	})
+
+	t.Run("mismatching mtu", func(t *testing.T) {
+		details := matching
+		details.MTU = 1500
+		mtu := int32(9000)
+		assert.False(t, details.matchesRequested("0000:03:02.0", PortOptions{MTU: &mtu, Description: "underlay"}))
+	})
 }

@@ -16,6 +16,13 @@ const (
 	DriverMlx5Core = "mlx5_core"
 )
 
+var IntelKernelDrivers = map[string]bool{
+	"igb":  true,
+	"iavf": true,
+	"ice":  true,
+	"i40e": true,
+}
+
 // SysfsRoot can be overridden in tests.
 var SysfsRoot = "/sys"
 

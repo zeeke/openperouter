@@ -41,6 +41,7 @@ type groutInterfaceDetails struct {
 	Description string   `json:"description"`
 	Devargs     string   `json:"devargs"`
 	MAC         string   `json:"mac"`
+	MTU         int32    `json:"mtu"`
 	NRxq        int32    `json:"n_rxq"`
 	RxqSize     int32    `json:"rxq_size"`
 	Flags       []string `json:"flags"`
@@ -61,6 +62,7 @@ func (c *Client) deleteAddress(ctx context.Context, iface, addr string) error {
 
 // PortOptions holds optional parameters for DPDK port creation.
 type PortOptions struct {
+	MTU         *int32
 	RXQueues    *int32
 	QSize       *int32
 	Promiscuous *bool
@@ -89,6 +91,9 @@ func (c *Client) ensurePortWithOptions(ctx context.Context, name, devargs string
 	}
 
 	args := []string{"interface", "add", "port", name, "devargs", devargs}
+	if opts.MTU != nil {
+		args = append(args, "mtu", fmt.Sprintf("%d", *opts.MTU))
+	}
 	if opts.RXQueues != nil {
 		args = append(args, "rxqs", fmt.Sprintf("%d", *opts.RXQueues))
 	}
@@ -208,15 +213,23 @@ func (c *Client) getInterfaceDetails(ctx context.Context, name string) (*groutIn
 
 // matchesRequested reports whether the existing grout port already has the
 // requested configuration. Unspecified options are ignored so TAP ports
-// created with empty PortOptions are left in place.
+// created with empty PortOptions are left in place. TAP devargs include a
+// random suffix, so they are not compared for equality.
 func (d *groutInterfaceDetails) matchesRequested(devargs string, opts PortOptions) bool {
 	if !portOptionsSpecified(opts) {
 		return true
 	}
-	if d.Devargs != devargs {
+	if isTAPDevargs(devargs) || isTAPDevargs(d.Devargs) {
+		if isTAPDevargs(devargs) != isTAPDevargs(d.Devargs) {
+			return false
+		}
+	} else if d.Devargs != devargs {
 		return false
 	}
 	if opts.Description != "" && d.Description != opts.Description {
+		return false
+	}
+	if opts.MTU != nil && d.MTU != *opts.MTU {
 		return false
 	}
 	if opts.RXQueues != nil && d.NRxq != *opts.RXQueues {
@@ -234,8 +247,12 @@ func (d *groutInterfaceDetails) matchesRequested(devargs string, opts PortOption
 	return true
 }
 
+func isTAPDevargs(devargs string) bool {
+	return strings.Contains(devargs, "net_tap")
+}
+
 func portOptionsSpecified(opts PortOptions) bool {
-	return opts.RXQueues != nil || opts.QSize != nil || opts.Promiscuous != nil || opts.MAC != nil || opts.Description != ""
+	return opts.MTU != nil || opts.RXQueues != nil || opts.QSize != nil || opts.Promiscuous != nil || opts.MAC != nil || opts.Description != ""
 }
 
 func hasPromiscFlag(flags []string) bool {

@@ -10,7 +10,32 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"k8s.io/utils/ptr"
 )
+
+func TestPortName(t *testing.T) {
+	t.Run("default prefix", func(t *testing.T) {
+		assert.Equal(t, "u_ens1f0", PortName(hostnetwork.UnderlayInterface{
+			InterfaceName: "ens1f0",
+		}))
+	})
+
+	t.Run("accelerated without override still uses prefix", func(t *testing.T) {
+		assert.Equal(t, "u_ens1f0", PortName(hostnetwork.UnderlayInterface{
+			InterfaceName:     "ens1f0",
+			AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{},
+		}))
+	})
+
+	t.Run("port name override", func(t *testing.T) {
+		assert.Equal(t, "p0", PortName(hostnetwork.UnderlayInterface{
+			InterfaceName: "ens1f0",
+			AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{
+				PortName: ptr.To("p0"),
+			},
+		}))
+	})
+}
 
 func TestGroutPortToUnderlayInterface(t *testing.T) {
 	origDir := devicestate.Dir
@@ -24,9 +49,23 @@ func TestGroutPortToUnderlayInterface(t *testing.T) {
 		Addresses:      []string{"10.0.0.1/24"},
 	}))
 
+	t.Run("tap port uses grout name without prefix", func(t *testing.T) {
+		got, err := groutPortToUnderlayInterface(
+			groutInterface{Name: "u_eth0"},
+			&groutInterfaceDetails{
+				Devargs:     "net_tap0,remote=eth0,iface=tap_eth0",
+				Description: UnderlayInterfaceDescriptionMarker,
+			},
+		)
+		require.NoError(t, err)
+		assert.Equal(t, "eth0", got.InterfaceName)
+		assert.Equal(t, hostnetwork.UnderlayInterfaceNetDev, got.Kind)
+		assert.Nil(t, got.AcceleratedConfig)
+	})
+
 	t.Run("pci port loads interface name from device state", func(t *testing.T) {
 		got, err := groutPortToUnderlayInterface(
-			groutInterface{Name: "u_ens1f0"},
+			groutInterface{Name: "p0"},
 			&groutInterfaceDetails{
 				Devargs:     "0000:01:00.0",
 				Description: UnderlayInterfaceDescriptionMarker,
@@ -36,11 +75,28 @@ func TestGroutPortToUnderlayInterface(t *testing.T) {
 		assert.Equal(t, "ens1f0", got.InterfaceName)
 		assert.Equal(t, hostnetwork.UnderlayInterfaceNetDev, got.Kind)
 		require.NotNil(t, got.AcceleratedConfig)
+		require.NotNil(t, got.AcceleratedConfig.PortName)
+		assert.Equal(t, "p0", *got.AcceleratedConfig.PortName)
+	})
+
+	t.Run("pci port with default grout name still uses device state", func(t *testing.T) {
+		got, err := groutPortToUnderlayInterface(
+			groutInterface{Name: "u_ens1f0"},
+			&groutInterfaceDetails{
+				Devargs:     "0000:01:00.0",
+				Description: UnderlayInterfaceDescriptionMarker,
+			},
+		)
+		require.NoError(t, err)
+		assert.Equal(t, "ens1f0", got.InterfaceName)
+		require.NotNil(t, got.AcceleratedConfig)
+		require.NotNil(t, got.AcceleratedConfig.PortName)
+		assert.Equal(t, "u_ens1f0", *got.AcceleratedConfig.PortName)
 	})
 
 	t.Run("pci port without device state returns error", func(t *testing.T) {
 		_, err := groutPortToUnderlayInterface(
-			groutInterface{Name: "u_missing"},
+			groutInterface{Name: "p1"},
 			&groutInterfaceDetails{
 				Devargs:     "0000:ff:00.0",
 				Description: UnderlayInterfaceDescriptionMarker,
