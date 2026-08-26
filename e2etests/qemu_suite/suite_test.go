@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/openperouter/openperouter/e2etests/pkg/config"
 	"github.com/openperouter/openperouter/e2etests/pkg/executor"
+	"github.com/openperouter/openperouter/e2etests/pkg/frrk8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/infra"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
@@ -55,7 +56,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	log.SetLogger(zap.New(zap.WriteTo(ginkgo.GinkgoWriter), zap.UseDevMode(true)))
 	clientconfig, err := k8sclient.RestConfig()
 	Expect(err).NotTo(HaveOccurred(), "failed to load kubeconfig (KUBECONFIG=%s)", os.Getenv("KUBECONFIG"))
-	Updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, "", GroutMode)
+	Updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace, GroutMode)
 	Expect(err).NotTo(HaveOccurred())
 
 	kubeconfig := os.Getenv("KUBECONFIG")
