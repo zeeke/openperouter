@@ -172,6 +172,8 @@ func validateVLANUniquenessPerTrunk(l2vnis []v1alpha1.L2VNI) error {
 			trunkKey = *cfg.PCIAddress
 		} else if cfg.PFName != nil && cfg.VFIndex != nil {
 			trunkKey = fmt.Sprintf("%s/vf%d", *cfg.PFName, *cfg.VFIndex)
+		} else if cfg.NetlinkName != nil {
+			trunkKey = "netlink:" + *cfg.NetlinkName
 		}
 		if trunkKey == "" {
 			continue

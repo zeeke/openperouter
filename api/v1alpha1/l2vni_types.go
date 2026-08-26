@@ -204,23 +204,23 @@ type HostMaster struct {
 
 // SRIOVVFPairConfig specifies the SR-IOV trunk VF and VLAN for VF-to-VF
 // communication on an L2VNI.
-// Exactly one VF selector must be used: either pciAddress alone, or pfName +
-// vfIndex together.
-// +kubebuilder:validation:XValidation:rule="has(self.pciAddress) != (has(self.pfName) && has(self.vfIndex))",message="specify either pciAddress or both pfName and vfIndex, not both"
+// Exactly one VF selector must be used: pciAddress, pfName + vfIndex, or
+// netlinkName.
+// +kubebuilder:validation:XValidation:rule="(has(self.pciAddress) ? 1 : 0) + ((has(self.pfName) && has(self.vfIndex)) ? 1 : 0) + (has(self.netlinkName) ? 1 : 0) == 1",message="specify exactly one of: pciAddress, pfName+vfIndex, or netlinkName"
 // +kubebuilder:validation:XValidation:rule="!has(self.pfName) || has(self.vfIndex)",message="vfIndex is required when pfName is set"
 // +kubebuilder:validation:XValidation:rule="!has(self.vfIndex) || has(self.pfName)",message="pfName is required when vfIndex is set"
 type SRIOVVFPairConfig struct {
 	// pciAddress is the PCI Bus:Device.Function address of the trunk VF to
 	// bind to grout (e.g. "0000:03:02.0"). The trunk VF must have no VLAN
 	// configured (VLAN 0) so it receives all tagged frames from other VFs.
-	// Mutually exclusive with pfName/vfIndex.
+	// Mutually exclusive with pfName/vfIndex and netlinkName.
 	// +kubebuilder:validation:Pattern=`^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$`
 	// +optional
 	PCIAddress *string `json:"pciAddress,omitempty"`
 
 	// pfName is the name of the Physical Function whose VF will be the
 	// trunk port. Must be used together with vfIndex.
-	// Mutually exclusive with pciAddress.
+	// Mutually exclusive with pciAddress and netlinkName.
 	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
 	// +kubebuilder:validation:MaxLength=15
 	// +optional
@@ -228,10 +228,19 @@ type SRIOVVFPairConfig struct {
 
 	// vfIndex is the index of the Virtual Function on the PF to use as
 	// the trunk port. Must be used together with pfName.
-	// Mutually exclusive with pciAddress.
+	// Mutually exclusive with pciAddress and netlinkName.
 	// +kubebuilder:validation:Minimum=0
 	// +optional
 	VFIndex *int32 `json:"vfIndex,omitempty"`
+
+	// netlinkName is the kernel network interface name of the trunk VF
+	// (e.g. "enp3s2"). The controller resolves it to a PCI address via
+	// sysfs at runtime. Mutually exclusive with pciAddress and
+	// pfName/vfIndex.
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
+	// +kubebuilder:validation:MaxLength=15
+	// +optional
+	NetlinkName *string `json:"netlinkName,omitempty"`
 
 	// vlan is the 802.1Q VLAN ID that maps to this L2VNI. Workload VFs
 	// on the same PF configured with this VLAN ID will participate in

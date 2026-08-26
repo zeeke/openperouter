@@ -733,5 +733,8 @@ func resolveVFPairPCI(cfg *v1alpha1.SRIOVVFPairConfig) (string, error) {
 	if cfg.PFName != nil && cfg.VFIndex != nil {
 		return sriov.ResolvePFVFIndex(*cfg.PFName, int(*cfg.VFIndex))
 	}
-	return "", fmt.Errorf("sriovVFPair must specify either pciAddress or pfName+vfIndex")
+	if cfg.NetlinkName != nil {
+		return sriov.ResolveNetlinkName(*cfg.NetlinkName)
+	}
+	return "", fmt.Errorf("sriovVFPair must specify pciAddress, pfName+vfIndex, or netlinkName")
 }

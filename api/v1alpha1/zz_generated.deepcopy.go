@@ -1276,6 +1276,11 @@ func (in *SRIOVVFPairConfig) DeepCopyInto(out *SRIOVVFPairConfig) {
 		*out = new(int32)
 		**out = **in
 	}
+	if in.NetlinkName != nil {
+		in, out := &in.NetlinkName, &out.NetlinkName
+		*out = new(string)
+		**out = **in
+	}
 	if in.AcceleratedConfig != nil {
 		in, out := &in.AcceleratedConfig, &out.AcceleratedConfig
 		*out = new(AcceleratedConfig)
