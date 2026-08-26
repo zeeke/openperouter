@@ -72,6 +72,8 @@ var _ = ginkgo.BeforeSuite(func() {
 
 	ginkgo.By("Waiting for router pods to be ready")
 	cs := k8sclient.New()
+	Expect(executor.SetupNodeExec(cs, frrk8s.Namespace, "busybox:1.36")).To(Succeed(), "failed to setup node-exec-helper")
+
 	Eventually(func() error {
 		routers, err := openperouter.Get(cs, HostMode)
 		if err != nil {

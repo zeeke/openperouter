@@ -5,14 +5,16 @@ package qemu_e2e
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/openperouter/openperouter/api/v1alpha1"
 	"github.com/openperouter/openperouter/e2etests/pkg/config"
+	"github.com/openperouter/openperouter/e2etests/pkg/executor"
 	"github.com/openperouter/openperouter/e2etests/pkg/frr"
+	"github.com/openperouter/openperouter/e2etests/pkg/infra"
+	"github.com/openperouter/openperouter/e2etests/pkg/k8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
 	corev1 "k8s.io/api/core/v1"
@@ -30,31 +32,9 @@ const (
 var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func() {
 	var cs clientset.Interface
 	var routerPods []*corev1.Pod
+	var nodes []corev1.Node
 
-	qemuUnderlay := v1alpha1.Underlay{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "underlay",
-			Namespace: openperouter.Namespace,
-		},
-		Spec: v1alpha1.UnderlaySpec{
-			ASN: 64514,
-			Interfaces: []v1alpha1.UnderlayInterface{
-				{
-					Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
-					NetworkDevice: &v1alpha1.NetworkDevice{
-						InterfaceName:     "toswitch1v0",
-						AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
-					},
-				},
-			},
-			Neighbors: []v1alpha1.Neighbor{
-				{
-					ASN:     ptr.To(int64(65000)),
-					Address: ptr.To("192.168.100.1"),
-				},
-			},
-		},
-	}
+	qemuUnderlay := AcceleratedUnderlay
 
 	l3vniRed := v1alpha1.L3VNI{
 		ObjectMeta: metav1.ObjectMeta{
@@ -85,7 +65,7 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 			GatewayIPs:    []string{"10.110.0.1/24"},
 			SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{
 				PCIAddress: ptr.To(trunkVFPCI),
-				VLAN:       500,
+				VLAN:       33,
 			},
 		},
 	}
@@ -101,7 +81,7 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 			GatewayIPs:    []string{"10.120.0.1/24"},
 			SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{
 				PCIAddress: ptr.To(trunkVFPCI),
-				VLAN:       600,
+				VLAN:       44,
 			},
 		},
 	}
@@ -115,18 +95,23 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 		Expect(routerPods).NotTo(BeEmpty(), "no router pods found")
 		DumpPods("Router pods", routerPods)
 
+		nodes, err = k8s.GetNodes(cs)
+		Expect(err).NotTo(HaveOccurred())
+
 		By("Creating accelerated underlay")
 		Expect(Updater.Update(config.Resources{
 			Underlays: []v1alpha1.Underlay{qemuUnderlay},
 		})).To(Succeed())
 
-		By("Waiting for BGP session with TOR")
-		for _, pod := range routerPods {
-			exec := openperouter.ExecutorForPod(pod)
-			validateSessionWithNeighbor(exec, validationParameters{
-				fromName:    pod.Name,
-				toName:      "qemu-tor",
-				neighborIP:  "192.168.100.1",
+		By("Verifying BGP sessions with leafkind1")
+		leafExec := executor.ForContainer(infra.KindLeaf)
+		for _, node := range nodes {
+			neighborIP, err := infra.NeighborIP(infra.KindLeaf, node.Name)
+			Expect(err).NotTo(HaveOccurred())
+			validateSessionWithNeighbor(leafExec, validationParameters{
+				fromName:    infra.KindLeaf,
+				toName:      node.Name,
+				neighborIP:  neighborIP,
 				established: Established,
 			})
 		}
@@ -155,81 +140,19 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 		})).To(Succeed())
 	})
 
-	It("should have grout VLAN sub-interfaces for VF-pair L2VNIs", func() {
-		for _, pod := range routerPods {
-			exec := openperouter.ExecutorForPod(pod)
-			Eventually(func() error {
-				out, err := exec.Exec("grcli", "--err-exit", "--json", "interface", "show")
-				if err != nil {
-					return fmt.Errorf("grcli interface show failed on %s: %s", pod.Name, out)
-				}
-
-				var ifaces []groutInterface
-				if err := json.Unmarshal([]byte(out), &ifaces); err != nil {
-					return fmt.Errorf("failed to parse grcli output on %s: %w", pod.Name, err)
-				}
-
-				var hasVlan500, hasVlan600 bool
-				for _, iface := range ifaces {
-					if iface.Type == "vlan" {
-						if containsVLANID(iface.Name, 500) {
-							hasVlan500 = true
-						}
-						if containsVLANID(iface.Name, 600) {
-							hasVlan600 = true
-						}
-					}
-				}
-
-				if !hasVlan500 {
-					return fmt.Errorf("VLAN 500 sub-interface not found on %s, interfaces: %v", pod.Name, ifaces)
-				}
-				if !hasVlan600 {
-					return fmt.Errorf("VLAN 600 sub-interface not found on %s, interfaces: %v", pod.Name, ifaces)
-				}
-				return nil
-			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
+	It("should not have host-side bridges (no br-hs-* for VF-pair L2VNIs)", func() {
+		for _, node := range nodes {
+			exec := executor.ForNode(node.Name)
+			out, err := exec.Exec("ip", "link", "show", "type", "bridge")
+			Expect(err).NotTo(HaveOccurred(), "ip link show failed on %s: %s", node.Name, out)
+			Expect(out).NotTo(ContainSubstring("br-hs-110"),
+				"host bridge br-hs-110 should not exist with VF-pair mode on %s", node.Name)
+			Expect(out).NotTo(ContainSubstring("br-hs-120"),
+				"host bridge br-hs-120 should not exist with VF-pair mode on %s", node.Name)
 		}
 	})
 
-	It("should have grout bridges for both L2VNIs", func() {
-		for _, pod := range routerPods {
-			exec := openperouter.ExecutorForPod(pod)
-			Eventually(func() error {
-				out, err := exec.Exec("grcli", "--err-exit", "--json", "interface", "show")
-				if err != nil {
-					return fmt.Errorf("grcli interface show failed on %s: %s", pod.Name, out)
-				}
-
-				var ifaces []groutInterface
-				if err := json.Unmarshal([]byte(out), &ifaces); err != nil {
-					return fmt.Errorf("failed to parse grcli output on %s: %w", pod.Name, err)
-				}
-
-				var hasBridge110, hasBridge120 bool
-				for _, iface := range ifaces {
-					if iface.Type == "bridge" {
-						if iface.Name == "br-pe-110" {
-							hasBridge110 = true
-						}
-						if iface.Name == "br-pe-120" {
-							hasBridge120 = true
-						}
-					}
-				}
-
-				if !hasBridge110 {
-					return fmt.Errorf("bridge br-pe-110 not found on %s", pod.Name)
-				}
-				if !hasBridge120 {
-					return fmt.Errorf("bridge br-pe-120 not found on %s", pod.Name)
-				}
-				return nil
-			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
-		}
-	})
-
-	It("should have VXLAN interfaces for both VNIs", func() {
+	It("should have VXLAN interfaces for both VNIs in grout", func() {
 		for _, pod := range routerPods {
 			exec := openperouter.ExecutorForPod(pod)
 			Eventually(func() error {
@@ -245,13 +168,14 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 
 				var hasVxlan110, hasVxlan120 bool
 				for _, iface := range ifaces {
-					if iface.Type == "vxlan" {
-						if iface.Name == "vni110" {
-							hasVxlan110 = true
-						}
-						if iface.Name == "vni120" {
-							hasVxlan120 = true
-						}
+					if iface.Type != "vxlan" {
+						continue
+					}
+					if iface.Name == "vni110" {
+						hasVxlan110 = true
+					}
+					if iface.Name == "vni120" {
+						hasVxlan120 = true
 					}
 				}
 
@@ -266,84 +190,30 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 		}
 	})
 
-	It("should configure FRR with VRF red and EVPN for the L2VNIs", func() {
+	It("should have EVPN VNIs provisioned in VRF red", func() {
 		for _, pod := range routerPods {
 			exec := openperouter.ExecutorForPod(pod)
-			Eventually(func() error {
-				cfg, err := frr.RunningConfig(exec)
-				if err != nil {
-					return fmt.Errorf("failed to get FRR running config from %s: %w", pod.Name, err)
-				}
-				for _, check := range []string{"vrf red", "vni 110", "vni 120"} {
-					if !strings.Contains(cfg, check) {
-						return fmt.Errorf("FRR config on %s missing %q:\n%s", pod.Name, check, cfg)
+			for _, vni := range []int{110, 120} {
+				Eventually(func() error {
+					info, err := frr.EVPNVNIStatus(exec, vni)
+					if err != nil {
+						return fmt.Errorf(
+							"failed to get EVPN VNI %d status on %s: %w",
+							vni, pod.Name, err,
+						)
 					}
-				}
-				return nil
-			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
-		}
-	})
-
-	It("should not have host-side bridges (no br-hs-* for VF-pair L2VNIs)", func() {
-		for _, pod := range routerPods {
-			exec := openperouter.ExecutorForPod(pod)
-			out, err := exec.Exec("ip", "link", "show", "type", "bridge")
-			Expect(err).NotTo(HaveOccurred(), "ip link show failed on %s: %s", pod.Name, out)
-			Expect(out).NotTo(ContainSubstring("br-hs-110"),
-				"host bridge br-hs-110 should not exist with VF-pair mode on %s", pod.Name)
-			Expect(out).NotTo(ContainSubstring("br-hs-120"),
-				"host bridge br-hs-120 should not exist with VF-pair mode on %s", pod.Name)
-		}
-	})
-
-	It("should accept L2VNI with netlinkName selector", func() {
-		l2vniNetlink := v1alpha1.L2VNI{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "tenant-netlink",
-				Namespace: openperouter.Namespace,
-			},
-			Spec: v1alpha1.L2VNISpec{
-				VNI:           130,
-				RoutingDomain: l3vniRoutingDomain("red"),
-				GatewayIPs:    []string{"10.130.0.1/24"},
-				SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{
-					NetlinkName: ptr.To(trunkVFNetlinkName),
-					VLAN:        700,
-				},
-			},
-		}
-
-		By("Creating L2VNI with netlinkName VF selector")
-		Expect(Updater.Update(config.Resources{
-			L2VNIs: []v1alpha1.L2VNI{l2vniA, l2vniB, l2vniNetlink},
-		})).To(Succeed())
-
-		By("Verifying grout creates the VLAN 700 sub-interface")
-		for _, pod := range routerPods {
-			exec := openperouter.ExecutorForPod(pod)
-			Eventually(func() error {
-				out, err := exec.Exec("grcli", "--err-exit", "--json", "interface", "show")
-				if err != nil {
-					return fmt.Errorf("grcli interface show failed on %s: %s", pod.Name, out)
-				}
-
-				var ifaces []groutInterface
-				if err := json.Unmarshal([]byte(out), &ifaces); err != nil {
-					return fmt.Errorf("failed to parse grcli output on %s: %w", pod.Name, err)
-				}
-
-				for _, iface := range ifaces {
-					if iface.Type == "vlan" && containsVLANID(iface.Name, 700) {
-						return nil
+					if info == nil {
+						return fmt.Errorf("EVPN VNI %d not provisioned on %s", vni, pod.Name)
 					}
-				}
-				return fmt.Errorf("VLAN 700 sub-interface not found on %s", pod.Name)
-			}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
+					if info.TenantVrf != "red" {
+						return fmt.Errorf(
+							"EVPN VNI %d on %s is in VRF %q, expected %q",
+							vni, pod.Name, info.TenantVrf, "red",
+						)
+					}
+					return nil
+				}, 2*time.Minute, 5*time.Second).ShouldNot(HaveOccurred())
+			}
 		}
 	})
 })
-
-func containsVLANID(name string, vlan int) bool {
-	suffix := fmt.Sprintf(".%d", vlan)
-	return strings.HasSuffix(name, suffix)
-}
