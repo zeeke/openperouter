@@ -1,6 +1,6 @@
 // SPDX-License-Identifier:Apache-2.0
 
-package tests
+package qemu_e2e
 
 import (
 	"encoding/json"
@@ -17,8 +17,8 @@ import (
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/ptr"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/utils/ptr"
 )
 
 // Trunk VF identifiers in the QEMU VM (2nd igb NIC, bound to grout via DPDK).
@@ -107,9 +107,6 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 	}
 
 	BeforeAll(func() {
-		if !QEMUMode {
-			Skip("QEMU mode not enabled")
-		}
 		cs = k8sclient.New()
 
 		var err error
@@ -136,9 +133,6 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 	})
 
 	AfterAll(func() {
-		if !QEMUMode {
-			return
-		}
 		Expect(Updater.CleanAll()).To(Succeed())
 		Eventually(func() error {
 			routers, err := openperouter.Get(cs, HostMode)
