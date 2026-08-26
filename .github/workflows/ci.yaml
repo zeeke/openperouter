@@ -219,7 +219,6 @@ jobs:
           path: /tmp/openperouter-grout.tar
 
   e2etests:
-    if: true
     runs-on: ubuntu-22.04
     env:
       NODE_IMAGE: quay.io/openperouter/kind-node-openperouter:${{ needs.build-kind-node-image.outputs.kind-node-version }}
@@ -327,11 +326,6 @@ jobs:
           fi
 
 
-      - name: Start grout memory monitor
-        if: ${{ contains(matrix.deployment, 'grout') }}
-        run: |
-          hack/monitor-grout-memory.sh start
-
       - name: Run e2e tests
         run: |
           if [ ${{ matrix.deployment }} = "systemdmode" ]; then
@@ -346,20 +340,6 @@ jobs:
             export GINKGO_ARGS="--label-filter='!systemdmode'"
             make e2etests
           fi
-
-      - name: Stop grout memory monitor
-        if: ${{ always() && contains(matrix.deployment, 'grout') }}
-        run: |
-          hack/monitor-grout-memory.sh stop
-
-      - name: Upload grout memory logs
-        if: ${{ always() && contains(matrix.deployment, 'grout') }}
-        uses: actions/upload-artifact@v7
-        with:
-          retention-days: 5
-          name: grout-memory-${{ matrix.deployment }}
-          path: /tmp/kind_logs/grout-memory-*.log
-          if-no-files-found: ignore
 
       - name: Upload e2e test reports
         if: ${{ always() }}
@@ -451,30 +431,14 @@ jobs:
         run: |
           docker load -i image/openperouter-grout.tar
 
-      - name: Prepare QEMU VM image
-        run: |
-          make qemu-image
-
-      - name: Deploy containerlab topology
-        run: |
-          make qemu-clab
-
-      - name: Launch QEMU VM
-        run: |
-          make qemu-launch
-
-      - name: Bootstrap k3s cluster
-        run: |
-          make qemu-setup
-
-      - name: Deploy openperouter in QEMU VM
+      - name: Deploy the QEMU cluster
         run: |
           KUSTOMIZE_LAYER=grout \
             make qemu-deploy IMG_TAG=main-grout
 
       - name: Run QEMU e2e tests
         run: |
-          make qemu-e2etests GINKGO_ARGS="--label-filter='qemu-support'"
+          make qemu-e2etests TEST_ARGS="--groutmode"
 
       - name: Collect QEMU logs
         if: ${{ failure() }}
@@ -492,7 +456,7 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          make qemu-clean
+          make qemu-clean clean
 
   scale-tests:
     if: contains(github.event.pull_request.labels.*.name, 'run-scale-tests')
