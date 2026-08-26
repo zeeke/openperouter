@@ -20,12 +20,50 @@ VM_MEM="${QEMU_VM_MEM:-6144}"
 PID_FILE="${SCRIPT_DIR}/qemu.pid"
 SERIAL_LOG="${SCRIPT_DIR}/serial.log"
 SSH_KEY="${SCRIPT_DIR}/qemu-vm-key"
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=5 -i ${SSH_KEY}"
+MAX_WAIT=300
 
-# Skip if VM is already running
+wait_for_ssh() {
+    local reason=$1
+    local elapsed=0
+    while ! ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost true 2>/dev/null; do
+        sleep 5
+        elapsed=$((elapsed + 5))
+        if [[ "${elapsed}" -ge "${MAX_WAIT}" ]]; then
+            echo "ERROR: VM did not become SSH-reachable ${reason} within ${MAX_WAIT}s." >&2
+            tail -50 "${SERIAL_LOG}" >&2 || true
+            exit 1
+        fi
+        echo "  still waiting... (${elapsed}s / ${MAX_WAIT}s)"
+    done
+}
+
+# Reboot once if cloud-init's grubby args (intel_iommu=on, hugepages) are not
+# yet on the running kernel. vfio-pci cannot bind without a guest IOMMU.
+ensure_iommu_cmdline() {
+    if ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost \
+        "grep -q intel_iommu=on /proc/cmdline" 2>/dev/null; then
+        return 0
+    fi
+
+    echo "Rebooting VM for kernel cmdline changes (IOMMU, hugepages)..."
+    ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost \
+        "sudo reboot" 2>/dev/null || true
+    sleep 10
+    echo "Waiting for VM to become SSH-reachable after reboot..."
+    wait_for_ssh "after reboot"
+    echo "VM is back after reboot."
+}
+
+# Skip QEMU launch if the VM is already running, but still apply the IOMMU
+# cmdline reboot if this boot happened before grubby took effect.
 if [[ -f "${PID_FILE}" ]]; then
     PID=$(cat "${PID_FILE}" 2>/dev/null || echo "")
     if [[ -n "${PID}" ]] && sudo kill -0 "${PID}" 2>/dev/null; then
-        echo "QEMU VM is already running (PID ${PID}), skipping."
+        echo "QEMU VM is already running (PID ${PID}), skipping launch."
+        wait_for_ssh "on already-running VM"
+        ensure_iommu_cmdline
+        echo "VM is ready."
         exit 0
     fi
 fi
@@ -155,23 +193,14 @@ echo "QEMU started (PID $(cat "${PID_FILE}"))"
 
 # --- Wait for SSH ---
 echo "Waiting for VM to become SSH-reachable (port ${SSH_PORT})..."
-SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=5 -i ${SSH_KEY}"
-MAX_WAIT=300
-ELAPSED=0
-while ! ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost true 2>/dev/null; do
-    sleep 5
-    ELAPSED=$((ELAPSED + 5))
-    if [[ "${ELAPSED}" -ge "${MAX_WAIT}" ]]; then
-        echo "ERROR: VM did not become SSH-reachable within ${MAX_WAIT}s." >&2
-        tail -50 "${SERIAL_LOG}" >&2 || true
-        exit 1
-    fi
-    echo "  still waiting... (${ELAPSED}s / ${MAX_WAIT}s)"
-done
-
+wait_for_ssh "after launch"
 echo "VM is SSH-reachable."
 
 # --- Wait for cloud-init ---
 echo "Waiting for cloud-init to complete..."
 ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost \
     "sudo cloud-init status --wait" 2>/dev/null || true
+
+ensure_iommu_cmdline
+
+echo "VM is ready."
