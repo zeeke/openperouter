@@ -24,7 +24,7 @@ import (
 // Trunk VF identifiers in the QEMU VM (2nd igb NIC, bound to grout via DPDK).
 const (
 	trunkVFPCI         = "0000:02:00.0"
-	trunkVFNetlinkName = "enp2s0"
+	trunkVFNetlinkName = "toswitch1v1"
 )
 
 var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func() {
@@ -42,7 +42,7 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 				{
 					Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
 					NetworkDevice: &v1alpha1.NetworkDevice{
-						InterfaceName:     "enp1s0",
+						InterfaceName:     "toswitch1v0",
 						AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
 					},
 				},
