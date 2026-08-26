@@ -611,6 +611,45 @@ func TestValidateVLANUniquenessPerTrunk(t *testing.T) {
 			errorString: "both use VLAN 10",
 		},
 		{
+			name: "same trunk via netlinkName same VLAN is rejected",
+			l2vnis: []v1alpha1.L2VNI{
+				{
+					ObjectMeta: metav1.ObjectMeta{Name: "a"},
+					Spec: v1alpha1.L2VNISpec{
+						VNI:         100,
+						SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{NetlinkName: pf("enp3s2"), VLAN: 10},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{Name: "b"},
+					Spec: v1alpha1.L2VNISpec{
+						VNI:         200,
+						SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{NetlinkName: pf("enp3s2"), VLAN: 10},
+					},
+				},
+			},
+			errorString: "both use VLAN 10",
+		},
+		{
+			name: "same trunk via netlinkName different VLANs is allowed",
+			l2vnis: []v1alpha1.L2VNI{
+				{
+					ObjectMeta: metav1.ObjectMeta{Name: "a"},
+					Spec: v1alpha1.L2VNISpec{
+						VNI:         100,
+						SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{NetlinkName: pf("enp3s2"), VLAN: 10},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{Name: "b"},
+					Spec: v1alpha1.L2VNISpec{
+						VNI:         200,
+						SRIOVVFPair: &v1alpha1.SRIOVVFPairConfig{NetlinkName: pf("enp3s2"), VLAN: 20},
+					},
+				},
+			},
+		},
+		{
 			name: "L2VNIs without sriovVFPair are ignored",
 			l2vnis: []v1alpha1.L2VNI{
 				{
