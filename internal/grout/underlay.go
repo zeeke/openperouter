@@ -77,9 +77,15 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		switch iface.Kind {
 		case hostnetwork.UnderlayInterfaceNetDev:
 			if iface.AcceleratedConfig == nil {
-				return setupTapUnderlay(ctx, client, perouterNetNS, params.TargetNS, iface)
+				err := setupTapUnderlay(ctx, client, perouterNetNS, params.TargetNS, iface)
+				if err != nil {
+					return err
+				}
 			} else {
-				return setupGroutPortUnderlay(ctx, client, perouterNetNS, iface)
+				err := setupGroutPortUnderlay(ctx, client, perouterNetNS, iface)
+				if err != nil {
+					return err
+				}
 			}
 		case hostnetwork.UnderlayInterfaceCNIDev:
 			if err := setupTapUnderlay(ctx, client, perouterNetNS, params.TargetNS, iface); err != nil {
@@ -305,6 +311,7 @@ func removeGroutPortAddresses(ctx context.Context, client *Client, ns netns.NsHa
 }
 
 func teardownGroutPortUnderlay(ctx context.Context, client *Client, ns netns.NsHandle, iface hostnetwork.UnderlayInterface) error {
+	slog.InfoContext(ctx, "tearing down grout port underlay", "interface", iface.InterfaceName)
 	portName := PortName(iface)
 	if err := removeGroutPortAddresses(ctx, client, ns, portName); err != nil {
 		return err
