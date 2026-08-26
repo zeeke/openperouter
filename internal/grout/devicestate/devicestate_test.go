@@ -11,6 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestDefaultDirMatchesGroutSocketMount(t *testing.T) {
+	assert.Equal(t, "/var/run/grout", Dir,
+		"device state must live on the grout-socket mountPath so it persists across pod restarts")
+}
+
 func TestSaveLoadDelete_PCIWithNetlink(t *testing.T) {
 	origDir := Dir
 	Dir = filepath.Join(t.TempDir(), "grout-state")

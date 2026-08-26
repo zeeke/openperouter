@@ -9,7 +9,11 @@ import (
 	"path/filepath"
 )
 
-var Dir = "/var/run/openperouter/grout"
+// Dir is the directory used to persist per-device state across grout
+// restarts. It must match the grout-socket volume mountPath
+// (/var/run/grout) so the files land on the hostPath
+// /var/run/openperouter/grout and survive controller/router pod recycle.
+var Dir = "/var/run/grout"
 
 // Entry records the original state of a network device before
 // it is handed to grout, so the device can be restored on teardown.
