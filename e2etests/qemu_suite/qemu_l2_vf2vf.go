@@ -31,30 +31,7 @@ var _ = Describe("QEMU L2VNI VF-to-VF", Ordered, QEMUSupport, GroutSupport, func
 	var cs clientset.Interface
 	var routerPods []*corev1.Pod
 
-	qemuUnderlay := v1alpha1.Underlay{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "underlay",
-			Namespace: openperouter.Namespace,
-		},
-		Spec: v1alpha1.UnderlaySpec{
-			ASN: 64514,
-			Interfaces: []v1alpha1.UnderlayInterface{
-				{
-					Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
-					NetworkDevice: &v1alpha1.NetworkDevice{
-						InterfaceName:     "toswitch1v0",
-						AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
-					},
-				},
-			},
-			Neighbors: []v1alpha1.Neighbor{
-				{
-					ASN:     ptr.To(int64(65000)),
-					Address: ptr.To("192.168.100.1"),
-				},
-			},
-		},
-	}
+	qemuUnderlay := AcceleratedUnderlay
 
 	l3vniRed := v1alpha1.L3VNI{
 		ObjectMeta: metav1.ObjectMeta{
