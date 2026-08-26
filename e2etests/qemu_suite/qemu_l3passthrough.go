@@ -1,6 +1,6 @@
 // SPDX-License-Identifier:Apache-2.0
 
-package tests
+package qemu_e2e
 
 import (
 	"context"
@@ -18,6 +18,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/utils/ptr"
 )
 
 func networkDeviceQEMUInterface(_ clientset.Interface) v1alpha1.UnderlayInterface {
@@ -27,8 +28,7 @@ func networkDeviceQEMUInterface(_ clientset.Interface) v1alpha1.UnderlayInterfac
 	}
 }
 
-func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
-
+func groutPortQEMUInterface(_ clientset.Interface) v1alpha1.UnderlayInterface {
 	return v1alpha1.UnderlayInterface{
 		Type: v1alpha1.UnderlayInterfaceTypeNetworkDevice,
 		NetworkDevice: &v1alpha1.NetworkDevice{
@@ -38,10 +38,9 @@ func groutPortQEMUInterface(cs clientset.Interface) v1alpha1.UnderlayInterface {
 	}
 }
 
-var _ = XDescribeTableSubtree("QEMU L3Passthrough with Underlay",
+var _ = DescribeTableSubtree("QEMU L3Passthrough with Underlay",
 	qemuL3PassthroughTests,
 	QEMUSupport,
-	XEntry("NetworkDevice", Ordered, networkDeviceQEMUInterface),
 	Entry("GroutPort", Ordered, groutPortQEMUInterface),
 )
 
@@ -58,18 +57,15 @@ func qemuL3PassthroughTests(makeInterface func(clientset.Interface) v1alpha1.Und
 		Spec: v1alpha1.L3PassthroughSpec{
 			HostSession: v1alpha1.HostSession{
 				ASN:     64514,
-				HostASN: new(int64(64515)),
+				HostASN: ptr.To(int64(64515)),
 				LocalCIDR: v1alpha1.LocalCIDRConfig{
-					IPv4: new("192.169.10.0/24"),
+					IPv4: ptr.To("192.169.10.0/24"),
 				},
 			},
 		},
 	}
 
 	BeforeAll(func() {
-		if !QEMUMode {
-			Skip("QEMU mode not enabled")
-		}
 		cs = k8sclient.New()
 
 		var err error
@@ -89,8 +85,8 @@ func qemuL3PassthroughTests(makeInterface func(clientset.Interface) v1alpha1.Und
 				Interfaces: []v1alpha1.UnderlayInterface{iface},
 				Neighbors: []v1alpha1.Neighbor{
 					{
-						ASN:     new(int64(65000)),
-						Address: new("192.168.100.1"),
+						ASN:     ptr.To(int64(65000)),
+						Address: ptr.To("192.168.100.1"),
 					},
 				},
 			},
@@ -98,9 +94,6 @@ func qemuL3PassthroughTests(makeInterface func(clientset.Interface) v1alpha1.Und
 	})
 
 	AfterAll(func() {
-		if !QEMUMode {
-			return
-		}
 		cli := Updater.Client()
 		p := passthrough.DeepCopy()
 		p.Namespace = openperouter.Namespace

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier:Apache-2.0
 
-package tests
+package qemu_e2e
 
 import (
 	"fmt"
@@ -21,6 +21,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
+	"k8s.io/utils/ptr"
+)
+
+var (
+	emptyPrefixes          = []string{}
+	leafAVRFRedPrefixes    = []string{"192.168.20.0/24", "2001:db8:20::/64"}
+	leafSRV6VRFRedPrefixes = []string{"192.170.20.0/24", "2001:db8:170:20::/64"}
 )
 
 var AcceleratedUnderlay = v1alpha1.Underlay{
@@ -41,18 +48,18 @@ var AcceleratedUnderlay = v1alpha1.Underlay{
 		},
 		Neighbors: []v1alpha1.Neighbor{
 			{
-				ASN:                  new(int64(64512)),
-				Address:              new("192.168.11.2"),
-				ConnectTimeSeconds:   new(int64(5)),
-				KeepaliveTimeSeconds: new(int64(3)),
-				HoldTimeSeconds:      new(int64(9)),
+				ASN:                  ptr.To(int64(64512)),
+				Address:              ptr.To("192.168.11.2"),
+				ConnectTimeSeconds:   ptr.To(int64(5)),
+				KeepaliveTimeSeconds: ptr.To(int64(3)),
+				HoldTimeSeconds:      ptr.To(int64(9)),
 			},
 			{
-				ASN:                  new(int64(64513)),
-				Address:              new("192.168.12.2"),
-				ConnectTimeSeconds:   new(int64(5)),
-				KeepaliveTimeSeconds: new(int64(3)),
-				HoldTimeSeconds:      new(int64(9)),
+				ASN:                  ptr.To(int64(64513)),
+				Address:              ptr.To("192.168.12.2"),
+				ConnectTimeSeconds:   ptr.To(int64(5)),
+				KeepaliveTimeSeconds: ptr.To(int64(3)),
+				HoldTimeSeconds:      ptr.To(int64(9)),
 			},
 		},
 		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
@@ -79,15 +86,15 @@ var AcceleratedUnderlaySRv6 = v1alpha1.Underlay{
 		},
 		Neighbors: []v1alpha1.Neighbor{
 			{
-				ASN:                  new(int64(64520)),
-				Address:              new("2001:db8:1234::1"),
+				ASN:                  ptr.To(int64(64520)),
+				Address:              ptr.To("2001:db8:1234::1"),
 				Properties:           []v1alpha1.NeighborProperty{{Type: v1alpha1.NeighborPropertyEBGPMultiHop}},
-				ConnectTimeSeconds:   new(int64(5)),
-				KeepaliveTimeSeconds: new(int64(3)),
-				HoldTimeSeconds:      new(int64(9)),
+				ConnectTimeSeconds:   ptr.To(int64(5)),
+				KeepaliveTimeSeconds: ptr.To(int64(3)),
+				HoldTimeSeconds:      ptr.To(int64(9)),
 			},
 		},
-		RouterIDCIDR: new("10.0.0.0/24"),
+		RouterIDCIDR: ptr.To("10.0.0.0/24"),
 		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
 			CIDRs: []string{
 				"2001:db8:1234:5678::/64",
@@ -95,11 +102,11 @@ var AcceleratedUnderlaySRv6 = v1alpha1.Underlay{
 		},
 		ISIS: &v1alpha1.ISISConfig{
 			BaseNet: "49.0001.0002.0003.0004.00",
-			Level:   new(int32(1)),
+			Level:   ptr.To(int32(1)),
 			Interfaces: []v1alpha1.ISISInterface{
 				{
 					Name:     "u_toswitch1v0",
-					IPFamily: new(v1alpha1.IPFamilyIPv6),
+					IPFamily: ptr.To(v1alpha1.IPFamilyIPv6),
 				},
 			},
 		},
@@ -116,7 +123,7 @@ var AcceleratedUnderlaySRv6 = v1alpha1.Underlay{
 
 const testNamespace = "test-clab-l2vni"
 
-var _ = Describe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func() {
+var _ = Describe("QEMU accelerated EVPN scenarios", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 	var nodes []corev1.Node
@@ -179,9 +186,9 @@ var _ = Describe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func(
 			Spec: v1alpha1.L3PassthroughSpec{
 				HostSession: v1alpha1.HostSession{
 					ASN:     64514,
-					HostASN: new(int64(64515)),
+					HostASN: ptr.To(int64(64515)),
 					LocalCIDR: v1alpha1.LocalCIDRConfig{
-						IPv4: new("192.169.10.0/24"),
+						IPv4: ptr.To("192.169.10.0/24"),
 					},
 				},
 			},
@@ -218,9 +225,9 @@ var _ = Describe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func(
 				VNI: 100,
 				HostSession: &v1alpha1.HostSession{
 					ASN:     64514,
-					HostASN: new(int64(64515)),
+					HostASN: ptr.To(int64(64515)),
 					LocalCIDR: v1alpha1.LocalCIDRConfig{
-						IPv4: new("192.169.10.0/24"),
+						IPv4: ptr.To("192.169.10.0/24"),
 					},
 				},
 			},
@@ -251,9 +258,9 @@ var _ = Describe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func(
 				VNI: 100,
 				HostSession: &v1alpha1.HostSession{
 					ASN:     64514,
-					HostASN: new(int64(64515)),
+					HostASN: ptr.To(int64(64515)),
 					LocalCIDR: v1alpha1.LocalCIDRConfig{
-						IPv4: new("192.169.10.0/24"),
+						IPv4: ptr.To("192.169.10.0/24"),
 					},
 				},
 			},
@@ -343,7 +350,7 @@ var _ = Describe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func(
 
 // --- SRv6 accelerated scenario ---
 
-var _ = Describe("Clab accelerated L3VPN scenario", Ordered, GroutSupport, func() {
+var _ = Describe("QEMU accelerated L3VPN scenario", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 
@@ -356,9 +363,9 @@ var _ = Describe("Clab accelerated L3VPN scenario", Ordered, GroutSupport, func(
 			VRF: "red",
 			HostSession: &v1alpha1.HostSession{
 				ASN:     64514,
-				HostASN: new(int64(64515)),
+				HostASN: ptr.To(int64(64515)),
 				LocalCIDR: v1alpha1.LocalCIDRConfig{
-					IPv4: new("192.169.10.0/24"),
+					IPv4: ptr.To("192.169.10.0/24"),
 				},
 			},
 			RDAssignedNumber: 100,
