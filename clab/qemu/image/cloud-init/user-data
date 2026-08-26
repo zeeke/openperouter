@@ -51,7 +51,7 @@ write_files:
 
 runcmd:
   - grubby --update-kernel=DEFAULT --args="intel_iommu=on iommu=pt hugepagesz=2M hugepages=1024 default_hugepagesz=2M"
-  # - modprobe vfio-pci || true TODO: remove this
+  - modprobe vfio-pci
   # Install k3s (but don't start it — setup.sh starts it after image import)
   - "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 INSTALL_K3S_SKIP_START=true sh -"
   # Signal that cloud-init is done

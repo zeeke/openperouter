@@ -23,38 +23,100 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
-func acceleratedUnderlay() v1alpha1.Underlay {
-	u := *infra.Underlay.DeepCopy()
-	for i := range u.Spec.Interfaces {
-		if u.Spec.Interfaces[i].NetworkDevice != nil {
-			u.Spec.Interfaces[i].NetworkDevice.AcceleratedConfig = &v1alpha1.AcceleratedConfig{}
-		}
-	}
-	return u
+var AcceleratedUnderlay = v1alpha1.Underlay{
+	ObjectMeta: metav1.ObjectMeta{
+		Name:      "underlay",
+		Namespace: openperouter.Namespace,
+	},
+	Spec: v1alpha1.UnderlaySpec{
+		ASN: 64514,
+		Interfaces: []v1alpha1.UnderlayInterface{
+			{
+				Type: "NetworkDevice",
+				NetworkDevice: &v1alpha1.NetworkDevice{
+					InterfaceName:     "toswitch1v0",
+					AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
+				},
+			},
+		},
+		Neighbors: []v1alpha1.Neighbor{
+			{
+				ASN:                  new(int64(64512)),
+				Address:              new("192.168.11.2"),
+				ConnectTimeSeconds:   new(int64(5)),
+				KeepaliveTimeSeconds: new(int64(3)),
+				HoldTimeSeconds:      new(int64(9)),
+			},
+			{
+				ASN:                  new(int64(64513)),
+				Address:              new("192.168.12.2"),
+				ConnectTimeSeconds:   new(int64(5)),
+				KeepaliveTimeSeconds: new(int64(3)),
+				HoldTimeSeconds:      new(int64(9)),
+			},
+		},
+		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+			CIDRs: []string{"100.65.0.0/24"},
+		},
+	},
 }
 
-func acceleratedSRv6Underlay() v1alpha1.Underlay {
-	u := *infra.UnderlaySRv6.DeepCopy()
-	for i := range u.Spec.Interfaces {
-		if u.Spec.Interfaces[i].NetworkDevice != nil {
-			u.Spec.Interfaces[i].NetworkDevice.AcceleratedConfig = &v1alpha1.AcceleratedConfig{}
-		}
-	}
-	// With AcceleratedConfig, fixUnderlayForGrout returns the underlay as-is
-	// (no u_ prefix added), but grout creates kernel ports named u_<interfaceName>.
-	if u.Spec.ISIS != nil {
-		for i := range u.Spec.ISIS.Interfaces {
-			if !strings.HasPrefix(u.Spec.ISIS.Interfaces[i].Name, "u_") {
-				u.Spec.ISIS.Interfaces[i].Name = "u_" + u.Spec.ISIS.Interfaces[i].Name
-			}
-		}
-	}
-	return u
+var AcceleratedUnderlaySRv6 = v1alpha1.Underlay{
+	ObjectMeta: metav1.ObjectMeta{
+		Name:      "underlay",
+		Namespace: openperouter.Namespace,
+	},
+	Spec: v1alpha1.UnderlaySpec{
+		ASN: 64514,
+		Interfaces: []v1alpha1.UnderlayInterface{
+			{
+				Type: "NetworkDevice",
+				NetworkDevice: &v1alpha1.NetworkDevice{
+					InterfaceName:     "toswitch1v0",
+					AcceleratedConfig: &v1alpha1.AcceleratedConfig{},
+				},
+			},
+		},
+		Neighbors: []v1alpha1.Neighbor{
+			{
+				ASN:                  new(int64(64520)),
+				Address:              new("2001:db8:1234::1"),
+				Properties:           []v1alpha1.NeighborProperty{{Type: v1alpha1.NeighborPropertyEBGPMultiHop}},
+				ConnectTimeSeconds:   new(int64(5)),
+				KeepaliveTimeSeconds: new(int64(3)),
+				HoldTimeSeconds:      new(int64(9)),
+			},
+		},
+		RouterIDCIDR: new("10.0.0.0/24"),
+		TunnelEndpoint: &v1alpha1.TunnelEndpointConfig{
+			CIDRs: []string{
+				"2001:db8:1234:5678::/64",
+			},
+		},
+		ISIS: &v1alpha1.ISISConfig{
+			BaseNet: "49.0001.0002.0003.0004.00",
+			Level:   new(int32(1)),
+			Interfaces: []v1alpha1.ISISInterface{
+				{
+					Name:     "u_toswitch1v0",
+					IPFamily: new(v1alpha1.IPFamilyIPv6),
+				},
+			},
+		},
+		SRV6: &v1alpha1.SRV6Config{
+			Locator: v1alpha1.SRV6Locator{
+				BasePrefix: "fd00:0:32::/48",
+				Format:     "usid-f3216",
+			},
+		},
+	},
 }
 
 // --- EVPN accelerated scenarios ---
 
-var _ = FDescribe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func() {
+const testNamespace = "test-clab-l2vni"
+
+var _ = Describe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 	var nodes []corev1.Node
@@ -73,7 +135,7 @@ var _ = FDescribe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func
 
 		By("Creating accelerated EVPN underlay")
 		Expect(Updater.Update(config.Resources{
-			Underlays: []v1alpha1.Underlay{acceleratedUnderlay()},
+			Underlays: []v1alpha1.Underlay{AcceleratedUnderlay},
 		})).To(Succeed())
 
 		By("Verifying BGP sessions with leafkind1")
@@ -102,7 +164,7 @@ var _ = FDescribe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func
 	})
 
 	AfterEach(func() {
-		dumpIfFails(cs)
+		dumpIfFails(cs, testNamespace)
 		Expect(Updater.CleanButUnderlay()).To(Succeed())
 		Expect(infra.LeafAConfig.Reset()).To(Succeed())
 		Expect(infra.LeafBConfig.Reset()).To(Succeed())
@@ -246,7 +308,6 @@ var _ = FDescribe("Clab accelerated EVPN scenarios", Ordered, GroutSupport, func
 			L2VNIs: []v1alpha1.L2VNI{l2Red110, l2Red120},
 		})).To(Succeed())
 
-		const testNamespace = "test-clab-l2vni"
 		_, err := k8s.CreateNamespace(cs, testNamespace)
 		Expect(err).NotTo(HaveOccurred())
 		defer func() {
@@ -330,7 +391,7 @@ var _ = Describe("Clab accelerated L3VPN scenario", Ordered, GroutSupport, func(
 
 		By("Creating accelerated SRv6 underlay")
 		Expect(Updater.Update(config.Resources{
-			Underlays: []v1alpha1.Underlay{acceleratedSRv6Underlay()},
+			Underlays: []v1alpha1.Underlay{AcceleratedUnderlaySRv6},
 		})).To(Succeed())
 	})
 
