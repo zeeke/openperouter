@@ -531,7 +531,8 @@ func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, p
 		if name == "" {
 			name, err = sriov.GetPCINetDevice(pciAddr)
 			if err != nil {
-				return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
+				slog.WarnContext(ctx, "mlx5 PCI device has no kernel netlink interface", "pciAddress", pciAddr, "error", err)
+				//return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
 			}
 		}
 		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
