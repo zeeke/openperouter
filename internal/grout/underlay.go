@@ -538,7 +538,9 @@ func prepareGroutPortDriver(ctx context.Context, perouterNetNS netns.NsHandle, p
 			InterfaceName: name,
 			Kind:          hostnetwork.UnderlayInterfaceNetDev,
 		}); err != nil {
-			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", name, err)
+			// TODO: make this better
+			slog.WarnContext(ctx, "failed to move mlx5 netlink device to namespace", "name", name, "error", err)
+			// return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", name, err)
 		}
 		return nil
 
