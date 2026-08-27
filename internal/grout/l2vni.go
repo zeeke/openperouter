@@ -5,11 +5,14 @@ package grout
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"log/slog"
 	"net"
+	"strconv"
 	"strings"
 
 	"github.com/openperouter/openperouter/internal/hostnetwork"
+	"github.com/openperouter/openperouter/internal/sriov"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 	"k8s.io/utils/ptr"
@@ -100,19 +103,53 @@ func setupL2VNITAP(ctx context.Context, client *Client, params hostnetwork.L2VNI
 	return nil
 }
 
+// pciAddressToIfName returns a 6-character hash of the PCI address using
+// FNV-1a, encoded in base-36 (0-9a-z). Used for VF pair trunk port names.
+func pciAddressToIfName(pciAddr string) string {
+	h := fnv.New32a()
+	h.Write([]byte(pciAddr))
+	s := strconv.FormatUint(uint64(h.Sum32()), 36)
+	for len(s) < 6 {
+		s = "0" + s
+	}
+	return s[len(s)-6:]
+}
+
+func resolveVFPairPCI(cfg *hostnetwork.VFPairParams) (string, error) {
+	if cfg.PCIAddress != nil {
+		if err := sriov.ResolvePCIAddress(*cfg.PCIAddress); err != nil {
+			return "", err
+		}
+		return *cfg.PCIAddress, nil
+	}
+	if cfg.PFName != nil && cfg.VFIndex != nil {
+		return sriov.ResolvePFVFIndex(*cfg.PFName, int(*cfg.VFIndex))
+	}
+	if cfg.NetlinkName != nil {
+		return sriov.ResolveNetlinkName(*cfg.NetlinkName)
+	}
+	return "", fmt.Errorf("sriovVFPair must specify pciAddress, pfName+vfIndex, or netlinkName")
+}
+
 func setupL2VNIVFPair(ctx context.Context, client *Client, params hostnetwork.L2VNIParams, bridgeName string) error {
 	vfPair := params.VFPair
+
+	pciAddr, err := resolveVFPairPCI(vfPair)
+	if err != nil {
+		return fmt.Errorf("SetupL2VNI VF-pair: failed to resolve PCI address: %w", err)
+	}
+	trunkPortName := "t_" + pciAddressToIfName(pciAddr)
 
 	opts := PortOptions{
 		RXQueues: vfPair.RXQueues,
 		QSize:    vfPair.QSize,
 	}
-	if err := PrepareAndBindTrunkVF(ctx, client, params.TargetNS, vfPair.PCIAddress, vfPair.TrunkPortName, opts); err != nil {
-		return fmt.Errorf("SetupL2VNI VF-pair: failed to prepare trunk VF %s: %w", vfPair.PCIAddress, err)
+	if err := PrepareAndBindTrunkVF(ctx, client, params.TargetNS, pciAddr, trunkPortName, opts); err != nil {
+		return fmt.Errorf("SetupL2VNI VF-pair: failed to prepare trunk VF %s: %w", pciAddr, err)
 	}
 
-	vlanIfName := VLANSubInterfaceName(vfPair.VLAN, vfPair.TrunkPortName)
-	if err := client.ensureVLANSubInterface(ctx, vlanIfName, vfPair.TrunkPortName, vfPair.VLAN); err != nil {
+	vlanIfName := VLANSubInterfaceName(vfPair.VLAN, trunkPortName)
+	if err := client.ensureVLANSubInterface(ctx, vlanIfName, trunkPortName, vfPair.VLAN); err != nil {
 		return fmt.Errorf("SetupL2VNI VF-pair: failed to create VLAN sub-interface: %w", err)
 	}
 
@@ -145,9 +182,15 @@ func RemoveStaleVFPairResources(ctx context.Context, client *Client, configuredL
 		if l2.VFPair == nil {
 			continue
 		}
-		vlanIfName := VLANSubInterfaceName(l2.VFPair.VLAN, l2.VFPair.TrunkPortName)
+		pciAddr, err := resolveVFPairPCI(l2.VFPair)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to resolve PCI address for L2VNI VF-pair during cleanup", "l2vni", l2.Name, "error", err)
+			continue
+		}
+		trunkPortName := "t_" + pciAddressToIfName(pciAddr)
+		vlanIfName := VLANSubInterfaceName(l2.VFPair.VLAN, trunkPortName)
 		expectedVLANIfs[vlanIfName] = true
-		referencedTrunks[l2.VFPair.TrunkPortName] = true
+		referencedTrunks[trunkPortName] = true
 	}
 
 	ifaces, err := client.listInterfaces(ctx)

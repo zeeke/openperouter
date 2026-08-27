@@ -14,29 +14,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestPCIAddressToIfName(t *testing.T) {
-	tests := []struct {
-		pciAddr string
-		want    string
-	}{
-		{"0000:03:02.0", "bq2vcy"},
-		{"0000:00:00.0", "fa8dpf"},
-		{"0000:af:1f.5", "lqwwn2"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.pciAddr, func(t *testing.T) {
-			got := pciAddressToIfName(tt.pciAddr)
-			if got != tt.want {
-				t.Errorf("pciAddressToIfName(%q) = %q, want %q", tt.pciAddr, got, tt.want)
-			}
-			if len(got) != 6 {
-				t.Errorf("pciAddressToIfName(%q) length = %d, want 6", tt.pciAddr, len(got))
-			}
-		})
-	}
-}
-
-
 func TestAPItoHostConfig(t *testing.T) {
 	tests := []struct {
 		name            string

@@ -6,9 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"hash/fnv"
 	"net"
-	"strconv"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -17,7 +15,6 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/ipam"
 	"github.com/openperouter/openperouter/internal/ipfamily"
-	"github.com/openperouter/openperouter/internal/sriov"
 	"k8s.io/utils/ptr"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -359,11 +356,7 @@ func l2vniToHost(
 		hostL2VNI.HostMaster = hm
 	}
 	if l2vni.Spec.SRIOVVFPair != nil {
-		vfPair, err := convertSRIOVVFPair(l2vni.Spec.SRIOVVFPair)
-		if err != nil {
-			return hostnetwork.L2VNIParams{}, fmt.Errorf("L2VNI %s: %w", l2vni.Name, err)
-		}
-		hostL2VNI.VFPair = vfPair
+		hostL2VNI.VFPair = convertSRIOVVFPair(l2vni.Spec.SRIOVVFPair)
 	}
 	return hostL2VNI, nil
 }
@@ -693,48 +686,17 @@ func cniDeviceInterfaceToHost(iface v1alpha1.UnderlayInterface) (hostnetwork.Und
 	}, nil
 }
 
-// pciAddressToIfName returns a 6-character hash of the PCI address using
-// FNV-1a, encoded in base-36 (0-9a-z). Used for VF pair trunk port names.
-func pciAddressToIfName(pciAddr string) string {
-	h := fnv.New32a()
-	h.Write([]byte(pciAddr))
-	s := strconv.FormatUint(uint64(h.Sum32()), 36)
-	for len(s) < 6 {
-		s = "0" + s
-	}
-	return s[len(s)-6:]
-}
-
-func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) (*hostnetwork.VFPairParams, error) {
-	pciAddr, err := resolveVFPairPCI(cfg)
-	if err != nil {
-		return nil, err
-	}
-	trunkPortName := "t_" + pciAddressToIfName(pciAddr)
+func convertSRIOVVFPair(cfg *v1alpha1.SRIOVVFPairConfig) *hostnetwork.VFPairParams {
 	params := &hostnetwork.VFPairParams{
-		PCIAddress:    pciAddr,
-		VLAN:          cfg.VLAN,
-		TrunkPortName: trunkPortName,
+		PCIAddress:  cfg.PCIAddress,
+		PFName:      cfg.PFName,
+		VFIndex:     cfg.VFIndex,
+		NetlinkName: cfg.NetlinkName,
+		VLAN:        cfg.VLAN,
 	}
 	if cfg.AcceleratedConfig != nil {
 		params.RXQueues = cfg.AcceleratedConfig.RXQueues
 		params.QSize = cfg.AcceleratedConfig.QSize
 	}
-	return params, nil
-}
-
-func resolveVFPairPCI(cfg *v1alpha1.SRIOVVFPairConfig) (string, error) {
-	if cfg.PCIAddress != nil {
-		if err := sriov.ResolvePCIAddress(*cfg.PCIAddress); err != nil {
-			return "", err
-		}
-		return *cfg.PCIAddress, nil
-	}
-	if cfg.PFName != nil && cfg.VFIndex != nil {
-		return sriov.ResolvePFVFIndex(*cfg.PFName, int(*cfg.VFIndex))
-	}
-	if cfg.NetlinkName != nil {
-		return sriov.ResolveNetlinkName(*cfg.NetlinkName)
-	}
-	return "", fmt.Errorf("sriovVFPair must specify pciAddress, pfName+vfIndex, or netlinkName")
+	return params
 }

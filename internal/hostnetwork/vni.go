@@ -60,11 +60,13 @@ type L2VNIParams struct {
 }
 
 type VFPairParams struct {
-	PCIAddress    string `json:"pciAddress"`
-	VLAN          int32  `json:"vlan"`
-	TrunkPortName string `json:"trunkPortName"`
-	RXQueues      *int32 `json:"rxQueues,omitempty"`
-	QSize         *int32 `json:"qSize,omitempty"`
+	PCIAddress  *string `json:"pciAddress,omitempty"`
+	PFName      *string `json:"pfName,omitempty"`
+	VFIndex     *int32  `json:"vfIndex,omitempty"`
+	NetlinkName *string `json:"netlinkName,omitempty"`
+	VLAN        int32   `json:"vlan"`
+	RXQueues    *int32  `json:"rxQueues,omitempty"`
+	QSize       *int32  `json:"qSize,omitempty"`
 }
 
 type HostMaster struct {
