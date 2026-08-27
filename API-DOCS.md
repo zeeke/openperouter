@@ -19,6 +19,28 @@ Package v1alpha1 contains API Schema definitions for the openpe v1alpha1 API gro
 
 
 
+#### AcceleratedConfig
+
+
+
+AcceleratedConfig holds optional DPDK port parameters for accelerated
+underlay interfaces bound directly to grout.
+
+
+
+_Appears in:_
+- [NetworkDevice](#networkdevice)
+- [SRIOVVFPairConfig](#sriovvfpairconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `rxQueues` _integer_ | rxQueues is the number of receive queues to allocate on the DPDK port. |  | Maximum: 64 <br />Minimum: 1 <br />Optional: \{\} <br /> |
+| `qSize` _integer_ | qSize is the descriptor ring size for each receive queue. Larger<br />rings absorb traffic bursts at the cost of memory. |  | Maximum: 32768 <br />Minimum: 64 <br />Optional: \{\} <br /> |
+| `promiscuous` _boolean_ | promiscuous enables promiscuous mode on the DPDK port.<br />When true, the NIC accepts all incoming frames regardless of<br />destination MAC address. Defaults to false. |  | Optional: \{\} <br /> |
+| `mac` _string_ | mac overrides the MAC address on the DPDK port. When unset, the<br />port inherits the NIC's hardware MAC address. |  | Pattern: `^([0-9a-fA-F]\{2\}:)\{5\}[0-9a-fA-F]\{2\}$` <br />Optional: \{\} <br /> |
+| `portName` _string_ | portName overrides the grout port name. When unset, the port is<br />named "u_<interfaceName>". |  | Optional: \{\} <br /> |
+
+
 #### AddressFamilyProperty
 
 
@@ -240,47 +262,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `restartTimeSeconds` _integer_ | restartTimeSeconds is the time in seconds that the restarting router<br />requests its peers to preserve routes. Peers will wait this long<br />before removing stale routes. | 120 | Maximum: 4095 <br />Minimum: 1 <br />Optional: \{\} <br /> |
 | `stalePathTimeSeconds` _integer_ | stalePathTimeSeconds is the time in seconds that stale paths from a<br />restarting peer are retained locally. | 360 | Maximum: 4095 <br />Minimum: 1 <br />Optional: \{\} <br /> |
-
-
-#### GroutPortConfig
-
-
-
-GroutPortConfig specifies a port to bind to grout.
-Exactly one device selector must be used: pciAddress, pfName + vfIndex, or netlinkName.
-
-
-
-_Appears in:_
-- [UnderlayInterface](#underlayinterface)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `pciAddress` _string_ | pciAddress is the PCI Bus:Device.Function address of the VF to bind<br />(e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex and netlinkName. |  | Pattern: `^[0-9a-fA-F]\{4\}:[0-9a-fA-F]\{2\}:[0-9a-fA-F]\{2\}\.[0-7]$` <br />Optional: \{\} <br /> |
-| `pfName` _string_ | pfName is the name of the Physical Function whose VF will be bound.<br />Must be used together with vfIndex. Mutually exclusive with pciAddress and netlinkName. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
-| `vfIndex` _integer_ | vfIndex is the index of the Virtual Function on the PF.<br />Must be used together with pfName. Mutually exclusive with pciAddress and netlinkName. |  | Minimum: 0 <br />Optional: \{\} <br /> |
-| `netlinkName` _string_ | netlinkName is the kernel netlink device name of the VF (e.g. "enp3s0f0v0").<br />The controller resolves the PCI address via sysfs and reads existing<br />IP addresses from the device before binding the DPDK driver.<br />Mutually exclusive with pciAddress and pfName/vfIndex. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
-| `portName` _string_ | portName overrides the grout interface name. When omitted, the<br />controller derives a name from the device selector. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
-| `portOptions` _[GroutPortOptions](#groutportoptions)_ | portOptions specifies optional DPDK port parameters. |  | Optional: \{\} <br /> |
-
-
-#### GroutPortOptions
-
-
-
-GroutPortOptions holds optional DPDK port parameters for grcli.
-
-
-
-_Appears in:_
-- [GroutPortConfig](#groutportconfig)
-- [SRIOVVFPairConfig](#sriovvfpairconfig)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `mtu` _integer_ | mtu is the Maximum Transmission Unit for the DPDK port. |  | Maximum: 9702 <br />Minimum: 68 <br />Optional: \{\} <br /> |
-| `rxQueues` _integer_ | rxQueues is the number of receive queues for the DPDK port. |  | Maximum: 64 <br />Minimum: 1 <br />Optional: \{\} <br /> |
-| `qSize` _integer_ | qSize is the size of each receive/transmit queue. |  | Maximum: 32768 <br />Minimum: 64 <br />Optional: \{\} <br /> |
 
 
 #### HostMaster
@@ -807,6 +788,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `interfaceName` _string_ | interfaceName is the name of the host network device to move into<br />the router netns. |  | MaxLength: 15 <br />MinLength: 1 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Required: \{\} <br /> |
+| `acceleratedConfig` _[AcceleratedConfig](#acceleratedconfig)_ | acceleratedConfig, when set, binds the device as a DPDK port instead of<br />creating a TAP+remote= bridge. Only valid when --datapath=grout. |  | Optional: \{\} <br /> |
 
 
 #### OVSBridgeConfig
@@ -969,8 +951,8 @@ _Appears in:_
 
 SRIOVVFPairConfig specifies the SR-IOV trunk VF and VLAN for VF-to-VF
 communication on an L2VNI.
-Exactly one VF selector must be used: either pciAddress alone, or pfName +
-vfIndex together.
+Exactly one VF selector must be used: pciAddress, pfName + vfIndex, or
+netlinkName.
 
 
 
@@ -979,11 +961,12 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `pciAddress` _string_ | pciAddress is the PCI Bus:Device.Function address of the trunk VF to<br />bind to grout (e.g. "0000:03:02.0"). The trunk VF must have no VLAN<br />configured (VLAN 0) so it receives all tagged frames from other VFs.<br />Mutually exclusive with pfName/vfIndex. |  | Pattern: `^[0-9a-fA-F]\{4\}:[0-9a-fA-F]\{2\}:[0-9a-fA-F]\{2\}\.[0-7]$` <br />Optional: \{\} <br /> |
-| `pfName` _string_ | pfName is the name of the Physical Function whose VF will be the<br />trunk port. Must be used together with vfIndex.<br />Mutually exclusive with pciAddress. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
-| `vfIndex` _integer_ | vfIndex is the index of the Virtual Function on the PF to use as<br />the trunk port. Must be used together with pfName.<br />Mutually exclusive with pciAddress. |  | Minimum: 0 <br />Optional: \{\} <br /> |
+| `pciAddress` _string_ | pciAddress is the PCI Bus:Device.Function address of the trunk VF to<br />bind to grout (e.g. "0000:03:02.0"). The trunk VF must have no VLAN<br />configured (VLAN 0) so it receives all tagged frames from other VFs.<br />Mutually exclusive with pfName/vfIndex and netlinkName. |  | Pattern: `^[0-9a-fA-F]\{4\}:[0-9a-fA-F]\{2\}:[0-9a-fA-F]\{2\}\.[0-7]$` <br />Optional: \{\} <br /> |
+| `pfName` _string_ | pfName is the name of the Physical Function whose VF will be the<br />trunk port. Must be used together with vfIndex.<br />Mutually exclusive with pciAddress and netlinkName. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
+| `vfIndex` _integer_ | vfIndex is the index of the Virtual Function on the PF to use as<br />the trunk port. Must be used together with pfName.<br />Mutually exclusive with pciAddress and netlinkName. |  | Minimum: 0 <br />Optional: \{\} <br /> |
+| `netlinkName` _string_ | netlinkName is the kernel network interface name of the trunk VF<br />(e.g. "enp3s2"). The controller resolves it to a PCI address via<br />sysfs at runtime. Mutually exclusive with pciAddress and<br />pfName/vfIndex. |  | MaxLength: 15 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Optional: \{\} <br /> |
 | `vlan` _integer_ | vlan is the 802.1Q VLAN ID that maps to this L2VNI. Workload VFs<br />on the same PF configured with this VLAN ID will participate in<br />this L2VNI's VXLAN overlay. |  | Maximum: 4094 <br />Minimum: 1 <br />Required: \{\} <br /> |
-| `portOptions` _[GroutPortOptions](#groutportoptions)_ | portOptions specifies optional DPDK port parameters for the trunk VF. |  | Optional: \{\} <br /> |
+| `acceleratedConfig` _[AcceleratedConfig](#acceleratedconfig)_ | acceleratedConfig specifies optional DPDK port parameters for the trunk VF. |  | Optional: \{\} <br /> |
 
 
 #### SRV6Config
@@ -1110,10 +1093,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[UnderlayInterfaceType](#underlayinterfacetype)_ | type selects how the router obtains this underlay link. |  | Enum: [NetworkDevice CNIDevice GroutPort] <br />Required: \{\} <br /> |
+| `type` _[UnderlayInterfaceType](#underlayinterfacetype)_ | type selects how the router obtains this underlay link. |  | Enum: [NetworkDevice CNIDevice] <br />Required: \{\} <br /> |
 | `networkDevice` _[NetworkDevice](#networkdevice)_ | networkDevice moves an existing host network device into the router netns.<br />The device can be of any kind (physical NIC, bridge, macvlan, etc.).<br />Must be set when type is "NetworkDevice". |  | Optional: \{\} <br /> |
 | `cniDevice` _[CNIDevice](#cnidevice)_ | cniDevice invokes a CNI plugin to provision an interface in the router<br />netns. IPAM is delegated to the CNI plugin. Must be set when type is<br />"CNIDevice". |  | Optional: \{\} <br /> |
-| `groutPort` _[GroutPortConfig](#groutportconfig)_ | groutPort binds an SR-IOV VF directly to grout as a DPDK port.<br />The VF is identified by PCI address or PF name + VF index.<br />IPAM is specified inline since DPDK-bound interfaces have no kernel<br />netdev for CNI IPAM plugins to target. Only valid when grout is enabled.<br />Must be set when type is "GroutPort". |  | Optional: \{\} <br /> |
 
 
 #### UnderlayInterfaceType
@@ -1125,7 +1107,7 @@ It is the discriminator of the UnderlayInterface union and is designed to be
 extended with future modes.
 
 _Validation:_
-- Enum: [NetworkDevice CNIDevice GroutPort]
+- Enum: [NetworkDevice CNIDevice]
 
 _Appears in:_
 - [UnderlayInterface](#underlayinterface)
@@ -1134,7 +1116,6 @@ _Appears in:_
 | --- | --- |
 | `NetworkDevice` | UnderlayInterfaceTypeNetworkDevice moves an existing host network device<br />into the router netns.<br /> |
 | `CNIDevice` | UnderlayInterfaceTypeCNIDevice invokes a CNI plugin to provision an interface<br />in the router netns.<br /> |
-| `GroutPort` | UnderlayInterfaceTypeGroutPort binds an SR-IOV VF directly to grout as a<br />DPDK port, bypassing the kernel on the underlay fast path.<br /> |
 
 
 #### UnderlaySpec
