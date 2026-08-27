@@ -19,6 +19,8 @@ func SetupL2VNI(ctx context.Context, client *Client, params hostnetwork.L2VNIPar
 	slog.DebugContext(ctx, "setup L2VNI", "vni", params.VNI, "vrf", params.VRF)
 	defer slog.DebugContext(ctx, "setup L2VNI done", "vni", params.VNI)
 
+	slog.DebugContext(ctx, "setup L2VNI", "params", params)
+
 	vrf := params.VRF
 	if vrf != "" {
 		if err := client.ensureVRF(ctx, vrf); err != nil {
