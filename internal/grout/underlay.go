@@ -124,6 +124,8 @@ func setupTapUnderlay(ctx context.Context, client *Client, perouterNetNS netns.N
 func setupGroutPortUnderlay(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, iface hostnetwork.UnderlayInterface) error {
 	netlinkName := iface.InterfaceName
 
+	slog.DebugContext(ctx, "setupGroutPortUnderlay", "netlinkName", netlinkName)
+
 	devState, err := devicestate.Load(devicestate.Entry{NetlinkName: netlinkName})
 	if err != nil {
 		return fmt.Errorf("failed to load device state for %s: %w", netlinkName, err)
@@ -152,6 +154,7 @@ func setupGroutPortUnderlay(ctx context.Context, client *Client, perouterNetNS n
 		if err := devicestate.Save(*devState); err != nil {
 			return fmt.Errorf("failed to save device state for %s: %w", netlinkName, err)
 		}
+		slog.DebugContext(ctx, "saved device state", "state", fmt.Sprintf("%+v", devState))
 	}
 
 	if err := prepareGroutPortDriver(ctx, perouterNetNS, devState.PCIAddress, devState.NetlinkName); err != nil {
