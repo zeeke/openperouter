@@ -44,9 +44,9 @@ write_files:
     content: |
       vfio-pci
 
-  - path: /etc/sysctl.d/99-hugepages.conf
-    content: |
-      vm.nr_hugepages=1024
+  #- path: /etc/sysctl.d/99-hugepages.conf
+  #  content: |
+  #    vm.nr_hugepages=1024
 
 runcmd:
   - grubby --update-kernel=DEFAULT --args="intel_iommu=on iommu=pt hugepagesz=2M hugepages=1024 default_hugepagesz=2M"
