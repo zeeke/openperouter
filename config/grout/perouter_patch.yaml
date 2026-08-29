@@ -56,10 +56,10 @@ spec:
         resources:
           requests:
             memory: "1Gi"
-            hugepages-2Mi: "2Gi"
+            hugepages-1Gi: "2Gi"
           limits:
             memory: "2Gi"
-            hugepages-2Mi: "2Gi"
+            hugepages-1Gi: "2Gi"
         command:
         - /bin/sh
         - -c
