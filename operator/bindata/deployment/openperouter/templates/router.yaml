@@ -284,13 +284,9 @@ spec:
         env:
           - name: GROUT_SOCK_PATH
             value: "/var/run/grout/grout.sock"
-<<<<<<< HEAD
           # TAP/test-mode sizing. Grout defaults target a full-table router and
           # would exhaust typical pod memory when allocating per-VRF FIBs.
           # _DUMMY_ skips the LPM tables that dominate that cost.
-=======
-          # TAP/test-mode sizing; grout defaults target a full-table router.
->>>>>>> 23491363e (test(grout): run on low memory footprint)
           - name: GROUT_MAX_IFACES
             value: "128"
           - name: GROUT_MEMPOOL_CHUNK_SIZE
