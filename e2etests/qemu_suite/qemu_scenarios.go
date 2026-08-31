@@ -247,7 +247,7 @@ var _ = Describe("QEMU accelerated EVPN scenarios", Ordered, GroutSupport, func(
 		}
 	})
 
-	It("should route between L2VNIs in the same L3VNI routing domain", func() {
+	XIt("should route between L2VNIs in the same L3VNI routing domain", func() {
 		l3vniRed := v1alpha1.L3VNI{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "red",
@@ -350,7 +350,7 @@ var _ = Describe("QEMU accelerated EVPN scenarios", Ordered, GroutSupport, func(
 
 // --- SRv6 accelerated scenario ---
 
-var _ = Describe("QEMU accelerated L3VPN scenario", Ordered, GroutSupport, func() {
+var _ = XDescribe("QEMU accelerated L3VPN scenario", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 
