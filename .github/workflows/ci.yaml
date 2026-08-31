@@ -372,6 +372,28 @@ jobs:
         with:
           artifact-name: kind-logs-${{ matrix.deployment }}
 
+      - name: Analyze e2e test failure
+        if: ${{ failure() }}
+        run: |
+          PROMPT="A GitHub Actions e2e test job failed.
+          Deployment/matrix variant: ${{ matrix.deployment }}
+          Workflow: ${{ github.workflow }}
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Job: ${{ github.job }}
+
+          The e2e test logs for this job are in /tmp/kind_logs/. Analyze the failure:
+          1. Which e2e test(s) failed and why
+          2. Identify the root cause from the logs (router/FRR/CNI/kind logs, Ginkgo failures, etc.)
+          3. Determine if this looks like a flake or a real regression
+          4. Give specific, actionable fix suggestions referencing file paths where relevant
+          Be concise and concrete."
+
+          npx --yes opencode@latest run \
+            --model opencode/big-pickle \
+            --auto \
+            "$PROMPT" \
+            | tee /tmp/kind_logs/e2e-failure-analysis.md
+
   qemu-e2etests:
     runs-on: ubuntu-24.04
     needs:
