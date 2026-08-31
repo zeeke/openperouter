@@ -75,7 +75,7 @@ spec:
               exit 1
             fi
           done
-          exec nsenter --net=/var/run/netns/perouter grout --test-mode --socket-mode 0666
+          exec nsenter --net=/var/run/netns/perouter grout --socket-mode 0666
         volumeMounts:
         - name: grout-socket
           mountPath: /var/run/grout
