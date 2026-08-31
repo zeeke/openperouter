@@ -97,7 +97,11 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	}
 
 	if params.TunnelEndpoint != nil {
-		if err := setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint); err != nil {
+		if len(params.UnderlayInterfaces) == 0 {
+			return fmt.Errorf("tunnel endpoint configured but no underlay interfaces available")
+		}
+		firstPortName := PortName(params.UnderlayInterfaces[0])
+		if err := setupTunnelEndpoint(ctx, client, firstPortName, *params.TunnelEndpoint); err != nil {
 			return err
 		}
 	}
@@ -165,10 +169,10 @@ func setupGroutPortUnderlay(ctx context.Context, client *Client, perouterNetNS n
 	})
 }
 
-func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
-	if err := assignIPsToGroutPort(ctx, client, defaultVRFName,
+func setupTunnelEndpoint(ctx context.Context, client *Client, portName string, ep hostnetwork.UnderlayTunnelEndpointParams) error {
+	if err := assignIPsToGroutPort(ctx, client, portName,
 		ep.IPv4CIDR, ep.IPv6CIDR); err != nil {
-		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout port %s: %w", portName, err)
 	}
 
 	return nil
