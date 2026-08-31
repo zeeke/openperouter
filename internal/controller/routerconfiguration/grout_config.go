@@ -164,10 +164,10 @@ func removeStaleResources(ctx context.Context, groutClient *grout.Client, target
 	}
 	for _, l2vni := range configuredL2VNIs {
 		configuredVNIs = append(configuredVNIs, l2vni.VNIParams)
-		configuredVRFs[l2vni.VRF] = true
+		configuredVRFs = append(configuredVRFs, l2vni.VRF)
 	}
 	for _, l3vpn := range configuredL3VPNs {
-		configuredVRFs[l3vpn.VRF] = true
+		configuredVRFs = append(configuredVRFs, l3vpn.VRF)
 	}
 
 	slog.InfoContext(ctx, "removing deleted vnis")
