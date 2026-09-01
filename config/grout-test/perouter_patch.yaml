@@ -75,7 +75,7 @@ spec:
           done
           ulimit -l unlimited
           date
-          exec nsenter --net=/var/run/netns/perouter grout --socket-mode 0666 --verbose --trace-packets --test-mode
+          exec nsenter --net=/var/run/netns/perouter grout --socket-mode 0666 --verbose --trace-packets --test-mode --max-mtu 9500
         volumeMounts:
         - name: grout-socket
           mountPath: /var/run/grout
