@@ -148,6 +148,12 @@ func setupGroutPortUnderlay(ctx context.Context, client *Client, perouterNetNS n
 			return fmt.Errorf("failed to read driver for %s: %w", devState.PCIAddress, err)
 		}
 
+		link, err := netlink.LinkByName(netlinkName)
+		if err != nil {
+			return fmt.Errorf("failed to find kernel interface %s: %w", netlinkName, err)
+		}
+		devState.MTU = int32(link.Attrs().MTU)
+
 		netlinkAddrs, err := hostnetwork.AddressesForInterface(netlinkName, hostnetwork.ExcludeLinkLocal())
 		if err != nil {
 			return fmt.Errorf("failed to read addresses from %s: %w", netlinkName, err)
@@ -474,6 +480,12 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 // state, and sets up the kernel routes needed by FRR.
 func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface, pciAddr string) error {
 	portName := PortName(iface)
+
+	state, err := devicestate.Load(devicestate.Entry{NetlinkName: iface.InterfaceName})
+	if err != nil {
+		return fmt.Errorf("failed to load device state for %s: %w", iface.InterfaceName, err)
+	}
+
 	opts := PortOptions{
 		RXQueues:    iface.AcceleratedConfig.RXQueues,
 		QSize:       iface.AcceleratedConfig.QSize,
@@ -481,14 +493,12 @@ func configureGroutPort(ctx context.Context, client *Client, iface hostnetwork.U
 		MAC:         iface.AcceleratedConfig.MAC,
 		Description: UnderlayInterfaceDescriptionMarker,
 	}
+	if state.MTU > 0 {
+		opts.MTU = &state.MTU
+	}
 
 	if err := client.ensurePortWithOptions(ctx, portName, pciAddr, opts); err != nil {
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
-	}
-
-	state, err := devicestate.Load(devicestate.Entry{NetlinkName: iface.InterfaceName})
-	if err != nil {
-		return fmt.Errorf("failed to load device state for %s: %w", iface.InterfaceName, err)
 	}
 
 	for _, addr := range state.Addresses {

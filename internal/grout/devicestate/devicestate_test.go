@@ -26,6 +26,7 @@ func TestSaveLoadDelete_PCIWithNetlink(t *testing.T) {
 		NetlinkName:    "eth0",
 		OriginalDriver: "iavf",
 		Addresses:      []string{"10.0.0.1/24", "fd00::1/64"},
+		MTU:            9000,
 	}
 
 	require.NoError(t, Save(state))
@@ -33,6 +34,7 @@ func TestSaveLoadDelete_PCIWithNetlink(t *testing.T) {
 	loaded, err := Load(Entry{NetlinkName: "eth0"})
 	require.NoError(t, err)
 	assert.Equal(t, state, *loaded)
+	assert.Equal(t, int32(9000), loaded.MTU)
 
 	require.NoError(t, Delete(Entry{NetlinkName: "eth0"}))
 	_, err = os.Stat(filePath(Entry{NetlinkName: "eth0"}))
@@ -112,6 +114,7 @@ func TestLoadByPCI(t *testing.T) {
 		NetlinkName:    "ens1f0",
 		OriginalDriver: "iavf",
 		Addresses:      []string{"10.0.0.1/24"},
+		MTU:            9000,
 	}))
 	require.NoError(t, Save(Entry{
 		PCIAddress:     "0000:02:00.0",
@@ -128,6 +131,12 @@ func TestLoadByPCI(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "ens2f0", loaded.NetlinkName)
 		assert.Equal(t, "mlx5_core", loaded.OriginalDriver)
+	})
+
+	t.Run("preserves MTU", func(t *testing.T) {
+		loaded, err := LoadByPCI("0000:01:00.0")
+		require.NoError(t, err)
+		assert.Equal(t, int32(9000), loaded.MTU)
 	})
 
 	t.Run("errors when PCI address is unknown", func(t *testing.T) {

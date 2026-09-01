@@ -26,6 +26,7 @@ type Entry struct {
 	NetlinkName    string   `json:"netlinkName,omitempty"`
 	OriginalDriver string   `json:"originalDriver,omitempty"`
 	Addresses      []string `json:"addresses"`
+	MTU            int32    `json:"mtu,omitempty"`
 }
 
 func filePath(state Entry) string {
