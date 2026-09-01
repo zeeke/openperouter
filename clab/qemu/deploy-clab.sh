@@ -30,7 +30,7 @@ if [[ "${ALREADY_DEPLOYED}" != "true" ]]; then
     done
 
     # Create all bridges referenced as kind: bridge in the topology
-    for br in leafkind1-sw leafkind2-sw toleafkind1 toswitch1; do
+    for br in leafkind1-sw leafkind2-sw; do
         if [[ ! -d "/sys/class/net/${br}" ]]; then
             echo "Creating bridge ${br}"
             sudo ip link add name "${br}" type bridge

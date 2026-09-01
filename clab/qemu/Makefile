@@ -28,7 +28,7 @@ qemu-load-image: ## Load the container image into the QEMU VM's k3s
 	$(QEMU_DIR)/vm/load-image.sh $(IMG)
 
 .PHONY: qemu-deploy
-qemu-deploy: qemu-image qemu-clab qemu-launch qemu-setup qemu-load-image deploy-controller ## Load image and deploy controller in the QEMU VM
+qemu-deploy: qemu-image qemu-launch qemu-setup qemu-clab qemu-load-image deploy-controller ## Load image and deploy controller in the QEMU VM
 
 .PHONY: qemu-e2etests
 qemu-e2etests: ginkgo kubectl create-export-logs ## Run QEMU e2e tests (VM must be running)

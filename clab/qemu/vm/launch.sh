@@ -89,87 +89,51 @@ fi
 # --- Networking setup ---
 echo "Setting up TAP devices and connecting to containerlab bridges..."
 
-setup_tap_for_clab() {
-    local tap=$1
-    local bridge=$2
 
-    if ! ip link show "${tap}" &>/dev/null 2>&1; then
-        echo "Creating TAP device ${tap}..."
-        sudo ip tuntap add dev "${tap}" mode tap
-    fi
+vf_incremental=1
 
-    if ip link show "${bridge}" &>/dev/null 2>&1; then
-        echo "Attaching ${tap} to ${bridge}..."
-        sudo ip link set "${tap}" master "${bridge}"
-        sudo ip link set "${tap}" up
-    else
-        echo "ERROR: Bridge ${bridge} not found!" >&2
-        echo "  Make sure containerlab topology is deployed." >&2
-        exit 1
-    fi
-}
+setup_fake_pf() {
+    local pfName=$1
+    local numVfs=$2
 
-# toleafkind1 PF (TAPs 0-3)
-echo "Setting up toleafkind1 PF (4 NICs)..."
-for i in 0 1 2 3; do
-    setup_tap_for_clab "qemu-tap${i}" "toleafkind1"
-done
-
-# toswitch1 PF (TAPs 4-7)
-echo "Setting up toswitch1 PF (4 NICs)..."
-for i in 4 5 6 7; do
-    setup_tap_for_clab "qemu-tap${i}" "toswitch1"
-done
-
-# --- Configure VLAN filtering on bridges ---
-echo "Configuring VLAN filtering on fake PF bridges..."
-
-configure_bridge_vlans() {
-    local bridge=$1
-    local tap_prefix=$2  # e.g., "0" for toleafkind1 (TAPs 0-3)
-
-    echo "  Configuring ${bridge}..."
-
-    sudo ip link set "${bridge}" type bridge vlan_filtering 1
-
-    # TAPs 0, 1 (or 4, 5): trunk ports
-    for i in 0 1; do
-        local tap_idx=$((tap_prefix + i))
-        sudo bridge vlan add vid 33 dev "qemu-tap${tap_idx}"
-        sudo bridge vlan add vid 44 dev "qemu-tap${tap_idx}"
+    for br in leafkind1-sw leafkind2-sw toleafkind1 toswitch1; do
+        if [[ ! -d "/sys/class/net/${br}" ]]; then
+            echo "Creating bridge ${br}"
+        fi
+        sudo ip link set dev "${br}" up
     done
 
-    # TAP 2 (or 6): VLAN 33 access port
-    local tap2=$((tap_prefix + 2))
-    sudo bridge vlan del vid 1 dev "qemu-tap${tap2}"
-    sudo bridge vlan add vid 33 dev "qemu-tap${tap2}" pvid untagged
+    
+    sudo ip link add name "${pfName}" type bridge
+    
+    for i in $(seq 0 $((numVfs - 1))); do
+        local vfRepresentor="${pfName}v${i}_rep"
 
-    # TAP 3 (or 7): VLAN 44 access port
-    local tap3=$((tap_prefix + 3))
-    sudo bridge vlan del vid 1 dev "qemu-tap${tap3}"
-    sudo bridge vlan add vid 44 dev "qemu-tap${tap3}" pvid untagged
+        sudo ip tuntap add dev "${vfRepresentor}" mode tap
+        sudo ip link set "${vfRepresentor}" master "${pfName}"
+        sudo ip link set "${vfRepresentor}" up
 
-    sudo bridge vlan add vid 33 dev "${bridge}" self
-    sudo bridge vlan add vid 44 dev "${bridge}" self
+        vf_mac=$(printf "52:54:00:ab:cd:%02x" $((vf_incremental + 1)))
+        NIC_ARGS="${NIC_ARGS} -device pcie-root-port,id=rp${vf_incremental},slot=${vf_incremental}"
+        NIC_ARGS="${NIC_ARGS} -netdev tap,id=nic${vf_incremental},ifname=vfRepresentor,script=no,downscript=no"
+        NIC_ARGS="${NIC_ARGS} -device igb,bus=rp${vf_incremental},netdev=nic${vf_incremental},mac=${vf_mac}"
+
+        vf_incremental=$((vf_incremental + 1))
+    done
+
+    sudo ip link set dev "${pfName}" up
 }
 
-configure_bridge_vlans "toleafkind1" 0
-configure_bridge_vlans "toswitch1" 4
 
-echo "VLAN filtering configured."
+setup_fake_pf "toswitch1" 4
+setup_fake_pf "toswitch2" 4
+setup_fake_pf "toleafkind1" 4
+setup_fake_pf "toleafkind2" 4
 
 # --- Launch QEMU ---
 echo "Launching QEMU VM with 8 igb NICs (2 fake PFs)..."
 
 touch "${SERIAL_LOG}" "${PID_FILE}"
-
-NIC_ARGS=""
-for i in $(seq 0 $((NUM_NICS - 1))); do
-    MAC=$(printf "52:54:00:ab:cd:%02x" $((i + 1)))
-    NIC_ARGS="${NIC_ARGS} -device pcie-root-port,id=rp${i},slot=${i}"
-    NIC_ARGS="${NIC_ARGS} -netdev tap,id=nic${i},ifname=qemu-tap${i},script=no,downscript=no"
-    NIC_ARGS="${NIC_ARGS} -device igb,bus=rp${i},netdev=nic${i},mac=${MAC}"
-done
 
 sudo qemu-system-x86_64 \
     -machine q35,kernel-irqchip=split \
@@ -203,5 +167,7 @@ ssh ${SSH_OPTS} -p "${SSH_PORT}" openperouter@localhost \
     "sudo cloud-init status --wait" 2>/dev/null || true
 
 ensure_iommu_cmdline
+
+
 
 echo "VM is ready."

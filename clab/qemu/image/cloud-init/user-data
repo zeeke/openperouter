@@ -30,15 +30,25 @@ write_files:
   - path: /etc/udev/rules.d/70-persistent-net.rules
     content: |
       # toleafkind1 PF (TAPs 0-3)
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toswitch1v0"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toswitch1v1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toswitch1v2"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toswitch1v3"
+      # toswitch2 PF (TAPs 0-3)
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toswitch2v0"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toswitch2v1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toswitch2v2"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toswitch2v3"
+      # toleafkind1 PF (TAPs 4-7)
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toleafkind1v0"
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toleafkind1v1"
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toleafkind1v2"
       SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toleafkind1v3"
-      # toswitch1 PF (TAPs 4-7)
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:05", NAME="toswitch1v0"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:06", NAME="toswitch1v1"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:07", NAME="toswitch1v2"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:08", NAME="toswitch1v3"
+      # toleafkind2 PF (TAPs 8-11)
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:05", NAME="toleafkind2v0"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:06", NAME="toleafkind2v1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:07", NAME="toleafkind2v2"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:08", NAME="toleafkind2v3"
 
   - path: /etc/modules-load.d/vfio.conf
     content: |

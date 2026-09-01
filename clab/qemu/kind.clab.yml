@@ -94,6 +94,11 @@ topology:
     toswitch1:
       kind: bridge
 
+    toleafkind2:
+      kind: bridge
+
+    toswitch2:
+      kind: bridge
   
 
   links:

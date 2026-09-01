@@ -43,14 +43,21 @@ fi
 '
 
 # --- Configure the underlay NIC ---
-echo "Configuring underlay IP on igb NIC..."
-UNDERLAY="${QEMU_UNDERLAY_NIC:-toswitch1v0}"
+echo "Configuring underlay IPs on igb NIC..."
+UNDERLAY1="toswitch1v0"
+UNDERLAY2="toswitch2v0"
 run_in_vm "
-echo \"Configuring underlay on ${UNDERLAY}\"
-nmcli device set ${UNDERLAY} managed no 2>/dev/null || true
-ip addr add 192.168.11.3/24 dev ${UNDERLAY} 2>/dev/null || true
-ip addr add 2001:db8:11::3/64 dev ${UNDERLAY} 2>/dev/null || true
-ip link set ${UNDERLAY} up
+echo \"Configuring underlay on ${UNDERLAY1}\"
+nmcli device set ${UNDERLAY1} managed no 2>/dev/null || true
+ip addr add 192.168.11.3/24 dev ${UNDERLAY1} 2>/dev/null || true
+ip addr add 2001:db8:11::3/64 dev ${UNDERLAY1} 2>/dev/null || true
+ip link set ${UNDERLAY1} up
+
+echo \"Configuring underlay on ${UNDERLAY2}\"
+nmcli device set ${UNDERLAY2} managed no 2>/dev/null || true
+ip addr add 192.168.12.3/24 dev ${UNDERLAY2} 2>/dev/null || true
+ip addr add 2001:db8:12::3/64 dev ${UNDERLAY2} 2>/dev/null || true
+ip link set ${UNDERLAY2} up
 "
 
 # --- Start k3s ---

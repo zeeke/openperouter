@@ -8,6 +8,8 @@ clab-kind-leafkind1,eth1,192.168.1.5/31
 clab-kind-leafkind1,toswitch1,192.168.11.2/24
 clab-kind-leafkind1,toswitch1,2001:db8:11::2/64
 clab-kind-leafkind2,eth1,192.168.1.7/31
+clab-kind-leafkind2,toswitch1,192.168.12.2/24
+clab-kind-leafkind2,toswitch1,2001:db8:12::2/64
 clab-kind-leafA,ethred,192.168.20.1/24
 clab-kind-leafA,ethred,2001:db8:20::1/64
 clab-kind-hostA_red,eth1,192.168.20.2/24
