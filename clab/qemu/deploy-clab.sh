@@ -29,8 +29,10 @@ if [[ "${ALREADY_DEPLOYED}" != "true" ]]; then
         sudo ip link del "${iface}" 2>/dev/null || true
     done
 
-    # Create all bridges referenced as kind: bridge in the topology
-    for br in leafkind1-sw leafkind2-sw; do
+    # Create all bridges referenced as kind: bridge in the topology.
+    # The NIC bridges (toswitch*, toleafkind*) are also created by
+    # launch.sh with an existence check, so this is safe to run first.
+    for br in leafkind1-sw leafkind2-sw toswitch1 toswitch2 toleafkind1 toleafkind2; do
         if [[ ! -d "/sys/class/net/${br}" ]]; then
             echo "Creating bridge ${br}"
             sudo ip link add name "${br}" type bridge

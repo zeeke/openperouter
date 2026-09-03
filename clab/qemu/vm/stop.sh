@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Stops the QEMU VM, cleans up TAP devices, and destroys the clab topology.
-# Pass --destroy to also remove the VM disk image and SSH keys.
+# Stops the QEMU VM, cleans up TAP devices and bridges, and destroys the
+# clab topology.  Pass --destroy to also remove the VM disk image and SSH keys.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAB_NAME="${CLAB_NAME:-kind}"
+NICS=(toswitch1 toswitch2 toleafkind1 toleafkind2)
 
 DESTROY_IMAGE=false
 if [[ "${1:-}" == "--destroy" ]]; then
@@ -29,18 +30,18 @@ if [[ -f "${SCRIPT_DIR}/qemu.pid" ]]; then
         echo "  QEMU process not running."
     fi
     rm -f "${SCRIPT_DIR}/qemu.pid"
+    rm -f "${SCRIPT_DIR}/monitor.sock"
 else
     echo "  No PID file found, skipping."
 fi
 
-# Clean up TAP devices
-echo "[2/3] Cleaning up TAP devices..."
-for i in 0 1 2 3 4 5 6 7; do
-    TAP="qemu-tap${i}"
-    if ip link show "${TAP}" &>/dev/null 2>&1; then
-        sudo ip link del "${TAP}" 2>/dev/null || true
-    fi
+
+# Clean up TAP devices and bridges (one tap + bridge per NIC)
+for nic in "${NICS[@]}"; do
+    sudo ip tuntap del dev "${nic}_t" mode tap 2>/dev/null || true
+    sudo ip link del "${nic}" 2>/dev/null || true
 done
+
 echo "  TAP devices cleaned up."
 
 # Destroy containerlab topology
@@ -55,8 +56,8 @@ else
     done
 fi
 
-# Remove bridges and orphaned veth pairs between bridge nodes
-for iface in toleafkind1 toswitch1 leafkind1-sw leafkind2-sw pf0-up pf1-up; do
+# Remove orphaned bridges and veth pairs from clab links
+for iface in leafkind1-sw leafkind2-sw pf0-up pf1-up; do
     sudo ip link del "${iface}" 2>/dev/null || true
 done
 echo "  Bridges and topology cleaned up."
@@ -67,6 +68,7 @@ if [[ "${DESTROY_IMAGE}" == "true" ]]; then
     rm -f "${SCRIPT_DIR}/fedora-cloud.qcow2"
     rm -f "${SCRIPT_DIR}/cloud-init.iso"
     rm -f "${SCRIPT_DIR}/serial.log"
+    rm -f "${SCRIPT_DIR}/monitor.sock"
     rm -f "${SCRIPT_DIR}/kubeconfig"
     rm -f "${SCRIPT_DIR}/qemu-vm-key"
     rm -f "${SCRIPT_DIR}/qemu-vm-key.pub"

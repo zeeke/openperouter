@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Launches QEMU VM with 8 igb NICs representing 2 fake SR-IOV PFs.
-# Each PF has 4 NICs: 2 trunk ports + 2 VLAN access ports (33, 44).
-# TAP devices are attached to containerlab-managed bridges.
+# Launches QEMU VM with 4 igb NICs.
+# Each NIC is backed by a TAP on the host, plugged into a Linux bridge.
+#
+# Naming convention (e.g. for toswitch1):
+#   Host:  toswitch1 (bridge) --- toswitch1_t (tap) | toswitch1 (igb) Guest
+#
+# The guest NIC name matches the bridge name via udev MAC-based rules.
 
 set -euo pipefail
 
@@ -12,13 +16,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VM_IMAGE="${SCRIPT_DIR}/fedora-cloud.qcow2"
 CLOUD_INIT_ISO="${SCRIPT_DIR}/cloud-init.iso"
 CLAB_NAME="${CLAB_NAME:-kind}"
-NUM_NICS=8  # 2 fake PFs × 4 NICs each
+NICS=(toswitch1 toswitch2 toleafkind1 toleafkind2)
 SSH_PORT="${QEMU_SSH_PORT:-2222}"
 K8S_PORT="${QEMU_K8S_PORT:-6443}"
 VM_CPUS="${QEMU_VM_CPUS:-4}"
 VM_MEM="${QEMU_VM_MEM:-6144}"
 PID_FILE="${SCRIPT_DIR}/qemu.pid"
 SERIAL_LOG="${SCRIPT_DIR}/serial.log"
+
+# Avoid absolute path, as they can cause the error:
+# qemu-system-x86_64: -monitor unix:.../monitor.sock,server,nowait: UNIX socket path '.../monitor.sock' is too long
+#Path must be less than 108 bytes
+MONITOR_SOCK="/tmp/monitor.sock"
 SSH_KEY="${SCRIPT_DIR}/qemu-vm-key"
 chmod 600 "${SSH_KEY}"
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=5 -i ${SSH_KEY}"
@@ -79,59 +88,36 @@ if [[ ! -f "${CLOUD_INIT_ISO}" ]]; then
     exit 1
 fi
 
-# Check if containerlab topology is deployed
-if ! sudo containerlab inspect --name "${CLAB_NAME}" &>/dev/null 2>&1; then
-    echo "ERROR: Containerlab topology '${CLAB_NAME}' is not deployed." >&2
-    echo "  Please run: make qemu-clab" >&2
-    exit 1
-fi
-
 # --- Networking setup ---
-echo "Setting up TAP devices and connecting to containerlab bridges..."
+# Create a bridge + TAP pair for each NIC. The bridge name matches the guest
+# interface name; the TAP has a _t suffix.  See ARCHITECTURE.md for the diagram.
+echo "Setting up TAP devices and connecting to bridges..."
 
+NIC_ARGS=""
+slot=1
 
-vf_incremental=1
+for nic in "${NICS[@]}"; do
+    tap="${nic}_t"
+    mac=$(printf "52:54:00:ab:cd:%02x" "${slot}")
 
-setup_fake_pf() {
-    local pfName=$1
-    local numVfs=$2
+    if [[ ! -d "/sys/class/net/${nic}" ]]; then
+        sudo ip link add name "${nic}" type bridge
+    fi
+    sudo ip link set dev "${nic}" up
 
-    for br in leafkind1-sw leafkind2-sw toleafkind1 toswitch1; do
-        if [[ ! -d "/sys/class/net/${br}" ]]; then
-            echo "Creating bridge ${br}"
-        fi
-        sudo ip link set dev "${br}" up
-    done
+    sudo ip tuntap add dev "${tap}" mode tap
+    sudo ip link set "${tap}" master "${nic}"
+    sudo ip link set "${tap}" up
 
-    
-    sudo ip link add name "${pfName}" type bridge
-    
-    for i in $(seq 0 $((numVfs - 1))); do
-        local vfRepresentor="${pfName}v${i}_rep"
+    NIC_ARGS="${NIC_ARGS} -device pcie-root-port,id=rp${slot},slot=${slot}"
+    NIC_ARGS="${NIC_ARGS} -netdev tap,id=${tap},ifname=${tap},script=no,downscript=no"
+    NIC_ARGS="${NIC_ARGS} -device igb,bus=rp${slot},netdev=${tap},mac=${mac}"
 
-        sudo ip tuntap add dev "${vfRepresentor}" mode tap
-        sudo ip link set "${vfRepresentor}" master "${pfName}"
-        sudo ip link set "${vfRepresentor}" up
-
-        vf_mac=$(printf "52:54:00:ab:cd:%02x" $((vf_incremental + 1)))
-        NIC_ARGS="${NIC_ARGS} -device pcie-root-port,id=rp${vf_incremental},slot=${vf_incremental}"
-        NIC_ARGS="${NIC_ARGS} -netdev tap,id=nic${vf_incremental},ifname=vfRepresentor,script=no,downscript=no"
-        NIC_ARGS="${NIC_ARGS} -device igb,bus=rp${vf_incremental},netdev=nic${vf_incremental},mac=${vf_mac}"
-
-        vf_incremental=$((vf_incremental + 1))
-    done
-
-    sudo ip link set dev "${pfName}" up
-}
-
-
-setup_fake_pf "toswitch1" 4
-setup_fake_pf "toswitch2" 4
-setup_fake_pf "toleafkind1" 4
-setup_fake_pf "toleafkind2" 4
+    slot=$((slot + 1))
+done
 
 # --- Launch QEMU ---
-echo "Launching QEMU VM with 8 igb NICs (2 fake PFs)..."
+echo "Launching QEMU VM with ${#NICS[@]} igb NICs..."
 
 touch "${SERIAL_LOG}" "${PID_FILE}"
 
@@ -149,6 +135,7 @@ sudo qemu-system-x86_64 \
     ${NIC_ARGS} \
     -display none \
     -serial file:"${SERIAL_LOG}" \
+    -monitor unix:"${MONITOR_SOCK}",server,nowait \
     -pidfile "${PID_FILE}" \
     -daemonize
 

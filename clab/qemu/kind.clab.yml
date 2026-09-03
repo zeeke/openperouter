@@ -80,17 +80,12 @@ topology:
     leafkind2-sw:
       kind: bridge
 
-    # Fake PF Bridges - Each represents a SR-IOV Physical Function
-    # to simulate the NIC embedded switch
-
-    # toleafkind1 PF: Connects 4 QEMU NICs (TAPs 0-3)
-    # TAPs 0,1: trunk ports, TAP 2: VLAN 33, TAP 3: VLAN 44
-    # Connects directly to leafkind1
+    # QEMU NIC bridges — each bridge has a single TAP plugged into it
+    # that backs one igb NIC inside the guest VM.
+    # See clab/qemu/ARCHITECTURE.md for the naming convention.
     toleafkind1:
       kind: bridge
 
-    # toswitch1 PF: Connects 4 QEMU NICs (TAPs 4-7)
-    # TAPs 4,5: trunk ports, TAP 6: VLAN 33, TAP 7: VLAN 44
     toswitch1:
       kind: bridge
 
@@ -116,8 +111,8 @@ topology:
     - endpoints: ["leafSRV6:ethblue", "hostSRV6_blue:eth1"]
     - endpoints: ["leafkind1:toswitch1", "leafkind1-sw:leaf1"]
 
-    # toleafkind1 PF uplink to leafkind1
+    # toleafkind1 bridge uplink to leafkind1
     - endpoints: ["toleafkind1:pf0-up", "leafkind1:toqemu"]
 
-    # toswitch1 PF uplink to leafkind1-sw
+    # toswitch1 bridge uplink to leafkind1-sw
     - endpoints: ["toswitch1:pf1-up", "leafkind1-sw:toqemu"]

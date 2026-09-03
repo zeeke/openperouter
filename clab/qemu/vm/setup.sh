@@ -34,7 +34,7 @@ echo "=== Bootstrapping QEMU VM cluster ==="
 # re-trigger udev, and let the NAME= rules rename them.
 echo "Renaming igb NICs..."
 run_in_vm '
-if ! ip link show toswitch1v0 &>/dev/null; then
+if ! ip link show toswitch1 &>/dev/null; then
   udevadm trigger --action=add --subsystem-match=net
   udevadm settle
 else
@@ -44,8 +44,8 @@ fi
 
 # --- Configure the underlay NIC ---
 echo "Configuring underlay IPs on igb NIC..."
-UNDERLAY1="toswitch1v0"
-UNDERLAY2="toswitch2v0"
+UNDERLAY1="toswitch1"
+UNDERLAY2="toswitch2"
 run_in_vm "
 echo \"Configuring underlay on ${UNDERLAY1}\"
 nmcli device set ${UNDERLAY1} managed no 2>/dev/null || true

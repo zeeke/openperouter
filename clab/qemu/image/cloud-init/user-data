@@ -29,26 +29,12 @@ packages:
 write_files:
   - path: /etc/udev/rules.d/70-persistent-net.rules
     content: |
-      # toleafkind1 PF (TAPs 0-3)
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toswitch1v0"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toswitch1v1"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toswitch1v2"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toswitch1v3"
-      # toswitch2 PF (TAPs 0-3)
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toswitch2v0"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toswitch2v1"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toswitch2v2"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toswitch2v3"
-      # toleafkind1 PF (TAPs 4-7)
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toleafkind1v0"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toleafkind1v1"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toleafkind1v2"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toleafkind1v3"
-      # toleafkind2 PF (TAPs 8-11)
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:05", NAME="toleafkind2v0"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:06", NAME="toleafkind2v1"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:07", NAME="toleafkind2v2"
-      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:08", NAME="toleafkind2v3"
+      # Rename igb NICs to match the host-side bridge names.
+      # MACs are assigned by launch.sh in NIC order.
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:01", NAME="toswitch1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:02", NAME="toswitch2"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:03", NAME="toleafkind1"
+      SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="52:54:00:ab:cd:04", NAME="toleafkind2"
 
   - path: /etc/modules-load.d/vfio.conf
     content: |
@@ -59,7 +45,7 @@ write_files:
   #    vm.nr_hugepages=1024
 
 runcmd:
-  - grubby --update-kernel=DEFAULT --args="intel_iommu=on iommu=pt hugepagesz=2M hugepages=1024 default_hugepagesz=2M"
+  - grubby --update-kernel=DEFAULT --args="intel_iommu=on iommu=pt hugepagesz=1G hugepages=2 default_hugepagesz=2M console=ttyS0,115200n8"
   - modprobe vfio-pci
   # Install k3s (but don't start it — setup.sh starts it after image import)
   - "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 INSTALL_K3S_SKIP_START=true sh -"

@@ -373,7 +373,7 @@ jobs:
         with:
           artifact-name: kind-logs-${{ matrix.deployment }}
 
-  qemu-e2etests:
+  e2etests-qemu:
     runs-on: ubuntu-24.04
     needs:
       - build-grout-images

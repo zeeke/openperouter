@@ -1,52 +1,59 @@
 # QEMU Containerlab Architecture
 
+## NIC Naming Convention
+
+Each QEMU NIC follows a consistent naming scheme across host and guest:
+
+```
+Host                                         Guest (QEMU VM)
+─────────────────────────────────────────────────────────────
+ <name> (bridge)  ◄──►  <name>_t (tap)  |  <name> (igb)
+```
+
+For example, `toswitch1`:
+
+```
+ toswitch1 (bridge)  ◄──►  toswitch1_t (tap)  |  toswitch1 (igb)
+```
+
+The guest NIC is renamed from its kernel name (e.g. `ens4`) to the bridge
+name using MAC-based udev rules written by cloud-init
+(`/etc/udev/rules.d/70-persistent-net.rules`).
+
+## NICs
+
+| # | Bridge (host) | TAP (host)      | Guest NIC    | MAC               |
+|---|---------------|-----------------|--------------|-------------------|
+| 1 | toswitch1     | toswitch1_t     | toswitch1    | 52:54:00:ab:cd:01 |
+| 2 | toswitch2     | toswitch2_t     | toswitch2    | 52:54:00:ab:cd:02 |
+| 3 | toleafkind1   | toleafkind1_t   | toleafkind1  | 52:54:00:ab:cd:03 |
+| 4 | toleafkind2   | toleafkind2_t   | toleafkind2  | 52:54:00:ab:cd:04 |
+
 ## Topology
 
 ```
-┌─────────────────────────────────────────────────────┐
-│               QEMU VM (8 igb NICs)                  │
-│                                                     │
-│  toleafkind1 PF          toswitch1 PF               │
-│  (NICs 0-3)              (NICs 4-7)                 │
-│  ┌───┬───┬───┬───┐      ┌───┬───┬───┬───┐           │
-│  │ 0 │ 1 │ 2 │ 3 │      │ 4 │ 5 │ 6 │ 7 │           │
-│  │trk│trk│V33│V44│      │trk│trk│V33│V44│           │
-│  └─┬─┴─┬─┴─┬─┴─┬─┘      └─┬─┴─┬─┴─┬─┴─┬─┘           │
-└────┼───┼───┼───┼──────────┼───┼───┼───┼─────────────┘
-     │   │   │   │          │   │   │   │
-   TAP0 TAP1 TAP2 TAP3    TAP4 TAP5 TAP6 TAP7
-     │   │   │   │          │   │   │   │
-     └───┴───┴───┘          └───┴───┴───┘
-          │                     │
-  ┌───────┴───────┐      ┌──────┴──────┐
-  │ toleafkind1   │      │  toswitch1  │
-  │ (bridge)      │      │  (bridge)   │
-  │ +VLAN filter  │      │ +VLAN filter│
-  └───────┬───────┘      └──────┬──────┘
-          │ uplink              │ uplink
-          │                     │
-  ┌───────┴───────┐      ┌──────┴──────┐
-  │               │      │ leafkind1-sw│
-  │               │      │  (bridge)   │
-  │               │      └──────┬──────┘
-  │               │             │ leaf1
-  │  leafkind1    │◄────────────┘
-  │  (FRR router) │
-  │  AS 64512     │
-  └───────┬───────┘
-          │ eth1
-   ┌──────┴──────┐
-   │    spine    │
-   │ (FRR router)│
-   │  AS 64612   │
-   └─────────────┘
+┌───────────────────────────────────────────────────────────┐
+│                    QEMU VM (4 igb NICs)                   │
+│                                                           │
+│  toswitch1    toswitch2    toleafkind1    toleafkind2     │
+│     │            │             │              │           │
+└─────┼────────────┼─────────────┼──────────────┼───────────┘
+      │            │             │              │
+  toswitch1_t  toswitch2_t  toleafkind1_t  toleafkind2_t  (TAPs)
+      │            │             │              │
+  toswitch1    toswitch2    toleafkind1    toleafkind2     (bridges)
+      │            │             │              │
+      │  uplink    │             │  uplink      │
+      ▼            ▼             ▼              ▼
+  leafkind1-sw     …         leafkind1         …
+  (bridge)                   (FRR router)
 ```
 
-## Links
+## Containerlab Links
 
 ```
-toleafkind1:uplink    ──► leafkind1:toqemu
-toswitch1:uplink      ──► leafkind1-sw:toqemu
+toleafkind1:pf0-up    ──► leafkind1:toqemu        (direct uplink)
+toswitch1:pf1-up      ──► leafkind1-sw:toqemu      (via switch bridge)
 leafkind1:toswitch1   ──► leafkind1-sw:leaf1
 leafkind1:eth1        ──► spine:eth3
 leafkind2:eth1        ──► spine:eth4
@@ -55,48 +62,38 @@ leafkind2:eth1        ──► spine:eth4
 ## Components
 
 ### QEMU VM (external)
-- 8 igb NICs (2 PFs × 4 NICs each)
+- 4 igb NICs, one per bridge
 - Connects via TAP devices
+- Management NIC (virtio) for SSH and k8s API on the host loopback
 
-### Fake PF 1: toleafkind1
-- Bridge with VLAN filtering
-- 4 TAPs: 0, 1 (trunk), 2 (VLAN 33), 3 (VLAN 44)
-- VM interfaces: toleafkind1v0, v1, v2, v3
-- 1 uplink: direct to leafkind1:toqemu
+### Bridges: toswitch1, toswitch2
+- Each carries a single TAP to the VM
+- `toswitch1` uplinks to `leafkind1-sw` bridge, which connects to `leafkind1`
 
-### Fake PF 2: toswitch1
-- Bridge with VLAN filtering
-- 4 TAPs: 4, 5 (trunk), 6 (VLAN 33), 7 (VLAN 44)
-- VM interfaces: toswitch1v0, v1, v2, v3
-- 1 uplink: to leafkind1-sw:toqemu
+### Bridges: toleafkind1, toleafkind2
+- Each carries a single TAP to the VM
+- `toleafkind1` uplinks directly to `leafkind1` (FRR router)
+
+### leafkind1-sw, leafkind2-sw (bridges)
+- Intermediate switch bridges between toswitch* and leaf routers
 
 ### leafkind1 (FRR router, AS 64512)
-- `toqemu`: direct uplink from toleafkind1 PF
+- `toqemu`: uplink from toleafkind1 bridge
 - `toswitch1`: to leafkind1-sw bridge
 - `eth1`: to spine:eth3
 
 ### leafkind2 (FRR router, AS 64513)
 - `eth1`: to spine:eth4
 
-### leafkind1-sw (bridge)
-- `toqemu`: from toswitch1 PF
-- `leaf1`: to leafkind1:toswitch1
-
-### leafkind2-sw (bridge)
-
 ### spine (FRR router, AS 64612)
 - `eth3`: to leafkind1
 - `eth4`: to leafkind2
 
-## VLAN Configuration
+## Scripts
 
-Both fake PF bridges use identical VLAN setup:
-
-**Trunk ports** (TAPs 0, 1, 4, 5):
-- PVID 1 (default VLAN), VLANs 33 and 44 tagged
-
-**VLAN 33 access** (TAPs 2, 6):
-- PVID 33, untagged, no VLAN 1
-
-**VLAN 44 access** (TAPs 3, 7):
-- PVID 44, untagged, no VLAN 1
+| Script          | Purpose                                                    |
+|-----------------|------------------------------------------------------------|
+| `vm/launch.sh`  | Creates bridges + TAPs, launches QEMU, waits for SSH       |
+| `vm/stop.sh`    | Kills QEMU, tears down TAPs and bridges, destroys clab     |
+| `vm/setup.sh`   | Bootstraps k3s, deploys FRR-k8s / Multus inside the VM    |
+| `deploy-clab.sh`| Deploys the containerlab topology and assigns fabric IPs   |
