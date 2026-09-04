@@ -229,18 +229,18 @@ func RemoveStaleVFPairResources(ctx context.Context, client *Client, configuredL
 func setupL2Gateway(ctx context.Context, client *Client, bridgeName string, params hostnetwork.L2VNIParams) error {
 	slog.DebugContext(ctx, "setting up L2 gateway", "bridge", bridgeName, "ips", params.L2GatewayIPs)
 
-	for _, ip := range params.L2GatewayIPs {
-		if err := client.ensureAddress(ctx, bridgeName, ip); err != nil {
-			return fmt.Errorf("failed to assign L2 gateway IP %s to bridge %s: %w", ip, bridgeName, err)
-		}
-	}
-
 	mac, err := hostnetwork.BridgeFixedMAC(params.VNI)
 	if err != nil {
 		return fmt.Errorf("failed to compute fixed MAC for VNI %d: %w", params.VNI, err)
 	}
 	if err := client.setBridgeMAC(ctx, bridgeName, net.HardwareAddr(mac).String()); err != nil {
 		return fmt.Errorf("failed to set fixed MAC on bridge %s: %w", bridgeName, err)
+	}
+
+	for _, ip := range params.L2GatewayIPs {
+		if err := client.ensureAddress(ctx, bridgeName, ip); err != nil {
+			return fmt.Errorf("failed to assign L2 gateway IP %s to bridge %s: %w", ip, bridgeName, err)
+		}
 	}
 
 	return nil
