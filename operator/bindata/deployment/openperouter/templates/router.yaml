@@ -276,17 +276,7 @@ spec:
       {{- if eq .Values.openperouter.datapath "grout" }}
       - name: grout
         securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop: ["ALL"]
-            add:
-            - SYS_ADMIN
-            - NET_ADMIN
-            - NET_RAW
-            - IPC_LOCK
-          seccompProfile:
-            type: Unconfined
+          privileged: true
         image: "{{ .Values.openperouter.grout.image.repository }}:{{ .Values.openperouter.grout.image.tag }}"
         {{- if .Values.openperouter.grout.image.pullPolicy }}
         imagePullPolicy: {{ .Values.openperouter.grout.image.pullPolicy }}
@@ -330,10 +320,12 @@ spec:
                 exit 1
               fi
             done
-            GROUT_ARGS="--test-mode --socket-mode 0666"
+            GROUT_ARGS="--test-mode --socket-mode 0666 --max-mtu 9500"
             {{- if eq .Values.openperouter.logLevel "debug" }}
             GROUT_ARGS="${GROUT_ARGS} --verbose"
+            GROUT_ARGS="${GROUT_ARGS} --trace-packets"
             {{- end }}
+            date
             exec nsenter --net=/var/run/netns/perouter grout ${GROUT_ARGS}
 
         volumeMounts:
@@ -349,13 +341,15 @@ spec:
             mountPath: /dev/net/tun
           - name: dpdk-runtime
             mountPath: /var/run/dpdk
+          - name: vfio
+            mountPath: /dev/vfio
         {{- with .Values.openperouter.grout.resources }}
         resources:
           {{- toYaml . | nindent 12 }}
         {{- end }}
         startupProbe:
           exec:
-            command: ["/bin/sh", "-c", "grcli -e"]
+            command: ["/bin/sh", "-c", "grcli -e trace enable all"]
           initialDelaySeconds: 2
           periodSeconds: 5
           timeoutSeconds: 5
@@ -371,6 +365,32 @@ spec:
           periodSeconds: 30
           timeoutSeconds: 5
       {{- end }}
+      - name: tcpdump
+        image: quay.io/centos/centos:stream10
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -xc
+          - |
+            yum install -y tcpdump
+            nsenter --net=/var/run/netns/perouter tcpdump -e -nn -i any tcp port 179 or udp port 4789 or tcp port 8090 or iso
+        volumeMounts:
+          - name: netns
+            mountPath: /var/run/netns
+            mountPropagation: HostToContainer
+        securityContext:
+          privileged: true
+      - name: tcpdump-host
+        image: quay.io/centos/centos:stream10
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - |
+            yum install -y tcpdump
+            tcpdump -e -nn -i any udp port 4789 or tcp port 8090
+        securityContext:
+          privileged: true
       {{- with .Values.openperouter.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -416,6 +436,10 @@ spec:
             type: CharDevice
         - name: dpdk-runtime
           emptyDir: {}
+        - name: vfio
+          hostPath:
+            path: /dev/vfio
+            type: Directory
         {{- end }}
       initContainers:
         # Copies the initial config files with the right permissions to the shared volume.

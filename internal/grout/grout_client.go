@@ -36,6 +36,12 @@ type groutVXLANInfo struct {
 	VRF     string `json:"vrf"`
 }
 
+type groutInterfaceDetails struct {
+	groutInterface
+	Description string `json:"description"`
+	Devargs     string `json:"devargs"`
+}
+
 // NewClient creates a new grout client pointing at the given UNIX socket.
 func NewClient(socketPath string) *Client {
 	return &Client{socketPath: socketPath}
@@ -49,7 +55,21 @@ func (c *Client) deleteAddress(ctx context.Context, iface, addr string) error {
 	return nil
 }
 
+// PortOptions holds optional parameters for DPDK port creation.
+type PortOptions struct {
+	MTU         *int32
+	RXQueues    *int32
+	QSize       *int32
+	Promiscuous *bool
+	MAC         *string
+	Description string
+}
+
 func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
+	return c.ensurePortWithOptions(ctx, name, devargs, PortOptions{})
+}
+
+func (c *Client) ensurePortWithOptions(ctx context.Context, name, devargs string, opts PortOptions) error {
 	exists, err := c.portExists(ctx, name)
 	if err != nil {
 		return fmt.Errorf("checking if port %s exists: %w", name, err)
@@ -59,8 +79,32 @@ func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
 		return nil
 	}
 
-	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs)
-	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs); err != nil {
+	args := []string{"interface", "add", "port", name, "devargs", devargs}
+	if opts.MTU != nil {
+		args = append(args, "mtu", fmt.Sprintf("%d", *opts.MTU))
+	}
+	if opts.RXQueues != nil {
+		args = append(args, "rxqs", fmt.Sprintf("%d", *opts.RXQueues))
+	}
+	if opts.QSize != nil {
+		args = append(args, "qsize", fmt.Sprintf("%d", *opts.QSize))
+	}
+	if opts.Promiscuous != nil {
+		if *opts.Promiscuous {
+			args = append(args, "promisc", "on")
+		} else {
+			args = append(args, "promisc", "off")
+		}
+	}
+	if opts.MAC != nil {
+		args = append(args, "mac", *opts.MAC)
+	}
+	if opts.Description != "" {
+		args = append(args, "description", opts.Description)
+	}
+
+	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs, "opts", opts)
+	if err := c.run(ctx, args...); err != nil {
 		return fmt.Errorf("creating grout port %s: %w", name, err)
 	}
 	return nil
@@ -77,8 +121,16 @@ func (c *Client) ensurePortInVRF(ctx context.Context, name, devargs, vrf string)
 	}
 
 	slog.InfoContext(ctx, "creating grout port in VRF", "name", name, "devargs", devargs, "vrf", vrf)
-	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs, "vrf", vrf, "up"); err != nil {
+	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs, "vrf", vrf, "down"); err != nil {
 		return fmt.Errorf("creating grout port %s in VRF %s: %w", name, vrf, err)
+	}
+	return nil
+}
+
+func (c *Client) setPortUp(ctx context.Context, name string) error {
+	slog.InfoContext(ctx, "setting grout port up", "name", name)
+	if err := c.run(ctx, "interface", "set", "port", name, "up"); err != nil {
+		return fmt.Errorf("setting grout port %s up: %w", name, err)
 	}
 	return nil
 }
@@ -144,6 +196,18 @@ func (c *Client) listInterfaces(ctx context.Context) ([]groutInterface, error) {
 	return ifaces, nil
 }
 
+func (c *Client) getInterfaceDetails(ctx context.Context, name string) (*groutInterfaceDetails, error) {
+	out, err := c.runOutput(ctx, "interface", "show", "name", name)
+	if err != nil {
+		return nil, fmt.Errorf("getting interface details for %s: %w", name, err)
+	}
+	var details groutInterfaceDetails
+	if err := json.Unmarshal([]byte(out), &details); err != nil {
+		return nil, fmt.Errorf("parsing interface details JSON for %s (raw %s): %w", name, out, err)
+	}
+	return &details, nil
+}
+
 // portExists checks whether a port with the given name exists in grout.
 func (c *Client) portExists(ctx context.Context, name string) (bool, error) {
 	info, err := c.getInterfaceInfo(ctx, name)
@@ -190,6 +254,65 @@ func (c *Client) runOutput(ctx context.Context, args ...string) (string, error) 
 		return output, fmt.Errorf("grcli %s failed: %w, output: %s", strings.Join(args, " "), err, output)
 	}
 	return output, nil
+}
+
+func (c *Client) ensureBridge(ctx context.Context, name, vrf string) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if bridge %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout bridge already exists", "name", name)
+		return nil
+	}
+
+	args := []string{"interface", "add", "bridge", name}
+	if vrf != "" {
+		args = append(args, "vrf", vrf)
+	}
+	slog.InfoContext(ctx, "creating grout bridge", "name", name, "vrf", vrf)
+	if err := c.run(ctx, args...); err != nil {
+		return fmt.Errorf("creating grout bridge %s: %w", name, err)
+	}
+	return nil
+}
+
+func (c *Client) setBridgeMAC(ctx context.Context, bridgeName, mac string) error {
+	slog.InfoContext(ctx, "setting bridge MAC", "bridge", bridgeName, "mac", mac)
+	if err := c.run(ctx, "interface", "set", "bridge", bridgeName, "mac", mac); err != nil {
+		return fmt.Errorf("setting MAC %s on bridge %s: %w", mac, bridgeName, err)
+	}
+	return nil
+}
+
+func (c *Client) ensureBridgeMember(ctx context.Context, portType, bridgeName, memberName string) error {
+	slog.InfoContext(ctx, "adding bridge member", "bridge", bridgeName, "member", memberName)
+	if err := c.run(ctx, "interface", "set", portType, memberName, "domain", bridgeName); err != nil {
+		return fmt.Errorf("adding %s to bridge %s: %w", memberName, bridgeName, err)
+	}
+	return nil
+}
+
+func (c *Client) ensureVLANSubInterface(ctx context.Context, name, parentPort string, vlanID int32) error {
+	exists, err := c.portExists(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if VLAN sub-interface %s exists: %w", name, err)
+	}
+	if exists {
+		slog.InfoContext(ctx, "grout VLAN sub-interface already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "creating grout VLAN sub-interface",
+		"name", name, "parent", parentPort, "vlan", vlanID)
+	if err := c.run(ctx,
+		"interface", "add", "vlan", name,
+		"parent", parentPort,
+		"vlan_id", fmt.Sprintf("%d", vlanID),
+	); err != nil {
+		return fmt.Errorf("creating VLAN sub-interface %s on %s: %w", name, parentPort, err)
+	}
+	return nil
 }
 
 func (c *Client) ensureVRF(ctx context.Context, name string) error {

@@ -4,6 +4,9 @@ package conversion
 
 import (
 	"errors"
+	"fmt"
+
+	"github.com/openperouter/openperouter/api/v1alpha1"
 )
 
 type DatapathConfigValidator interface {
@@ -32,6 +35,19 @@ func (g *GroutDatapathConfigValidator) Validate(apiConfig APIConfigData) error {
 
 type KernelDatapathConfigValidator struct{}
 
-func (k *KernelDatapathConfigValidator) Validate(_ APIConfigData) error {
+func (k *KernelDatapathConfigValidator) Validate(apiConfig APIConfigData) error {
+	for _, underlay := range apiConfig.Underlays {
+		for _, iface := range underlay.Spec.Interfaces {
+			if iface.Type == v1alpha1.UnderlayInterfaceTypeNetworkDevice &&
+				iface.NetworkDevice != nil && iface.NetworkDevice.AcceleratedConfig != nil {
+				return fmt.Errorf("acceleratedConfig requires grout datapath (--datapath=grout)")
+			}
+		}
+	}
+	for _, l2vni := range apiConfig.L2VNIs {
+		if l2vni.Spec.SRIOVVFPair != nil {
+			return fmt.Errorf("sriovVFPair requires grout datapath (--datapath=grout)")
+		}
+	}
 	return nil
 }
