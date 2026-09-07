@@ -42,6 +42,24 @@ type UnderlayInterface struct {
 	// CNI holds the CNI provisioning data; set when Kind is
 	// UnderlayInterfaceCNIDev.
 	CNI *CNIDeviceParams `json:"cni,omitempty"`
+	// AcceleratedConfig holds DPDK port provisioning data; set when Kind is
+	// UnderlayInterfaceGroutPort.
+	AcceleratedConfig *AcceleratedConfigParams `json:"acceleratedConfig,omitempty"`
+}
+
+// AcceleratedConfigParams holds the data needed to provision an underlay
+// interface as a DPDK port bound directly to grout.
+type AcceleratedConfigParams struct {
+	// RXQueues is the optional number of receive queues.
+	RXQueues *int32 `json:"rxQueues,omitempty"`
+	// QSize is the optional queue size.
+	QSize *int32 `json:"qSize,omitempty"`
+	// Promiscuous enables promiscuous mode on the DPDK port.
+	Promiscuous *bool `json:"promiscuous,omitempty"`
+	// MAC overrides the MAC address on the DPDK port.
+	MAC *string `json:"mac,omitempty"`
+	// PortName overrides the grout port name.
+	PortName *string `json:"portName,omitempty"`
 }
 
 // CNIDeviceParams holds the data needed to provision an underlay interface

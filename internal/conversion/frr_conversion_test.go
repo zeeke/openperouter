@@ -2369,7 +2369,6 @@ func TestAPItoFRR(t *testing.T) {
 						Interfaces: []frr.ISISInterface{
 							{Name: "eth0", IPv4: true, IPv6: true},
 							{Name: "eth1", IPv4: true, IsPassive: true},
-							{Name: "eth10", IPv6: true},
 							{Name: "lo"},
 						},
 					},

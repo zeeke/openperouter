@@ -136,6 +136,86 @@ spec:
                       - message: 'type/config mismatch: rawConfig must be set if and
                           only if type is ''RawConfig'''
                         rule: has(self.rawConfig) == (self.type == 'RawConfig')
+                    groutPort:
+                      description: |-
+                        groutPort binds an SR-IOV VF directly to grout as a DPDK port.
+                        The VF is identified by PCI address or PF name + VF index.
+                        IPAM is specified inline since DPDK-bound interfaces have no kernel
+                        netdev for CNI IPAM plugins to target. Only valid when grout is enabled.
+                        Must be set when type is "GroutPort".
+                      properties:
+                        netlinkName:
+                          description: |-
+                            netlinkName is the kernel netlink device name of the VF (e.g. "enp3s0f0v0").
+                            The controller resolves the PCI address via sysfs and reads existing
+                            IP addresses from the device before binding the DPDK driver.
+                            Mutually exclusive with pciAddress and pfName/vfIndex.
+                          maxLength: 15
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
+                        pciAddress:
+                          description: |-
+                            pciAddress is the PCI Bus:Device.Function address of the VF to bind
+                            (e.g. "0000:03:02.0"). Mutually exclusive with pfName/vfIndex and netlinkName.
+                          pattern: ^[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]$
+                          type: string
+                        pfName:
+                          description: |-
+                            pfName is the name of the Physical Function whose VF will be bound.
+                            Must be used together with vfIndex. Mutually exclusive with pciAddress and netlinkName.
+                          maxLength: 15
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
+                        portName:
+                          description: |-
+                            portName overrides the grout interface name. When omitted, the
+                            controller derives a name from the device selector.
+                          maxLength: 15
+                          pattern: ^[a-zA-Z][a-zA-Z0-9._-]*$
+                          type: string
+                        portOptions:
+                          description: portOptions specifies optional DPDK port parameters.
+                          properties:
+                            mtu:
+                              description: mtu is the Maximum Transmission Unit for
+                                the DPDK port.
+                              format: int32
+                              maximum: 9702
+                              minimum: 68
+                              type: integer
+                            qSize:
+                              description: qSize is the size of each receive/transmit
+                                queue.
+                              format: int32
+                              maximum: 32768
+                              minimum: 64
+                              type: integer
+                            rxQueues:
+                              description: rxQueues is the number of receive queues
+                                for the DPDK port.
+                              format: int32
+                              maximum: 64
+                              minimum: 1
+                              type: integer
+                          type: object
+                        vfIndex:
+                          description: |-
+                            vfIndex is the index of the Virtual Function on the PF.
+                            Must be used together with pfName. Mutually exclusive with pciAddress and netlinkName.
+                          format: int32
+                          minimum: 0
+                          type: integer
+                      type: object
+                      x-kubernetes-validations:
+                      - message: specify exactly one of pciAddress, pfName+vfIndex,
+                          or netlinkName
+                        rule: '(has(self.pciAddress) ? 1 : 0) + ((has(self.pfName)
+                          && has(self.vfIndex)) ? 1 : 0) + (has(self.netlinkName)
+                          ? 1 : 0) == 1'
+                      - message: vfIndex is required when pfName is set
+                        rule: '!has(self.pfName) || has(self.vfIndex)'
+                      - message: pfName is required when vfIndex is set
+                        rule: '!has(self.vfIndex) || has(self.pfName)'
                     networkDevice:
                       description: |-
                         networkDevice moves an existing host network device into the router netns.
@@ -159,6 +239,7 @@ spec:
                       enum:
                       - NetworkDevice
                       - CNIDevice
+                      - GroutPort
                       type: string
                   required:
                   - type
@@ -170,6 +251,9 @@ spec:
                   - message: 'type/config mismatch: cniDevice must be set if and only
                       if type is ''CNIDevice'''
                     rule: has(self.cniDevice) == (self.type == 'CNIDevice')
+                  - message: 'type/config mismatch: groutPort must be set if and only
+                      if type is ''GroutPort'''
+                    rule: has(self.groutPort) == (self.type == 'GroutPort')
                 minItems: 1
                 type: array
                 x-kubernetes-list-type: atomic

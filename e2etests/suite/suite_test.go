@@ -41,6 +41,7 @@ func handleFlags() {
 	flag.StringVar(&openperouter.Namespace, "openperouter-namespace", openperouter.Namespace, "namespace where OpenPERouter pods run")
 	flag.StringVar(&nodeLinkConfigPath, "nodelink-config", "../nodelink-default.json", "path to node links config JSON")
 	flag.StringVar(&nodeExecImage, "node-exec-image", "busybox:1.36", "container image for node-exec-helper pods")
+	flag.BoolVar(&tests.QEMUMode, "qemu-mode", false, "tells if openperouter is running on a QEMU VM with SR-IOV hardware")
 	flag.Parse()
 }
 
@@ -67,7 +68,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	log.SetLogger(zap.New(zap.WriteTo(ginkgo.GinkgoWriter), zap.UseDevMode(true)))
 	clientconfig, err := k8sclient.RestConfig()
 	Expect(err).NotTo(HaveOccurred(), "failed to load kubeconfig (KUBECONFIG=%s)", os.Getenv("KUBECONFIG"))
-	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace)
+	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace, tests.GroutMode)
 	Expect(err).NotTo(HaveOccurred())
 	tests.Updater = updater
 	kubeconfig := os.Getenv("KUBECONFIG")
@@ -88,6 +89,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	Eventually(func(g Gomega) {
 		tests.ValidateCNIBinaries(g, cs)
 	}).WithTimeout(30 * time.Second).WithPolling(2 * time.Second).Should(Succeed())
+
 })
 
 var _ = ginkgo.AfterSuite(func() {
