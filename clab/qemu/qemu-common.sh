@@ -1,15 +1,26 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Common SSH helpers for QEMU VM scripts.
-# Expects SCRIPT_DIR to be set by the sourcing script.
+# Shared paths and SSH helpers for scripts that manage the QEMU guest.
 
-SSH_PORT="${QEMU_SSH_PORT:-2222}"
-SSH_KEY="${SCRIPT_DIR}/qemu-vm-key"
-chmod 600 "${SSH_KEY}" 2>/dev/null || true
-SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -i ${SSH_KEY} -p ${SSH_PORT} openperouter@localhost"
-SCP_CMD="scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -i ${SSH_KEY} -P ${SSH_PORT}"
+QEMU_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VM_DIR="${QEMU_DIR}/vm"
+SSH_KEY="${VM_DIR}/qemu-vm-key"
+QEMU_SSH_PORT="${QEMU_SSH_PORT:-2222}"
+SSH_OPTIONS=(
+    -o StrictHostKeyChecking=no
+    -o UserKnownHostsFile=/dev/null
+    -o LogLevel=ERROR
+    -i "${SSH_KEY}"
+)
 
-run_in_vm() {
-    ${SSH_CMD} "sudo bash -c '$*'"
+ssh_vm() {
+    ssh "${SSH_OPTIONS[@]}" -p "${QEMU_SSH_PORT}" openperouter@127.0.0.1 "$@"
+}
+
+scp_to_vm() {
+    local source_path=$1
+    local destination_path=$2
+    scp "${SSH_OPTIONS[@]}" -P "${QEMU_SSH_PORT}" \
+        "${source_path}" "openperouter@127.0.0.1:${destination_path}"
 }

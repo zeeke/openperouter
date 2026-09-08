@@ -81,28 +81,27 @@ topology:
       kind: bridge
 
     pe-kind-control-plane:
-      group: agnhost
-      cmd: |-
-        sh -xc "while true; do ping 192.168.3.2; sleep 1; done":
+      kind: linux
+      image: docker.io/qemux/qemu:7.50
+      devices:
+        - /dev/kvm
+        - /dev/net/tun
+      entrypoint: /entrypoint.sh
+      binds:
+        - vm/entrypoint.sh:/entrypoint.sh
+        - vm/fedora-cloud.qcow2:/vm/fedora-cloud.qcow2
+        - vm/cloud-init.iso:/vm/cloud-init.iso
+        - ../..:/workspace
+      exec:
+        - bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-client ca-certificates git'
+        - bash -lc 'KUBECTL=/workspace/bin/kubectl KUBECONFIG_PATH=/workspace/bin/kubeconfig /workspace/clab/qemu/vm/setup.sh'
+      ports:
+        - "2222:2222/tcp"
+        - "6443:6443/tcp"
+      env:
+        VM_CPUS: "4"
+        VM_MEM: "6144"
 
-
-
-    # QEMU NIC bridges — each bridge has a single TAP plugged into it
-    # that backs one igb NIC inside the guest VM.
-    # See clab/qemu/ARCHITECTURE.md for the naming convention.
-    #toleafkind1:
-    #  kind: bridge
-#
-    #toswitch1:
-    #  kind: bridge
-#
-    #toleafkind2:
-    #  kind: bridge
-#
-    #toswitch2:
-    #  kind: bridge
-  #
-#
   links:
     - endpoints: ["leafA:eth1", "spine:eth1"]
     - endpoints: ["leafB:eth1", "spine:eth2"]
@@ -122,23 +121,3 @@ topology:
     - endpoints: ["leafkind2:tokindctrlpl", "pe-kind-control-plane:toleafkind2"]
     - endpoints: ["pe-kind-control-plane:toswitch1", "leafkind1-sw:kindctrlpl1"]
     - endpoints: ["pe-kind-control-plane:toswitch2", "leafkind2-sw:kindctrlpl2"]
-
-
-
-
-
-
-
-
-
-
-    #### old
-    # toleafkind1 bridge uplink to leafkind1
-    #- endpoints: ["leafkind1:tokindctrlpl", "toleafkind1:toleafkind1_up"]
-    #- endpoints: ["leafkind2:tokindctrlpl", "toleafkind2:toleafkind2_up"]
-    #
-#
-    #- endpoints: ["toswitch1:toswitch1_up", "leafkind1-sw:kindctrlpl1"]
-    #- endpoints: ["toswitch2:toswitch2_up", "leafkind2-sw:kindctrlpl2"]
-
-

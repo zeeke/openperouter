@@ -6,38 +6,43 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="${SCRIPT_DIR}/../../.."
 
+# shellcheck disable=SC1091
 source "${SCRIPT_DIR}/../qemu-common.sh"
 CLAB_NAME="${CLAB_NAME:-kind}"
 LOG_DIR="${KIND_EXPORT_LOGS:-/tmp/kind_logs}"
-KUBECONFIG="${SCRIPT_DIR}/kubeconfig"
+KUBECONFIG="${KUBECONFIG_PATH:-${REPO_ROOT}/bin/kubeconfig}"
+QEMU_CONTAINER="clab-${CLAB_NAME}-pe-kind-control-plane"
 
 mkdir -p "${LOG_DIR}/qemu-vm"
 
 echo "Collecting QEMU VM logs..."
 
-# VM serial console log
-if [[ -f "${SCRIPT_DIR}/serial.log" ]]; then
-    sudo cp "${SCRIPT_DIR}/serial.log" "${LOG_DIR}/qemu-vm/serial.log" || true
+# VM serial console log (inside the clab container)
+if docker inspect "${QEMU_CONTAINER}" &>/dev/null; then
+    docker cp "${QEMU_CONTAINER}:/var/log/serial.log" "${LOG_DIR}/qemu-vm/serial.log" 2>/dev/null || true
 fi
 
 # In-VM logs (best effort)
-if ${SSH_CMD} true 2>/dev/null; then
+if ssh_vm true 2>/dev/null; then
     echo "  journalctl..."
-    ${SSH_CMD} "sudo journalctl --no-pager -l" > "${LOG_DIR}/qemu-vm/journalctl.log" 2>/dev/null || true
+    ssh_vm "sudo journalctl --no-pager -l" > "${LOG_DIR}/qemu-vm/journalctl.log" 2>/dev/null || true
 
     echo "  k3s logs..."
-    ${SSH_CMD} "sudo journalctl -u k3s --no-pager -l" > "${LOG_DIR}/qemu-vm/k3s.log" 2>/dev/null || true
+    ssh_vm "sudo journalctl -u k3s --no-pager -l" > "${LOG_DIR}/qemu-vm/k3s.log" 2>/dev/null || true
 
     echo "  dmesg..."
-    ${SSH_CMD} "sudo dmesg" > "${LOG_DIR}/qemu-vm/dmesg.log" 2>/dev/null || true
+    ssh_vm "sudo dmesg" > "${LOG_DIR}/qemu-vm/dmesg.log" 2>/dev/null || true
 
     echo "  PCI devices..."
-    ${SSH_CMD} "sudo lspci -vvv" > "${LOG_DIR}/qemu-vm/lspci.log" 2>/dev/null || true
-    ${SSH_CMD} "sudo lspci -k" > "${LOG_DIR}/qemu-vm/lspci-k.log" 2>/dev/null || true
+    ssh_vm "sudo lspci -vvv" > "${LOG_DIR}/qemu-vm/lspci.log" 2>/dev/null || true
+    ssh_vm "sudo lspci -k" > "${LOG_DIR}/qemu-vm/lspci-k.log" 2>/dev/null || true
 
     echo "  SR-IOV info..."
-    ${SSH_CMD} 'for d in /sys/class/net/*/device/sriov_numvfs; do
+    # This script is intentionally single-quoted so expansion happens in the VM.
+    # shellcheck disable=SC2016
+    ssh_vm 'for d in /sys/class/net/*/device/sriov_numvfs; do
         iface=$(basename $(dirname $(dirname "$d")))
         echo "=== $iface ==="
         echo "sriov_numvfs: $(cat $d)"
@@ -45,8 +50,8 @@ if ${SSH_CMD} true 2>/dev/null; then
     done' > "${LOG_DIR}/qemu-vm/sriov-info.log" 2>/dev/null || true
 
     echo "  ip addr/route..."
-    ${SSH_CMD} "ip addr show" > "${LOG_DIR}/qemu-vm/ip-addr.log" 2>/dev/null || true
-    ${SSH_CMD} "ip route show" > "${LOG_DIR}/qemu-vm/ip-route.log" 2>/dev/null || true
+    ssh_vm "ip addr show" > "${LOG_DIR}/qemu-vm/ip-addr.log" 2>/dev/null || true
+    ssh_vm "ip route show" > "${LOG_DIR}/qemu-vm/ip-route.log" 2>/dev/null || true
 
     # kubectl logs for openperouter pods
     if [[ -f "${KUBECONFIG}" ]]; then

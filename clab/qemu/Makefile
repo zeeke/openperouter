@@ -10,30 +10,21 @@ QEMU_CLOUD_INIT_ISO := $(QEMU_DIR)/vm/cloud-init.iso
 qemu-image: $(QEMU_VM_IMAGE) $(QEMU_CLOUD_INIT_ISO) ## Prepare the QEMU VM image with cloud-init
 
 $(QEMU_VM_IMAGE):
-	$(QEMU_DIR)/image/prepare.sh image
+	$(QEMU_DIR)/vm/prepare-vm-image.sh
 
 $(QEMU_CLOUD_INIT_ISO):
-	$(QEMU_DIR)/image/prepare.sh iso
-
-.PHONY: qemu-launch
-qemu-launch: ## Launch the QEMU VM (run qemu-image and clab-qemu first)
-	$(QEMU_DIR)/vm/launch.sh
-
-.PHONY: qemu-setup
-qemu-setup: kubectl ## Bootstrap k3s cluster inside the VM (run qemu-launch first)
-	KUBECONFIG_PATH=$(KUBECONFIG_PATH) KUBECTL=$(KUBECTL) $(QEMU_DIR)/vm/setup.sh
+	$(QEMU_DIR)/vm/prepare-vm-iso.sh
 
 .PHONY: qemu-load-image
 qemu-load-image: ## Load the container image into the QEMU VM's k3s
 	$(QEMU_DIR)/vm/load-image.sh $(IMG)
 
 .PHONY: qemu-clab
-qemu-clab: ## Deploy containerlab topology for QEMU
+qemu-clab: qemu-image kubectl ## Deploy containerlab topology and bootstrap k3s in the QEMU guest
 	$(QEMU_DIR)/deploy-clab.sh
 
-
 .PHONY: qemu-deploy
-qemu-deploy: qemu-image qemu-launch qemu-setup qemu-clab qemu-load-image deploy-controller ## Load image and deploy controller in the QEMU VM
+qemu-deploy: qemu-clab qemu-load-image deploy-controller ## Full QEMU environment deploy
 
 .PHONY: qemu-e2etests
 qemu-e2etests: ginkgo kubectl create-export-logs ## Run QEMU e2e tests (VM must be running)
@@ -48,11 +39,20 @@ qemu-collect-logs: create-export-logs ## Collect QEMU VM and FRR logs
 	$(QEMU_DIR)/vm/collect-logs.sh
 
 .PHONY: qemu-clean
-qemu-clean: ## Tear down the QEMU VM and clab topology (preserves disk image)
-	$(QEMU_DIR)/vm/stop.sh
+qemu-clean: ## Tear down clab topology (stops the QEMU VM)
 	CLAB_TOPOLOGY=qemu/kind.clab.yml clab/clean.sh pe-kind
 
 .PHONY: qemu-destroy
-qemu-destroy: ## Fully destroy the VM, disk image, SSH keys, and clab topology
-	$(QEMU_DIR)/vm/stop.sh --destroy
+qemu-destroy: qemu-clean ## Fully destroy clab topology, VM disk image, and SSH keys
+	rm -f "$(QEMU_DIR)/vm/fedora-cloud.qcow2"
+	rm -f "$(QEMU_DIR)/vm/cloud-init.iso"
+	rm -f "$(QEMU_DIR)/vm/qemu-vm-key"
+	rm -f "$(QEMU_DIR)/vm/qemu-vm-key.pub"
 
+.PHONY: qemu-ssh
+qemu-ssh:
+	ssh -p "$(QEMU_SSH_PORT)" \
+	    -i clab/qemu/vm/qemu-vm-key \
+	    -o StrictHostKeyChecking=no \
+	    -o UserKnownHostsFile=/dev/null \
+	    openperouter@127.0.0.1

@@ -1,128 +1,117 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 #
-# Bootstraps the k3s cluster inside the QEMU VM: starts k3s, extracts
-# kubeconfig, deploys FRR-k8s, Multus, and CNI plugins.
-#
-# FRR-k8s and Multus must be deployed here (not via clab/setup.sh) because
-# clab/setup.sh uses kind-specific mechanisms (kind get nodes, docker cp)
-# that don't work with k3s-in-QEMU.
+# Bootstraps k3s, FRR-k8s, Multus, and the required CNI plugins in the VM.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${SCRIPT_DIR}/../../.."
-
-K8S_PORT="${QEMU_K8S_PORT:-6443}"
-MULTUS_VERSION="${MULTUS_VERSION:-v4.2.1}"
-CNI_PLUGINS_VERSION=${CNI_PLUGINS_VERSION:-"v1.9.2-0.20260803142000-012159164d7f"}
-
+# shellcheck disable=SC1091
 source "${SCRIPT_DIR}/../qemu-common.sh"
+
+readonly SSH_WAIT_SECONDS=300
+readonly K3S_VERSION="${K3S_VERSION:-v1.36.4+k3s1}"
+readonly MULTUS_VERSION="${MULTUS_VERSION:-v4.2.1}"
+readonly CNI_PLUGINS_VERSION="${CNI_PLUGINS_VERSION:-v1.9.2-0.20260803142000-012159164d7f}"
+readonly K8S_PORT="${QEMU_K8S_PORT:-6443}"
+
+wait_for_ssh() {
+    local description=$1
+    local elapsed=0
+
+    echo "Waiting for the VM ${description}..."
+    until ssh_vm true 2>/dev/null; do
+        if ((elapsed >= SSH_WAIT_SECONDS)); then
+            echo "ERROR: VM was not SSH-reachable within ${SSH_WAIT_SECONDS}s." >&2
+            return 1
+        fi
+        sleep 5
+        elapsed=$((elapsed + 5))
+        echo "  waited ${elapsed}s / ${SSH_WAIT_SECONDS}s"
+    done
+}
 
 echo "=== Bootstrapping QEMU VM cluster ==="
 
-# --- Rename igb NICs to match the bridge they're connected to ---
-# Uses udev rules written by cloud-init (70-persistent-net.rules).
-# On first boot the NICs are already up with kernel names, so we 
-# re-trigger udev, and let the NAME= rules rename them.
-#echo "Renaming igb NICs..."
-#run_in_vm '
-#if ! ip link show toswitch1 &>/dev/null; then
-#  udevadm trigger --action=add --subsystem-match=net
-#  udevadm settle
-#else
-#  echo "  NICs already renamed, skipping."
-#fi
-#'
+chmod 600 "${SSH_KEY}"
+wait_for_ssh "to become SSH-reachable"
 
-run_in_vm "ip link"
-run_in_vm "ip a"
+echo "Waiting for cloud-init to complete..."
+ssh_vm "sudo cloud-init status --wait"
 
-# --- Configure the underlay NIC ---
-echo "Configuring underlay IPs on igb NIC..."
-UNDERLAY1="toswitch1"
-UNDERLAY2="toswitch2"
-run_in_vm "
-echo \"Configuring underlay on ${UNDERLAY1}\"
-nmcli device set ${UNDERLAY1} managed no 2>/dev/null || true
-ip addr add 192.168.11.3/24 dev ${UNDERLAY1} 2>/dev/null || true
-ip addr add 2001:db8:11::3/64 dev ${UNDERLAY1} 2>/dev/null || true
-ip link set ${UNDERLAY1} up
+# cloud-init adds the IOMMU kernel arguments and persistent NIC names. They take
+# effect only after this first reboot.
+echo "Rebooting the VM to apply its kernel and NIC configuration..."
+ssh_vm "sudo reboot" || true
+sleep 10
+wait_for_ssh "to return after reboot"
 
-echo \"Configuring underlay on ${UNDERLAY2}\"
-nmcli device set ${UNDERLAY2} managed no 2>/dev/null || true
-ip addr add 192.168.12.3/24 dev ${UNDERLAY2} 2>/dev/null || true
-ip addr add 2001:db8:12::3/64 dev ${UNDERLAY2} 2>/dev/null || true
-ip link set ${UNDERLAY2} up
-"
+echo "Configuring VM underlay interfaces..."
+ssh_vm sudo bash -s <<'EOF'
+set -euo pipefail
 
-# install k3s without traefik and start it
-run_in_vm "
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 sh -
-"
+configure_interface() {
+    local interface=$1
+    local ipv4_address=$2
+    local ipv6_address=$3
 
-## --- Start k3s ---
-#echo "Starting k3s..."
-#run_in_vm 'systemctl start k3s'
+    nmcli device set "${interface}" managed no 2>/dev/null || true
+    ip address replace "${ipv4_address}" dev "${interface}"
+    ip -6 address replace "${ipv6_address}" dev "${interface}"
+    ip link set "${interface}" up
+}
 
-echo "Waiting for k3s to be ready..."
-RETRIES=60
-for i in $(seq 1 $RETRIES); do
-    if ${SSH_CMD} "sudo k3s kubectl get nodes" 2>/dev/null | grep -q " Ready"; then
-        echo "k3s is ready."
+configure_interface toswitch1 192.168.11.3/24 2001:db8:11::3/64
+configure_interface toswitch2 192.168.12.3/24 2001:db8:12::3/64
+EOF
+
+echo "Installing k3s ${K3S_VERSION}..."
+ssh_vm "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION='${K3S_VERSION}' INSTALL_K3S_EXEC='--disable=traefik' K3S_KUBECONFIG_MODE=644 sh -"
+
+echo "Waiting for the k3s node to become ready..."
+for attempt in $(seq 1 60); do
+    if ssh_vm "sudo k3s kubectl get nodes" 2>/dev/null | grep -q " Ready"; then
         break
     fi
-    if [[ "$i" -eq "$RETRIES" ]]; then
-        echo "ERROR: k3s did not become ready within $((RETRIES * 5))s" >&2
+    if ((attempt == 60)); then
+        echo "ERROR: k3s did not become ready within 300s." >&2
         exit 1
     fi
     sleep 5
 done
 
-# --- Extract kubeconfig to the standard path ---
 KUBECONFIG_PATH="${KUBECONFIG_PATH:-${REPO_ROOT}/bin/kubeconfig}"
-echo "Extracting kubeconfig..."
+echo "Writing kubeconfig to ${KUBECONFIG_PATH}..."
 mkdir -p "$(dirname "${KUBECONFIG_PATH}")"
-${SSH_CMD} "sudo cat /etc/rancher/k3s/k3s.yaml" 2>/dev/null \
-    | sed "s|https://127.0.0.1:6443|https://127.0.0.1:${K8S_PORT}|g" \
+ssh_vm "sudo cat /etc/rancher/k3s/k3s.yaml" \
+    | sed "s|https://127.0.0.1:6443|https://127.0.0.1:${K8S_PORT}|" \
     > "${KUBECONFIG_PATH}"
-echo "Kubeconfig saved to ${KUBECONFIG_PATH}"
 
 export KUBECONFIG="${KUBECONFIG_PATH}"
-
 KUBECTL="${KUBECTL:-kubectl}"
-FRR_K8S_DIR="${REPO_ROOT}/clab/kind/frr-k8s"
 
-# --- Deploy FRR-K8s and Multus (same kustomization/manifests as the kind flow) ---
-echo "Deploying FRR-K8s..."
-${KUBECTL} apply -k "${FRR_K8S_DIR}"
+echo "Deploying FRR-k8s..."
+"${KUBECTL}" apply -k "${REPO_ROOT}/clab/kind/frr-k8s"
 
-echo "Deploying Multus CNI..."
-${KUBECTL} apply -f "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/refs/tags/${MULTUS_VERSION}/deployments/multus-daemonset.yml"
+echo "Installing CNI plugins in the VM..."
+ssh_vm sudo bash -s -- "${CNI_PLUGINS_VERSION}" <<'EOF'
+set -euo pipefail
+cni_plugins_version=$1
 
-# --- Install CNI plugins (same versions as clab/kind/frr-k8s/setup.sh, via SCP instead of docker cp) ---
-echo "Creating CNI symlinks for k3s paths..."
-run_in_vm 'mkdir -p /etc/cni /opt/cni'
-run_in_vm 'ln -sfn /var/lib/rancher/k3s/agent/etc/cni/net.d /etc/cni/net.d'
-run_in_vm 'ln -sfn /var/lib/rancher/k3s/data/cni /opt/cni/bin'
+dnf install -y golang
+mkdir -p /etc/cni /opt/cni
+ln -sfn /var/lib/rancher/k3s/agent/etc/cni/net.d /etc/cni/net.d
+ln -sfn /var/lib/rancher/k3s/data/cni /opt/cni/bin
+GOBIN=/opt/cni/bin go install "github.com/containernetworking/plugins/plugins/main/macvlan@${cni_plugins_version}"
+GOBIN=/opt/cni/bin go install "github.com/containernetworking/plugins/plugins/ipam/static@${cni_plugins_version}"
+EOF
 
-echo "Building CNI plugins from source..."
-TEMP_GOBIN=$(mktemp -d)
-GOBIN=$TEMP_GOBIN go install github.com/containernetworking/plugins/plugins/main/macvlan@${CNI_PLUGINS_VERSION}
-GOBIN=$TEMP_GOBIN go install github.com/containernetworking/plugins/plugins/main/bridge@${CNI_PLUGINS_VERSION}
-GOBIN=$TEMP_GOBIN go install github.com/containernetworking/plugins/plugins/ipam/static@${CNI_PLUGINS_VERSION}
+echo "Deploying Multus ${MULTUS_VERSION}..."
+"${KUBECTL}" apply -f "https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/refs/tags/${MULTUS_VERSION}/deployments/multus-daemonset.yml"
 
-echo "Copying CNI plugins to VM..."
-for plugin in macvlan bridge static; do
-    ${SCP_CMD} "${TEMP_GOBIN}/${plugin}" openperouter@localhost:/tmp/
-    run_in_vm "mv /tmp/${plugin} /opt/cni/bin/${plugin} && chmod +x /opt/cni/bin/${plugin}"
-done
-rm -rf "${TEMP_GOBIN}"
-
-echo "Waiting for FRR-K8s pods to be ready..."
-${KUBECTL} -n frr-k8s-system wait --for=condition=Ready --all pods --timeout=300s
-
-echo "Waiting for Multus pods to be ready..."
-${KUBECTL} -n kube-system wait --for=condition=Ready pods -l name=multus --timeout=300s
+echo "Waiting for FRR-k8s and Multus..."
+"${KUBECTL}" -n frr-k8s-system wait --for=condition=Ready --all pods --timeout=300s
+"${KUBECTL}" -n kube-system wait --for=condition=Ready pods -l name=multus --timeout=300s
 
 echo "=== QEMU VM cluster bootstrap complete ==="

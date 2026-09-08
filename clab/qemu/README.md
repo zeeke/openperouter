@@ -1,26 +1,30 @@
-# QEMU Integration with Containerlab
+# QEMU Containerlab Environment
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the topology diagram and link map.
+This environment runs one Fedora VM inside the `pe-kind-control-plane`
+containerlab node. The VM hosts the k3s cluster used by the QEMU end-to-end
+tests. See [ARCHITECTURE.md](ARCHITECTURE.md) for the network layout.
 
 ## Deployment
 
 ```bash
-# One-command (image + clab + VM + k3s + deploy controller)
+# Build the VM inputs, deploy containerlab, bootstrap k3s, load IMG, and deploy
+# the controller.
 make qemu-deploy
 
-# Or manual steps:
+# Run individual stages when debugging.
 make qemu-image
 make qemu-clab
-make qemu-launch
-make qemu-setup
-make qemu-load-image
+make qemu-load-image IMG=quay.io/example/image:tag
 make qemu-e2etests
 ```
 
+`make qemu-clab` starts QEMU and bootstraps k3s as part of the containerlab
+node setup. It writes the guest kubeconfig to `bin/kubeconfig`.
+
 ## NIC Mapping
 
-| Bridge (host) | TAP (host)      | Guest NIC    | MAC               |
-|---------------|-----------------|--------------|-------------------|
+| Clab interface | TAP in QEMU container | Guest NIC    | MAC               |
+|----------------|-----------------------|--------------|-------------------|
 | toswitch1     | toswitch1_t     | toswitch1    | 52:54:00:ab:cd:01 |
 | toswitch2     | toswitch2_t     | toswitch2    | 52:54:00:ab:cd:02 |
 | toleafkind1   | toleafkind1_t   | toleafkind1  | 52:54:00:ab:cd:03 |
@@ -33,12 +37,14 @@ make qemu-clean      # tear down VM + clab, preserve disk image
 make qemu-destroy    # fully destroy VM, disk image, SSH keys, and clab
 ```
 
+The generated image, cloud-init ISO, SSH keys, overlay disk, logs, and
+`clab-kind/` state are ignored by Git.
+
 ## Troubleshooting
 
 ```bash
 sudo containerlab inspect --name kind
-sudo bridge vlan show
-ip link show | grep '_t'
+sudo docker exec clab-kind-pe-kind-control-plane ip link show
 sudo docker exec clab-kind-leafkind1 vtysh -c "show running-config"
-ssh -p 2222 -i clab/qemu/vm/qemu-vm-key openperouter@localhost ip link show
+make qemu-ssh
 ```
