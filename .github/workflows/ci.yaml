@@ -373,7 +373,7 @@ jobs:
         with:
           artifact-name: kind-logs-${{ matrix.deployment }}
 
-  e2etests-qemu:
+  e2etests-qemu-grout:
     runs-on: ubuntu-24.04
     needs:
       - build-grout-images
@@ -408,10 +408,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu-system-x86 qemu-utils genisoimage sshpass
-
-      - name: Install containerlab
-        run: |
-          bash -c "$(curl -sL https://get.containerlab.dev)"
 
       - name: Verify KVM support
         run: |

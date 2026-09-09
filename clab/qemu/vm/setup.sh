@@ -38,7 +38,16 @@ chmod 600 "${SSH_KEY}"
 wait_for_ssh "to become SSH-reachable"
 
 echo "Waiting for cloud-init to complete..."
-ssh_vm "sudo cloud-init status --wait"
+# Exit code 2 means "done with recoverable warnings" (e.g. hostnamectl failing
+# because systemd-hostnamed isn't up yet during early boot). The hostname is
+# still set correctly via /etc/hostname, so treat it as success.
+ssh_vm "sudo cloud-init status --wait --long" || {
+    rc=$?
+    if [[ $rc -ne 2 ]]; then
+        exit $rc
+    fi
+    echo "cloud-init completed with recoverable warnings (exit code 2), continuing."
+}
 
 # cloud-init adds the IOMMU kernel arguments and persistent NIC names. They take
 # effect only after this first reboot.
@@ -105,6 +114,7 @@ ln -sfn /var/lib/rancher/k3s/agent/etc/cni/net.d /etc/cni/net.d
 ln -sfn /var/lib/rancher/k3s/data/cni /opt/cni/bin
 GOBIN=/opt/cni/bin go install "github.com/containernetworking/plugins/plugins/main/macvlan@${cni_plugins_version}"
 GOBIN=/opt/cni/bin go install "github.com/containernetworking/plugins/plugins/ipam/static@${cni_plugins_version}"
+# bridge plugin is already part of k3s networking stack
 EOF
 
 echo "Deploying Multus ${MULTUS_VERSION}..."

@@ -6,6 +6,7 @@
 # QEMU with igb NICs backed by those TAPs.
 
 set -euo pipefail
+set -x
 
 readonly NICS=(toswitch1 toswitch2 toleafkind1 toleafkind2)
 VM_CPUS="${VM_CPUS:-4}"
@@ -35,7 +36,18 @@ for nic in "${NICS[@]}"; do
     done
 done
 
+# For each NIC eth0, there is a bridge and a tap device:
+#
+#        eth0 <---------------> eth0_br <---------> eth0_tap <----------> eth0 
+#  <veth created by clab>      <bridge>             <atp>          <igb nic in QEMU VM>
+#
+
 QEMU_NIC_ARGS=()
+
+# Generate udev rules so the VM renames NICs to match the names we use here.
+UDEV_RULES="/tmp/70-persistent-net.rules"
+: > "${UDEV_RULES}"
+
 slot=1
 for nic in "${NICS[@]}"; do
     tap="${nic}_t"
@@ -57,8 +69,13 @@ for nic in "${NICS[@]}"; do
     )
 
     echo "Bridge ${br}: ${nic} <-> ${tap} (mac ${mac})"
+
+    echo "SUBSYSTEM==\"net\", ACTION==\"add\", ATTR{address}==\"${mac}\", NAME=\"${nic}\"" >> "${UDEV_RULES}"
+
     slot=$((slot + 1))
 done
+
+hostname
 
 echo "Launching QEMU with ${#NICS[@]} igb NICs..."
 MGMT_NETDEV="user,id=mgmt,hostfwd=tcp::${SSH_PORT}-:22,hostfwd=tcp::${K8S_PORT}-:6443"
@@ -75,6 +92,8 @@ exec qemu-system-x86_64 \
     -netdev "${MGMT_NETDEV}" \
     -device virtio-net-pci,netdev=mgmt \
     "${QEMU_NIC_ARGS[@]}" \
+    -fw_cfg "name=opt/udev-nic-rules,file=${UDEV_RULES}" \
+    -smbios "type=1,serial=ds=nocloud;h=pe-kind-control-plane;i=pe-kind-control-plane" \
     -display none \
     -serial file:/var/log/serial.log \
     -monitor unix:/tmp/monitor.sock,server,nowait
