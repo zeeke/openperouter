@@ -3,11 +3,7 @@
 package qemu_e2e
 
 import (
-	"context"
-	"errors"
 	"fmt"
-	"os"
-	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -19,12 +15,10 @@ import (
 	"github.com/openperouter/openperouter/e2etests/pkg/executor"
 	"github.com/openperouter/openperouter/e2etests/pkg/frr"
 	"github.com/openperouter/openperouter/e2etests/pkg/ipfamily"
-	"github.com/openperouter/openperouter/e2etests/pkg/k8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/networklayerprotocol"
-	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
+	"github.com/openperouter/openperouter/e2etests/triage"
 	"github.com/openshift-kni/k8sreporter"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 )
 
@@ -168,122 +162,11 @@ func findNextHopIPv6(exec executor.Executor, destination, device string) (string
 	return strings.TrimSpace(match[1]), nil
 }
 
-func DumpPods(name string, pods []*corev1.Pod) {
-	ginkgo.GinkgoWriter.Printf("%s pods are:", name)
-	for _, pod := range pods {
-		ginkgo.GinkgoWriter.Printf("Pod %s/%s: %s", pod.Namespace, pod.Name, pod.Status.Phase)
-		ginkgo.GinkgoWriter.Printf("  Node: %s", pod.Spec.NodeName)
-		ginkgo.GinkgoWriter.Printf("  IPs: %v", pod.Status.PodIPs)
-		ginkgo.GinkgoWriter.Printf("  Containers:")
-		for _, c := range pod.Spec.Containers {
-			ginkgo.GinkgoWriter.Printf("    - %s: %s", c.Name, c.Image)
-		}
-		ginkgo.GinkgoWriter.Print("\n")
-	}
-}
-
 func dumpIfFails(cs clientset.Interface, additionalNamespaces ...string) {
-	if !ginkgo.CurrentSpecReport().Failed() {
-		return
-	}
-
-	routers, err := openperouter.Get(cs, HostMode)
-	if err != nil {
-		ginkgo.GinkgoWriter.Printf("dumpIfFails: failed to get routers: %v", err)
-		return
-	}
-
-	testPath, err := createTestOutput(ReportPath, ginkgo.CurrentSpecReport().FullText())
-	if err != nil {
-		ginkgo.GinkgoWriter.Printf("dumpIfFails: failed to create test dir: %v", err)
-		return
-	}
-
-	for router := range routers.GetExecutors() {
-		func() {
-			var dump strings.Builder
-			dump.WriteString(frr.RawDump(router) + "\n\n")
-			if GroutMode {
-				dump.WriteString(frr.GroutDump(router) + "\n\n")
-			}
-
-			f, err := logFileFor(testPath, fmt.Sprintf("frrdump-%s", router.Name()))
-			if err != nil {
-				ginkgo.GinkgoWriter.Printf("dumpIfFails: failed to open file for %s: %v", router.Name(), err)
-				return
-			}
-			defer f.Close()
-			fmt.Fprintf(f, "Dumping information for %s\n", router.Name())
-			fmt.Fprint(f, dump.String())
-		}()
-	}
-
-	for _, namespace := range additionalNamespaces {
-		dumpWorkloadInfo(testPath, cs, namespace)
-	}
-
-	k8s.DumpInfo(k8sReporter, ginkgo.CurrentSpecReport().FullText())
-}
-
-func dumpWorkloadInfo(testPath string, cs clientset.Interface, namespace string) {
-	pods, err := cs.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
-	if err != nil {
-		ginkgo.GinkgoWriter.Printf("dumpWorkloadInfo: failed to list pods in namespace %s: %v", namespace, err)
-		return
-	}
-
-	for _, pod := range pods.Items {
-		if len(pod.Spec.Containers) == 0 {
-			continue
-		}
-		container := pod.Spec.Containers[0]
-		exec := executor.ForPod(pod.Namespace, pod.Name, container.Name)
-		func() {
-			var res strings.Builder
-			commands := []struct {
-				desc string
-				cmd  []string
-			}{
-				{"ip link", []string{"bash", "-c", "ip l"}},
-				{"ip address", []string{"bash", "-c", "ip address"}},
-				{"ip route table all", []string{"bash", "-c", "ip route show table all"}},
-			}
-			for _, c := range commands {
-				fmt.Fprintf(&res, "\n######## %s\n\n", c.desc)
-				out, err := exec.Exec(c.cmd[0], c.cmd[1:]...)
-				if err != nil {
-					fmt.Fprintf(&res, "\nFailed exec %q: %v", strings.Join(c.cmd, " "), err)
-				}
-				res.WriteString(out)
-			}
-
-			f, err := logFileFor(testPath, fmt.Sprintf("pod-dump-%s-%s", namespace, pod.Name))
-			if err != nil {
-				ginkgo.GinkgoWriter.Printf("dumpWorkloadInfo: failed to open file for pod %s: %v", pod.Name, err)
-				return
-			}
-			defer f.Close()
-			fmt.Fprint(f, res.String())
-		}()
-	}
-}
-
-func createTestOutput(basePath, testName string) (string, error) {
-	nonAlphanumeric := regexp.MustCompile(`[^a-zA-Z0-9]+`)
-	sanitizedName := nonAlphanumeric.ReplaceAllString(testName, "_")
-	testPath := path.Join(basePath, sanitizedName)
-	err := os.Mkdir(testPath, 0755)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		return "", fmt.Errorf("failed to create test dir: %w", err)
-	}
-	return testPath, nil
-}
-
-func logFileFor(base string, kind string) (*os.File, error) {
-	path := path.Join(base, kind) + ".log"
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
+	triage.DumpIfFails(cs, triage.Config{
+		ReportPath:  ReportPath,
+		HostMode:    HostMode,
+		GroutMode:   GroutMode,
+		K8sReporter: k8sReporter,
+	}, additionalNamespaces...)
 }
