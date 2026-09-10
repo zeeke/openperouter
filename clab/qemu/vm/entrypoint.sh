@@ -75,8 +75,6 @@ for nic in "${NICS[@]}"; do
     slot=$((slot + 1))
 done
 
-hostname
-
 echo "Launching QEMU with ${#NICS[@]} igb NICs..."
 MGMT_NETDEV="user,id=mgmt,hostfwd=tcp::${SSH_PORT}-:22,hostfwd=tcp::${K8S_PORT}-:6443"
 

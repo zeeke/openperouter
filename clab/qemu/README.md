@@ -1,8 +1,9 @@
 # QEMU Containerlab Environment
 
-This environment runs one Fedora VM inside the `pe-kind-control-plane`
-containerlab node. The VM hosts the k3s cluster used by the QEMU end-to-end
-tests. See [ARCHITECTURE.md](ARCHITECTURE.md) for the network layout.
+This environment runs one Fedora Cloud VM inside the
+`pe-kind-control-plane` Containerlab node. The VM hosts the single-node k3s
+cluster used by the QEMU end-to-end tests. See
+[ARCHITECTURE.md](ARCHITECTURE.md) for the complete network layout.
 
 ## Deployment
 
@@ -18,8 +19,9 @@ make qemu-load-image IMG=quay.io/example/image:tag
 make qemu-e2etests
 ```
 
-`make qemu-clab` starts QEMU and bootstraps k3s as part of the containerlab
-node setup. It writes the guest kubeconfig to `bin/kubeconfig`.
+`make qemu-clab` starts QEMU and bootstraps k3s as part of the Containerlab
+node setup. With the default root Makefile settings, it writes the guest
+kubeconfig to `bin/kubeconfig` (or to `KUBECONFIG_PATH` when overridden).
 
 ## NIC Mapping
 
@@ -34,11 +36,14 @@ node setup. It writes the guest kubeconfig to `bin/kubeconfig`.
 
 ```bash
 make qemu-clean      # tear down VM + clab, preserve disk image
-make qemu-destroy    # fully destroy VM, disk image, SSH keys, and clab
+make qemu-destroy    # tear down clab and remove the base image, ISO, and SSH keys
 ```
 
-The generated image, cloud-init ISO, SSH keys, overlay disk, logs, and
-`clab-kind/` state are ignored by Git.
+The generated base image, cloud-init ISO, SSH keys, overlay disk, serial log,
+and `clab-kind/` state are ignored by Git. `qemu-clean` removes the
+Containerlab deployment but preserves the VM artifacts; `qemu-destroy` also
+removes the base image, cloud-init ISO, and SSH keys. The overlay and serial
+log may remain in `clab/qemu/vm` and can be removed separately if needed.
 
 ## Troubleshooting
 
@@ -47,4 +52,5 @@ sudo containerlab inspect --name kind
 sudo docker exec clab-kind-pe-kind-control-plane ip link show
 sudo docker exec clab-kind-leafkind1 vtysh -c "show running-config"
 make qemu-ssh
+make qemu-collect-logs
 ```

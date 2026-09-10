@@ -49,6 +49,7 @@ qemu-destroy: qemu-clean ## Fully destroy clab topology, VM disk image, and SSH 
 	rm -f "$(QEMU_DIR)/vm/cloud-init.iso"
 	rm -f "$(QEMU_DIR)/vm/qemu-vm-key"
 	rm -f "$(QEMU_DIR)/vm/qemu-vm-key.pub"
+	rm -f "$(QEMU_DIR)/vm/serial.log"
 
 .PHONY: qemu-ssh
 qemu-ssh:
