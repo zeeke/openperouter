@@ -25,9 +25,8 @@ import (
 )
 
 var (
-	emptyPrefixes          = []string{}
-	leafAVRFRedPrefixes    = []string{"192.168.20.0/24", "2001:db8:20::/64"}
-	leafSRV6VRFRedPrefixes = []string{"192.170.20.0/24", "2001:db8:170:20::/64"}
+	emptyPrefixes       = []string{}
+	leafAVRFRedPrefixes = []string{"192.168.20.0/24", "2001:db8:20::/64"}
 )
 
 var AcceleratedUnderlay = v1alpha1.Underlay{
