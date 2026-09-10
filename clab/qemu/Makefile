@@ -21,7 +21,8 @@ qemu-load-image: ## Load the container image into the QEMU VM's k3s
 
 .PHONY: qemu-clab
 qemu-clab: qemu-image kubectl ## Deploy containerlab topology and bootstrap k3s in the QEMU guest
-	$(QEMU_DIR)/deploy-clab.sh
+	KUBECONFIG_PATH=$(KUBECONFIG_PATH) \
+	  $(QEMU_DIR)/deploy-clab.sh
 
 .PHONY: qemu-deploy
 qemu-deploy: qemu-clab qemu-load-image deploy-controller ## Full QEMU environment deploy

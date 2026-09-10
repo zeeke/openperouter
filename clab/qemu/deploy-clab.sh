@@ -48,3 +48,5 @@ IP_MAP_FILE=qemu/ip_map.txt "${CLAB_DIR}/scripts/08-ip-assignment.sh" pe-kind
 
 echo "=== Container setup ==="
 "${CLAB_DIR}/scripts/09-container-setup.sh" pe-kind
+
+cp "${CLAB_DIR}/qemu/vm/kubeconfig" "${KUBECONFIG_PATH}"

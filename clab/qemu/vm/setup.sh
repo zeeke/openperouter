@@ -6,15 +6,23 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="${SCRIPT_DIR}/../../.."
+
 # shellcheck disable=SC1091
-source "${SCRIPT_DIR}/../qemu-common.sh"
+source "${SCRIPT_DIR}/qemu-common.sh"
 
 readonly SSH_WAIT_SECONDS=300
 readonly K3S_VERSION="${K3S_VERSION:-v1.36.4+k3s1}"
 readonly MULTUS_VERSION="${MULTUS_VERSION:-v4.2.1}"
 readonly CNI_PLUGINS_VERSION="${CNI_PLUGINS_VERSION:-v1.9.2-0.20260803142000-012159164d7f}"
 readonly K8S_PORT="${QEMU_K8S_PORT:-6443}"
+
+
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-client ca-certificates git
+
+curl -Lo /usr/local/bin/kubectl https://dl.k8s.io/release/v1.37.0/bin/linux/amd64/kubectl
+chmod +x /usr/local/bin/kubectl
+
 
 wait_for_ssh() {
     local description=$1
@@ -90,7 +98,6 @@ for attempt in $(seq 1 60); do
     sleep 5
 done
 
-KUBECONFIG_PATH="${KUBECONFIG_PATH:-${REPO_ROOT}/bin/kubeconfig}"
 echo "Writing kubeconfig to ${KUBECONFIG_PATH}..."
 mkdir -p "$(dirname "${KUBECONFIG_PATH}")"
 ssh_vm "sudo cat /etc/rancher/k3s/k3s.yaml" \
@@ -101,7 +108,7 @@ export KUBECONFIG="${KUBECONFIG_PATH}"
 KUBECTL="${KUBECTL:-kubectl}"
 
 echo "Deploying FRR-k8s..."
-"${KUBECTL}" apply -k "${REPO_ROOT}/clab/kind/frr-k8s"
+"${KUBECTL}" apply -k "/frr-k8s-manifests"
 
 echo "Installing CNI plugins in the VM..."
 ssh_vm sudo bash -s -- "${CNI_PLUGINS_VERSION}" <<'EOF'

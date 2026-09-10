@@ -3,9 +3,8 @@
 #
 # Shared paths and SSH helpers for scripts that manage the QEMU guest.
 
-QEMU_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VM_DIR="${QEMU_DIR}/vm"
-SSH_KEY="${VM_DIR}/qemu-vm-key"
+QEMU_COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SSH_KEY="${QEMU_COMMON_DIR}/qemu-vm-key"
 QEMU_SSH_PORT="${QEMU_SSH_PORT:-2222}"
 SSH_OPTIONS=(
     -o StrictHostKeyChecking=no

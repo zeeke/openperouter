@@ -86,15 +86,17 @@ topology:
       devices:
         - /dev/kvm
         - /dev/net/tun
-      entrypoint: /entrypoint.sh
+      entrypoint: /vm/entrypoint.sh
       binds:
-        - vm/entrypoint.sh:/entrypoint.sh
-        - vm/fedora-cloud.qcow2:/vm/fedora-cloud.qcow2
-        - vm/cloud-init.iso:/vm/cloud-init.iso
-        - ../..:/workspace
+        #- vm/entrypoint.sh:/entrypoint.sh
+        #- vm/fedora-cloud.qcow2:/vm/fedora-cloud.qcow2
+        #- vm/cloud-init.iso:/vm/cloud-init.iso
+        #- ../..:/workspace
+        - ./vm:/vm
+        - ../kind/frr-k8s:/frr-k8s-manifests
       exec:
-        - bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-client ca-certificates git'
-        - bash -lc 'KUBECTL=/workspace/bin/kubectl KUBECONFIG_PATH=/workspace/bin/kubeconfig /workspace/clab/qemu/vm/setup.sh'
+#        - bash -lc 'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-client ca-certificates git'
+        - bash -c 'KUBECONFIG_PATH=/vm/kubeconfig /vm/setup.sh'
       ports:
         - "2222:2222/tcp"
         - "6443:6443/tcp"

@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${SCRIPT_DIR}/../../.."
 
 # shellcheck disable=SC1091
-source "${SCRIPT_DIR}/../qemu-common.sh"
+source "${SCRIPT_DIR}/qemu-common.sh"
 CLAB_NAME="${CLAB_NAME:-kind}"
 LOG_DIR="${KIND_EXPORT_LOGS:-/tmp/kind_logs}"
 KUBECONFIG="${KUBECONFIG_PATH:-${REPO_ROOT}/bin/kubeconfig}"

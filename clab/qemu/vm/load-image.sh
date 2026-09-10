@@ -8,7 +8,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
-source "${SCRIPT_DIR}/../qemu-common.sh"
+source "${SCRIPT_DIR}/qemu-common.sh"
 
 IMAGE_REF="${1:?Usage: load-image.sh <image-ref> [tar-path]}"
 TAR_PATH="${2:-}"

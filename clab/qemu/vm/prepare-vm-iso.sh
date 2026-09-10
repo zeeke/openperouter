@@ -8,8 +8,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
-source "${SCRIPT_DIR}/../qemu-common.sh"
-CLOUD_INIT_DIR="${QEMU_DIR}/image/cloud-init"
+source "${SCRIPT_DIR}/qemu-common.sh"
+CLOUD_INIT_DIR="${SCRIPT_DIR}/cloud-init"
 CLOUD_INIT_ISO="${SCRIPT_DIR}/cloud-init.iso"
 
 mkdir -p "${SCRIPT_DIR}"

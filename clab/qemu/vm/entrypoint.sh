@@ -93,7 +93,7 @@ exec qemu-system-x86_64 \
     -device virtio-net-pci,netdev=mgmt \
     "${QEMU_NIC_ARGS[@]}" \
     -fw_cfg "name=opt/udev-nic-rules,file=${UDEV_RULES}" \
-    -smbios "type=1,serial=ds=nocloud;h=pe-kind-control-plane;i=pe-kind-control-plane" \
+    -smbios "type=1,serial=ds=nocloud;h=`hostname`;i=`hostname`" \
     -display none \
-    -serial file:/var/log/serial.log \
+    -serial file:/vm/serial.log \
     -monitor unix:/tmp/monitor.sock,server,nowait
