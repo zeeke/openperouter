@@ -42,6 +42,18 @@ type UnderlayInterface struct {
 	// CNI holds the CNI provisioning data; set when Kind is
 	// UnderlayInterfaceCNIDev.
 	CNI *CNIDeviceParams
+	// AcceleratedConfig holds optional grout port parameters.
+	AcceleratedConfig *AcceleratedConfigParams
+}
+
+// AcceleratedConfigParams holds optional grout port parameters.
+type AcceleratedConfigParams struct {
+	// RXQueues is the optional number of receive queues.
+	RXQueues *int32
+	// QSize is the optional queue size.
+	QSize *int32
+	// PortName overrides the grout port name.
+	PortName *string
 }
 
 // CNIDeviceParams holds the data needed to provision an underlay interface
@@ -131,6 +143,16 @@ func SetupUnderlayNetDevInterface(ctx context.Context, ns netns.NsHandle,
 		return fmt.Errorf("failed to setup underlay net device %s: %w", iface.InterfaceName, err)
 	}
 	return nil
+}
+
+// RestoreUnderlayNetDevInterface moves a single underlay netdev from the
+// router namespace back to the default namespace. It is a no-op if the
+// device is already in the default namespace.
+func RestoreUnderlayNetDevInterface(ctx context.Context, fromNetNSPath, name string) error {
+	return restoreUnderlayWithHandles(ctx, fromNetNSPath,
+		func(ctx context.Context, fromHandle, defaultHandle *netlink.Handle, defaultNS netns.NsHandle) error {
+			return MoveInterfaceToNamespace(ctx, name, fromHandle, defaultHandle, defaultNS, 0)
+		})
 }
 
 // SetupUnderlayCNIDevInterface provisions a single underlay cni dev interface.
