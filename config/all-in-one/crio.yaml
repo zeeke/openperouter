@@ -273,6 +273,8 @@ spec:
                 default: 4789
                 description: vxlanPort is the port to be used for VXLan encapsulation.
                 format: int32
+                maximum: 65535
+                minimum: 1
                 type: integer
             required:
             - vni
@@ -673,6 +675,8 @@ spec:
                 default: 4789
                 description: vxlanPort is the port to be used for VXLan encapsulation.
                 format: int32
+                maximum: 65535
+                minimum: 1
                 type: integer
             required:
             - vni
@@ -1690,8 +1694,8 @@ spec:
                         port is the port to dial when establishing the session.
                         Defaults to 179.
                       format: int32
-                      maximum: 16384
-                      minimum: 0
+                      maximum: 65535
+                      minimum: 1
                       type: integer
                     properties:
                       description: |-
