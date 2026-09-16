@@ -1,0 +1,128 @@
+name: Mirror upstream PR
+
+# Mirrors zeeke/openperouter#10 into this fork once a day.
+#
+# The mirror branch is force-pushed to the upstream pull request head commit
+# *object*, so both pull requests share the exact same head SHA. Nothing must
+# ever rebase, merge into or "update" the mirror branch: any of those rewrite
+# the commit and break that equality.
+#
+# The upstream base branch is mirrored as well, because this fork's main has
+# diverged from it and a mirror pull request opened against main would show a
+# diff full of unrelated commits.
+#
+# Pushes and pull requests made with the default GITHUB_TOKEN do not trigger
+# workflows. Set the MIRROR_PR_TOKEN secret to a personal access token with
+# contents+pull-requests write if CI has to run on the mirror pull request.
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+env:
+  UPSTREAM_REPO: zeeke/openperouter
+  UPSTREAM_PR: "10"
+  MIRROR_BRANCH: mirror/zeeke-pr-10
+  MIRROR_BASE_BRANCH: mirror/zeeke-pr-10-base
+
+jobs:
+  mirror:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.MIRROR_PR_TOKEN || github.token }}
+
+      - name: Read the upstream pull request
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          pr="$(gh api "repos/${UPSTREAM_REPO}/pulls/${UPSTREAM_PR}")"
+          {
+            echo "state=$(jq -r 'if .merged then "merged" else .state end' <<<"$pr")"
+            echo "head_sha=$(jq -r '.head.sha' <<<"$pr")"
+            echo "base_ref=$(jq -r '.base.ref' <<<"$pr")"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Close the mirror when the upstream pull request is done
+        if: steps.upstream.outputs.state != 'open'
+        env:
+          GH_TOKEN: ${{ secrets.MIRROR_PR_TOKEN || github.token }}
+          UPSTREAM_STATE: ${{ steps.upstream.outputs.state }}
+        run: |
+          set -euo pipefail
+          number="$(gh pr list --head "$MIRROR_BRANCH" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "$number" ]; then
+            echo "upstream pull request is ${UPSTREAM_STATE}, no open mirror to close"
+            exit 0
+          fi
+          gh pr close "$number" \
+            --comment "Upstream ${UPSTREAM_REPO}#${UPSTREAM_PR} is ${UPSTREAM_STATE}, closing the mirror."
+
+      - name: Fetch the upstream head and base
+        if: steps.upstream.outputs.state == 'open'
+        env:
+          UPSTREAM_BASE_REF: ${{ steps.upstream.outputs.base_ref }}
+          UPSTREAM_HEAD_SHA: ${{ steps.upstream.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          # refs/pull/N/head lives on the base repository, so this keeps working
+          # even when the pull request comes from a fork that later disappears.
+          git fetch --no-tags "https://github.com/${UPSTREAM_REPO}" \
+            "+refs/pull/${UPSTREAM_PR}/head:refs/mirror/head" \
+            "+refs/heads/${UPSTREAM_BASE_REF}:refs/mirror/base"
+          fetched="$(git rev-parse refs/mirror/head)"
+          if [ "$fetched" != "$UPSTREAM_HEAD_SHA" ]; then
+            echo "::notice::upstream head moved during this run, mirroring ${fetched}"
+          fi
+
+      - name: Push the mirror branches
+        if: steps.upstream.outputs.state == 'open'
+        run: |
+          set -euo pipefail
+          push_if_changed() {
+            local source_ref="$1" target_branch="$2" want have
+            want="$(git rev-parse "$source_ref")"
+            have="$(git ls-remote origin "refs/heads/${target_branch}" | cut -f1)"
+            if [ "$want" = "$have" ]; then
+              echo "${target_branch} is already at ${want}"
+              return
+            fi
+            git push --force origin "${source_ref}:refs/heads/${target_branch}"
+          }
+          push_if_changed refs/mirror/base "$MIRROR_BASE_BRANCH"
+          push_if_changed refs/mirror/head "$MIRROR_BRANCH"
+
+      - name: Open the mirror pull request
+        if: steps.upstream.outputs.state == 'open'
+        env:
+          GH_TOKEN: ${{ secrets.MIRROR_PR_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          number="$(gh pr list --head "$MIRROR_BRANCH" --base "$MIRROR_BASE_BRANCH" \
+            --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$number" ]; then
+            echo "mirror pull request #${number} is already open"
+            exit 0
+          fi
+          body="$(printf '%s\n' \
+            "Automated mirror of https://github.com/${UPSTREAM_REPO}/pull/${UPSTREAM_PR}." \
+            "" \
+            "The head of this pull request is the very same commit as the upstream one," \
+            "and the base branch mirrors the upstream base branch." \
+            "" \
+            "Do not push to, rebase or update this branch: it is force-pushed daily by" \
+            "\`.github/workflows/mirror-upstream-pr.yaml\` and any rewrite breaks the mirroring.")"
+          gh pr create \
+            --base "$MIRROR_BASE_BRANCH" \
+            --head "$MIRROR_BRANCH" \
+            --title "[mirror] ${UPSTREAM_REPO}#${UPSTREAM_PR}" \
+            --body "$body"
