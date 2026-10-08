@@ -121,19 +121,20 @@ func (s *stringSliceFlag) Set(value string) error {
 }
 
 type parameters struct {
-	probeAddr       string
-	frrConfigPath   string
-	reloaderSocket  string
-	mode            string
-	ovsSocketPath   string
-	nodeName        string
-	namespace       string
-	logLevel        string
-	bgpListenLimit  uint
-	cniPluginDirs   stringSliceFlag
-	cniCacheDir     string
-	datapath        string
-	groutSocketPath string
+	probeAddr        string
+	frrConfigPath    string
+	reloaderSocket   string
+	mode             string
+	ovsSocketPath    string
+	nodeName         string
+	namespace        string
+	logLevel         string
+	bgpListenLimit   uint
+	cniPluginDirs    stringSliceFlag
+	cniCacheDir      string
+	datapath         string
+	groutSocketPath  string
+	groutTapUnderlay bool
 }
 
 func main() {
@@ -154,6 +155,7 @@ func main() {
 
 	flag.StringVar(&args.datapath, "datapath", "kernel", "The datapath to use (kernel or grout)")
 	flag.StringVar(&args.groutSocketPath, "grout-socket", "/var/run/grout/grout.sock", "Path to the grout control socket")
+	flag.BoolVar(&args.groutTapUnderlay, "grout-tap-underlay", false, "Use TAP ports for grout underlay interfaces")
 
 	flag.StringVar(&args.nodeName, "nodename", "", "The name of the node the controller runs on")
 	flag.StringVar(&args.namespace, "namespace", "", "The namespace the controller runs in")
@@ -366,7 +368,7 @@ func runK8sConfigReconcilerHostMode(ctx context.Context,
 
 	var datapathConfigurator routerconfiguration.DatapathConfigurator = &routerconfiguration.KernelDatapathConfigurator{}
 	if args.datapath == datapathGrout {
-		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath)
+		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath, args.groutTapUnderlay)
 	}
 
 	dhcpSupervisor.OnRestart = triggerKubernetesReconcile(triggerChan, types.NamespacedName{
@@ -473,7 +475,7 @@ func runK8sConfigReconciler(ctx context.Context,
 
 	var datapathConfigurator routerconfiguration.DatapathConfigurator = &routerconfiguration.KernelDatapathConfigurator{}
 	if args.datapath == datapathGrout {
-		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath)
+		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath, args.groutTapUnderlay)
 	}
 
 	triggerChan := make(chan event.GenericEvent, 1)
@@ -540,7 +542,7 @@ func runStaticConfigReconciler(ctx context.Context,
 
 	var datapathConfigurator routerconfiguration.DatapathConfigurator = &routerconfiguration.KernelDatapathConfigurator{}
 	if args.datapath == datapathGrout {
-		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath)
+		datapathConfigurator = routerconfiguration.NewGroutConfigurator(args.groutSocketPath, args.groutTapUnderlay)
 	}
 
 	staticReconciler := &routerconfiguration.StaticConfigReconciler{

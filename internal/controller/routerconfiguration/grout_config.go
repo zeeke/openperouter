@@ -21,11 +21,13 @@ type GroutDatapathConfigurator struct {
 	conversion.GroutDatapathConfigValidator
 
 	groutSocketPath string
+	tapUnderlay     bool
 }
 
-func NewGroutConfigurator(groutSocketPath string) *GroutDatapathConfigurator {
+func NewGroutConfigurator(groutSocketPath string, tapUnderlay bool) *GroutDatapathConfigurator {
 	return &GroutDatapathConfigurator{
 		groutSocketPath: groutSocketPath,
+		tapUnderlay:     tapUnderlay,
 	}
 }
 
@@ -59,7 +61,7 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	}
 
 	slog.InfoContext(ctx, "setting up underlay")
-	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay); err != nil {
+	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay, g.tapUnderlay); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
 
