@@ -157,8 +157,7 @@ spec:
                       properties:
                         acceleratedConfig:
                           description: |-
-                            acceleratedConfig when set binds the device as a DPDK port instead of
-                            creating a TAP+remote= bridge. Only valid when --datapath=grout.
+                            acceleratedConfig sets optional grout port parameters. Only valid when --datapath=grout.
                           properties:
                             portName:
                               description: |-
