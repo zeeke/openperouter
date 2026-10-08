@@ -44,8 +44,6 @@ type UnderlayInterface struct {
 	CNI *CNIDeviceParams
 	// AcceleratedConfig holds optional grout port parameters.
 	AcceleratedConfig *AcceleratedConfigParams
-	// ExistingGroutPortName is the name of a discovered grout port.
-	ExistingGroutPortName string
 }
 
 // AcceleratedConfigParams holds optional grout port parameters.
