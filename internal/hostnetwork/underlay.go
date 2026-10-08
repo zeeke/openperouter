@@ -244,16 +244,11 @@ func UnderlayInterfacesToRemove(existing,
 	}
 	removed := []UnderlayInterface{}
 	for _, iface := range existing {
-		req, found := requestedByName[iface.InterfaceName]
-		if !found || req.Kind != iface.Kind || isAccelerated(req) != isAccelerated(iface) {
+		if req, found := requestedByName[iface.InterfaceName]; !found || req.Kind != iface.Kind {
 			removed = append(removed, iface)
 		}
 	}
 	return removed
-}
-
-func isAccelerated(iface UnderlayInterface) bool {
-	return iface.AcceleratedConfig != nil
 }
 
 func ensureLoopback(ctx context.Context, ns netns.NsHandle, vtepIPs ...string) error {
