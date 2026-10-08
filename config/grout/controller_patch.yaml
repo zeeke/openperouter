@@ -17,6 +17,7 @@ spec:
           - "--cni-plugin-dirs=/opt/openperouter/cni/bin/"
           - "--cni-cache-dir=/var/lib/openperouter/cni/cache"
           - "--datapath=grout"
+          - "--grout-tap-underlay"
           - "--grout-socket=/var/run/grout/grout.sock"
           volumeMounts:
           - mountPath: /var/run/grout
