@@ -31,8 +31,7 @@ Package v1alpha1 contains API Schema definitions for the openpe v1alpha1 API gro
 
 
 
-AcceleratedConfig holds optional DPDK port parameters for accelerated
-underlay interfaces bound directly to grout.
+AcceleratedConfig holds optional grout port parameters for underlay interfaces.
 
 
 
@@ -797,7 +796,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `interfaceName` _string_ | interfaceName is the name of the host network device to move into<br />the router netns. |  | MaxLength: 15 <br />MinLength: 1 <br />Pattern: `^[a-zA-Z][a-zA-Z0-9._-]*$` <br />Required: \{\} <br /> |
-| `acceleratedConfig` _[AcceleratedConfig](#acceleratedconfig)_ | acceleratedConfig when set binds the device as a DPDK port instead of<br />creating a TAP+remote= bridge. Only valid when --datapath=grout. |  | Optional: \{\} <br /> |
+| `acceleratedConfig` _[AcceleratedConfig](#acceleratedconfig)_ | acceleratedConfig sets optional grout port parameters for either PCI or TAP<br />ports. Only valid when --datapath=grout. |  | Optional: \{\} <br /> |
 
 
 #### OVSBridgeConfig

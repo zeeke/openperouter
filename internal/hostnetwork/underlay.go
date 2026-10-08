@@ -42,13 +42,13 @@ type UnderlayInterface struct {
 	// CNI holds the CNI provisioning data; set when Kind is
 	// UnderlayInterfaceCNIDev.
 	CNI *CNIDeviceParams
-	// AcceleratedConfig holds DPDK port parameters; set when the device is
-	// bound directly to grout instead of using a TAP+remote= bridge.
+	// AcceleratedConfig holds optional grout port parameters.
 	AcceleratedConfig *AcceleratedConfigParams
+	// ExistingGroutPortName is the name of a discovered grout port.
+	ExistingGroutPortName string
 }
 
-// AcceleratedConfigParams holds the data needed to provision an underlay
-// interface as a DPDK port bound directly to grout.
+// AcceleratedConfigParams holds optional grout port parameters.
 type AcceleratedConfigParams struct {
 	// RXQueues is the optional number of receive queues.
 	RXQueues *int32

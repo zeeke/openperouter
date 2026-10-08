@@ -149,14 +149,12 @@ type NetworkDevice struct {
 	// +required
 	InterfaceName string `json:"interfaceName,omitempty"`
 
-	// acceleratedConfig when set binds the device as a DPDK port instead of
-	// creating a TAP+remote= bridge. Only valid when --datapath=grout.
+	// acceleratedConfig sets optional grout port parameters. Only valid when --datapath=grout.
 	// +optional
 	AcceleratedConfig *AcceleratedConfig `json:"acceleratedConfig,omitempty"`
 }
 
-// AcceleratedConfig holds optional DPDK port parameters for accelerated
-// underlay interfaces bound directly to grout.
+// AcceleratedConfig holds optional grout port parameters for underlay interfaces.
 type AcceleratedConfig struct {
 	// rxQueues is the number of receive queues to allocate on the DPDK port.
 	// +kubebuilder:validation:Minimum=1
