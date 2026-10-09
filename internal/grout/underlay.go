@@ -44,6 +44,11 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		}
 	}()
 
+	// Debug
+	if err := client.run(ctx, "nexthop", "config", "set", "held-packets", "16"); err != nil {
+		slog.Error("failed to set held-packets to 16", "error", err)
+	}
+
 	// If any existing underlay interfaces were removed from the new list,
 	// clean them up before setting up the new ones, tearing down their
 	// grout state first.
@@ -183,6 +188,10 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 
 	if err := migrateAddressesToGrout(ctx, client, underlayInterface, underlayAddrs); err != nil {
 		return err
+	}
+
+	if err := client.setPortUp(ctx, UnderlayPortNamePrefix+underlayInterface); err != nil {
+		return fmt.Errorf("failed to set grout port up: %w", err)
 	}
 
 	return nil
