@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
@@ -14,6 +15,12 @@ import (
 	"github.com/openperouter/openperouter/internal/pci"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
+	"k8s.io/apimachinery/pkg/util/wait"
+)
+
+const (
+	netdevPollInterval = 100 * time.Millisecond
+	netdevPollTimeout  = 10 * time.Second
 )
 
 func setupAcceleratedUnderlay(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, iface hostnetwork.UnderlayInterface) error {
@@ -23,6 +30,7 @@ func setupAcceleratedUnderlay(ctx context.Context, client *Client, perouterNetNS
 		if err != nil {
 			return err
 		}
+		devState.PortName = PortName(iface)
 		if err := devicestate.Save(iface.InterfaceName, *devState); err != nil {
 			return fmt.Errorf("failed to save device state for %s: %w", iface.InterfaceName, err)
 		}
@@ -140,65 +148,56 @@ func deviceStateForAcceleratedDevice(netlinkName string) (*devicestate.Entry, er
 	return &devState, nil
 }
 
-func teardownAcceleratedUnderlay(ctx context.Context, client *Client, ns netns.NsHandle, targetNS string, iface hostnetwork.UnderlayInterface) error {
-	portName := PortName(iface)
-	if err := removeAddressFromGroutPort(ctx, client, ns, portName); err != nil {
-		return err
-	}
-
-	if err := client.deletePort(ctx, portName); err != nil {
-		slog.ErrorContext(ctx, "failed to delete grout port", "port", portName, "error", err)
-	}
-
-	netlinkName := iface.InterfaceName
-	state, err := devicestate.Load(netlinkName)
-	if err != nil {
-		slog.WarnContext(ctx, "no saved device state, cannot restore driver/IPs",
-			"interfaceName", netlinkName, "error", err)
+// restoreAcceleratedDevice hands a PCI device back to its original kernel
+// driver and re-applies the saved MTU and addresses to its netdev.
+func restoreAcceleratedDevice(ctx context.Context, targetNS string, state *devicestate.Entry) error {
+	switch {
+	case state.OriginalDriver == "" || state.OriginalDriver == pci.DriverVFIOPCI:
 		return nil
+	case pci.IsBifurcated(state.OriginalDriver):
+		return restoreBifurcatedDevice(ctx, targetNS, state)
 	}
 
-	if err := restoreDeviceDriver(ctx, targetNS, netlinkName, state); err != nil {
-		return err
-	}
-
-	if err := applyStateToNetlinkInterface(ctx, *state); err != nil {
-		return err
-	}
-
-	if err := devicestate.Delete(netlinkName); err != nil {
-		return fmt.Errorf("failed to delete device state file for %s: %w", netlinkName, err)
-	}
-
-	return nil
-}
-
-func restoreDeviceDriver(ctx context.Context, targetNS string, netlinkName string, state *devicestate.Entry) error {
-	if pci.IsBifurcated(state.OriginalDriver) {
-		return restoreBifurcatedDevice(ctx, targetNS, netlinkName)
-	}
-
-	if state.PCIAddress != "" && state.OriginalDriver != "" && state.OriginalDriver != pci.DriverVFIOPCI {
-		return restorePCIDriver(ctx, state)
-	}
-
-	return nil
-}
-
-func restoreBifurcatedDevice(ctx context.Context, targetNS string, netlinkName string) error {
-	if err := hostnetwork.RestoreUnderlayNetDevInterface(ctx, targetNS, netlinkName); err != nil {
-		return fmt.Errorf("failed to move bifurcated netdev %s back to the host namespace: %w",
-			netlinkName, err)
-	}
-	return nil
-}
-
-func restorePCIDriver(ctx context.Context, state *devicestate.Entry) error {
 	if err := pci.RestoreDriver(state.PCIAddress, state.OriginalDriver); err != nil {
-		return fmt.Errorf("failed to restore driver %s on %s: %w",
-			state.OriginalDriver, state.PCIAddress, err)
+		return fmt.Errorf("failed to restore driver %s on %s: %w", state.OriginalDriver, state.PCIAddress, err)
 	}
-	slog.InfoContext(ctx, "restored original driver",
-		"pciAddress", state.PCIAddress, "driver", state.OriginalDriver)
-	return nil
+	slog.InfoContext(ctx, "restored original driver", "pciAddress", state.PCIAddress, "driver", state.OriginalDriver)
+
+	link, err := waitForPCINetdev(ctx, state.PCIAddress)
+	if err != nil {
+		return err
+	}
+	return applyStateToLink(ctx, link, state)
+}
+
+func restoreBifurcatedDevice(ctx context.Context, targetNS string, state *devicestate.Entry) error {
+	if err := hostnetwork.RestoreUnderlayNetDevInterface(ctx, targetNS, state.InterfaceName); err != nil {
+		return fmt.Errorf("failed to move bifurcated netdev %s back to the host namespace: %w",
+			state.InterfaceName, err)
+	}
+	link, err := netlink.LinkByName(state.InterfaceName)
+	if err != nil {
+		return fmt.Errorf("failed to find kernel netdev %s: %w", state.InterfaceName, err)
+	}
+	return applyStateToLink(ctx, link, state)
+}
+
+// waitForPCINetdev returns the netdev of a PCI device just rebound to its
+// kernel driver. The netdev appears asynchronously and udev may rename it, so
+// it is looked up by PCI address until it shows up.
+func waitForPCINetdev(ctx context.Context, pciAddr string) (netlink.Link, error) {
+	var link netlink.Link
+	err := wait.PollUntilContextTimeout(ctx, netdevPollInterval, netdevPollTimeout, true,
+		func(context.Context) (bool, error) {
+			name, err := pci.NetDeviceForPCIAddress(pciAddr)
+			if err != nil {
+				return false, nil
+			}
+			link, err = netlink.LinkByName(name)
+			return err == nil, nil
+		})
+	if err != nil {
+		return nil, fmt.Errorf("kernel netdev for PCI device %s did not appear: %w", pciAddr, err)
+	}
+	return link, nil
 }

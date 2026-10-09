@@ -67,3 +67,22 @@ func TestDeleteNonExistent(t *testing.T) {
 	assert.Error(t, Delete(""))
 	assert.Error(t, Save("", Entry{}))
 }
+
+func TestList(t *testing.T) {
+	origDir := dir
+	dir = filepath.Join(t.TempDir(), "grout-state")
+	t.Cleanup(func() { dir = origDir })
+
+	entries, err := List()
+	require.NoError(t, err)
+	assert.Empty(t, entries)
+
+	tap := Entry{InterfaceName: "toswitch1", Addresses: []string{"10.0.0.1/24"}, PortName: "u_toswitch1"}
+	pci := Entry{InterfaceName: "ens1f0", PCIAddress: "0000:03:02.0", OriginalDriver: "ice", PortName: "p0"}
+	require.NoError(t, Save(tap.InterfaceName, tap))
+	require.NoError(t, Save(pci.InterfaceName, pci))
+
+	entries, err = List()
+	require.NoError(t, err)
+	assert.ElementsMatch(t, []Entry{tap, pci}, entries)
+}

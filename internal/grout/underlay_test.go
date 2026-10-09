@@ -5,6 +5,7 @@ package grout
 import (
 	"testing"
 
+	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -102,6 +103,43 @@ func TestUnderlayInterfacesToRemove(t *testing.T) {
 	withOptions.AcceleratedConfig.PortName = new("renamed")
 	assert.Equal(t, []hostnetwork.UnderlayInterface{customPort},
 		underlayInterfacesToRemove([]hostnetwork.UnderlayInterface{customPort}, []hostnetwork.UnderlayInterface{withOptions}))
+}
+
+func TestDeviceStateToUnderlayInterface(t *testing.T) {
+	t.Run("custom port name is kept", func(t *testing.T) {
+		got := deviceStateToUnderlayInterface(devicestate.Entry{InterfaceName: "ens1f0", PortName: "p0"})
+		assert.Equal(t, "ens1f0", got.InterfaceName)
+		assert.Equal(t, hostnetwork.UnderlayInterfaceNetDev, got.Kind)
+		assert.Equal(t, "p0", PortName(got))
+
+		requested := hostnetwork.UnderlayInterface{InterfaceName: "ens1f0", Kind: hostnetwork.UnderlayInterfaceNetDev,
+			AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{PortName: new("p0")}}
+		assert.Empty(t, underlayInterfacesToRemove([]hostnetwork.UnderlayInterface{got},
+			[]hostnetwork.UnderlayInterface{requested}))
+	})
+
+	t.Run("state without port name uses the default", func(t *testing.T) {
+		got := deviceStateToUnderlayInterface(devicestate.Entry{InterfaceName: "ens1f0"})
+		assert.Nil(t, got.AcceleratedConfig)
+		assert.Equal(t, "u_ens1f0", PortName(got))
+	})
+}
+
+func TestMergeUnderlayInterfaces(t *testing.T) {
+	fromGrout := hostnetwork.UnderlayInterface{InterfaceName: "eth0", Kind: hostnetwork.UnderlayInterfaceNetDev,
+		AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{PortName: new("p0")}}
+	fromState := hostnetwork.UnderlayInterface{InterfaceName: "eth0", Kind: hostnetwork.UnderlayInterfaceNetDev}
+	stateOnly := hostnetwork.UnderlayInterface{InterfaceName: "eth1", Kind: hostnetwork.UnderlayInterfaceNetDev}
+	hostOnly := hostnetwork.UnderlayInterface{InterfaceName: "eth2", Kind: hostnetwork.UnderlayInterfaceNetDev}
+	fromHost := hostnetwork.UnderlayInterface{InterfaceName: "eth0", Kind: hostnetwork.UnderlayInterfaceNetDev}
+
+	got := mergeUnderlayInterfaces(
+		[]hostnetwork.UnderlayInterface{fromGrout},
+		[]hostnetwork.UnderlayInterface{fromState, stateOnly},
+		[]hostnetwork.UnderlayInterface{fromHost, hostOnly},
+	)
+	assert.Equal(t, []hostnetwork.UnderlayInterface{fromGrout, stateOnly, hostOnly}, got)
+	assert.Empty(t, mergeUnderlayInterfaces())
 }
 
 func TestUnderlayPortOptions(t *testing.T) {

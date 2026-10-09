@@ -27,6 +27,9 @@ type Entry struct {
 	OriginalDriver string   `json:"originalDriver,omitempty"`
 	Addresses      []string `json:"addresses"`
 	MTU            int32    `json:"mtu,omitempty"`
+	// PortName is the grout port created for the device, so a teardown
+	// interrupted after the port was deleted can still be resumed.
+	PortName string `json:"portName,omitempty"`
 }
 
 func Save(deviceID string, state Entry) error {
@@ -50,6 +53,23 @@ func Save(deviceID string, state Entry) error {
 func Load(deviceID string) (*Entry, error) {
 	path := filePath(deviceID)
 	return loadEntry(path)
+}
+
+// List returns all the saved device states.
+func List() ([]Entry, error) {
+	paths, err := filepath.Glob(filepath.Join(dir, "*.json"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to list device state files in %s: %w", dir, err)
+	}
+	entries := make([]Entry, 0, len(paths))
+	for _, path := range paths {
+		entry, err := loadEntry(path)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, *entry)
+	}
+	return entries, nil
 }
 
 func Delete(deviceID string) error {
