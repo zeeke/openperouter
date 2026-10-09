@@ -8,6 +8,8 @@ spec:
     spec:
       containers:
         - name: controller
+          # Kind nodes have veth underlays, which can only be attached to
+          # grout through TAP ports.
           args:
           - "--nodename=$(NODE_NAME)"
           - "--loglevel=debug"
@@ -17,12 +19,5 @@ spec:
           - "--cni-plugin-dirs=/opt/openperouter/cni/bin/"
           - "--cni-cache-dir=/var/lib/openperouter/cni/cache"
           - "--datapath=grout"
+          - "--grout-tap-underlay"
           - "--grout-socket=/var/run/grout/grout.sock"
-          volumeMounts:
-          - mountPath: /var/run/grout
-            name: grout-socket
-      volumes:
-      - name: grout-socket
-        hostPath:
-          path: /var/run/openperouter/grout
-          type: DirectoryOrCreate
