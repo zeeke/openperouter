@@ -3,6 +3,9 @@
 package qemu_e2e
 
 import (
+	"encoding/json"
+	"path/filepath"
+	"strings"
 	"time"
 
 	frrk8sv1beta1 "github.com/metallb/frr-k8s/api/v1beta1"
@@ -113,6 +116,13 @@ var _ = Describe("HWEmulation", Ordered, GroutSupport, func() {
 				Established: Established,
 			})
 		}
+
+		By("Verifying the underlays are attached to grout as vfio-pci DPDK ports")
+		for router := range routers.GetExecutors() {
+			for _, iface := range AcceleratedUnderlay.Spec.Interfaces {
+				validateAcceleratedPort(router, iface.NetworkDevice.InterfaceName)
+			}
+		}
 	})
 
 	AfterAll(func() {
@@ -219,3 +229,24 @@ var _ = Describe("HWEmulation", Ordered, GroutSupport, func() {
 		}
 	})
 })
+
+// validateAcceleratedPort checks that the underlay interface is attached to
+// grout as a DPDK port on its PCI device (not as a TAP port) and that the
+// device is bound to vfio-pci on the node.
+func validateAcceleratedPort(router openperouter.RouterExecutor, interfaceName string) {
+	var port struct {
+		Devargs string `json:"devargs"`
+	}
+	Eventually(func(g Gomega) {
+		out, err := router.Exec("grcli", "--json", "interface", "show", "name", "u_"+interfaceName)
+		g.Expect(err).NotTo(HaveOccurred(), out)
+		g.Expect(json.Unmarshal([]byte(out), &port)).To(Succeed(), out)
+		g.Expect(port.Devargs).To(MatchRegexp(`^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-7]$`))
+	}, time.Minute, time.Second).Should(Succeed(), "router %s, interface %s", router.Name(), interfaceName)
+
+	nodeExec := executor.ForNode(router.NodeName())
+	driver, err := nodeExec.Exec("readlink", filepath.Join("/sys/bus/pci/devices", port.Devargs, "driver"))
+	Expect(err).NotTo(HaveOccurred(), driver)
+	Expect(filepath.Base(strings.TrimSpace(driver))).To(Equal("vfio-pci"),
+		"node %s, device %s", router.NodeName(), port.Devargs)
+}
