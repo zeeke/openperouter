@@ -29,7 +29,6 @@ func TestSaveLoadDelete(t *testing.T) {
 	loaded, err := Load("enp3s0f0v0")
 	require.NoError(t, err)
 	assert.Equal(t, state, *loaded)
-	assert.Equal(t, int32(9000), loaded.MTU)
 
 	require.NoError(t, Delete("enp3s0f0v0"))
 	_, err = os.Stat(filePath("enp3s0f0v0"))
@@ -66,6 +65,8 @@ func TestDeleteNonExistent(t *testing.T) {
 	assert.NoError(t, Delete("does_not_exist"))
 	assert.Error(t, Delete(""))
 	assert.Error(t, Save("", Entry{}))
+	_, err := Load("")
+	assert.Error(t, err)
 }
 
 func TestList(t *testing.T) {

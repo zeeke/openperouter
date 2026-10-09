@@ -142,13 +142,13 @@ func TestMergeUnderlayInterfaces(t *testing.T) {
 	assert.Empty(t, mergeUnderlayInterfaces())
 }
 
-func TestUnderlayPortOptions(t *testing.T) {
+func TestUnderlayportOptions(t *testing.T) {
 	queues, size := int32(4), int32(1024)
 	iface := hostnetwork.UnderlayInterface{InterfaceName: "eth0", AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{
 		RXQueues: &queues, QSize: &size,
 	}}
-	assert.Equal(t, PortOptions{Description: "underlay-for=eth0", RXQueues: &queues, QSize: &size},
-		underlayPortOptions(iface))
-	assert.Equal(t, PortOptions{Description: "underlay-for=eth0"},
-		underlayPortOptions(hostnetwork.UnderlayInterface{InterfaceName: "eth0"}))
+	assert.Equal(t, portOptions{Description: "underlay-for=eth0", RXQueues: &queues, QSize: &size},
+		underlayportOptions(iface))
+	assert.Equal(t, portOptions{Description: "underlay-for=eth0"},
+		underlayportOptions(hostnetwork.UnderlayInterface{InterfaceName: "eth0"}))
 }

@@ -62,29 +62,27 @@ func (c *Client) deleteAddress(ctx context.Context, iface, addr string) error {
 	return nil
 }
 
-// PortOptions holds optional parameters for DPDK port creation.
-type PortOptions struct {
+// portOptions holds optional parameters for port creation.
+type portOptions struct {
 	MTU         *int32
 	RXQueues    *int32
 	QSize       *int32
-	MAC         *string
 	Description string
 }
 
-func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
-	return c.ensurePortWithOptions(ctx, name, devargs, PortOptions{})
-}
-
-func (c *Client) ensurePortWithOptions(ctx context.Context, name, devargs string, opts PortOptions) error {
+// ensurePort creates the port, recreating it when an existing port with the
+// same name was created with different devargs or options.
+func (c *Client) ensurePort(ctx context.Context, name, devargs string, opts portOptions) error {
 	details, err := c.getInterfaceDetails(ctx, name)
-	if err != nil && !isGroutErrno(err, syscall.ENODEV) {
+	switch {
+	case isGroutErrno(err, syscall.ENODEV):
+		// Not there yet: created below.
+	case err != nil:
 		return fmt.Errorf("checking if port %s exists: %w", name, err)
-	}
-	if err == nil && (!portOptionsSpecified(opts) || details.matchesRequested(devargs, opts)) {
+	case details.matchesRequested(devargs, opts):
 		slog.InfoContext(ctx, "grout port already exists", "name", name)
 		return nil
-	}
-	if err == nil {
+	default:
 		slog.InfoContext(ctx, "grout port exists with different options, deleting", "name", name)
 		if err := c.deletePort(ctx, name); err != nil {
 			return err
@@ -100,9 +98,6 @@ func (c *Client) ensurePortWithOptions(ctx context.Context, name, devargs string
 	}
 	if opts.QSize != nil {
 		args = append(args, "qsize", fmt.Sprintf("%d", *opts.QSize))
-	}
-	if opts.MAC != nil {
-		args = append(args, "mac", *opts.MAC)
 	}
 	if opts.Description != "" {
 		args = append(args, "description", opts.Description)
@@ -208,7 +203,7 @@ func (c *Client) getInterfaceDetails(ctx context.Context, name string) (*groutIn
 // matchesRequested reports whether the existing grout port already has the
 // requested configuration. TAP devargs include a random suffix, so they are
 // not compared for equality.
-func (d *groutInterfaceProperties) matchesRequested(devargs string, opts PortOptions) bool {
+func (d *groutInterfaceProperties) matchesRequested(devargs string, opts portOptions) bool {
 	if isTAPDevargs(devargs) || isTAPDevargs(d.Devargs) {
 		if isTAPDevargs(devargs) != isTAPDevargs(d.Devargs) {
 			return false
@@ -228,18 +223,11 @@ func (d *groutInterfaceProperties) matchesRequested(devargs string, opts PortOpt
 	if opts.QSize != nil && d.RxqSize != *opts.QSize {
 		return false
 	}
-	if opts.MAC != nil && !strings.EqualFold(d.MAC, *opts.MAC) {
-		return false
-	}
 	return true
 }
 
 func isTAPDevargs(devargs string) bool {
 	return strings.Contains(devargs, "net_tap")
-}
-
-func portOptionsSpecified(opts PortOptions) bool {
-	return opts.MTU != nil || opts.RXQueues != nil || opts.QSize != nil || opts.MAC != nil || opts.Description != ""
 }
 
 // portExists checks whether a port with the given name exists in grout.

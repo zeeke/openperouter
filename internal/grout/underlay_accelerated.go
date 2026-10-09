@@ -24,7 +24,12 @@ const (
 	netdevPollTimeout  = 10 * time.Second
 )
 
-func setupAcceleratedUnderlay(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, iface hostnetwork.UnderlayInterface) error {
+func setupAcceleratedUnderlay(
+	ctx context.Context,
+	client *Client,
+	perouterNetNS netns.NsHandle,
+	iface hostnetwork.UnderlayInterface,
+) error {
 	devState, err := devicestate.Load(iface.InterfaceName)
 	if errors.Is(err, devicestate.ErrDeviceStateNotFound) {
 		devState, err = deviceStateForAcceleratedDevice(iface.InterfaceName)
@@ -40,8 +45,15 @@ func setupAcceleratedUnderlay(ctx context.Context, client *Client, perouterNetNS
 	if err != nil {
 		return fmt.Errorf("failed to load device state for %s: %w", iface.InterfaceName, err)
 	}
+	// A state file left by the TAP path has no PCI address: going on would
+	// poke at bogus sysfs paths.
+	if devState.PCIAddress == "" {
+		return fmt.Errorf("device state for %s has no PCI address, it was not saved for an accelerated port",
+			iface.InterfaceName)
+	}
 
-	if err := setupInterfaceForHWAcceleration(ctx, perouterNetNS, devState.PCIAddress, devState.InterfaceName); err != nil {
+	err = setupInterfaceForHWAcceleration(ctx, perouterNetNS, devState.PCIAddress, devState.InterfaceName)
+	if err != nil {
 		return fmt.Errorf("failed to prepare grout port driver for %s: %w", devState.PCIAddress, err)
 	}
 	return netnamespace.In(perouterNetNS, func() error {
@@ -51,12 +63,11 @@ func setupAcceleratedUnderlay(ctx context.Context, client *Client, perouterNetNS
 
 // setupInterfaceForHWAcceleration inspects the driver bound to a PCI device and
 // takes the appropriate action:
-//   - Intel kernel drivers (igb, iavf, ice, i40e): rebind to vfio-pci
 //   - vfio-pci: already bound, nothing to do
-//   - mlx5_core: move the kernel netlink interface to the perouter namespace (bifurcated driver)
-//   - unknown/unbound: bind to vfio-pci
-func setupInterfaceForHWAcceleration(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr, netlinkName string) error {
-	driver, err := pci.DriverForPCAddress(pciAddr)
+//   - mlx5_core: move the kernel netdev to the perouter namespace (bifurcated driver)
+//   - any other driver, or none: bind to vfio-pci
+func setupInterfaceForHWAcceleration(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr, netdev string) error {
+	driver, err := pci.DriverForPCIAddress(pciAddr)
 	if err != nil {
 		return fmt.Errorf("failed to get PCI driver for %s: %w", pciAddr, err)
 	}
@@ -66,23 +77,16 @@ func setupInterfaceForHWAcceleration(ctx context.Context, perouterNetNS netns.Ns
 		return nil
 
 	case pci.DriverMlx5Core:
-		name := netlinkName
-		if name == "" {
-			name, err = pci.NetDeviceForPCIAddress(pciAddr)
-			if err != nil {
-				return fmt.Errorf("mlx5 PCI device %s has no kernel netlink interface: %w", pciAddr, err)
-			}
-		}
 		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
-			InterfaceName: name,
+			InterfaceName: netdev,
 			Kind:          hostnetwork.UnderlayInterfaceNetDev,
 		}); err != nil {
-			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", name, err)
+			return fmt.Errorf("failed to move mlx5 netlink device %s to namespace: %w", netdev, err)
 		}
 		return nil
 
 	default:
-		slog.Info("binding GroutPort PCI device to vfio-pci",
+		slog.InfoContext(ctx, "binding GroutPort PCI device to vfio-pci",
 			"pciAddress", pciAddr, "currentDriver", driver)
 		if err := pci.BindVFIOPCI(pciAddr); err != nil {
 			return fmt.Errorf("failed to bind PCI device %s to vfio-pci: %w", pciAddr, err)
@@ -94,13 +98,18 @@ func setupInterfaceForHWAcceleration(ctx context.Context, perouterNetNS netns.Ns
 // configureAcceleratedPort creates a DPDK port in grout directly from a PCI
 // device address, loads the scraped IP addresses from the saved device
 // state, and sets up the kernel routes needed by FRR.
-func configureAcceleratedPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface, state *devicestate.Entry) error {
+func configureAcceleratedPort(
+	ctx context.Context,
+	client *Client,
+	iface hostnetwork.UnderlayInterface,
+	state *devicestate.Entry,
+) error {
 	portName := PortName(iface)
 
-	opts := underlayPortOptions(iface)
+	opts := underlayportOptions(iface)
 	opts.MTU = &state.MTU
 
-	if err := client.ensurePortWithOptions(ctx, portName, state.PCIAddress, opts); err != nil {
+	if err := client.ensurePort(ctx, portName, state.PCIAddress, opts); err != nil {
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
 	}
 
@@ -145,17 +154,18 @@ func migrateBifurcatedAddresses(ctx context.Context, client *Client, state *devi
 }
 
 func deviceStateForAcceleratedDevice(netlinkName string) (*devicestate.Entry, error) {
-	devState := devicestate.Entry{
-		InterfaceName: netlinkName,
-	}
-	var err error
-	devState.PCIAddress, err = pci.GetPCIAddressForNetlinkName(netlinkName)
+	pciAddr, err := pci.GetPCIAddressForNetlinkName(netlinkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve PCI address for %s: %w", netlinkName, err)
 	}
-	devState.OriginalDriver, err = pci.DriverForPCAddress(devState.PCIAddress)
+	driver, err := pci.DriverForPCIAddress(pciAddr)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read driver for %s: %w", devState.PCIAddress, err)
+		return nil, fmt.Errorf("failed to read driver for %s: %w", pciAddr, err)
+	}
+	devState := devicestate.Entry{
+		InterfaceName:  netlinkName,
+		PCIAddress:     pciAddr,
+		OriginalDriver: driver,
 	}
 
 	link, err := netlink.LinkByName(netlinkName)

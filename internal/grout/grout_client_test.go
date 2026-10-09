@@ -41,6 +41,7 @@ const interfaceShowP0Output = `{
 	"name": "p0",
 	"type": "port",
 	"id": 2,
+	"devargs": "net_tap0,remote=remote_i,iface=p0_tap",
 	"flags": ["up", "running", "allmulti", "tracing"],
 	"mode": "VRF",
 	"domain": "main",
@@ -67,6 +68,7 @@ func TestEnsurePort(t *testing.T) {
 				context.Background(),
 				"p0",
 				"net_tap0,remote=remote_i,iface=p0_tap",
+				portOptions{},
 			),
 		)
 	})
@@ -83,6 +85,7 @@ func TestEnsurePort(t *testing.T) {
 				context.Background(),
 				"p0",
 				"net_tap0,remote=remote_i,iface=p0_tap",
+				portOptions{},
 			),
 		)
 	})
@@ -289,14 +292,12 @@ const interfaceShowUnderlayPortOutput = `{
 	"description": "underlay"
 }`
 
-func TestEnsurePortWithOptions(t *testing.T) {
+func TestEnsurePortOptions(t *testing.T) {
 	rxqs := int32(4)
 	qsize := int32(1024)
-	mac := "aa:bb:cc:dd:ee:ff"
-	opts := PortOptions{
+	opts := portOptions{
 		RXQueues:    &rxqs,
 		QSize:       &qsize,
-		MAC:         &mac,
 		Description: "underlay",
 	}
 
@@ -308,11 +309,11 @@ func TestEnsurePortWithOptions(t *testing.T) {
 				err:    fmt.Errorf("exit status 1"),
 			},
 			cmdCall{
-				cmd: "grcli --err-exit --json --socket sock interface add port u_enp3s0f0v0 devargs 0000:03:02.0 rxqs 4 qsize 1024 mac aa:bb:cc:dd:ee:ff description underlay",
+				cmd: "grcli --err-exit --json --socket sock interface add port u_enp3s0f0v0 devargs 0000:03:02.0 rxqs 4 qsize 1024 description underlay",
 			})()
 
 		assert.NoError(t,
-			NewClient("sock").ensurePortWithOptions(
+			NewClient("sock").ensurePort(
 				context.Background(),
 				"u_enp3s0f0v0",
 				"0000:03:02.0",
@@ -333,11 +334,11 @@ func TestEnsurePortWithOptions(t *testing.T) {
 			})()
 
 		assert.NoError(t,
-			NewClient("sock").ensurePortWithOptions(
+			NewClient("sock").ensurePort(
 				context.Background(),
 				"u_enp3s0f0v0",
 				"0000:03:02.0",
-				PortOptions{Description: "underlay"},
+				portOptions{Description: "underlay"},
 			),
 		)
 	})
@@ -350,7 +351,7 @@ func TestEnsurePortWithOptions(t *testing.T) {
 			})()
 
 		assert.NoError(t,
-			NewClient("sock").ensurePortWithOptions(
+			NewClient("sock").ensurePort(
 				context.Background(),
 				"u_enp3s0f0v0",
 				"0000:03:02.0",
@@ -369,17 +370,35 @@ func TestEnsurePortWithOptions(t *testing.T) {
 				cmd: "grcli --err-exit --json --socket sock interface del u_enp3s0f0v0",
 			},
 			cmdCall{
-				cmd: "grcli --err-exit --json --socket sock interface add port u_enp3s0f0v0 devargs 0000:03:02.0 rxqs 4 qsize 1024 mac aa:bb:cc:dd:ee:ff description underlay",
+				cmd: "grcli --err-exit --json --socket sock interface add port u_enp3s0f0v0 devargs 0000:03:02.0 rxqs 4 qsize 1024 description underlay",
 			})()
 
 		assert.NoError(t,
-			NewClient("sock").ensurePortWithOptions(
+			NewClient("sock").ensurePort(
 				context.Background(),
 				"u_enp3s0f0v0",
 				"0000:03:02.0",
 				opts,
 			),
 		)
+	})
+
+	t.Run("recreates the port when devargs change without options", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface show name u_enp3s0f0v0",
+				output: `{"name":"u_enp3s0f0v0","type":"port",` +
+					`"devargs":"net_tap0,remote=enp3s0f0v0,iface=tap_enp3s0f0v0"}`,
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface del u_enp3s0f0v0",
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface add port u_enp3s0f0v0 devargs 0000:03:02.0",
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensurePort(context.Background(), "u_enp3s0f0v0", "0000:03:02.0", portOptions{}))
 	})
 }
 
@@ -406,7 +425,6 @@ func TestGetInterfaceDetails(t *testing.T) {
 func TestMatchesRequested(t *testing.T) {
 	rxqs := int32(4)
 	qsize := int32(1024)
-	mac := "AA:BB:CC:DD:EE:FF"
 	matching := groutInterfaceProperties{
 		Devargs:     "0000:03:02.0",
 		Description: "underlay",
@@ -414,10 +432,9 @@ func TestMatchesRequested(t *testing.T) {
 		NRxq:        4,
 		RxqSize:     1024,
 	}
-	opts := PortOptions{
+	opts := portOptions{
 		RXQueues:    &rxqs,
 		QSize:       &qsize,
-		MAC:         &mac,
 		Description: "underlay",
 	}
 
@@ -437,12 +454,6 @@ func TestMatchesRequested(t *testing.T) {
 		assert.False(t, details.matchesRequested("0000:03:02.0", opts))
 	})
 
-	t.Run("mismatching mac", func(t *testing.T) {
-		details := matching
-		details.MAC = "00:00:00:00:00:00"
-		assert.False(t, details.matchesRequested("0000:03:02.0", opts))
-	})
-
 	t.Run("mismatching description", func(t *testing.T) {
 		details := matching
 		details.Description = ""
@@ -454,7 +465,7 @@ func TestMatchesRequested(t *testing.T) {
 	})
 
 	t.Run("unspecified fields are ignored", func(t *testing.T) {
-		assert.True(t, matching.matchesRequested("0000:03:02.0", PortOptions{Description: "underlay"}))
+		assert.True(t, matching.matchesRequested("0000:03:02.0", portOptions{Description: "underlay"}))
 	})
 
 	t.Run("tap devargs with random suffix still match", func(t *testing.T) {
@@ -464,7 +475,7 @@ func TestMatchesRequested(t *testing.T) {
 			MTU:         1500,
 		}
 		mtu := int32(1500)
-		assert.True(t, tap.matchesRequested("net_tapxyz789,remote=eth0,iface=tap_eth0", PortOptions{
+		assert.True(t, tap.matchesRequested("net_tapxyz789,remote=eth0,iface=tap_eth0", portOptions{
 			MTU:         &mtu,
 			Description: "underlay",
 		}))
@@ -478,6 +489,6 @@ func TestMatchesRequested(t *testing.T) {
 		details := matching
 		details.MTU = 1500
 		mtu := int32(9000)
-		assert.False(t, details.matchesRequested("0000:03:02.0", PortOptions{MTU: &mtu, Description: "underlay"}))
+		assert.False(t, details.matchesRequested("0000:03:02.0", portOptions{MTU: &mtu, Description: "underlay"}))
 	})
 }

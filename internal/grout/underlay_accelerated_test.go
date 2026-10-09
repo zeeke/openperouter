@@ -58,7 +58,7 @@ func TestSetupInterfaceForHWAcceleration(t *testing.T) {
 			name:            "mlx5 without a kernel netdev",
 			driver:          pci.DriverMlx5Core,
 			vfioLoaded:      true,
-			expectErrSubstr: "has no kernel netlink interface",
+			expectErrSubstr: "failed to move mlx5 netlink device nonexistent0",
 		},
 	}
 
@@ -69,7 +69,7 @@ func TestSetupInterfaceForHWAcceleration(t *testing.T) {
 				sysfs.addDriver(pci.DriverVFIOPCI)
 			}
 
-			err := setupInterfaceForHWAcceleration(context.Background(), netns.None(), testPCIAddr, "")
+			err := setupInterfaceForHWAcceleration(context.Background(), netns.None(), testPCIAddr, "nonexistent0")
 			if tc.expectErrSubstr != "" {
 				require.ErrorContains(t, err, tc.expectErrSubstr)
 				return

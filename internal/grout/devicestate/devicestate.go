@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -51,8 +52,10 @@ func Save(deviceID string, state Entry) error {
 }
 
 func Load(deviceID string) (*Entry, error) {
-	path := filePath(deviceID)
-	return loadEntry(path)
+	if deviceID == "" {
+		return nil, fmt.Errorf("device state deviceID is required")
+	}
+	return loadEntry(filePath(deviceID))
 }
 
 // List returns all the saved device states.
@@ -77,7 +80,7 @@ func Delete(deviceID string) error {
 		return fmt.Errorf("device state deviceID is required")
 	}
 	path := filePath(deviceID)
-	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(path); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return fmt.Errorf("failed to delete device state file %s: %w", path, err)
 	}
 	return nil
@@ -88,15 +91,10 @@ func filePath(deviceID string) string {
 }
 
 func loadEntry(path string) (*Entry, error) {
-	_, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, ErrDeviceStateNotFound
-		}
-		return nil, fmt.Errorf("failed to stat device state file %s: %w", path, err)
-	}
-
 	data, err := os.ReadFile(path)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil, ErrDeviceStateNotFound
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to read device state from %s: %w", path, err)
 	}

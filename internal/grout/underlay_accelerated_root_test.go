@@ -134,6 +134,19 @@ func TestSetupAcceleratedUnderlayMovesBifurcatedNetdev(t *testing.T) {
 	})
 }
 
+func TestSetupAcceleratedUnderlayRejectsTapDeviceState(t *testing.T) {
+	ns := newAccelTestNS(t)
+	cleanDeviceState(t)
+	require.NoError(t, devicestate.Save(accelIface, devicestate.Entry{
+		InterfaceName: accelIface,
+		Addresses:     []string{accelCIDR},
+		PortName:      accelPort,
+	}))
+
+	err := setupAcceleratedUnderlay(context.Background(), NewClient("sock"), ns, accelUnderlay)
+	assert.ErrorContains(t, err, "no PCI address")
+}
+
 func TestTeardownAcceleratedUnderlayRestoresKernelDriver(t *testing.T) {
 	ns := newAccelTestNS(t)
 	cleanDeviceState(t)

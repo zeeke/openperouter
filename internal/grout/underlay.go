@@ -86,7 +86,11 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 // discoverable, so an interrupted teardown is resumed on the next reconcile.
 // CNI dev underlays are not supported by the grout datapath, so any libcni
 // cache entry is ignored.
-func UnderlayInterfaces(ctx context.Context, client *Client, namespace string) ([]hostnetwork.UnderlayInterface, error) {
+func UnderlayInterfaces(
+	ctx context.Context,
+	client *Client,
+	namespace string,
+) ([]hostnetwork.UnderlayInterface, error) {
 	fromGrout, err := groutUnderlayInterfaces(ctx, client)
 	if err != nil {
 		return nil, err
@@ -136,21 +140,25 @@ func RestoreUnderlay(
 	return nil
 }
 
-func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, iface hostnetwork.UnderlayInterface, tapUnderlay bool) error {
-	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && tapUnderlay {
-		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, iface); err != nil {
-			return err
-		}
-		return netnamespace.In(perouterNetNS, func() error {
-			return configureUnderlayGroutTapPort(ctx, client, iface)
-		})
+func setupUnderlayInterface(
+	ctx context.Context,
+	client *Client,
+	perouterNetNS netns.NsHandle,
+	iface hostnetwork.UnderlayInterface,
+	tapUnderlay bool,
+) error {
+	if iface.Kind != hostnetwork.UnderlayInterfaceNetDev {
+		return fmt.Errorf("underlay interface has unsupported kind %q", iface.Kind)
 	}
-
-	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev {
+	if !tapUnderlay {
 		return setupAcceleratedUnderlay(ctx, client, perouterNetNS, iface)
 	}
-
-	return fmt.Errorf("underlay interface has unsupported kind %q", iface.Kind)
+	if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, iface); err != nil {
+		return err
+	}
+	return netnamespace.In(perouterNetNS, func() error {
+		return configureUnderlayGroutTapPort(ctx, client, iface)
+	})
 }
 
 func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
@@ -328,9 +336,10 @@ func configureUnderlayGroutTapPort(ctx context.Context, client *Client, iface ho
 		return fmt.Errorf("failed to suppress link-local on underlay interface %s: %w", underlayInterface, err)
 	}
 
-	devargs := fmt.Sprintf("net_tap%s,remote=%s,iface=%s", makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
-	opts := underlayPortOptions(iface)
-	if err := client.ensurePortWithOptions(ctx, portName, devargs, opts); err != nil {
+	devargs := fmt.Sprintf("net_tap%s,remote=%s,iface=%s",
+		makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
+	opts := underlayportOptions(iface)
+	if err := client.ensurePort(ctx, portName, devargs, opts); err != nil {
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
 
@@ -448,8 +457,8 @@ func underlayInterfacesToRemove(existing, requested []hostnetwork.UnderlayInterf
 	return removed
 }
 
-func underlayPortOptions(iface hostnetwork.UnderlayInterface) PortOptions {
-	opts := PortOptions{Description: UnderlayInterfaceDescriptionPrefix + iface.InterfaceName}
+func underlayportOptions(iface hostnetwork.UnderlayInterface) portOptions {
+	opts := portOptions{Description: UnderlayInterfaceDescriptionPrefix + iface.InterfaceName}
 	if iface.AcceleratedConfig != nil {
 		opts.RXQueues = iface.AcceleratedConfig.RXQueues
 		opts.QSize = iface.AcceleratedConfig.QSize
@@ -461,7 +470,6 @@ func deviceStateForTapDevice(netlinkName string) (*devicestate.Entry, error) {
 	devState := devicestate.Entry{
 		InterfaceName: netlinkName,
 	}
-	var err error
 	link, err := netlink.LinkByName(netlinkName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find kernel interface %s: %w", netlinkName, err)
@@ -478,7 +486,12 @@ func deviceStateForTapDevice(netlinkName string) (*devicestate.Entry, error) {
 	return &devState, nil
 }
 
-func migrateAddressesToGrout(ctx context.Context, client *Client, kernelDevice, portName string, addrs []netlink.Addr) error {
+func migrateAddressesToGrout(
+	ctx context.Context,
+	client *Client,
+	kernelDevice, portName string,
+	addrs []netlink.Addr,
+) error {
 	for _, addr := range addrs {
 		cidr := addr.IPNet.String()
 
@@ -486,8 +499,11 @@ func migrateAddressesToGrout(ctx context.Context, client *Client, kernelDevice, 
 			return fmt.Errorf("failed to assign address %s to grout underlay port: %w", cidr, err)
 		}
 
-		if err := hostnetwork.DeleteAddressFromInterface(kernelDevice, addr); err != nil {
-			slog.WarnContext(ctx, "failed to remove address from underlay interface", "cidr", cidr, "iface", kernelDevice, "error", err)
+		// The addresses come from the saved device state, so on later
+		// reconciles they are already gone from the kernel device.
+		err := hostnetwork.DeleteAddressFromInterface(kernelDevice, addr)
+		if err != nil && !errors.Is(err, syscall.EADDRNOTAVAIL) {
+			return fmt.Errorf("failed to remove address %s from underlay interface %s: %w", cidr, kernelDevice, err)
 		}
 
 		// FRR needs kernel routes to establish BGP connections. Grout requires that all the kernel
