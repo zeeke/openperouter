@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestDriverForPCAddress_Bound(t *testing.T) {
+func TestDriverForPCIAddress_Bound(t *testing.T) {
 	origRoot := SysfsRoot
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
@@ -26,7 +26,7 @@ func TestDriverForPCAddress_Bound(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	drv, err := DriverForPCAddress(pciAddr)
+	drv, err := DriverForPCIAddress(pciAddr)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -35,7 +35,7 @@ func TestDriverForPCAddress_Bound(t *testing.T) {
 	}
 }
 
-func TestDriverForPCAddress_Unbound(t *testing.T) {
+func TestDriverForPCIAddress_Unbound(t *testing.T) {
 	origRoot := SysfsRoot
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
@@ -46,7 +46,7 @@ func TestDriverForPCAddress_Unbound(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	drv, err := DriverForPCAddress(pciAddr)
+	drv, err := DriverForPCIAddress(pciAddr)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -96,7 +96,7 @@ func TestIsVFIODriverLoaded_Missing(t *testing.T) {
 	t.Cleanup(func() { SysfsRoot = origRoot })
 	SysfsRoot = t.TempDir()
 
-	loaded, err := IsVFIODriverLoaded()
+	loaded, err := isVFIODriverLoaded()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

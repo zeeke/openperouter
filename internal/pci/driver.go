@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 )
 
-// DriverForPCAddress returns the name of the kernel driver currently bound to
+// DriverForPCIAddress returns the name of the kernel driver currently bound to
 // the given PCI device. It reads the "driver" symlink under the device's
 // sysfs directory. If no driver is bound the returned string is empty.
-func DriverForPCAddress(pciAddr string) (string, error) {
+func DriverForPCIAddress(pciAddr string) (string, error) {
 	driverLink := filepath.Join(SysfsRoot, "bus", "pci", "devices", pciAddr, "driver")
 	target, err := os.Readlink(driverLink)
 	if errors.Is(err, os.ErrNotExist) {
@@ -42,8 +42,8 @@ func NetDeviceForPCIAddress(pciAddr string) (string, error) {
 	return "", fmt.Errorf("no kernel net device found under %s", netDir)
 }
 
-// IsVFIODriverLoaded checks that the vfio-pci driver is available in sysfs.
-func IsVFIODriverLoaded() (bool, error) {
+// isVFIODriverLoaded checks that the vfio-pci driver is available in sysfs.
+func isVFIODriverLoaded() (bool, error) {
 	driverDir := filepath.Join(SysfsRoot, "bus", "pci", "drivers", DriverVFIOPCI)
 	_, err := os.Stat(driverDir)
 	if errors.Is(err, os.ErrNotExist) {
@@ -59,7 +59,7 @@ func IsVFIODriverLoaded() (bool, error) {
 // kernel driver. It clears the driver_override, unbinds from vfio-pci,
 // and binds the original driver.
 func RestoreDriver(pciAddr, originalDriver string) error {
-	current, err := DriverForPCAddress(pciAddr)
+	current, err := DriverForPCIAddress(pciAddr)
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func RestoreDriver(pciAddr, originalDriver string) error {
 // BindVFIOPCI rebinds a PCI device to the vfio-pci driver.
 // It is a no-op if the device is already bound to vfio-pci.
 func BindVFIOPCI(pciAddr string) error {
-	current, err := DriverForPCAddress(pciAddr)
+	current, err := DriverForPCIAddress(pciAddr)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func BindVFIOPCI(pciAddr string) error {
 		return nil
 	}
 
-	loaded, err := IsVFIODriverLoaded()
+	loaded, err := isVFIODriverLoaded()
 	if err != nil {
 		return fmt.Errorf("failed to check if vfio-pci driver is loaded: %w", err)
 	}
