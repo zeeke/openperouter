@@ -26,14 +26,12 @@ func TestUnderlayInterfacesToRemove(t *testing.T) {
 		assert.Equal(t, []UnderlayInterface{other}, got)
 	})
 
-	t.Run("removes tap interface when requested as dpdk", func(t *testing.T) {
-		got := UnderlayInterfacesToRemove([]UnderlayInterface{tap}, []UnderlayInterface{dpdk})
-		assert.Equal(t, []UnderlayInterface{tap}, got)
+	t.Run("keeps interface when grout port options are added", func(t *testing.T) {
+		assert.Empty(t, UnderlayInterfacesToRemove([]UnderlayInterface{tap}, []UnderlayInterface{dpdk}))
 	})
 
-	t.Run("removes dpdk interface when requested as tap", func(t *testing.T) {
-		got := UnderlayInterfacesToRemove([]UnderlayInterface{dpdk}, []UnderlayInterface{tap})
-		assert.Equal(t, []UnderlayInterface{dpdk}, got)
+	t.Run("keeps interface when grout port options are removed", func(t *testing.T) {
+		assert.Empty(t, UnderlayInterfacesToRemove([]UnderlayInterface{dpdk}, []UnderlayInterface{tap}))
 	})
 
 	t.Run("keeps matching dpdk interface", func(t *testing.T) {
