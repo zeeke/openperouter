@@ -5,7 +5,6 @@ package conversion
 import (
 	"errors"
 	"fmt"
-	"slices"
 
 	"github.com/openperouter/openperouter/api/v1alpha1"
 )
@@ -38,8 +37,11 @@ type KernelDatapathConfigValidator struct{}
 
 func (k *KernelDatapathConfigValidator) Validate(apiConfig APIConfigData) error {
 	for _, underlay := range apiConfig.Underlays {
-		if slices.ContainsFunc(underlay.Spec.Interfaces, hasAcceleratedConfig) {
-			return fmt.Errorf("acceleratedConfig requires grout datapath")
+		for _, iface := range underlay.Spec.Interfaces {
+			if hasAcceleratedConfig(iface) {
+				return fmt.Errorf("underlay %s, interface %s: acceleratedConfig requires grout datapath",
+					underlay.Name, iface.NetworkDevice.InterfaceName)
+			}
 		}
 	}
 	return nil

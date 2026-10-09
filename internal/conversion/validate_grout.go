@@ -34,10 +34,13 @@ func ValidateGroutUnderlay(underlay v1alpha1.Underlay) error {
 		return err
 	}
 	for _, iface := range underlayInterfaces {
-		portName := grout.PortName(iface)
-		if len(portName) >= syscall.IFNAMSIZ {
-			return fmt.Errorf("grout port name %s can't be longer than %d characters", portName,
-				syscall.IFNAMSIZ-1)
+		// An explicit portName is bounded by the CRD, so only the default
+		// "u_<nic>" name can overflow.
+		if portName := grout.PortName(iface); len(portName) >= syscall.IFNAMSIZ {
+			return fmt.Errorf("nic name %s can't be longer than %d characters, as its grout port name %s "+
+				"adds the %q prefix: set acceleratedConfig.portName to use a longer nic",
+				iface.InterfaceName, syscall.IFNAMSIZ-1-len(grout.UnderlayPortNamePrefix), portName,
+				grout.UnderlayPortNamePrefix)
 		}
 	}
 	return nil
