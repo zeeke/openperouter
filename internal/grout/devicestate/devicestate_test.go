@@ -12,9 +12,9 @@ import (
 )
 
 func TestSaveLoadDelete(t *testing.T) {
-	origDir := Dir
-	Dir = filepath.Join(t.TempDir(), "grout-state")
-	t.Cleanup(func() { Dir = origDir })
+	origDir := dir
+	dir = filepath.Join(t.TempDir(), "grout-state")
+	t.Cleanup(func() { dir = origDir })
 
 	state := Entry{
 		InterfaceName:  "enp3s0f0v0",
@@ -40,9 +40,9 @@ func TestSaveLoadDelete(t *testing.T) {
 }
 
 func TestOverwrite(t *testing.T) {
-	origDir := Dir
-	Dir = filepath.Join(t.TempDir(), "grout-state")
-	t.Cleanup(func() { Dir = origDir })
+	origDir := dir
+	dir = filepath.Join(t.TempDir(), "grout-state")
+	t.Cleanup(func() { dir = origDir })
 
 	require.NoError(t, Save("toswitch1", Entry{
 		InterfaceName: "toswitch1",
@@ -59,9 +59,9 @@ func TestOverwrite(t *testing.T) {
 }
 
 func TestDeleteNonExistent(t *testing.T) {
-	origDir := Dir
-	Dir = filepath.Join(t.TempDir(), "grout-state")
-	t.Cleanup(func() { Dir = origDir })
+	origDir := dir
+	dir = filepath.Join(t.TempDir(), "grout-state")
+	t.Cleanup(func() { dir = origDir })
 
 	assert.NoError(t, Delete("does_not_exist"))
 	assert.Error(t, Delete(""))

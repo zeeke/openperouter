@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 )
 
-// Dir is the directory that holds per-device state files. It can be
+// dir is the directory that holds per-device state files. It can be
 // overridden in tests.
-var Dir = "/var/run/openperouter/grout"
+var dir = "/var/run/grout/device-state"
 var ErrDeviceStateNotFound = errors.New("device state not found")
 
 // Entry records the original state of a network device before it is
@@ -33,7 +33,7 @@ func Save(deviceID string, state Entry) error {
 	if deviceID == "" {
 		return fmt.Errorf("device state deviceID is required")
 	}
-	if err := os.MkdirAll(Dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create device state directory: %w", err)
 	}
 	data, err := json.Marshal(state)
@@ -64,7 +64,7 @@ func Delete(deviceID string) error {
 }
 
 func filePath(deviceID string) string {
-	return filepath.Join(Dir, deviceID+".json")
+	return filepath.Join(dir, deviceID+".json")
 }
 
 func loadEntry(path string) (*Entry, error) {
