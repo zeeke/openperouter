@@ -76,8 +76,7 @@ spec:
             fi
           done
           ulimit -l unlimited
-          date
-          exec nsenter --net=/var/run/netns/perouter grout --socket-mode 0666 --verbose --trace-packets --test-mode
+          exec nsenter --net=/var/run/netns/perouter grout --socket-mode 0666 --test-mode
         volumeMounts:
         - name: grout-socket
           mountPath: /var/run/grout
@@ -132,4 +131,4 @@ spec:
       - name: vfio
         hostPath:
           path: /dev/vfio
-          type: Directory
+          type: DirectoryOrCreate
