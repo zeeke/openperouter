@@ -33,34 +33,37 @@ Compared to the default kernel-based deployment, enabling grout adds:
 
 Grout support is being delivered incrementally. The current implementation covers:
 
-- **Underlay** interface setup via grout ports
+- **Underlay** interface setup via grout ports, including optional DPDK
+  acceleration (`acceleratedConfig` on `NetworkDevice`)
 - **L3Passthrough** forwarding via grout
 - **L3VNI** (EVPN Layer 3 overlays) via grout TAP devices
 
 The following are **not yet supported** with grout:
 
 - L2VNI (EVPN Layer 2 overlays)
-- Hardware acceleration with SR-IOV NICs
+- Hardware acceleration of L2VNI via VF pairs
 
-Additionally, grout currently:
-
-- Uses **TAP devices** rather than DPDK poll-mode drivers bound to physical NICs
-- Expects hugepages on the node, unless [test mode](#test-mode) is enabled
-
-These limitations will be addressed in subsequent milestones.
+By default grout binds underlay NICs as **PCI ports**. Set
+`--grout-tap-underlay` on the controller to use **TAP devices** (`net_tap` with
+`remote=`). The `acceleratedConfig` fields configure either port type.
 
 ## Prerequisites
 
-For the current scope, no special hardware is required — grout uses TAP devices rather than DPDK poll-mode drivers bound to physical NICs. Hugepages must be allocated on the node and requested through `grout.resources`, unless grout is run in [test mode](#test-mode). In future milestones, DPDK-capable NICs will be needed for hardware-accelerated forwarding.
+TAP-based grout underlays need no DPDK-capable NIC or `vfio-pci`; they are
+independent of test mode. With test mode disabled (the default), grout still
+needs hugepages as described below. DPDK-accelerated underlay ports need a
+DPDK-capable NIC.
 
 ## Helm Configuration
 
-Grout is configured under `openperouter.grout` in the Helm values:
+Select grout with `openperouter.datapath`; its sidecar settings are under
+`openperouter.grout`:
 
 ```yaml
 openperouter:
   datapath: grout
   grout:
+    tapUnderlay: false
     testMode: false
     image:
       repository: quay.io/openperouter/router
@@ -71,7 +74,7 @@ openperouter:
         memory: "512Mi"
         cpu: "250m"
       limits:
-        memory: "1Gi"
+        memory: "2Gi"
         cpu: "500m"
 ```
 
@@ -80,11 +83,15 @@ openperouter:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `datapath` | string | `kernel` | Datapath to use for L3 forwarding. "kernel" uses the standard Linux kernel datapath; "grout" adds a DPDK-accelerated sidecar that runs alongside FRR |
+| `grout.tapUnderlay` | bool | `false` | Use TAP ports for grout underlay interfaces instead of PCI ports |
 | `grout.testMode` | bool | `false` | Run grout in test mode. See [Test mode](#test-mode) |
 | `grout.image.repository` | string | `quay.io/openperouter/router` | Grout container image repository |
 | `grout.image.tag` | string | `main-grout` | Grout container image tag |
 | `grout.image.pullPolicy` | string | `""` | Image pull policy (defaults to Kubernetes default) |
 | `grout.resources` | object | see above | Resource requests and limits for the grout container |
+
+With the operator, set `GROUT_TAP_UNDERLAY=true` on the operator deployment to
+select TAP underlay ports for its Grout installation.
 
 ### Test mode
 
@@ -131,7 +138,7 @@ The Underlay and L3Passthrough Custom Resources are the same as the kernel-based
 
 ```bash
 helm install openperouter openperouter/openperouter \
-  --set openperouter.grout.enabled=true
+  --set openperouter.datapath=grout
 ```
 
 Or using a values file:
@@ -139,8 +146,7 @@ Or using a values file:
 ```yaml
 # values.yaml
 openperouter:
-  grout:
-    enabled: true
+  datapath: grout
 ```
 
 ```bash
@@ -181,6 +187,52 @@ spec:
 ```
 
 When grout is enabled, the controller configures FRR as usual but delegates the host network setup to the grout data path instead of kernel interfaces.
+
+## DPDK-Accelerated Underlay Ports
+
+The controller binds `NetworkDevice` entries as PCI ports by default, even if
+`acceleratedConfig` is absent. With `--grout-tap-underlay`, it uses TAP+`remote=`
+ports for every underlay interface, including those with `acceleratedConfig`.
+For PCI ports, the controller:
+
+1. Resolves the PCI address from `/sys/class/net/<interfaceName>/device`
+2. Saves the original driver, MTU, and non-link-local addresses
+3. Binds non-bifurcated NICs (for example Intel) to `vfio-pci`, or moves
+   `mlx5_core` devices (Mellanox) into the router namespace
+4. Creates the grout port with `grcli interface add port <portName> devargs <pci>`
+
+
+The interface referenced by interfaceName must exist on the host. Any address 
+assigned to the interface will be used for the setup in the accelerated data path.
+When the Underlay CR is disposed, the interface will be moved back to the kernel 
+together with its addresses and the original driver.
+
+`acceleratedConfig` is rejected when `--datapath=kernel`.
+
+```yaml
+apiVersion: network.openperouter.io/v1alpha1
+kind: Underlay
+metadata:
+  name: underlay-dpdk
+  namespace: openperouter-system
+spec:
+  asn: 64514
+  interfaces:
+    - type: NetworkDevice
+      networkDevice:
+        interfaceName: enp3s0f0v0
+        acceleratedConfig:
+          rxQueues: 4
+          qSize: 1024
+  neighbors:
+    - asn: 64512
+      address: 192.168.1.1
+```
+
+All `acceleratedConfig` fields are optional. The field can be omitted to use
+grout defaults for either port type.
+`portName` overrides the grout port name (`u_<interfaceName>` when unset).
+`rxQueues` and `qSize` also apply to TAP ports.
 
 ## Verification
 

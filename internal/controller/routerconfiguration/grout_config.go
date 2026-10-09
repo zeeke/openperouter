@@ -21,24 +21,25 @@ type GroutDatapathConfigurator struct {
 	conversion.GroutDatapathConfigValidator
 
 	groutSocketPath string
+	tapUnderlay     bool
 }
 
-func NewGroutConfigurator(groutSocketPath string) *GroutDatapathConfigurator {
+func NewGroutConfigurator(groutSocketPath string, tapUnderlay bool) *GroutDatapathConfigurator {
 	return &GroutDatapathConfigurator{
 		groutSocketPath: groutSocketPath,
+		tapUnderlay:     tapUnderlay,
 	}
 }
 
 func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interfacesConfiguration) error {
 	groutClient := grout.NewClient(g.groutSocketPath)
 
-	currentUnderlayIfaces, err := hostnetwork.UnderlayInterfaces(config.targetNamespace)
+	currentUnderlayIfaces, err := grout.UnderlayInterfaces(ctx, groutClient, config.targetNamespace)
 	if err != nil {
 		return fmt.Errorf("failed to check if target namespace %s has underlay: %w", config.targetNamespace, err)
 	}
 	if len(currentUnderlayIfaces) > 0 && len(config.Underlays) == 0 {
-		cleanupGroutInterfaces(ctx, groutClient, config.targetNamespace, currentUnderlayIfaces)
-		return nil
+		return cleanupGroutInterfaces(ctx, groutClient, config.targetNamespace, currentUnderlayIfaces)
 	}
 
 	if len(config.Underlays) == 0 {
@@ -59,7 +60,7 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	}
 
 	slog.InfoContext(ctx, "setting up underlay")
-	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay); err != nil {
+	if err := grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay, g.tapUnderlay); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
 	}
 
@@ -123,7 +124,8 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	return errors.Join(resourceErrors...)
 }
 
-func cleanupGroutInterfaces(ctx context.Context, groutClient *grout.Client, targetNamespace string, currentUnderlayIfaces []hostnetwork.UnderlayInterface) {
+func cleanupGroutInterfaces(ctx context.Context, groutClient *grout.Client, targetNamespace string,
+	currentUnderlayIfaces []hostnetwork.UnderlayInterface) error {
 	slog.InfoContext(ctx, "underlay removed, cleaning up VNIs and underlay interfaces")
 	if err := grout.RemoveAllVNIs(ctx, groutClient, targetNamespace); err != nil {
 		slog.Warn("failed to remove vnis after underlay removal", "err", err)
@@ -132,6 +134,7 @@ func cleanupGroutInterfaces(ctx context.Context, groutClient *grout.Client, targ
 		slog.Warn("failed to remove vrfs after underlay removal", "err", err)
 	}
 	if err := grout.RestoreUnderlay(ctx, groutClient, targetNamespace, currentUnderlayIfaces); err != nil {
-		slog.Warn("failed to remove underlay after underlay removal", "err", err)
+		return fmt.Errorf("failed to remove underlay after underlay removal: %w", err)
 	}
+	return nil
 }

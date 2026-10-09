@@ -1,10 +1,8 @@
 resources:
-- ../default
+- ../grout
 patchesStrategicMerge:
-  - controller_patch.yaml
   - perouter_patch.yaml
-  - frr_cm_patch.yaml
-  - nodemarker_patch.yaml
+  - controller_patch.yaml
 
 images:
 - name: quay.io/openperouter/router

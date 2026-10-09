@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: controller
+  namespace: system
+spec:
+  template:
+    spec:
+      containers:
+        - name: controller
+          # Kind nodes have veth underlays, which can only be attached to
+          # grout through TAP ports.
+          args:
+          - "--nodename=$(NODE_NAME)"
+          - "--loglevel=debug"
+          - "--namespace=$(NAMESPACE)"
+          - "--frrconfig=/etc/frr/frr.conf"
+          - "--reloader-socket=/etc/frr/reload.sock"
+          - "--cni-plugin-dirs=/opt/openperouter/cni/bin/"
+          - "--cni-cache-dir=/var/lib/openperouter/cni/cache"
+          - "--datapath=grout"
+          - "--grout-tap-underlay"
+          - "--grout-socket=/var/run/grout/grout.sock"
