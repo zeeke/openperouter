@@ -67,7 +67,7 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	}
 
 	for _, iface := range params.UnderlayInterfaces {
-		if err := setupUnderlayInterface(ctx, client, perouterNetNS, params.TargetNS, iface, tapUnderlay); err != nil {
+		if err := setupUnderlayInterface(ctx, client, perouterNetNS, iface, tapUnderlay); err != nil {
 			return err
 		}
 	}
@@ -81,10 +81,19 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	return nil
 }
 
+// UnderlayInterfaces returns the netdev underlays configured in the namespace
+// and in grout. CNI dev underlays are not supported by the grout datapath, so
+// any libcni cache entry is ignored.
 func UnderlayInterfaces(ctx context.Context, client *Client, namespace string) ([]hostnetwork.UnderlayInterface, error) {
-	ret, err := hostnetwork.UnderlayInterfaces(namespace)
+	hostInterfaces, err := hostnetwork.UnderlayInterfaces(namespace)
 	if err != nil {
 		return nil, err
+	}
+	var ret []hostnetwork.UnderlayInterface
+	for _, iface := range hostInterfaces {
+		if iface.Kind == hostnetwork.UnderlayInterfaceNetDev {
+			ret = append(ret, iface)
+		}
 	}
 
 	groutInterfaces, err := client.listInterfaces(ctx)
@@ -159,20 +168,13 @@ func RestoreUnderlay(
 			continue
 		}
 
-		if iface.Kind == hostnetwork.UnderlayInterfaceCNIDev {
-			if err := teardownTapUnderlay(ctx, client, targetNS, ns, iface); err != nil {
-				return err
-			}
-			continue
-		}
-
 		return fmt.Errorf("underlay interface has unsupported kind %q", iface.Kind)
 	}
 
 	return nil
 }
 
-func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, targetNS string, iface hostnetwork.UnderlayInterface, tapUnderlay bool) error {
+func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, iface hostnetwork.UnderlayInterface, tapUnderlay bool) error {
 	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && tapUnderlay {
 		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, iface); err != nil {
 			return err
@@ -184,15 +186,6 @@ func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS n
 
 	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev {
 		return setupAcceleratedUnderlay(ctx, client, perouterNetNS, iface)
-	}
-
-	if iface.Kind == hostnetwork.UnderlayInterfaceCNIDev {
-		if err := hostnetwork.SetupUnderlayCNIDevInterface(ctx, targetNS, iface); err != nil {
-			return err
-		}
-		return netnamespace.In(perouterNetNS, func() error {
-			return configureUnderlayGroutTapPort(ctx, client, iface)
-		})
 	}
 
 	return fmt.Errorf("underlay interface has unsupported kind %q", iface.Kind)
