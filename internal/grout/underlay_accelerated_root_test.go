@@ -17,6 +17,7 @@ import (
 
 	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
+	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/openperouter/openperouter/internal/pci"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -101,16 +102,14 @@ func TestSetupAcceleratedUnderlayRebindsKernelDriver(t *testing.T) {
 func TestSetupAcceleratedUnderlayMovesBifurcatedNetdev(t *testing.T) {
 	ns := newAccelTestNS(t)
 	addGroutMainInterface(t, ns)
-	// No address: the moved netdev keeps it and its connected route clashes
-	// with the one added towards grout.
-	addHostDummy(t, accelMTU, "")
+	addHostDummy(t, accelMTU, accelCIDR)
 	cleanDeviceState(t)
 
 	sysfs := newFakeSysfs(t, testPCIAddr, pci.DriverMlx5Core)
 	sysfs.addDriver(pci.DriverVFIOPCI)
 	sysfs.addNetDevice(accelIface)
 
-	recordCmdExec(t, accelPortCalls()...)
+	calls := recordCmdExec(t, accelPortCalls()...)
 	require.NoError(t, setupAcceleratedUnderlay(context.Background(), NewClient("sock"), ns, accelUnderlay))
 
 	assert.Empty(t, sysfs.read(sysfs.devicePath("driver_override")), "mlx5 must not be rebound to vfio-pci")
@@ -123,6 +122,16 @@ func TestSetupAcceleratedUnderlayMovesBifurcatedNetdev(t *testing.T) {
 	state, err := devicestate.Load(accelIface)
 	require.NoError(t, err)
 	assert.Equal(t, pci.DriverMlx5Core, state.OriginalDriver)
+
+	t.Run("migrates the addresses from the netdev to the grout port", func(t *testing.T) {
+		assert.Contains(t, *calls, accelAddressAddCmd())
+		assert.Empty(t, nsLinkAddresses(t, ns, nsLink))
+		assert.True(t, hasSubnetRoute(t, ns, "192.168.50.0/24"))
+	})
+
+	t.Run("disables accept_ra on the netdev", func(t *testing.T) {
+		assert.Equal(t, "0", nsSysctl(t, ns, "net/ipv6/conf/"+accelIface+"/accept_ra"))
+	})
 }
 
 func TestTeardownAcceleratedUnderlayRestoresKernelDriver(t *testing.T) {
@@ -325,4 +334,29 @@ func linkAddresses(t *testing.T, link netlink.Link) []string {
 		ret = append(ret, a.IPNet.String())
 	}
 	return ret
+}
+
+func nsLinkAddresses(t *testing.T, ns netns.NsHandle, link netlink.Link) []string {
+	t.Helper()
+	handle, err := netlink.NewHandleAt(ns)
+	require.NoError(t, err)
+	defer handle.Close()
+	addrs, err := handle.AddrList(link, netlink.FAMILY_ALL)
+	require.NoError(t, err)
+	ret := make([]string, 0, len(addrs))
+	for _, a := range addrs {
+		ret = append(ret, a.IPNet.String())
+	}
+	return ret
+}
+
+func nsSysctl(t *testing.T, ns netns.NsHandle, path string) string {
+	t.Helper()
+	var value string
+	require.NoError(t, netnamespace.In(ns, func() error {
+		raw, err := os.ReadFile(filepath.Join("/proc/sys", path))
+		value = strings.TrimSpace(string(raw))
+		return err
+	}))
+	return value
 }

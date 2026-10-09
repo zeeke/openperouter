@@ -13,6 +13,7 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/openperouter/openperouter/internal/pci"
+	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -103,6 +104,10 @@ func configureAcceleratedPort(ctx context.Context, client *Client, iface hostnet
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
 	}
 
+	if pci.IsBifurcated(state.OriginalDriver) {
+		return migrateBifurcatedAddresses(ctx, client, state, portName)
+	}
+
 	for _, addr := range state.Addresses {
 		if err := client.ensureAddress(ctx, portName, addr); err != nil {
 			return fmt.Errorf("failed to assign address %s to grout port %s: %w", addr, portName, err)
@@ -116,6 +121,27 @@ func configureAcceleratedPort(ctx context.Context, client *Client, iface hostnet
 	}
 
 	return nil
+}
+
+// migrateBifurcatedAddresses moves the addresses of a bifurcated device from
+// its kernel netdev to the grout port. The netdev lives on in the router
+// namespace next to the DPDK port, so, as on the TAP path, it must give up
+// its addresses and link-local and stop autoconfiguring new ones from Router
+// Advertisements: otherwise they clash with grout's connected routes (EBUSY)
+// and with the identical link-local of the port sharing its MAC.
+func migrateBifurcatedAddresses(ctx context.Context, client *Client, state *devicestate.Entry, portName string) error {
+	netdev := state.InterfaceName
+	if err := hostnetwork.SuppressLinkLocal(netdev); err != nil {
+		return fmt.Errorf("failed to suppress link-local on bifurcated netdev %s: %w", netdev, err)
+	}
+	if err := sysctl.Ensure(sysctl.DisableAcceptRA(netdev)); err != nil {
+		return fmt.Errorf("failed to disable accept_ra on bifurcated netdev %s: %w", netdev, err)
+	}
+	addrs, err := parseAddresses(state.Addresses)
+	if err != nil {
+		return err
+	}
+	return migrateAddressesToGrout(ctx, client, netdev, portName, addrs)
 }
 
 func deviceStateForAcceleratedDevice(netlinkName string) (*devicestate.Entry, error) {

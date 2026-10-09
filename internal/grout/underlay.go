@@ -343,13 +343,9 @@ func configureUnderlayGroutTapPort(ctx context.Context, client *Client, iface ho
 		return fmt.Errorf("failed to disable accept_ra on underlay interface %s: %w", underlayInterface, err)
 	}
 
-	var underlayAddrs []netlink.Addr
-	for _, addr := range devState.Addresses {
-		parsed, err := netlink.ParseAddr(addr)
-		if err != nil {
-			return fmt.Errorf("failed to parse saved address %s: %w", addr, err)
-		}
-		underlayAddrs = append(underlayAddrs, *parsed)
+	underlayAddrs, err := parseAddresses(devState.Addresses)
+	if err != nil {
+		return err
 	}
 
 	if err := migrateAddressesToGrout(ctx, client, underlayInterface, portName, underlayAddrs); err != nil {
@@ -504,6 +500,18 @@ func migrateAddressesToGrout(ctx context.Context, client *Client, kernelDevice, 
 	}
 
 	return nil
+}
+
+func parseAddresses(addrs []string) ([]netlink.Addr, error) {
+	ret := make([]netlink.Addr, 0, len(addrs))
+	for _, addr := range addrs {
+		parsed, err := netlink.ParseAddr(addr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse saved address %s: %w", addr, err)
+		}
+		ret = append(ret, *parsed)
+	}
+	return ret, nil
 }
 
 func ensureKernelSubnetRoute(ifaceName, addr string) error {
