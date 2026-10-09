@@ -297,7 +297,7 @@ func TestEnsurePortWithOptions(t *testing.T) {
 		RXQueues:    &rxqs,
 		QSize:       &qsize,
 		MAC:         &mac,
-		Description: UnderlayInterfaceDescriptionMarker,
+		Description: "underlay",
 	}
 
 	t.Run("appends optional port arguments", func(t *testing.T) {
@@ -337,7 +337,7 @@ func TestEnsurePortWithOptions(t *testing.T) {
 				context.Background(),
 				"u_enp3s0f0v0",
 				"0000:03:02.0",
-				PortOptions{Description: UnderlayInterfaceDescriptionMarker},
+				PortOptions{Description: "underlay"},
 			),
 		)
 	})

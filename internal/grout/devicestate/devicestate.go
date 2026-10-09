@@ -52,31 +52,6 @@ func Load(deviceID string) (*Entry, error) {
 	return loadEntry(path)
 }
 
-// LoadByPCI finds the saved device state whose PCIAddress matches.
-// State files are keyed by interface name, so this scans the state directory.
-func LoadByPCI(pciAddress string) (*Entry, error) {
-	if pciAddress == "" {
-		return nil, fmt.Errorf("pci address is required")
-	}
-	entries, err := os.ReadDir(Dir)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list device state directory %s: %w", Dir, err)
-	}
-	for _, entry := range entries {
-		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
-			continue
-		}
-		state, err := loadEntry(filepath.Join(Dir, entry.Name()))
-		if err != nil {
-			return nil, err
-		}
-		if state.PCIAddress == pciAddress {
-			return state, nil
-		}
-	}
-	return nil, fmt.Errorf("no device state for PCI address %s", pciAddress)
-}
-
 func Delete(deviceID string) error {
 	if deviceID == "" {
 		return fmt.Errorf("device state deviceID is required")

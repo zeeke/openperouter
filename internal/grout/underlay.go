@@ -22,12 +22,11 @@ import (
 
 const (
 	UnderlayPortNamePrefix             = "u_"
-	UnderlayInterfaceDescriptionMarker = "underlay"
+	UnderlayInterfaceDescriptionPrefix = "underlay-for="
 )
 
 // PortName returns the grout port name for the given underlay interface.
-// If the interface has an AcceleratedConfig with a PortName override, that
-// value is used directly; otherwise the name is "u_<InterfaceName>".
+// An AcceleratedConfig PortName override takes precedence over "u_<InterfaceName>".
 func PortName(iface hostnetwork.UnderlayInterface) string {
 	if iface.AcceleratedConfig != nil && iface.AcceleratedConfig.PortName != nil {
 		return *iface.AcceleratedConfig.PortName
@@ -36,17 +35,9 @@ func PortName(iface hostnetwork.UnderlayInterface) string {
 }
 
 // SetupUnderlay configures the underlay interfaces via the grout dataplane.
-// Every interface is provisioned in the router namespace according to its
-// kind (host network devices are moved in, CNI interfaces are added by
-// invoking their plugin); then a grout TAP port with remote= is created so
-// TC ingress rules redirect incoming packets from the interface to grout,
-// and the underlay IPs are moved to the grout port. Grout handles all L2
-// (ARP) and L3 forwarding; it also creates a NOARP kernel interface for
-// kernel TCP (used by FRR bgpd for BGP sessions).
-//
-// When AcceleratedConfig is set, the kernel netdev is bound as a DPDK port
-// instead of using TAP+remote=.
-func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.UnderlayParams) error {
+// tapUnderlay selects TAP+remote= ports; otherwise kernel netdevs are bound
+// directly as PCI ports. Grout owns the underlay addresses and forwarding.
+func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.UnderlayParams, tapUnderlay bool) error {
 	slog.DebugContext(ctx, "setup underlay", "params", params)
 	defer slog.DebugContext(ctx, "setup underlay done")
 
@@ -67,7 +58,7 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	if err != nil {
 		return fmt.Errorf("failed to check existing underlay interfaces: %w", err)
 	}
-	if toRemove := hostnetwork.UnderlayInterfacesToRemove(existing, params.UnderlayInterfaces); len(toRemove) > 0 {
+	if toRemove := underlayInterfacesToRemove(existing, params.UnderlayInterfaces); len(toRemove) > 0 {
 		slog.InfoContext(ctx, "underlay interfaces changed, removing old interfaces before setup",
 			"toRemove", toRemove, "requested", params.UnderlayInterfaces)
 		if err := RestoreUnderlay(ctx, client, params.TargetNS, toRemove); err != nil {
@@ -76,7 +67,7 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 	}
 
 	for _, iface := range params.UnderlayInterfaces {
-		if err := setupUnderlayInterface(ctx, client, perouterNetNS, params.TargetNS, iface); err != nil {
+		if err := setupUnderlayInterface(ctx, client, perouterNetNS, params.TargetNS, iface, tapUnderlay); err != nil {
 			return err
 		}
 	}
@@ -106,12 +97,12 @@ func UnderlayInterfaces(ctx context.Context, client *Client, namespace string) (
 		if err != nil {
 			return nil, err
 		}
-		if !strings.Contains(interfaceProperties.Description, UnderlayInterfaceDescriptionMarker) {
-			continue
-		}
-		iface, err := groutPortToUnderlayInterface(interfaceProperties)
+		iface, isUnderlay, err := groutPortToUnderlayInterface(interfaceProperties)
 		if err != nil {
 			return nil, err
+		}
+		if !isUnderlay {
+			continue
 		}
 		ret = append(ret, iface)
 	}
@@ -133,15 +124,6 @@ func RestoreUnderlay(
 		return nil
 	}
 
-	interfaces, err := client.listInterfaces(ctx)
-	if err != nil {
-		return fmt.Errorf("RestoreUnderlay: failed to list grout interfaces: %w", err)
-	}
-	existingPorts := map[string]struct{}{}
-	for _, iface := range interfaces {
-		existingPorts[iface.Name] = struct{}{}
-	}
-
 	ns, err := netns.GetFromPath(targetNS)
 	if err != nil {
 		return fmt.Errorf("RestoreUnderlay: failed to find network namespace %s: %w", targetNS, err)
@@ -154,19 +136,23 @@ func RestoreUnderlay(
 
 	for _, iface := range toRemove {
 		portName := PortName(iface)
-		if _, found := existingPorts[portName]; !found {
+		port, err := client.getInterfaceDetails(ctx, portName)
+		if isGroutErrno(err, syscall.ENODEV) {
 			slog.Debug("RestoreUnderlay: port already removed", "namespace", targetNS, "port", portName)
 			continue
 		}
+		if err != nil {
+			return fmt.Errorf("RestoreUnderlay: failed to inspect grout port %s: %w", portName, err)
+		}
 
-		if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && iface.AcceleratedConfig != nil {
+		if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && pci.IsPCIAddress(port.Devargs) {
 			if err := teardownAcceleratedUnderlay(ctx, client, ns, targetNS, iface); err != nil {
 				return err
 			}
 			continue
 		}
 
-		if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && iface.AcceleratedConfig == nil {
+		if iface.Kind == hostnetwork.UnderlayInterfaceNetDev {
 			if err := teardownTapUnderlay(ctx, client, targetNS, ns, iface); err != nil {
 				return err
 			}
@@ -186,18 +172,17 @@ func RestoreUnderlay(
 	return nil
 }
 
-func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, targetNS string, iface hostnetwork.UnderlayInterface) error {
-
-	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && iface.AcceleratedConfig == nil {
+func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS netns.NsHandle, targetNS string, iface hostnetwork.UnderlayInterface, tapUnderlay bool) error {
+	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && tapUnderlay {
 		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, iface); err != nil {
 			return err
 		}
 		return netnamespace.In(perouterNetNS, func() error {
-			return configureUnderlayGroutTapPort(ctx, client, iface.InterfaceName, PortName(iface))
+			return configureUnderlayGroutTapPort(ctx, client, iface)
 		})
 	}
 
-	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev && iface.AcceleratedConfig != nil {
+	if iface.Kind == hostnetwork.UnderlayInterfaceNetDev {
 		return setupAcceleratedUnderlay(ctx, client, perouterNetNS, iface)
 	}
 
@@ -206,7 +191,7 @@ func setupUnderlayInterface(ctx context.Context, client *Client, perouterNetNS n
 			return err
 		}
 		return netnamespace.In(perouterNetNS, func() error {
-			return configureUnderlayGroutTapPort(ctx, client, iface.InterfaceName, PortName(iface))
+			return configureUnderlayGroutTapPort(ctx, client, iface)
 		})
 	}
 
@@ -222,33 +207,26 @@ func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.Und
 	return nil
 }
 
-// groutPortToUnderlayInterface returns the host underlay interface
-// from a grout port. PCI-backed (DPDK) ports store the original netlink
-// name in the device state file; TAP ports encode it in the grout name
-// as "u_<InterfaceName>".
-func groutPortToUnderlayInterface(interfaceProperties *groutInterfaceProperties) (hostnetwork.UnderlayInterface, error) {
-	if !pci.IsPCIAddress(interfaceProperties.Devargs) {
-		return hostnetwork.UnderlayInterface{
-			InterfaceName: strings.TrimPrefix(interfaceProperties.Name, UnderlayPortNamePrefix),
-			Kind:          hostnetwork.UnderlayInterfaceNetDev,
-		}, nil
+// groutPortToUnderlayInterface returns the host underlay interface a grout port
+// was created for, read from the port description. It reports false for
+// ports that are not underlays.
+func groutPortToUnderlayInterface(
+	interfaceProperties *groutInterfaceProperties,
+) (hostnetwork.UnderlayInterface, bool, error) {
+	interfaceName, found := strings.CutPrefix(interfaceProperties.Description, UnderlayInterfaceDescriptionPrefix)
+	if !found {
+		return hostnetwork.UnderlayInterface{}, false, nil
 	}
-
-	state, err := devicestate.LoadByPCI(interfaceProperties.Devargs)
-	if err != nil {
-		return hostnetwork.UnderlayInterface{}, fmt.Errorf("failed to load device state for grout port %s: %w", interfaceProperties.Name, err)
-	}
-	if state.InterfaceName == "" {
-		return hostnetwork.UnderlayInterface{}, fmt.Errorf("device state for grout port %s has no interface name", interfaceProperties.Name)
+	if interfaceName == "" {
+		return hostnetwork.UnderlayInterface{}, false,
+			fmt.Errorf("grout underlay port %s has no interface name", interfaceProperties.Name)
 	}
 	portName := interfaceProperties.Name
 	return hostnetwork.UnderlayInterface{
-		InterfaceName: state.InterfaceName,
-		Kind:          hostnetwork.UnderlayInterfaceNetDev,
-		AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{
-			PortName: &portName,
-		},
-	}, nil
+		InterfaceName:     interfaceName,
+		Kind:              hostnetwork.UnderlayInterfaceNetDev,
+		AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{PortName: &portName},
+	}, true, nil
 }
 
 func removeAddressFromGroutPort(ctx context.Context, client *Client, ns netns.NsHandle, portName string) error {
@@ -329,7 +307,9 @@ func applyStateToNetlinkInterface(ctx context.Context, state devicestate.Entry) 
 	return nil
 }
 
-func configureUnderlayGroutTapPort(ctx context.Context, client *Client, underlayInterface, portName string) error {
+func configureUnderlayGroutTapPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface) error {
+	underlayInterface := iface.InterfaceName
+	portName := PortName(iface)
 	devState, err := devicestate.Load(underlayInterface)
 	if errors.Is(err, devicestate.ErrDeviceStateNotFound) {
 		devState, err = deviceStateForTapDevice(underlayInterface)
@@ -356,7 +336,7 @@ func configureUnderlayGroutTapPort(ctx context.Context, client *Client, underlay
 	}
 
 	devargs := fmt.Sprintf("net_tap%s,remote=%s,iface=%s", makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
-	opts := PortOptions{Description: UnderlayInterfaceDescriptionMarker}
+	opts := underlayPortOptions(iface)
 	if err := client.ensurePortWithOptions(ctx, portName, devargs, opts); err != nil {
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
@@ -384,6 +364,30 @@ func configureUnderlayGroutTapPort(ctx context.Context, client *Client, underlay
 	}
 
 	return nil
+}
+
+func underlayInterfacesToRemove(existing, requested []hostnetwork.UnderlayInterface) []hostnetwork.UnderlayInterface {
+	requestedByName := make(map[string]hostnetwork.UnderlayInterface, len(requested))
+	for _, iface := range requested {
+		requestedByName[iface.InterfaceName] = iface
+	}
+	var removed []hostnetwork.UnderlayInterface
+	for _, iface := range existing {
+		req, found := requestedByName[iface.InterfaceName]
+		if !found || req.Kind != iface.Kind || PortName(iface) != PortName(req) {
+			removed = append(removed, iface)
+		}
+	}
+	return removed
+}
+
+func underlayPortOptions(iface hostnetwork.UnderlayInterface) PortOptions {
+	opts := PortOptions{Description: UnderlayInterfaceDescriptionPrefix + iface.InterfaceName}
+	if iface.AcceleratedConfig != nil {
+		opts.RXQueues = iface.AcceleratedConfig.RXQueues
+		opts.QSize = iface.AcceleratedConfig.QSize
+	}
+	return opts
 }
 
 func deviceStateForTapDevice(netlinkName string) (*devicestate.Entry, error) {

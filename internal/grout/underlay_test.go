@@ -3,10 +3,8 @@
 package grout
 
 import (
-	"path/filepath"
 	"testing"
 
-	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,71 +35,82 @@ func TestPortName(t *testing.T) {
 }
 
 func TestGroutPortToUnderlayInterface(t *testing.T) {
-	origDir := devicestate.Dir
-	devicestate.Dir = filepath.Join(t.TempDir(), "grout-state")
-	t.Cleanup(func() { devicestate.Dir = origDir })
-
-	require.NoError(t, devicestate.Save("ens1f0", devicestate.Entry{
-		PCIAddress:     "0000:01:00.0",
-		InterfaceName:  "ens1f0",
-		OriginalDriver: "iavf",
-		Addresses:      []string{"10.0.0.1/24"},
-	}))
-
-	t.Run("tap port uses grout name without prefix", func(t *testing.T) {
-		got, err := groutPortToUnderlayInterface(
-			&groutInterfaceProperties{
-				Name:        "u_eth0",
-				Devargs:     "net_tap0,remote=eth0,iface=tap_eth0",
-				Description: UnderlayInterfaceDescriptionMarker,
-			},
-		)
+	t.Run("port uses interface name in description", func(t *testing.T) {
+		got, isUnderlay, err := groutPortToUnderlayInterface(&groutInterfaceProperties{
+			Name:        "tap-port",
+			Devargs:     "net_tap0,iface=tap_eth0",
+			Description: UnderlayInterfaceDescriptionPrefix + "eth0",
+		})
 		require.NoError(t, err)
+		assert.True(t, isUnderlay)
 		assert.Equal(t, "eth0", got.InterfaceName)
 		assert.Equal(t, hostnetwork.UnderlayInterfaceNetDev, got.Kind)
-		assert.Nil(t, got.AcceleratedConfig)
+		assert.Equal(t, "tap-port", PortName(got))
 	})
 
-	t.Run("pci port loads interface name from device state", func(t *testing.T) {
-		got, err := groutPortToUnderlayInterface(
-			&groutInterfaceProperties{
-				Name:        "p0",
-				Devargs:     "0000:01:00.0",
-				Description: UnderlayInterfaceDescriptionMarker,
-			},
-		)
+	t.Run("pci port uses interface name in description", func(t *testing.T) {
+		got, isUnderlay, err := groutPortToUnderlayInterface(&groutInterfaceProperties{
+			Name:        "pci-port",
+			Devargs:     "0000:ff:00.0",
+			Description: UnderlayInterfaceDescriptionPrefix + "enp1s0",
+		})
 		require.NoError(t, err)
-		assert.Equal(t, "ens1f0", got.InterfaceName)
-		assert.Equal(t, hostnetwork.UnderlayInterfaceNetDev, got.Kind)
-		require.NotNil(t, got.AcceleratedConfig)
-		require.NotNil(t, got.AcceleratedConfig.PortName)
-		assert.Equal(t, "p0", *got.AcceleratedConfig.PortName)
+		assert.True(t, isUnderlay)
+		assert.Equal(t, "enp1s0", got.InterfaceName)
+		assert.Equal(t, "pci-port", PortName(got))
 	})
 
-	t.Run("pci port with default grout name still uses device state", func(t *testing.T) {
-		got, err := groutPortToUnderlayInterface(
-			&groutInterfaceProperties{
-				Name:        "u_ens1f0",
-				Devargs:     "0000:01:00.0",
-				Description: UnderlayInterfaceDescriptionMarker,
-			},
-		)
+	t.Run("port without underlay description is skipped", func(t *testing.T) {
+		_, isUnderlay, err := groutPortToUnderlayInterface(&groutInterfaceProperties{
+			Name:        "other",
+			Devargs:     "0000:ff:00.0",
+			Description: "something-else",
+		})
 		require.NoError(t, err)
-		assert.Equal(t, "ens1f0", got.InterfaceName)
-		require.NotNil(t, got.AcceleratedConfig)
-		require.NotNil(t, got.AcceleratedConfig.PortName)
-		assert.Equal(t, "u_ens1f0", *got.AcceleratedConfig.PortName)
+		assert.False(t, isUnderlay)
 	})
 
-	t.Run("pci port without device state returns error", func(t *testing.T) {
-		_, err := groutPortToUnderlayInterface(
-			&groutInterfaceProperties{
-				Name:        "p1",
-				Devargs:     "0000:ff:00.0",
-				Description: UnderlayInterfaceDescriptionMarker,
-			},
-		)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "failed to load device state")
+	t.Run("empty interface name in description returns error", func(t *testing.T) {
+		_, _, err := groutPortToUnderlayInterface(&groutInterfaceProperties{
+			Name:        "pci-port",
+			Devargs:     "0000:ff:00.0",
+			Description: UnderlayInterfaceDescriptionPrefix,
+		})
+		require.ErrorContains(t, err, "has no interface name")
 	})
+}
+
+func TestUnderlayInterfacesToRemove(t *testing.T) {
+	port := hostnetwork.UnderlayInterface{
+		InterfaceName: "eth0", Kind: hostnetwork.UnderlayInterfaceNetDev,
+		AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{PortName: new("u_eth0")},
+	}
+	withOptions := hostnetwork.UnderlayInterface{InterfaceName: "eth0", Kind: hostnetwork.UnderlayInterfaceNetDev,
+		AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{}}
+	noOptions := hostnetwork.UnderlayInterface{InterfaceName: "eth0", Kind: hostnetwork.UnderlayInterfaceNetDev}
+	existing := []hostnetwork.UnderlayInterface{port}
+
+	assert.Empty(t, underlayInterfacesToRemove(existing, []hostnetwork.UnderlayInterface{withOptions}))
+	assert.Empty(t, underlayInterfacesToRemove(existing, []hostnetwork.UnderlayInterface{noOptions}))
+	assert.Equal(t, existing, underlayInterfacesToRemove(existing, nil))
+
+	customPort := port
+	customPort.AcceleratedConfig = &hostnetwork.AcceleratedConfigParams{PortName: new("my-port")}
+	withOptions.AcceleratedConfig.PortName = new("my-port")
+	assert.Empty(t, underlayInterfacesToRemove([]hostnetwork.UnderlayInterface{customPort},
+		[]hostnetwork.UnderlayInterface{withOptions}))
+	withOptions.AcceleratedConfig.PortName = new("renamed")
+	assert.Equal(t, []hostnetwork.UnderlayInterface{customPort},
+		underlayInterfacesToRemove([]hostnetwork.UnderlayInterface{customPort}, []hostnetwork.UnderlayInterface{withOptions}))
+}
+
+func TestUnderlayPortOptions(t *testing.T) {
+	queues, size := int32(4), int32(1024)
+	iface := hostnetwork.UnderlayInterface{InterfaceName: "eth0", AcceleratedConfig: &hostnetwork.AcceleratedConfigParams{
+		RXQueues: &queues, QSize: &size,
+	}}
+	assert.Equal(t, PortOptions{Description: "underlay-for=eth0", RXQueues: &queues, QSize: &size},
+		underlayPortOptions(iface))
+	assert.Equal(t, PortOptions{Description: "underlay-for=eth0"},
+		underlayPortOptions(hostnetwork.UnderlayInterface{InterfaceName: "eth0"}))
 }

@@ -88,12 +88,8 @@ func setupInterfaceForHWAcceleration(ctx context.Context, perouterNetNS netns.Ns
 func configureAcceleratedPort(ctx context.Context, client *Client, iface hostnetwork.UnderlayInterface, state *devicestate.Entry) error {
 	portName := PortName(iface)
 
-	opts := PortOptions{
-		RXQueues:    iface.AcceleratedConfig.RXQueues,
-		QSize:       iface.AcceleratedConfig.QSize,
-		Description: UnderlayInterfaceDescriptionMarker,
-		MTU:         &state.MTU,
-	}
+	opts := underlayPortOptions(iface)
+	opts.MTU = &state.MTU
 
 	if err := client.ensurePortWithOptions(ctx, portName, state.PCIAddress, opts); err != nil {
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
