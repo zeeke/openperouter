@@ -188,6 +188,14 @@ func RestoreUnderlay(
 }
 
 func configureUnderlayPort(ctx context.Context, client *Client, underlayInterface string) error {
+	// Grout owns the underlay addressing: addresses the kernel autoconfigured
+	// from router advertisements (e.g. the ones FRR sends for BGP extended
+	// nexthop) must not be migrated, as grout rejects a second address in a
+	// subnet the port already has.
+	if err := hostnetwork.SuppressAutoconf(underlayInterface); err != nil {
+		return fmt.Errorf("failed to suppress autoconf on underlay interface %s: %w", underlayInterface, err)
+	}
+
 	underlayAddrs, err := hostnetwork.AddressesForInterface(underlayInterface, hostnetwork.ExcludeLinkLocal())
 	if err != nil {
 		return fmt.Errorf("failed to read underlay interface addresses: %w", err)
