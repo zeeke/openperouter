@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os/exec"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -30,6 +31,7 @@ type groutInterface struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 	VRF  string `json:"vrf"`
+	MTU  int    `json:"mtu"`
 }
 
 type groutVXLANInfo struct {
@@ -52,18 +54,22 @@ func (c *Client) deleteAddress(ctx context.Context, iface, addr string) error {
 	return nil
 }
 
-func (c *Client) ensurePort(ctx context.Context, name, devargs string) error {
-	exists, err := c.portExists(ctx, name)
+func (c *Client) ensurePort(ctx context.Context, name, devargs string, mtu int) error {
+	info, err := c.getInterfaceInfo(ctx, name)
 	if err != nil {
 		return fmt.Errorf("checking if port %s exists: %w", name, err)
 	}
-	if exists {
-		slog.InfoContext(ctx, "grout port already exists", "name", name)
-		return nil
+	if info != nil {
+		return c.ensurePortMTU(ctx, name, info.MTU, mtu)
 	}
 
-	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs)
-	if err := c.run(ctx, "interface", "add", "port", name, "devargs", devargs, "down"); err != nil {
+	slog.InfoContext(ctx, "creating grout port", "name", name, "devargs", devargs, "mtu", mtu)
+	err = c.run(ctx, "interface", "add", "port", name, "devargs", devargs, "mtu", strconv.Itoa(mtu), "down")
+	if isGroutErrno(err, syscall.ERANGE) {
+		return fmt.Errorf("creating grout port %s: MTU %d exceeds the grout maximum MTU, raise it with GROUT_MAX_MTU: %w",
+			name, mtu, err)
+	}
+	if err != nil {
 		return fmt.Errorf("creating grout port %s: %w", name, err)
 	}
 	return nil
@@ -90,6 +96,24 @@ func (c *Client) setPortUp(ctx context.Context, name string) error {
 	slog.InfoContext(ctx, "setting grout port up", "name", name)
 	if err := c.run(ctx, "interface", "set", "port", name, "up"); err != nil {
 		return fmt.Errorf("setting grout port %s up: %w", name, err)
+	}
+	return nil
+}
+
+func (c *Client) ensurePortMTU(ctx context.Context, name string, currentMTU, mtu int) error {
+	if currentMTU == mtu {
+		slog.InfoContext(ctx, "grout port already exists", "name", name)
+		return nil
+	}
+
+	slog.InfoContext(ctx, "updating grout port MTU", "name", name, "oldMTU", currentMTU, "newMTU", mtu)
+	err := c.run(ctx, "interface", "set", "port", name, "mtu", strconv.Itoa(mtu))
+	if isGroutErrno(err, syscall.ERANGE) {
+		return fmt.Errorf("setting MTU on grout port %s: MTU %d exceeds the grout maximum MTU, raise it with GROUT_MAX_MTU: %w",
+			name, mtu, err)
+	}
+	if err != nil {
+		return fmt.Errorf("setting MTU %d on grout port %s: %w", mtu, name, err)
 	}
 	return nil
 }

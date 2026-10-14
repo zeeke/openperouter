@@ -176,8 +176,18 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 		return fmt.Errorf("failed to suppress link-local on underlay interface %s: %w", underlayInterface, err)
 	}
 
+	underlayLink, err := netlink.LinkByName(underlayInterface)
+	if err != nil {
+		return fmt.Errorf("failed to find underlay interface %s: %w", underlayInterface, err)
+	}
+
+	// The TAP PMD applies the port MTU to the remote interface too: creating
+	// the port with grout's default MTU would silently shrink the underlay
+	// MTU, and neighbors relying on it (e.g. IS-IS hello padding) would no
+	// longer reach us.
 	devargs := fmt.Sprintf("net_tap%s,remote=%s,iface=%s", makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
-	if err := client.ensurePort(ctx, UnderlayPortNamePrefix+underlayInterface, devargs); err != nil {
+	if err := client.ensurePort(ctx, UnderlayPortNamePrefix+underlayInterface, devargs,
+		underlayLink.Attrs().MTU); err != nil {
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
 

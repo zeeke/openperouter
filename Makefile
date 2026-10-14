@@ -699,10 +699,12 @@ grout-deploy-operator-with-olm: bundle kustomize kind clab-cluster load-on-kind 
 grout-set-csv-values:
 	sed -i 's|quay.io/openperouter/router:main$$|quay.io/openperouter/router:main-grout|g' $(CSV_FILE)
 	sed -i '/name: GROUT_TEST_MODE/{n;s|value: "false"|value: "true"|}' $(CSV_FILE)
+	sed -i '/name: GROUT_MAX_MTU/{n;s|value: "0"|value: "9500"|}' $(CSV_FILE)
 
 .PHONY: grout-deploy-helm
 grout-deploy-helm: IMG_TAG=main-grout
-grout-deploy-helm: HELM_ARGS=--set openperouter.datapath=grout --set openperouter.grout.testMode=true
+grout-deploy-helm: HELM_ARGS=--set openperouter.datapath=grout --set openperouter.grout.testMode=true \
+	--set openperouter.grout.maxMTU=9500
 grout-deploy-helm: helm kind deploy-cluster load-on-kind deploy-helm
 
 .PHONY: grout-docker-build

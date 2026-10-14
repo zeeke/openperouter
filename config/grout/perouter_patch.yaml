@@ -59,6 +59,8 @@ spec:
           value: "128"
         - name: GROUT_PORT_QUEUE_SIZE
           value: "128"
+        - name: GROUT_MAX_MTU
+          value: "9500"
         - name: GROUT_FIB4_ALGORITHM
           value: DUMMY
         - name: GROUT_FIB6_ALGORITHM

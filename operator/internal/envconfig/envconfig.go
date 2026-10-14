@@ -22,6 +22,7 @@ type EnvConfig struct {
 	KubeRBacImage         ImageInfo
 	GroutImage            *ImageInfo
 	GroutTestMode         bool
+	GroutMaxMTU           int
 	FRRMetricsPort        int
 	SecureFRRMetricsPort  int
 	MetricsPort           int
@@ -57,6 +58,10 @@ func FromEnvironment(isOpenshift bool) (EnvConfig, error) {
 
 	res.GroutImage = optionalImageFromEnv("GROUT_IMAGE")
 	res.GroutTestMode = boolFromEnv("GROUT_TEST_MODE")
+	res.GroutMaxMTU, err = intValueWithDefault("GROUT_MAX_MTU", 0)
+	if err != nil {
+		return EnvConfig{}, err
+	}
 
 	res.FRRMetricsPort, err = intValueWithDefault("FRR_METRICS_PORT", 7473)
 	if err != nil {
