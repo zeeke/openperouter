@@ -20,6 +20,14 @@ import (
 
 const (
 	UnderlayPortNamePrefix = "u_"
+	// TunnelEndpointPortName is the grout port carrying the tunnel endpoint
+	// addresses, playing the role of the loopback in the kernel datapath.
+	// The name can't be "lo", as grout creates a kernel interface named
+	// after each port.
+	TunnelEndpointPortName = "tunnel-ep"
+	// The tunnel endpoint port is a null device that never carries traffic,
+	// so its MTU does not matter.
+	tunnelEndpointPortMTU = 1500
 )
 
 // SetupUnderlay configures the underlay interfaces via the grout dataplane.
@@ -79,19 +87,38 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		}
 	}
 
-	if params.TunnelEndpoint != nil {
-		if err := setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint); err != nil {
-			return err
-		}
+	if params.TunnelEndpoint == nil {
+		return RemoveTunnelEndpoint(ctx, client)
 	}
+	return setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint)
+}
 
+// RemoveTunnelEndpoint removes the grout port carrying the tunnel endpoint
+// addresses, together with the addresses.
+func RemoveTunnelEndpoint(ctx context.Context, client *Client) error {
+	if err := client.deletePort(ctx, TunnelEndpointPortName); err != nil {
+		return fmt.Errorf("failed to remove the tunnel endpoint port: %w", err)
+	}
 	return nil
 }
 
+// setupTunnelEndpoint assigns the tunnel endpoint addresses to a dedicated
+// null port. Unlike the main VRF interface, which FRR sees as a VRF device,
+// the port is a regular interface IS-IS can advertise as passive, and
+// removing it takes the addresses away without touching the underlay ports.
 func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
-	if err := assignIPsToGroutPort(ctx, client, defaultVRFName,
+	devargs := fmt.Sprintf("net_null%s,no-rx=1", makeTapRandomString())
+	if err := client.ensurePort(ctx, TunnelEndpointPortName, devargs, tunnelEndpointPortMTU); err != nil {
+		return fmt.Errorf("failed to create the tunnel endpoint port: %w", err)
+	}
+
+	if err := assignIPsToGroutPort(ctx, client, TunnelEndpointPortName,
 		ep.IPv4CIDR, ep.IPv6CIDR); err != nil {
-		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout: %w", err)
+	}
+
+	if err := client.setPortUp(ctx, TunnelEndpointPortName); err != nil {
+		return fmt.Errorf("failed to set the tunnel endpoint port up: %w", err)
 	}
 
 	return nil
