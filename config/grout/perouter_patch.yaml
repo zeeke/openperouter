@@ -54,6 +54,8 @@ spec:
           value: "128"
         - name: GROUT_PORT_QUEUE_SIZE
           value: "128"
+        - name: GROUT_MAX_MTU
+          value: "9500"
         resources:
           requests:
             memory: "1Gi"

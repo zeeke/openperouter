@@ -68,19 +68,41 @@ func TestEnsurePort(t *testing.T) {
 				err:    fmt.Errorf("exit status 1"),
 			},
 			cmdCall{
-				cmd: "grcli --err-exit --json --socket sock interface add port p0 devargs net_tap0,remote=remote_i,iface=p0_tap down",
+				cmd: "grcli --err-exit --json --socket sock interface add port p0 devargs net_tap0,remote=remote_i,iface=p0_tap mtu 9500 down",
 			})()
 
 		assert.NoError(t,
 			NewClient("sock").ensurePort(
 				context.Background(),
 				"p0",
-				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap"},
+				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 9500},
 			),
 		)
 	})
 
-	t.Run("ensure port when port already exists", func(t *testing.T) {
+	t.Run("ensure port with an MTU above the grout maximum", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name p0",
+				output: interfaceNotFoundOutput,
+				err:    fmt.Errorf("exit status 1"),
+			},
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface add port p0 devargs net_tap0,remote=remote_i,iface=p0_tap mtu 9500 down",
+				output: `{"error":"command failed: Numerical result out of range (ERANGE)","errno":34}`,
+				err:    fmt.Errorf("exit status 1"),
+			})()
+
+		err := NewClient("sock").ensurePort(
+			context.Background(),
+			"p0",
+			portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 9500},
+		)
+		assert.ErrorContains(t, err, "GROUT_MAX_MTU")
+		assert.True(t, isGroutErrno(err, syscall.ERANGE))
+	})
+
+	t.Run("ensure port when port already exists with the same MTU", func(t *testing.T) {
 		defer mockCmdExec(
 			cmdCall{
 				cmd:    "grcli --err-exit --json --socket sock interface show name p0",
@@ -91,7 +113,26 @@ func TestEnsurePort(t *testing.T) {
 			NewClient("sock").ensurePort(
 				context.Background(),
 				"p0",
-				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap"},
+				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 1500},
+			),
+		)
+	})
+
+	t.Run("ensure port when port already exists with a different MTU", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name p0",
+				output: interfaceShowP0Output,
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface set port p0 mtu 9500",
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensurePort(
+				context.Background(),
+				"p0",
+				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 9500},
 			),
 		)
 	})
