@@ -275,18 +275,13 @@ spec:
         {{- end }}
       {{- if eq .Values.openperouter.datapath "grout" }}
       - name: grout
+        # Grout tunes its kernel control-plane interfaces through /proc/sys
+        # (e.g. accept_ra=0), which the runtime mounts read-only unless the
+        # container is privileged. Without it, router advertisements flooded
+        # over an L2VNI can install a default route that hijacks multihop BGP.
         securityContext:
-          allowPrivilegeEscalation: false
+          privileged: true
           readOnlyRootFilesystem: true
-          capabilities:
-            drop: ["ALL"]
-            add:
-            - SYS_ADMIN
-            - NET_ADMIN
-            - NET_RAW
-            - IPC_LOCK
-          seccompProfile:
-            type: Unconfined
         image: "{{ .Values.openperouter.grout.image.repository }}:{{ .Values.openperouter.grout.image.tag }}"
         {{- if .Values.openperouter.grout.image.pullPolicy }}
         imagePullPolicy: {{ .Values.openperouter.grout.image.pullPolicy }}
