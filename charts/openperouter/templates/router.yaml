@@ -275,7 +275,7 @@ spec:
         {{- end }}
       {{- if eq .Values.openperouter.datapath "grout" }}
       - name: grout
-        securityContext:
+          securityContext:
           privileged: true
         image: "{{ .Values.openperouter.grout.image.repository }}:{{ .Values.openperouter.grout.image.tag }}"
         {{- if .Values.openperouter.grout.image.pullPolicy }}
