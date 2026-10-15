@@ -37,6 +37,10 @@ func (f *failingDatapathConfigurator) InterfaceNameForFRR(name string) string {
 	return name
 }
 
+func (f *failingDatapathConfigurator) SRv6EncapSourceAddress() bool {
+	return false
+}
+
 func TestReconcileUpdatesNodeStatus(t *testing.T) {
 	t.Run("sets Ready status on successful reconcile", func(t *testing.T) {
 		r := newTestPERouterReconciler(t, &noopDatapathConfigurator{}, testNode())

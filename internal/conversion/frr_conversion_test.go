@@ -4148,7 +4148,7 @@ func TestAPItoFRRDatapath(t *testing.T) {
 		},
 		{
 			name:     "renamed interfaces in ISIS and neighbors",
-			datapath: testDatapath{underlayPrefix: "u_", loopback: "lo"},
+			datapath: testDatapath{underlayPrefix: "u_", loopback: "lo", encapSourceAddress: true},
 			wantISISInterfaces: []frr.ISISInterface{
 				{Name: "lo", IPv6: true, IsPassive: true},
 				{Name: "u_eth9", IPv6: true},
@@ -4179,6 +4179,10 @@ func TestAPItoFRRDatapath(t *testing.T) {
 
 			if diff := cmp.Diff(tt.wantISISInterfaces, got.Underlay.ISIS.Interfaces); diff != "" {
 				t.Errorf("ISIS interfaces diff: %s", diff)
+			}
+			if got.Underlay.SegmentRouting.EncapSourceAddress != tt.datapath.SRv6EncapSourceAddress() {
+				t.Errorf("EncapSourceAddress = %t, want %t",
+					got.Underlay.SegmentRouting.EncapSourceAddress, tt.datapath.SRv6EncapSourceAddress())
 			}
 
 			gotNeighborIfaces := []string{}
@@ -4340,8 +4344,9 @@ func TestNeighborID(t *testing.T) {
 // testDatapath exposes the interfaces to FRR prefixed by underlayPrefix,
 // and the kernel loopback as loopback.
 type testDatapath struct {
-	underlayPrefix string
-	loopback       string
+	underlayPrefix     string
+	loopback           string
+	encapSourceAddress bool
 }
 
 var kernelDatapath = testDatapath{loopback: "lo"}
@@ -4351,4 +4356,8 @@ func (d testDatapath) InterfaceNameForFRR(name string) string {
 		return d.loopback
 	}
 	return d.underlayPrefix + name
+}
+
+func (d testDatapath) SRv6EncapSourceAddress() bool {
+	return d.encapSourceAddress
 }

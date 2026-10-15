@@ -39,6 +39,10 @@ func (n *noopDatapathConfigurator) InterfaceNameForFRR(name string) string {
 	return name
 }
 
+func (n *noopDatapathConfigurator) SRv6EncapSourceAddress() bool {
+	return false
+}
+
 func TestReconcilePerResourceErrors(t *testing.T) {
 	tests := []struct {
 		name             string
@@ -632,6 +636,10 @@ func (r *recordingDatapathConfigurator) Validate(_ conversion.APIConfigData) err
 
 func (r *recordingDatapathConfigurator) InterfaceNameForFRR(name string) string {
 	return name
+}
+
+func (r *recordingDatapathConfigurator) SRv6EncapSourceAddress() bool {
+	return false
 }
 
 // TestReconcileAppliesFRRConfigBeforeDatapath pins the ordering between the FRR

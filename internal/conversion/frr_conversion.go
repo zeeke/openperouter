@@ -96,6 +96,9 @@ func L3VPNWithGatewayIPs(cidrs []string) L3VPNOption {
 type FRRDatapath interface {
 	// InterfaceNameForFRR returns the name FRR knows an interface by.
 	InterfaceNameForFRR(name string) string
+	// SRv6EncapSourceAddress tells whether the tunnel endpoint must be set as
+	// the source address of the SRv6 encapsulated packets.
+	SRv6EncapSourceAddress() bool
 }
 
 func APItoFRR(config APIConfigData, nodeIndex int, logLevel string, datapath FRRDatapath) (frr.Config, error) {
@@ -138,6 +141,9 @@ func APItoFRR(config APIConfigData, nodeIndex int, logLevel string, datapath FRR
 	underlayConfigSegmentRouting, err := underlaySegmentRoutingToFRR(underlay.Spec.SRV6, nodeIndex, tunnelEndpoint)
 	if err != nil {
 		return frr.Config{}, fmt.Errorf("failed to translate segment routing settings, err: %w", err)
+	}
+	if underlayConfigSegmentRouting != nil {
+		underlayConfigSegmentRouting.EncapSourceAddress = datapath.SRv6EncapSourceAddress()
 	}
 
 	neighbors, err := neighborsToFRR(
