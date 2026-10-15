@@ -48,6 +48,12 @@ func (g *GroutDatapathConfigurator) InterfaceNameForFRR(name string) string {
 	return grout.UnderlayPortNamePrefix + name
 }
 
+// SRv6EncapSourceAddress is true as grout needs an explicit source address
+// to encapsulate SRv6 packets.
+func (g *GroutDatapathConfigurator) SRv6EncapSourceAddress() bool {
+	return true
+}
+
 func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interfacesConfiguration) error {
 	groutClient := grout.NewClient(g.groutSocketPath)
 

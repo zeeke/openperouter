@@ -34,6 +34,12 @@ func (k *KernelDatapathConfigurator) InterfaceNameForFRR(name string) string {
 	return name
 }
 
+// SRv6EncapSourceAddress is false as the kernel datapath FRR image does not
+// support the encapsulation source address yet.
+func (k *KernelDatapathConfigurator) SRv6EncapSourceAddress() bool {
+	return false
+}
+
 func (k *KernelDatapathConfigurator) Configure(ctx context.Context, config interfacesConfiguration) error { // nolint:gocognit
 	currentUnderlayIfaces, err := hostnetwork.UnderlayInterfaces(config.targetNamespace)
 	if err != nil {
