@@ -20,6 +20,14 @@ import (
 
 const (
 	UnderlayPortNamePrefix = "u_"
+	// TunnelEndpointPortName is the grout port carrying the tunnel endpoint
+	// addresses, playing the role of the loopback in the kernel datapath.
+	// The name can't be "lo", as grout creates a kernel interface named
+	// after each port.
+	TunnelEndpointPortName = "tunnel-ep"
+	// The tunnel endpoint port is a null device that never carries traffic,
+	// so its MTU does not matter.
+	tunnelEndpointPortMTU = 1500
 )
 
 // SetupUnderlay configures the underlay interfaces via the grout dataplane.
@@ -79,19 +87,38 @@ func SetupUnderlay(ctx context.Context, client *Client, params hostnetwork.Under
 		}
 	}
 
-	if params.TunnelEndpoint != nil {
-		if err := setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint); err != nil {
-			return err
-		}
+	if params.TunnelEndpoint == nil {
+		return RemoveTunnelEndpoint(ctx, client)
 	}
+	return setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint)
+}
 
+// RemoveTunnelEndpoint removes the grout port carrying the tunnel endpoint
+// addresses, together with the addresses.
+func RemoveTunnelEndpoint(ctx context.Context, client *Client) error {
+	if err := client.deletePort(ctx, TunnelEndpointPortName); err != nil {
+		return fmt.Errorf("failed to remove the tunnel endpoint port: %w", err)
+	}
 	return nil
 }
 
+// setupTunnelEndpoint assigns the tunnel endpoint addresses to a dedicated
+// null port. Unlike the main VRF interface, which FRR sees as a VRF device,
+// the port is a regular interface IS-IS can advertise as passive, and
+// removing it takes the addresses away without touching the underlay ports.
 func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
-	if err := assignIPsToGroutPort(ctx, client, defaultVRFName,
+	devargs := fmt.Sprintf("net_null%s,no-rx=1", makeTapRandomString())
+	if err := client.ensurePort(ctx, TunnelEndpointPortName, devargs, tunnelEndpointPortMTU); err != nil {
+		return fmt.Errorf("failed to create the tunnel endpoint port: %w", err)
+	}
+
+	if err := assignIPsToGroutPort(ctx, client, TunnelEndpointPortName,
 		ep.IPv4CIDR, ep.IPv6CIDR); err != nil {
-		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout: %w", err)
+	}
+
+	if err := client.setPortUp(ctx, TunnelEndpointPortName); err != nil {
+		return fmt.Errorf("failed to set the tunnel endpoint port up: %w", err)
 	}
 
 	return nil
@@ -161,6 +188,14 @@ func RestoreUnderlay(
 }
 
 func configureUnderlayPort(ctx context.Context, client *Client, underlayInterface string) error {
+	// Grout owns the underlay addressing: addresses the kernel autoconfigured
+	// from router advertisements (e.g. the ones FRR sends for BGP extended
+	// nexthop) must not be migrated, as grout rejects a second address in a
+	// subnet the port already has.
+	if err := hostnetwork.SuppressAutoconf(underlayInterface); err != nil {
+		return fmt.Errorf("failed to suppress autoconf on underlay interface %s: %w", underlayInterface, err)
+	}
+
 	underlayAddrs, err := hostnetwork.AddressesForInterface(underlayInterface, hostnetwork.ExcludeLinkLocal())
 	if err != nil {
 		return fmt.Errorf("failed to read underlay interface addresses: %w", err)
@@ -176,8 +211,18 @@ func configureUnderlayPort(ctx context.Context, client *Client, underlayInterfac
 		return fmt.Errorf("failed to suppress link-local on underlay interface %s: %w", underlayInterface, err)
 	}
 
+	underlayLink, err := netlink.LinkByName(underlayInterface)
+	if err != nil {
+		return fmt.Errorf("failed to find underlay interface %s: %w", underlayInterface, err)
+	}
+
+	// The TAP PMD applies the port MTU to the remote interface too: creating
+	// the port with grout's default MTU would silently shrink the underlay
+	// MTU, and neighbors relying on it (e.g. IS-IS hello padding) would no
+	// longer reach us.
 	devargs := fmt.Sprintf("net_tap%s,remote=%s,iface=%s", makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
-	if err := client.ensurePort(ctx, UnderlayPortNamePrefix+underlayInterface, devargs); err != nil {
+	if err := client.ensurePort(ctx, UnderlayPortNamePrefix+underlayInterface, devargs,
+		underlayLink.Attrs().MTU); err != nil {
 		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
 

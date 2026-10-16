@@ -154,6 +154,17 @@ func DisableRPFilter(ifname string) Sysctl {
 	}
 }
 
+// DisableAcceptRA returns the sysctl definition for ignoring IPv6 router
+// advertisements on the given interface, so the kernel neither autoconfigures
+// addresses nor installs routes from them.
+func DisableAcceptRA(ifname string) Sysctl {
+	return Sysctl{
+		Path:        fmt.Sprintf("net/ipv6/conf/%s/accept_ra", ifname),
+		Description: fmt.Sprintf("ignore router advertisements on interface %s", ifname),
+		Value:       "0",
+	}
+}
+
 // Seg6MakeFlowLabel sets the sysctl for SRv6 flow label handling to use seg6_make_flowlabel().
 // When set to 1, the kernel will compute the flow label using seg6_make_flowlabel().
 // Reference: https://docs.kernel.org/networking/seg6-sysctl.html

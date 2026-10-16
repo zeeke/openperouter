@@ -1192,6 +1192,81 @@ func TestSegmentRouting(t *testing.T) {
 	testCheckConfigFile(t)
 }
 
+func TestSegmentRoutingGrout(t *testing.T) {
+	configFile := testSetup(t)
+	updater := testUpdater(configFile)
+
+	config := Config{
+		Underlay: UnderlayConfig{
+			MyASN:    64512,
+			RouterID: "10.0.0.1",
+			Neighbors: []NeighborConfig{
+				{
+					ASN:  mustNewPeerASNFromNumber(64513),
+					Addr: "fc00::2:172:31:1:12",
+					ID:   "fc00::2:172:31:1:12",
+					NetworkLayerProtocols: []networklayerprotocol.NLP{
+						{AFI: networklayerprotocol.IPv4, SAFI: networklayerprotocol.VPN},
+						{AFI: networklayerprotocol.IPv6, SAFI: networklayerprotocol.VPN},
+					},
+					ExtendedNexthop: true,
+					UpdateSource:    "fc00::2:172:31:1:32",
+				},
+			},
+			ISIS: &UnderlayISIS{
+				Net:   MustParseISISNet("49.0001.0002.0003.0004.00"),
+				Name:  isisProcessName,
+				Level: 1,
+				Interfaces: []ISISInterface{
+					{Name: "lo", IPv6: true, IsPassive: true},
+					{Name: "u_eth0", IPv4: false, IPv6: true},
+				},
+			},
+			SegmentRouting: &UnderlaySegmentRouting{
+				SourceAddress:      "fc00::2:172:31:1:32",
+				EncapSourceAddress: true,
+				Locator: SRV6Locator{
+					Name:     locatorName,
+					Prefix:   "fd00:0:32::/48",
+					BlockLen: 32,
+					NodeLen:  16,
+					Behavior: "usid",
+					Format:   "usid-f3216",
+				},
+				EncapBehavior: HEncaps,
+			},
+		},
+		VPNs: []L3VPNConfig{
+			{
+				ASN:             65000,
+				ToAdvertiseIPv4: []string{"192.168.2.2/32"},
+				ToAdvertiseIPv6: []string{},
+				LocalNeighbor: &NeighborConfig{
+					ASN:  mustNewPeerASNFromNumber(65001),
+					Addr: "192.168.2.2",
+					ID:   "192.168.2.2",
+				},
+				VRF:                "vrf1",
+				ExportRTs:          []string{"65000:100 65000:101"},
+				ImportRTs:          []string{"65001:102 65001:103"},
+				RouteDistinguisher: "10.0.0.1:100",
+				RouterID:           "10.0.0.1",
+			},
+		},
+	}
+	if err := ApplyConfig(context.TODO(), &config, updater); err != nil {
+		t.Fatalf("Failed to apply config: %s", err)
+	}
+
+	// The FRR image used to validate the configuration does not support the
+	// SRv6 encapsulation source address yet, only the grout one does.
+	configFile, goldenFile := testGenerateFileNames(t)
+	if *update {
+		testUpdateGoldenFile(t, configFile, goldenFile)
+	}
+	testCompareFiles(t, configFile, goldenFile)
+}
+
 func TestSegmentRoutingWithL2VNI(t *testing.T) {
 	configFile := testSetup(t)
 	updater := testUpdater(configFile)
