@@ -52,11 +52,26 @@ const interfaceShowP0Output = `{
 const interfaceNotFoundOutput = `{"error":"interface lookup failed","errno":19}`
 
 func TestSetPortUp(t *testing.T) {
-	defer mockCmdExec(cmdCall{
-		cmd: "grcli --err-exit --json --socket sock interface set port pe-100 up",
-	})()
+	t.Run("brings a down port up", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name pe-100",
+				output: `{"name":"pe-100","type":"port","flags":[]}`,
+			},
+			cmdCall{cmd: "grcli --err-exit --json --socket sock interface set port pe-100 up"},
+		)()
 
-	assert.NoError(t, NewClient("sock").setPortUp(context.Background(), "pe-100"))
+		assert.NoError(t, NewClient("sock").setPortUp(context.Background(), "pe-100"))
+	})
+
+	t.Run("leaves an up port alone", func(t *testing.T) {
+		defer mockCmdExec(cmdCall{
+			cmd:    "grcli --err-exit --json --socket sock interface show name pe-100",
+			output: `{"name":"pe-100","type":"port","flags":["up","running"]}`,
+		})()
+
+		assert.NoError(t, NewClient("sock").setPortUp(context.Background(), "pe-100"))
+	})
 }
 
 func TestEnsurePort(t *testing.T) {
@@ -68,19 +83,41 @@ func TestEnsurePort(t *testing.T) {
 				err:    fmt.Errorf("exit status 1"),
 			},
 			cmdCall{
-				cmd: "grcli --err-exit --json --socket sock interface add port p0 devargs net_tap0,remote=remote_i,iface=p0_tap down",
+				cmd: "grcli --err-exit --json --socket sock interface add port p0 devargs net_tap0,remote=remote_i,iface=p0_tap mtu 9500 down",
 			})()
 
 		assert.NoError(t,
 			NewClient("sock").ensurePort(
 				context.Background(),
 				"p0",
-				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap"},
+				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 9500},
 			),
 		)
 	})
 
-	t.Run("ensure port when port already exists", func(t *testing.T) {
+	t.Run("ensure port with an MTU above the grout maximum", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name p0",
+				output: interfaceNotFoundOutput,
+				err:    fmt.Errorf("exit status 1"),
+			},
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface add port p0 devargs net_tap0,remote=remote_i,iface=p0_tap mtu 9500 down",
+				output: `{"error":"command failed: Numerical result out of range (ERANGE)","errno":34}`,
+				err:    fmt.Errorf("exit status 1"),
+			})()
+
+		err := NewClient("sock").ensurePort(
+			context.Background(),
+			"p0",
+			portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 9500},
+		)
+		assert.ErrorContains(t, err, "GROUT_MAX_MTU")
+		assert.True(t, isGroutErrno(err, syscall.ERANGE))
+	})
+
+	t.Run("ensure port when port already exists with the same MTU", func(t *testing.T) {
 		defer mockCmdExec(
 			cmdCall{
 				cmd:    "grcli --err-exit --json --socket sock interface show name p0",
@@ -91,7 +128,26 @@ func TestEnsurePort(t *testing.T) {
 			NewClient("sock").ensurePort(
 				context.Background(),
 				"p0",
-				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap"},
+				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 1500},
+			),
+		)
+	})
+
+	t.Run("ensure port when port already exists with a different MTU", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name p0",
+				output: interfaceShowP0Output,
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface set port p0 mtu 9500",
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensurePort(
+				context.Background(),
+				"p0",
+				portOptions{Devargs: "net_tap0,remote=remote_i,iface=p0_tap", MTU: 9500},
 			),
 		)
 	})
@@ -114,7 +170,7 @@ func TestEnsurePortWithVRF(t *testing.T) {
 }
 
 func TestEnsureBridge(t *testing.T) {
-	t.Run("creates bridge in VRF with neighbor suppression and snooping", func(t *testing.T) {
+	t.Run("creates bridge in VRF with neighbor snooping", func(t *testing.T) {
 		defer mockCmdExec(
 			cmdCall{
 				cmd:    "grcli --err-exit --json --socket sock interface show name br-pe-100",
@@ -122,7 +178,7 @@ func TestEnsureBridge(t *testing.T) {
 				err:    fmt.Errorf("exit status 1"),
 			},
 			cmdCall{
-				cmd: "grcli --err-exit --json --socket sock interface add bridge br-pe-100 vrf red neigh_suppress on neigh_snoop on",
+				cmd: "grcli --err-exit --json --socket sock interface add bridge br-pe-100 vrf red neigh_snoop on",
 			},
 		)()
 
@@ -137,7 +193,7 @@ func TestEnsureBridge(t *testing.T) {
 				err:    fmt.Errorf("exit status 1"),
 			},
 			cmdCall{
-				cmd: "grcli --err-exit --json --socket sock interface add bridge br-pe-100 neigh_suppress on neigh_snoop on",
+				cmd: "grcli --err-exit --json --socket sock interface add bridge br-pe-100 neigh_snoop on",
 			},
 		)()
 
@@ -174,7 +230,7 @@ func TestEnsureBridge(t *testing.T) {
 			case "grcli --err-exit --json --socket sock interface show name br-pe-100":
 				return []byte(`{"name":"br-pe-100","type":"bridge","vrf":"red"}`), nil
 			case "grcli --err-exit --json --socket sock interface del br-pe-100",
-				"grcli --err-exit --json --socket sock interface add bridge br-pe-100 vrf blue neigh_suppress on neigh_snoop on":
+				"grcli --err-exit --json --socket sock interface add bridge br-pe-100 vrf blue neigh_snoop on":
 				return nil, nil
 			default:
 				return nil, fmt.Errorf("unexpected command: %s", cmd)
@@ -186,7 +242,7 @@ func TestEnsureBridge(t *testing.T) {
 			"grcli --err-exit --json --socket sock interface show name br-pe-100",
 			"grcli --err-exit --json --socket sock interface show name br-pe-100",
 			"grcli --err-exit --json --socket sock interface del br-pe-100",
-			"grcli --err-exit --json --socket sock interface add bridge br-pe-100 vrf blue neigh_suppress on neigh_snoop on",
+			"grcli --err-exit --json --socket sock interface add bridge br-pe-100 vrf blue neigh_snoop on",
 		}, got)
 	})
 }
@@ -659,4 +715,44 @@ func TestDevargsMatch(t *testing.T) {
 			assert.Equal(t, tc.want, devargsMatch(tc.requested, tc.existing))
 		})
 	}
+}
+
+func TestEnsureVLANSubInterface(t *testing.T) {
+	t.Run("creates VLAN sub-interface when none exists", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name t_bq2vcy.10",
+				output: interfaceNotFoundOutput,
+				err:    fmt.Errorf("exit status 1"),
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface add vlan t_bq2vcy.10 parent t_bq2vcy vlan_id 10",
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensureVLANSubInterface(
+				context.Background(),
+				"t_bq2vcy.10",
+				"t_bq2vcy",
+				10,
+			),
+		)
+	})
+
+	t.Run("no-op when VLAN sub-interface already exists", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name t_bq2vcy.10",
+				output: `{"name": "t_bq2vcy.10", "type": "vlan"}`,
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensureVLANSubInterface(
+				context.Background(),
+				"t_bq2vcy.10",
+				"t_bq2vcy",
+				10,
+			),
+		)
+	})
 }

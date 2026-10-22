@@ -5,8 +5,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"strings"
-	"sync"
 	"time"
 
 	nad "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
@@ -20,6 +18,7 @@ import (
 	"github.com/openperouter/openperouter/e2etests/pkg/infra"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8s"
 	"github.com/openperouter/openperouter/e2etests/pkg/k8sclient"
+	"github.com/openperouter/openperouter/e2etests/pkg/neighbor"
 	"github.com/openperouter/openperouter/e2etests/pkg/openperouter"
 	"github.com/openperouter/openperouter/e2etests/pkg/sysctl"
 	"github.com/openperouter/openperouter/internal/ipfamily"
@@ -28,7 +27,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
-var _ = Describe("BridgeRefresher E2E - Type 2 Route Persistence", Ordered, func() {
+var _ = Describe("BridgeRefresher E2E - Type 2 Route Persistence", Ordered, GroutSupport, func() {
 	var cs clientset.Interface
 	var routers openperouter.Routers
 
@@ -197,7 +196,8 @@ var _ = Describe("BridgeRefresher E2E - Type 2 Route Persistence", Ordered, func
 			// without BridgeRefresher, the neighbor entry would go
 			// STALE -> DELETE after gc_stale_time, causing the Type 2 route
 			// to be withdrawn. With BridgeRefresher, ICMP pings keep the neighbor
-			// alive and the route persists.
+			// alive and the route persists. On grout there is no BridgeRefresher:
+			// grout probes the neighbor itself whenever its lifetime expires.
 			Consistently(func() error {
 				return checkType2RouteExists(cs, podIPOnly, vtepIPOnly, l2VNI)
 			}, 90*time.Second, 10*time.Second).
@@ -215,7 +215,7 @@ var _ = Describe("BridgeRefresher E2E - Type 2 Route Persistence", Ordered, func
 	// In order to have a solid reproducer we need to ping the local gateway so the neighbor table is filled, and
 	// then trigger the migration to the other node.
 	Context("Pod migrates to a different node", func() {
-		var cancelIPNeighMonitorNodeSource, cancelIPNeighMonitorNodeDestination func() (string, error)
+		var stopNeighborMonitorNodeSource, stopNeighborMonitorNodeDestination func() (string, error)
 
 		type migrationTestCase struct {
 			l2GatewayIP     string
@@ -296,19 +296,23 @@ var _ = Describe("BridgeRefresher E2E - Type 2 Route Persistence", Ordered, func
 				nodeSource := nodes[0]
 				nodeDestination := nodes[1]
 
-				By("Collecting ip neigh monitor during the test")
-				exec := executor.ForContainer(nodeSource.Name)
-				cancelIPNeighMonitorNodeSource = ipNeighMonitor(exec, openperouter.NamedNetns)
-				exec = executor.ForContainer(nodeDestination.Name)
-				cancelIPNeighMonitorNodeDestination = ipNeighMonitor(exec, openperouter.NamedNetns)
+				By("Collecting neighbor events during the test")
+				currentRouters, err := openperouter.Get(cs, HostMode)
+				Expect(err).NotTo(HaveOccurred())
+				routerSource, err := openperouter.ExecutorForNode(currentRouters, nodeSource.Name)
+				Expect(err).NotTo(HaveOccurred())
+				routerDestination, err := openperouter.ExecutorForNode(currentRouters, nodeDestination.Name)
+				Expect(err).NotTo(HaveOccurred())
+				stopNeighborMonitorNodeSource = neighbor.Monitor(routerSource, GroutMode)
+				stopNeighborMonitorNodeDestination = neighbor.Monitor(routerDestination, GroutMode)
 				DeferCleanup(func() {
-					By("Printing ip neigh monitor output after the test for migration source node")
-					output, err := cancelIPNeighMonitorNodeSource()
-					fmt.Fprintf(GinkgoWriter, "ip neigh monitor output: %s; err: %q\n", output, err)
+					By("Printing neighbor events after the test for migration source node")
+					output, err := stopNeighborMonitorNodeSource()
+					fmt.Fprintf(GinkgoWriter, "neighbor events: %s; err: %q\n", output, err)
 
-					By("Printing ip neigh monitor output after the test for migration destination node")
-					output, err = cancelIPNeighMonitorNodeDestination()
-					fmt.Fprintf(GinkgoWriter, "ip neigh monitor output: %s; err: %q\n", output, err)
+					By("Printing neighbor events after the test for migration destination node")
+					output, err = stopNeighborMonitorNodeDestination()
+					fmt.Fprintf(GinkgoWriter, "neighbor events: %s; err: %q\n", output, err)
 				})
 
 				By(fmt.Sprintf("Creating stationary pod on migration destination node (%s)", nodeDestination.Name))
@@ -376,12 +380,17 @@ var _ = Describe("BridgeRefresher E2E - Type 2 Route Persistence", Ordered, func
 				// occur while the pod was already deleted.
 				// Note: We are guaranteed to go STALE eventually: we're not sending any more traffic, the bridge
 				// refresher runs every 30 seconds, and we probe every 2 for 3 minutes.
-				By(fmt.Sprintf("Waiting for neighbor entry (%s) on bridge br-pe-%d to go STALE on the "+
-					"router on the same node (%s)",
-					migratingPodIPOnly, l2VNI, migratingPod.Spec.NodeName))
-				Eventually(func() error {
-					return checkNeighborStale(cs, migratingPodIPOnly, l2VNI, migratingPod.Spec.NodeName)
-				}).WithPolling(2 * time.Second).WithTimeout(3 * time.Minute).Should(Succeed())
+				// Grout probes its neighbors as soon as they go stale, so they stay stale for about a second
+				// before going back to reachable or failing: the deadlock is specific to the kernel datapath, and
+				// on grout we only verify that connectivity survives the migration.
+				if !GroutMode {
+					By(fmt.Sprintf("Waiting for neighbor entry (%s) on bridge br-pe-%d to go STALE on the "+
+						"router on the same node (%s)",
+						migratingPodIPOnly, l2VNI, migratingPod.Spec.NodeName))
+					Eventually(func() error {
+						return checkNeighborStale(cs, migratingPodIPOnly, l2VNI, migratingPod.Spec.NodeName)
+					}).WithPolling(2 * time.Second).WithTimeout(3 * time.Minute).Should(Succeed())
+				}
 
 				By("Deleting migrating pod (simulating pod eviction/migration)")
 				err = cs.CoreV1().Pods(testNamespace).Delete(
@@ -464,36 +473,12 @@ func checkNeighborStale(cs clientset.Interface, podIP string, vni int, nodeName 
 	if err != nil {
 		return err
 	}
-	out, err := exec.Exec("ip", "neigh", "show", podIP, "dev", bridgeDev)
+	stale, err := neighbor.IsKernelStale(exec, bridgeDev, podIP)
 	if err != nil {
 		return fmt.Errorf("failed to check neighbor on router %s: %w", exec.Name(), err)
 	}
-	out = strings.TrimSpace(out)
-	if out == "" {
-		return fmt.Errorf("no neighbor entry for %s on %s in router %s", podIP, bridgeDev, exec.Name())
+	if !stale {
+		return fmt.Errorf("neighbor %s on %s in router %s is not STALE yet", podIP, bridgeDev, exec.Name())
 	}
-	if strings.Contains(out, "STALE") {
-		return nil
-	}
-	return fmt.Errorf("neighbor %s on %s in router %s is not STALE yet: %s", podIP, bridgeDev, exec.Name(), out)
-}
-
-func ipNeighMonitor(exec executor.ExecutorWithContext, namespace string) func() (string, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	var mu sync.Mutex
-	var output string
-	var err error
-	go func() {
-		mu.Lock()
-		defer mu.Unlock()
-		output, err = exec.CommandContext(ctx, "ip", "netns", "exec", namespace, "ip", "-ts", "monitor", "neigh")
-	}()
-
-	return func() (string, error) {
-		cancel()
-		mu.Lock()
-		defer mu.Unlock()
-		return output, err
-	}
+	return nil
 }

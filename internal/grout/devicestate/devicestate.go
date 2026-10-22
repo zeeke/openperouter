@@ -38,6 +38,11 @@ type State struct {
 	Addresses      []string `json:"addresses"`
 	AddrGenMode    string   `json:"addrGenMode,omitempty"`
 	AcceptRA       string   `json:"acceptRA,omitempty"`
+	// AltNames are the netlink alternative names the device carried before
+	// it was handed to grout. Binding to vfio-pci destroys the netdev and
+	// with it its property list, so they are saved here to be put back on
+	// teardown.
+	AltNames []string `json:"altNames,omitempty"`
 }
 
 func (s Store) Save(state State) error {
