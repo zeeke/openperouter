@@ -1,0 +1,22 @@
+2026/10/26 18:43:34.690 ZEBRA: [ME3M2-X6YT9]   IFA_ADDRESS   2001:db8:2::1/64
+2026/10/26 18:43:34.692 BGP: [G49HN-S8M77] Rx Intf address del VRF blue IF pe-e-200 addr 192.169.11.1/24
+2026/10/26 18:43:34.692 ZEBRA: [VZ3H4-Y2B48] RTM_DELLINK for pe-e-200(155), enqueuing to zebra
+2026/10/26 18:43:34.693 BGP: [G49HN-S8M77] Rx Intf address del VRF blue IF pe-e-200 addr fe80::fcb1:8fff:fe33:326c/64
+2026/10/26 18:43:34.696 BGP: [G49HN-S8M77] Rx Intf address del VRF blue IF pe-e-200 addr 2001:db8:2::1/64
+2026/10/26 18:43:39.536 ZEBRA: [HM9SA-V2WJB] RTM_NEWLINK ADD for pe-e-200(161) vrf_id 0 type 6 sl_type 0 master 0 flags 0x1002
+2026/10/26 18:43:39.544 ZEBRA: [ME3M2-X6YT9]   IFA_ADDRESS   2001:db8:2::1/64
+2026/10/26 18:43:39.549 ZEBRA: [N73AC-ABZV2] RTM_NEWLINK vrf-change for pe-e-200(161) vrf_id 0 -> 199
+2026/10/26 18:43:39.550 ZEBRA: [NBGDS-5ZDQ9] MESSAGE: ZEBRA_INTERFACE_ADDRESS_ADD 192.169.11.1/24 on pe-e-200 vrf blue(199)
+2026/10/26 18:43:39.550 ZEBRA: [VKHDA-B1ZYY] zebra_if_addr_update_ctx: INTF_ADDR_ADD: Tentative addr 2001:db8:2::1/64 on UP interface pe-e-200, skipping
+2026/10/26 18:43:39.554 BGP: [HFMHR-E3VMR] Rx Intf address add VRF blue IF pe-e-200 addr 192.169.11.1/24
+2026/10/26 18:43:40.555 BGP: [ZZPVC-3AHMF] 192.169.11.4 fd 38 went from Idle to Active for Incoming
+2026/10/26 18:43:40.555 BGP: [P90Z5-FP0GJ][EC 33554461] 192.169.11.4: nexthop_set failed, local: 192.169.11.1:179 remote: 192.169.11.4:56808 update_if: (None) resetting connection - intf pe-e-200
+2026/10/26 18:43:40.651 BGP: [HFMHR-E3VMR] Rx Intf address add VRF blue IF pe-e-200 addr fe80::74fd:eeff:fef9:12d2/64
+2026/10/26 18:43:40.651 ZEBRA: [NBGDS-5ZDQ9] MESSAGE: ZEBRA_INTERFACE_ADDRESS_ADD fe80::74fd:eeff:fef9:12d2/64 on pe-e-200 vrf blue(199)
+2026/10/26 18:43:41.556 BGP: [ZZPVC-3AHMF] 192.169.11.4 fd 38 went from Idle to Active for Incoming
+2026/10/26 18:43:41.557 BGP: [ZZPVC-3AHMF] 192.169.11.4 fd 38 went from OpenConfirm to Established for Established
+2026/10/26 18:43:41.610 ZEBRA: [ME3M2-X6YT9]   IFA_ADDRESS   2001:db8:2::1/64
+2026/10/26 18:43:41.610 ZEBRA: [NBGDS-5ZDQ9] MESSAGE: ZEBRA_INTERFACE_ADDRESS_ADD 2001:db8:2::1/64 on pe-e-200 vrf blue(199)
+2026/10/26 18:43:41.611 BGP: [HFMHR-E3VMR] Rx Intf address add VRF blue IF pe-e-200 addr 2001:db8:2::1/64
+2026/10/26 18:43:41.622 BGP: [ZZPVC-3AHMF] 2001:db8:2::4 fd 40 went from Idle to Active for Incoming
+2026/10/26 18:43:41.624 BGP: [ZZPVC-3AHMF] 2001:db8:2::4 fd 40 went from OpenConfirm to Established for Established

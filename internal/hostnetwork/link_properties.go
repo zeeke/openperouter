@@ -15,12 +15,19 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// assingIPToInterface assignes the given address to the link.
+// AssignIPToInterface assigns the given address to the link.
 func AssignIPToInterface(link netlink.Link, address string) error {
+	return assignIPToInterfaceWithFlags(link, address, 0)
+}
+
+// assignIPToInterfaceWithFlags assigns the given address to the link, using the given IFA_F_* flags
+// when the address is not already present.
+func assignIPToInterfaceWithFlags(link netlink.Link, address string, flags int) error {
 	addr, err := netlink.ParseAddr(address)
 	if err != nil {
 		return fmt.Errorf("AssignIPToInterface: failed to parse address %s for interface %s: %w", address, link.Attrs().Name, err)
 	}
+	addr.Flags = flags
 
 	hasIP, err := interfaceHasIP(link, address)
 	if err != nil {

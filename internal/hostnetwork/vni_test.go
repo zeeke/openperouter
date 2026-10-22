@@ -16,6 +16,7 @@ import (
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
+	"golang.org/x/sys/unix"
 	"k8s.io/utils/ptr"
 )
 
@@ -632,6 +633,7 @@ func validateL3HostLeg(g Gomega, params L3VNIParams) {
 		hasIP, err := interfaceHasIP(hostLegLink, params.LinkIPs.HostIPv6)
 		g.Expect(err).NotTo(HaveOccurred())
 		g.Expect(hasIP).To(BeTrue(), "host leg does not have IPv6", params.LinkIPs.HostIPv6)
+		validateIPv6SkipsDAD(g, hostLegLink, params.LinkIPs.HostIPv6)
 	}
 }
 
@@ -703,6 +705,7 @@ func validateL3VNI(g Gomega, params L3VNIParams) {
 		hasIP, err := interfaceHasIP(peLegLink, params.LinkIPs.NSIPv6)
 		g.Expect(err).NotTo(HaveOccurred())
 		g.Expect(hasIP).To(BeTrue(), "PE leg does not have IPv6", params.LinkIPs.NSIPv6)
+		validateIPv6SkipsDAD(g, peLegLink, params.LinkIPs.NSIPv6)
 	}
 }
 
@@ -956,4 +959,25 @@ func createVRFInNamespace(ns netns.NsHandle, name string) {
 		return setupVRF(name)
 	})
 	Expect(err).NotTo(HaveOccurred(), "failed to create VRF %s", name)
+}
+
+// validateIPv6SkipsDAD checks that the address was added with duplicate address detection disabled,
+// so it is never tentative.
+func validateIPv6SkipsDAD(g Gomega, link netlink.Link, address string) {
+	desired, err := netlink.ParseAddr(address)
+	g.Expect(err).NotTo(HaveOccurred())
+	addresses, err := netlink.AddrList(link, netlink.FAMILY_V6)
+	g.Expect(err).NotTo(HaveOccurred())
+	for _, a := range addresses {
+		if !a.IP.Equal(desired.IP) {
+			continue
+		}
+		g.Expect(a.Flags&unix.IFA_F_NODAD).NotTo(BeZero(), "address %s on %s was added without IFA_F_NODAD",
+			address, link.Attrs().Name)
+		g.Expect(a.Flags&unix.IFA_F_TENTATIVE).To(BeZero(), "address %s on %s is tentative",
+			address, link.Attrs().Name)
+		return
+	}
+	g.Expect(addresses).To(ContainElement(HaveField("IP", desired.IP)), "address %s not found on %s",
+		address, link.Attrs().Name)
 }

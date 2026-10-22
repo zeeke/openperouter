@@ -12,6 +12,7 @@ import (
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -126,8 +127,12 @@ func AssignIPsToInterface(link netlink.Link, ipv4, ipv6 string) error {
 		}
 	}
 
+	// These links are point to point between the host and the router, with both ends owned by us, so
+	// duplicate address detection cannot find a conflict. Skipping it makes the address usable immediately:
+	// while it is tentative FRR ignores it, and a BGP session established over IPv4 in that window keeps
+	// advertising the link-local address as the IPv6 global next hop for as long as the session stays up.
 	if ipv6 != "" {
-		if err := AssignIPToInterface(link, ipv6); err != nil {
+		if err := assignIPToInterfaceWithFlags(link, ipv6, unix.IFA_F_NODAD); err != nil {
 			return fmt.Errorf("failed to assign IPv6 address %s: %w", ipv6, err)
 		}
 	}

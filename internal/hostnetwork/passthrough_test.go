@@ -165,6 +165,7 @@ func vethHasIPs(g Gomega, linkName, ipv4, ipv6 string) {
 		hasIP, err := interfaceHasIP(link, ipv6)
 		g.Expect(err).NotTo(HaveOccurred())
 		g.Expect(hasIP).To(BeTrue(), "passthrough does not have IPv6", ipv6)
+		validateIPv6SkipsDAD(g, link, ipv6)
 	}
 }
 

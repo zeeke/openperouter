@@ -1,0 +1,72 @@
+######## BGP route table ipv6
+
+
+Instance default:
+BGP table version is 22, local router ID is 192.169.10.4, vrf id 0
+Default local pref 100, local AS 64515
+Status codes:  s suppressed, d damped, h history, * valid, > best, = multipath,
+               i internal, r RIB-failure, S Stale, R Removed
+Nexthop codes: @NNN nexthop's vrf id, < announce-nh-self
+Origin codes:  i - IGP, e - EGP, ? - incomplete
+RPKI validation codes: V valid, I invalid, N Not found
+
+    Network          Next Hop            Metric LocPrf Weight Path
+ *> 2001:db8:1::2/128
+                    fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64514 i
+ *                   fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64514 i
+ *> 2001:db8:1::3/128
+                    fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64514 i
+ *                   fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64514 i
+ *> 2001:db8:1::4/128
+                    fe80::b456:acff:fe4e:3ac9
+                                             0             0 64514 i
+ *                   fe80::b456:acff:fe4e:3ac9
+                                             0             0 64514 i
+ *> 2001:db8:2::2/128
+                    fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64514 i
+ *                   fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64514 i
+ *> 2001:db8:2::3/128
+                    fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64514 i
+ *                   fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64514 i
+ *> 2001:db8:2::4/128
+                    fe80::74fd:eeff:fef9:12d2
+                                             0             0 64514 i
+ *                   fe80::74fd:eeff:fef9:12d2
+                                             0             0 64514 i
+ *  2001:db8:20::/64 fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64612 64520 i
+ *>                  fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64612 64520 i
+ *  2001:db8:21::/64 fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64612 64520 i
+ *>                  fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64612 64520 i
+ *> 2001:db8:169:20::/64
+                    fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64612 64520 i
+ *                   fe80::b456:acff:fe4e:3ac9
+                                                           0 64514 64512 64612 64520 i
+ *  2001:db8:169:21::/64
+                    fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64612 64520 i
+ *>                  fe80::74fd:eeff:fef9:12d2
+                                                           0 64514 64512 64612 64520 i
+
+Displayed  10 routes and 20 total paths
+
+
+######## RIB ipv6 (blue-related entries)
+C>* 2001:db8:2::/64 is directly connected, host-e-200, 00:04:21
+B>* 2001:db8:2::2/128 [20/0] via fe80::74fd:eeff:fef9:12d2, host-e-200, weight 1, 00:04:19
+B>* 2001:db8:2::3/128 [20/0] via fe80::74fd:eeff:fef9:12d2, host-e-200, weight 1, 00:04:19
+B>* 2001:db8:2::4/128 [20/0] via fe80::74fd:eeff:fef9:12d2, host-e-200, weight 1, 00:04:19
+B>* 2001:db8:21::/64 [20/0] via fe80::74fd:eeff:fef9:12d2, host-e-200, weight 1, 00:04:15
+B>* 2001:db8:169:21::/64 [20/0] via fe80::74fd:eeff:fef9:12d2, host-e-200, weight 1, 00:04:14

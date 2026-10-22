@@ -1,0 +1,8 @@
+161: pe-e-200@if162: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9450 qdisc noqueue master blue state UP group default 
+    link/ether 76:fd:ee:f9:12:d2 brd ff:ff:ff:ff:ff:ff link-netnsid 1
+    inet 192.169.11.1/24 brd 192.169.11.255 scope global pe-e-200
+       valid_lft forever preferred_lft forever
+    inet6 2001:db8:2::1/64 scope global 
+       valid_lft forever preferred_lft forever
+    inet6 fe80::74fd:eeff:fef9:12d2/64 scope link proto kernel_ll 
+       valid_lft forever preferred_lft forever

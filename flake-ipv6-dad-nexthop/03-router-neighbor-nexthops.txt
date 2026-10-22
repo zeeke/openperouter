@@ -1,0 +1,28 @@
+BGP neighbor is 192.169.10.4, remote AS 64515, local AS 64514, external link
+  BGP state = Established, up for 00:04:47
+Local host: 192.169.10.1, Local port: 179
+Foreign host: 192.169.10.4, Foreign port: 53140
+Nexthop: 192.169.10.1
+Nexthop global: 2001:db8:1::1
+Nexthop local: fe80::b456:acff:fe4e:3ac9
+BGP neighbor is 2001:db8:1::4, remote AS 64515, local AS 64514, external link
+  BGP state = Established, up for 00:04:46
+Local host: 2001:db8:1::1, Local port: 179
+Foreign host: 2001:db8:1::4, Foreign port: 53926
+Nexthop: 192.169.10.1
+Nexthop global: 2001:db8:1::1
+Nexthop local: fe80::b456:acff:fe4e:3ac9
+BGP neighbor is 192.169.11.4, remote AS 64515, local AS 64514, external link
+  BGP state = Established, up for 00:04:45
+Local host: 192.169.11.1, Local port: 179
+Foreign host: 192.169.11.4, Foreign port: 56824
+Nexthop: 192.169.11.1
+Nexthop global: fe80::74fd:eeff:fef9:12d2
+Nexthop local: fe80::74fd:eeff:fef9:12d2
+BGP neighbor is 2001:db8:2::4, remote AS 64515, local AS 64514, external link
+  BGP state = Established, up for 00:04:45
+Local host: 2001:db8:2::1, Local port: 179
+Foreign host: 2001:db8:2::4, Foreign port: 51184
+Nexthop: 192.169.11.1
+Nexthop global: 2001:db8:2::1
+Nexthop local: fe80::74fd:eeff:fef9:12d2

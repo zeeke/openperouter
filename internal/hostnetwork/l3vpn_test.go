@@ -495,6 +495,7 @@ func validateL3VPNHostLeg(g Gomega, params L3VPNParams) {
 		hasIP, err := interfaceHasIP(hostLegLink, params.LinkIPs.HostIPv6)
 		g.Expect(err).NotTo(HaveOccurred())
 		g.Expect(hasIP).To(BeTrue(), "host leg does not have IPv6", params.LinkIPs.HostIPv6)
+		validateIPv6SkipsDAD(g, hostLegLink, params.LinkIPs.HostIPv6)
 	}
 }
 
@@ -523,5 +524,6 @@ func validateL3VPNNamespaceLeg(g Gomega, params L3VPNParams) {
 		hasIP, err := interfaceHasIP(peLegLink, params.LinkIPs.NSIPv6)
 		g.Expect(err).NotTo(HaveOccurred())
 		g.Expect(hasIP).To(BeTrue(), "PE leg does not have IPv6", params.LinkIPs.NSIPv6)
+		validateIPv6SkipsDAD(g, peLegLink, params.LinkIPs.NSIPv6)
 	}
 }

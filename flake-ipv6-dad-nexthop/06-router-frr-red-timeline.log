@@ -1,0 +1,10 @@
+2026/10/26 18:43:35.798 ZEBRA: [XN0NB-2NSYE] MESSAGE: ZEBRA_INTERFACE_ADDRESS_DELETE 2001:db8:1::1/64 on pe-e-100 vrf red(193)
+2026/10/26 18:43:35.799 BGP: [G49HN-S8M77] Rx Intf address del VRF red IF pe-e-100 addr 2001:db8:1::1/64
+2026/10/26 18:43:35.801 ZEBRA: [MZPZA-W042K] zebra_if_addr_update_ctx: INTF_ADDR_DEL: ifindex pe-e-100(157), addr 2001:db8:1::1/64
+2026/10/26 18:43:35.801 ZEBRA: [XN0NB-2NSYE] MESSAGE: ZEBRA_INTERFACE_ADDRESS_DELETE 2001:db8:1::1/64 on pe-e-100 vrf red(193)
+2026/10/26 18:43:37.343 ZEBRA: [MZPZA-W042K] zebra_if_addr_update_ctx: INTF_ADDR_ADD: ifindex pe-e-100(159), addr 2001:db8:1::1/64
+2026/10/26 18:43:37.343 ZEBRA: [VKHDA-B1ZYY] zebra_if_addr_update_ctx: INTF_ADDR_ADD: Tentative addr 2001:db8:1::1/64 on UP interface pe-e-100, skipping
+2026/10/26 18:43:38.986 ZEBRA: [MZPZA-W042K] zebra_if_addr_update_ctx: INTF_ADDR_ADD: ifindex pe-e-100(159), addr 2001:db8:1::1/64
+2026/10/26 18:43:38.986 ZEBRA: [NBGDS-5ZDQ9] MESSAGE: ZEBRA_INTERFACE_ADDRESS_ADD 2001:db8:1::1/64 on pe-e-100 vrf red(196)
+2026/10/26 18:43:39.385 BGP: [ZZPVC-3AHMF] 192.169.10.4 fd 35 went from OpenConfirm to Established for Established
+2026/10/26 18:43:39.817 BGP: [ZZPVC-3AHMF] 2001:db8:1::4 fd 37 went from OpenConfirm to Established for Established
