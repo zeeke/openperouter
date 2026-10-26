@@ -4,13 +4,13 @@ title: "Grout (DPDK Dataplane)"
 description: "Using the optional DPDK-accelerated grout dataplane with OpenPERouter"
 icon: "article"
 date: "2026-05-07T09:00:00+02:00"
-lastmod: "2026-09-11T09:00:00+02:00"
+lastmod: "2026-10-14T09:00:00+02:00"
 toc: true
 ---
 
 ## Overview
 
-[Grout](https://github.com/DPDK/grout) is an optional, DPDK-accelerated data plane that can replace the Linux kernel's networking stack for packet forwarding in OpenPERouter. When enabled, grout handles VXLAN encapsulation/decapsulation and routing in user-space using poll-mode drivers, while [FRR](https://frrouting.org/) continues to manage the control plane (BGP, EVPN, route exchange).
+[Grout](https://github.com/DPDK/grout) is an optional, DPDK-accelerated data plane that can replace the Linux kernel's networking stack for packet forwarding in OpenPERouter. When enabled, grout handles VXLAN and SRv6 encapsulation/decapsulation and routing in user-space using poll-mode drivers, while [FRR](https://frrouting.org/) continues to manage the control plane (BGP, EVPN, IS-IS, route exchange).
 
 The integration is opt-in: grout is disabled by default and enabling it does not affect existing kernel-based deployments.
 
@@ -38,6 +38,7 @@ Grout support is being delivered incrementally. The current implementation cover
 - **L3Passthrough** forwarding via grout
 - **L3VNI** (EVPN Layer 3 overlays) via grout TAP devices
 - **L2VNI** (EVPN Layer 2 overlays) via grout bridge domains and TAP devices
+- **L3VPN** (SRv6 Layer 3 overlays) via grout VRFs and TAP devices
 
 The following are **not yet supported** with grout:
 
@@ -56,7 +57,8 @@ By default grout binds underlay NICs as **PCI ports**. Set
 TAP-based grout underlays need no DPDK-capable NIC or `vfio-pci`; they are
 independent of test mode. With test mode disabled (the default), grout still
 needs hugepages as described below. DPDK-accelerated underlay ports need a
-DPDK-capable NIC.
+PCI NIC supported by DPDK, including virtio-net PCI interfaces in virtual
+machines.
 
 ## Helm Configuration
 
@@ -89,6 +91,7 @@ openperouter:
 | `datapath` | string | `kernel` | Datapath to use for L3 forwarding. "kernel" uses the standard Linux kernel datapath; "grout" adds a DPDK-accelerated sidecar that runs alongside FRR |
 | `grout.tapUnderlay` | bool | `false` | Use TAP ports for grout underlay interfaces instead of PCI ports |
 | `grout.testMode` | bool | `false` | Run grout in test mode. See [Test mode](#test-mode) |
+| `grout.maxMTU` | int | `""` (grout default, 1800) | Maximum MTU grout accepts on its ports. See [MTU](#mtu) |
 | `grout.image.repository` | string | `quay.io/openperouter/router` | Grout container image repository |
 | `grout.image.tag` | string | `main-grout` | Grout container image tag |
 | `grout.image.pullPolicy` | string | `""` | Image pull policy (defaults to Kubernetes default) |
@@ -133,6 +136,27 @@ openperouter:
 
 With the operator, test mode is set through the `GROUT_TEST_MODE` environment
 variable on the operator deployment rather than through the Helm values.
+
+### MTU
+
+The grout underlay ports inherit the MTU of the underlay interfaces they are
+attached to, so that the underlay MTU is preserved. Grout refuses ports whose
+MTU exceeds its maximum MTU, which defaults to 1800: when the underlay
+interfaces use a larger MTU (for example jumbo frames), raise it through
+`openperouter.grout.maxMTU`, otherwise the underlay setup fails:
+
+```yaml
+openperouter:
+  datapath: grout
+  grout:
+    maxMTU: 9500
+```
+
+Every packet buffer is sized after the maximum MTU, so larger values increase
+grout memory usage.
+
+With the operator, the maximum MTU is set through the `GROUT_MAX_MTU`
+environment variable on the operator deployment.
 
 ## Enabling Grout for L3Passthrough
 
@@ -206,6 +230,37 @@ the bridge in that VRF and configures any addresses in `gatewayIPs` as the
 distributed anycast gateway. The `hostMaster` settings continue to control the
 Linux or OVS bridge attachment on the host.
 
+Grout keeps the EVPN Type-2 routes of silent workloads alive by itself: when a
+learned neighbor has not answered for 30 seconds, grout probes it, and a
+neighbor that doesn't reply is removed. OpenPERouter sets this lifetime on
+grout to match the kernel's default neighbor reachable time, instead of grout's
+20 minute default.
+
+## Enabling Grout for SRv6 L3VPN
+
+`L3VPN` resources, and the `srv6` and `isis` settings of the `Underlay`, use
+the same configuration with the grout data path as with the kernel data path.
+See the [SRv6 L3VPN Configuration]({{< ref "srv6.md" >}}) documentation for
+the available fields and examples.
+
+For each `L3VPN`, grout creates a VRF and, when `hostSession` is set, connects
+it to the host through a TAP device. FRR programs the SRv6 local SIDs and the
+encapsulated routes into grout. `L2VNI` resources can use an `L3VPN` as their
+routing domain, as with the kernel data path.
+
+When grout is enabled, the controller adapts the generated FRR configuration:
+
+- The underlay network devices are attached to grout ports named
+  `u_<interfaceName>`, which are the interfaces FRR runs on. Keep using the
+  network device names in the `Underlay` resource, for example in
+  `isis.interfaces` and in the `interface` of the neighbors: the controller
+  translates them to the grout port names.
+- The tunnel endpoint addresses are assigned to a dedicated grout port named
+  `tunnel-ep`, which IS-IS advertises as passive in place of the `lo`
+  loopback used by the kernel data path.
+- The tunnel endpoint IPv6 address is set as the SRv6 encapsulation source
+  address (`segment-routing srv6 encapsulation source-address`).
+
 ## DPDK-Accelerated Underlay Ports
 
 The controller binds `NetworkDevice` entries as PCI ports by default, even if
@@ -215,8 +270,8 @@ For PCI ports, the controller:
 
 1. Resolves the PCI address from `/sys/class/net/<interfaceName>/device`
 2. Saves the original driver and non-link-local addresses
-3. Binds non-bifurcated NICs (for example Intel) to `vfio-pci`, or moves
-   `mlx5_core` devices (Mellanox) into the router namespace
+3. Binds non-bifurcated NICs (for example Intel and virtio-net PCI) to
+   `vfio-pci`, or moves `mlx5_core` devices (Mellanox) into the router namespace
 4. Creates the grout port with `grcli interface add port u_<interfaceName> devargs <pci>`
 
 The interface referenced by interfaceName must exist on the host. Any address

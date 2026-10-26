@@ -112,7 +112,7 @@ func TestConfigureAcceleratedPort(t *testing.T) {
 			Addresses:     []string{"192.168.11.3/32", "2001:db8::3/128"},
 		}
 		require.NoError(t, configureUnderlayAcceleratedPort(context.Background(), NewClient("sock"), portOptions{}, state))
-		assert.Len(t, *calls, 5)
+		assert.Len(t, *calls, 6)
 	})
 
 	t.Run("applies the accelerated config options", func(t *testing.T) {
@@ -132,7 +132,7 @@ func TestConfigureAcceleratedPort(t *testing.T) {
 		opts := portOptions{RXQueues: new(int32(4)), QSize: new(int32(1024))}
 		state := devicestate.State{InterfaceName: "ens1f0", PCIAddress: testPCIAddr}
 		require.NoError(t, configureUnderlayAcceleratedPort(context.Background(), NewClient("sock"), opts, state))
-		assert.Len(t, *calls, 3)
+		assert.Len(t, *calls, 4)
 	})
 
 	t.Run("existing matching port is kept", func(t *testing.T) {
@@ -147,7 +147,7 @@ func TestConfigureAcceleratedPort(t *testing.T) {
 
 		state := devicestate.State{InterfaceName: "ens1f0", PCIAddress: testPCIAddr}
 		require.NoError(t, configureUnderlayAcceleratedPort(context.Background(), NewClient("sock"), portOptions{}, state))
-		assert.Len(t, *calls, 2)
+		assert.Len(t, *calls, 3)
 	})
 }
 
@@ -160,15 +160,15 @@ func TestSetupAcceleratedUnderlayRejectsTapDeviceState(t *testing.T) {
 	require.ErrorContains(t, err, "expecting a PCI address")
 }
 
-func TestDeviceStateForAcceleratedDeviceRejectsNonPCIDevices(t *testing.T) {
+func TestRetrievePCIStateRejectsNonPCIDevices(t *testing.T) {
 	t.Parallel()
 	sysfs := newFakeSysfs(t, testPCIAddr, "igb")
 	sysfs.addNetClassDevice("veth0", "../../devices/virtual/net/veth0")
 
-	_, err := retrieveDeviceState("veth0", PortModeAccelerated, sysfs.Sysfs)
+	_, _, err := retrievePCIState("veth0", sysfs.Sysfs)
 	require.ErrorContains(t, err, "does not look like a PCI address")
 
-	_, err = retrieveDeviceState("missing0", PortModeAccelerated, sysfs.Sysfs)
+	_, _, err = retrievePCIState("missing0", sysfs.Sysfs)
 	require.ErrorContains(t, err, "failed to resolve PCI address for missing0")
 }
 
@@ -227,6 +227,8 @@ func (s *fakeSysfs) addNetClassDevice(name, deviceTarget string) {
 	s.t.Helper()
 	dir := filepath.Join(s.Root, "class", "net", name)
 	s.mkdir(dir)
+	// The pci package resolves the link with EvalSymlinks, so its target must exist.
+	s.mkdir(filepath.Join(dir, deviceTarget))
 	if err := os.Symlink(deviceTarget, filepath.Join(dir, "device")); err != nil {
 		s.t.Fatal(err)
 	}

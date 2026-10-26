@@ -33,6 +33,7 @@ const (
 
 // L2VNISpec defines the desired state of VNI.
 // +kubebuilder:validation:XValidation:rule="!has(self.gatewayIPs) || size(self.gatewayIPs) == 0 || has(self.routingDomain)",message="gatewayIPs cannot be set without routingDomain"
+// +kubebuilder:validation:XValidation:rule="!(has(self.hostMaster) && has(self.sriovVFPair))",message="hostMaster and sriovVFPair are mutually exclusive"
 type L2VNISpec struct {
 	// nodeSelector specifies which nodes this L2VNI applies to.
 	// If empty or not specified, applies to all nodes.
@@ -71,8 +72,19 @@ type L2VNISpec struct {
 	// If not set, the host veth will not be attached to any interface and it must be
 	// attached manually (or by some other means). This is useful if another controller
 	// is leveraging the host interface for the VNI.
+	// Mutually exclusive with sriovVFPair.
 	// +optional
 	HostMaster *HostMaster `json:"hostMaster,omitempty"`
+
+	// sriovVFPair enables SR-IOV VF-to-VF communication for this L2VNI,
+	// replacing the host bridge and TAP/veth pair with direct VF binding.
+	// The specified trunk VF is bound to grout as a DPDK port. Workloads
+	// connect via other VFs on the same PF, tagged with the specified VLAN.
+	// The NIC's embedded switch handles local VF-to-VF forwarding; grout
+	// handles VXLAN encap/decap for remote nodes.
+	// Only valid when grout is enabled. Mutually exclusive with hostmaster.
+	// +optional
+	SRIOVVFPair *SRIOVVFPairConfig `json:"sriovVFPair,omitempty"`
 
 	// gatewayIPs is a list of IP addresses in CIDR notation for the
 	// distributed anycast gateway on this L2 segment's bridge
@@ -204,6 +216,28 @@ type HostMaster struct {
 	// ovsBridge configuration. Must be set when Type is "OVSBridge".
 	// +optional
 	OVSBridge *OVSBridgeConfig `json:"ovsBridge,omitempty"`
+}
+
+// SRIOVVFPairConfig specifies the SR-IOV trunk VF and VLAN for VF-to-VF
+// communication on an L2VNI.
+type SRIOVVFPairConfig struct {
+	// trunkVFName is the kernel network interface name of the trunk VF
+	// (e.g. "enp3s2") to bind to grout. The controller resolves it to a PCI
+	// address via sysfs at runtime. The trunk VF must have no VLAN
+	// configured (VLAN 0) so it receives all tagged frames from other VFs.
+	// +kubebuilder:validation:Pattern=`^[a-zA-Z][a-zA-Z0-9._-]*$`
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=15
+	// +required
+	TrunkVFName string `json:"trunkVFName,omitempty"`
+
+	// vlan is the 802.1Q VLAN ID that maps to this L2VNI. Workload VFs
+	// on the same PF configured with this VLAN ID will participate in
+	// this L2VNI's VXLAN overlay.
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=4094
+	// +required
+	VLAN int32 `json:"vlan,omitempty"`
 }
 
 // VNIStatus defines the observed state of VNI.

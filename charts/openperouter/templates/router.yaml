@@ -275,6 +275,10 @@ spec:
         {{- end }}
       {{- if eq .Values.openperouter.datapath "grout" }}
       - name: grout
+        # Grout tunes its kernel control-plane interfaces through /proc/sys
+        # (e.g. accept_ra=0), which the runtime mounts read-only unless the
+        # container is privileged. Without it, router advertisements flooded
+        # over an L2VNI can install a default route that hijacks multihop BGP.
         securityContext:
           privileged: true
         image: "{{ .Values.openperouter.grout.image.repository }}:{{ .Values.openperouter.grout.image.tag }}"
@@ -306,6 +310,10 @@ spec:
             value: "128"
           - name: GROUT_PORT_QUEUE_SIZE
             value: "128"
+          {{- with .Values.openperouter.grout.maxMTU }}
+          - name: GROUT_MAX_MTU
+            value: {{ . | quote }}
+          {{- end }}
           {{- if .Values.openperouter.grout.testMode }}
           # DUMMY skips the LPM tables that dominate the per-VRF FIB cost.
           - name: GROUT_FIB4_ALGORITHM
@@ -328,7 +336,7 @@ spec:
                 exit 1
               fi
             done
-            GROUT_ARGS="--socket-mode 0666"
+            GROUT_ARGS="--socket-mode 0666 --max-mtu 9500"
             {{- if .Values.openperouter.grout.testMode }}
             GROUT_ARGS="${GROUT_ARGS} --test-mode"
             {{- end }}
@@ -374,7 +382,7 @@ spec:
           timeoutSeconds: 5
         livenessProbe:
           exec:
-            command: ["/bin/sh", "-c", "grcli -e"]
+            command: ["/bin/sh", "-c", "grcli -e log level set *:debug"]
           periodSeconds: 30
           timeoutSeconds: 5
       {{- end }}

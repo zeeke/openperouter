@@ -14,7 +14,6 @@ import (
 	"github.com/openperouter/openperouter/internal/grout"
 	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
-	"github.com/openperouter/openperouter/internal/hostnetwork/bridgerefresh"
 	"github.com/openperouter/openperouter/internal/pci"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -25,6 +24,9 @@ type GroutDatapathConfigurator struct {
 
 	groutSocketPath  string
 	deviceStateStore devicestate.Store
+	// trunkStateStore is kept apart from deviceStateStore, which tracks the
+	// underlays: a trunk VF state there would be taken for a stale underlay.
+	trunkStateStore  devicestate.Store
 	sysfs            pci.Sysfs
 	underlayPortMode grout.UnderlayPortMode
 }
@@ -33,9 +35,26 @@ func NewGroutConfigurator(groutSocketPath string, mode grout.UnderlayPortMode) *
 	return &GroutDatapathConfigurator{
 		groutSocketPath:  groutSocketPath,
 		deviceStateStore: devicestate.Store{Dir: "/var/run/grout/device-state"},
+		trunkStateStore:  devicestate.Store{Dir: "/var/run/grout/trunk-state"},
 		sysfs:            pci.Sysfs{Root: "/sys"},
 		underlayPortMode: mode,
 	}
+}
+
+// InterfaceNameForFRR returns the grout port an underlay network device is
+// attached to, as FRR sees the port and not the device. The loopback is the
+// dedicated port carrying the tunnel endpoint, which plays its role.
+func (g *GroutDatapathConfigurator) InterfaceNameForFRR(name string) string {
+	if name == "lo" {
+		return grout.TunnelEndpointPortName
+	}
+	return grout.UnderlayPortNamePrefix + name
+}
+
+// SRv6EncapSourceAddress is true as grout needs an explicit source address
+// to encapsulate SRv6 packets.
+func (g *GroutDatapathConfigurator) SRv6EncapSourceAddress() bool {
+	return true
 }
 
 func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interfacesConfiguration) error {
@@ -59,6 +78,7 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		Underlays:     config.Underlays,
 		L3VNIs:        config.L3VNIs,
 		L2VNIs:        config.L2VNIs,
+		L3VPNs:        config.L3VPNs,
 		L3Passthrough: config.L3Passthrough,
 	}
 	hostConfig, err := conversion.APItoHostConfig(config.nodeIndex, config.targetNamespace, apiConfig)
@@ -69,6 +89,11 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	slog.InfoContext(ctx, "setting up underlay")
 	if err = grout.SetupUnderlay(ctx, groutClient, hostConfig.Underlay, g.underlayPortMode, g.deviceStateStore, g.sysfs); err != nil {
 		return fmt.Errorf("failed to setup underlay: %w", err)
+	}
+
+	// No BridgeRefresher on grout: grout probes its expired neighbors itself.
+	if err := grout.EnsureNeighborAgeing(ctx, groutClient); err != nil {
+		return err
 	}
 
 	var resourceErrors []error
@@ -90,6 +115,10 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		configuredL3VNIs = append(configuredL3VNIs, vni)
 	}
 
+	configuredL3VPNs, l3vpnErrors, failedL3VPNs := setupGroutL3VPNs(ctx, groutClient, hostConfig.L3VPNs)
+	resourceErrors = append(resourceErrors, l3vpnErrors...)
+	failedL3Domains = failedL3Domains.Union(failedL3VPNs)
+
 	var configuredL2VNIs []hostnetwork.L2VNIParams
 	for _, vni := range hostConfig.L2VNIs {
 		if failedL3Domains.Has(vni.VRF) {
@@ -101,17 +130,8 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 			})
 			continue
 		}
-
 		slog.InfoContext(ctx, "setting up L2VNI", "vni", vni.VNI)
-		if err := grout.SetupL2VNI(ctx, groutClient, vni); err != nil {
-			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
-				Obj: v1alpha1.FailedResource{
-					Kind: openpeerrors.KindL2VNI, Name: vni.Name, Reason: reason, Message: err.Error(),
-				},
-			})
-			continue
-		}
-		if err := bridgerefresh.StartForVNI(ctx, vni); err != nil {
+		if err := grout.SetupL2VNI(ctx, groutClient, vni, g.trunkStateStore, g.sysfs); err != nil {
 			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
 				Obj: v1alpha1.FailedResource{
 					Kind: openpeerrors.KindL2VNI, Name: vni.Name, Reason: reason, Message: err.Error(),
@@ -133,12 +153,8 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		}
 	}
 
-	if len(resourceErrors) > 0 {
-		slog.Error("configuration failed", "errors", resourceErrors)
-	}
-
 	configuredVNIs := make([]hostnetwork.VNIParams, 0, len(configuredL3VNIs)+len(configuredL2VNIs))
-	configuredVRFs := []string{}
+	configuredVRFs := make([]string, 0, len(configuredL3VNIs)+len(configuredL2VNIs)+len(configuredL3VPNs))
 	for _, vni := range configuredL3VNIs {
 		configuredVNIs = append(configuredVNIs, vni.VNIParams)
 		configuredVRFs = append(configuredVRFs, vni.VRF)
@@ -147,12 +163,25 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 		configuredVNIs = append(configuredVNIs, vni.VNIParams)
 		configuredVRFs = append(configuredVRFs, vni.VRF)
 	}
+	for _, l3vpn := range configuredL3VPNs {
+		configuredVRFs = append(configuredVRFs, l3vpn.VRF)
+	}
 
 	slog.InfoContext(ctx, "removing deleted vnis")
 	if err := grout.RemoveNonConfiguredVNIs(ctx, groutClient, config.targetNamespace, configuredVNIs); err != nil {
 		return fmt.Errorf("failed to remove deleted vnis: %w", err)
 	}
-	bridgerefresh.StopForRemovedVNIs(configuredL2VNIs)
+
+	slog.InfoContext(ctx, "removing stale VF-pair resources")
+	if err := grout.RemoveStaleVFPairResources(ctx, groutClient, config.targetNamespace, configuredL2VNIs,
+		g.trunkStateStore, g.sysfs); err != nil {
+		return fmt.Errorf("failed to remove stale VF-pair resources: %w", err)
+	}
+
+	slog.InfoContext(ctx, "removing deleted l3vpns")
+	if err := grout.RemoveNonConfiguredL3VPNs(ctx, groutClient, configuredL3VPNs); err != nil {
+		return fmt.Errorf("failed to remove deleted l3vpns: %w", err)
+	}
 
 	slog.InfoContext(ctx, "removing deleted vrfs")
 	if err := grout.RemoveNonConfiguredVRFs(ctx, groutClient, config.targetNamespace, configuredVRFs); err != nil {
@@ -168,6 +197,30 @@ func (g *GroutDatapathConfigurator) Configure(ctx context.Context, config interf
 	return errors.Join(resourceErrors...)
 }
 
+func setupGroutL3VPNs(ctx context.Context, groutClient *grout.Client,
+	l3vpns []hostnetwork.L3VPNParams) ([]hostnetwork.L3VPNParams, []error, sets.Set[string]) {
+	var configured []hostnetwork.L3VPNParams
+	var resourceErrors []error
+	failedVRFs := sets.New[string]()
+	for _, l3vpn := range l3vpns {
+		slog.InfoContext(ctx, "setting up L3 VPN", "VRF", l3vpn.VRF)
+		if err := grout.SetupL3VPN(ctx, groutClient, l3vpn); err != nil {
+			resourceErrors = append(resourceErrors, &openpeerrors.ResourceError{
+				Obj: v1alpha1.FailedResource{
+					Kind:    openpeerrors.KindL3VPN,
+					Name:    l3vpn.Name,
+					Reason:  v1alpha1.FailedResourceReasonOverlayAttachmentFailed,
+					Message: err.Error(),
+				},
+			})
+			failedVRFs.Insert(l3vpn.VRF)
+			continue
+		}
+		configured = append(configured, l3vpn)
+	}
+	return configured, resourceErrors, failedVRFs
+}
+
 func (g *GroutDatapathConfigurator) cleanupGroutInterfaces(
 	ctx context.Context,
 	groutClient *grout.Client,
@@ -175,12 +228,21 @@ func (g *GroutDatapathConfigurator) cleanupGroutInterfaces(
 	currentUnderlayIfaces []hostnetwork.UnderlayInterface,
 ) error {
 	slog.InfoContext(ctx, "underlay removed, cleaning up VNIs and underlay interfaces")
+	if err := grout.RemoveStaleVFPairResources(ctx, groutClient, targetNamespace, nil,
+		g.trunkStateStore, g.sysfs); err != nil {
+		slog.Warn("failed to remove VF-pair resources after underlay removal", "err", err)
+	}
 	if err := grout.RemoveAllVNIs(ctx, groutClient, targetNamespace); err != nil {
 		slog.Warn("failed to remove vnis after underlay removal", "err", err)
 	}
-	bridgerefresh.StopAllVNIs()
+	if err := grout.RemoveAllL3VPNs(ctx, groutClient); err != nil {
+		slog.Warn("failed to remove l3vpns after underlay removal", "err", err)
+	}
 	if err := grout.RemoveAllVRFs(ctx, groutClient, targetNamespace); err != nil {
 		slog.Warn("failed to remove vrfs after underlay removal", "err", err)
+	}
+	if err := grout.RemoveTunnelEndpoint(ctx, groutClient); err != nil {
+		slog.Warn("failed to remove tunnel endpoint after underlay removal", "err", err)
 	}
 	if err := grout.RestoreUnderlay(ctx, groutClient, targetNamespace,
 		currentUnderlayIfaces, g.deviceStateStore, g.sysfs); err != nil {

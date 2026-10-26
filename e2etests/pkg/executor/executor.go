@@ -86,7 +86,7 @@ type podExecutor struct {
 	container string
 }
 
-func ForPod(namespace, name, container string) Executor {
+func ForPod(namespace, name, container string) ExecutorWithContext {
 	return &podExecutor{
 		namespace: namespace,
 		name:      name,
@@ -95,11 +95,15 @@ func ForPod(namespace, name, container string) Executor {
 }
 
 func (p *podExecutor) Exec(cmd string, args ...string) (string, error) {
+	return p.CommandContext(context.Background(), cmd, args...)
+}
+
+func (p *podExecutor) CommandContext(ctx context.Context, cmd string, args ...string) (string, error) {
 	if Kubectl == "" {
 		return "", errors.New("the kubectl parameter is not set")
 	}
 	fullargs := append([]string{"exec", p.name, "-n", p.namespace, "-c", p.container, "--", cmd}, args...)
-	out, err := exec.Command(Kubectl, fullargs...).CombinedOutput()
+	out, err := exec.CommandContext(ctx, Kubectl, fullargs...).CombinedOutput()
 	if err != nil {
 		return string(out), fmt.Errorf("exec in pod %s/%s container %s failed: %w. Output: %s",
 			p.namespace, p.name, p.container, err, string(out))

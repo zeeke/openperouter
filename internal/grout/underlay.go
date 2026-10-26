@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"slices"
 	"syscall"
 
 	"github.com/openperouter/openperouter/internal/grout/devicestate"
@@ -17,6 +18,7 @@ import (
 	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
+	"golang.org/x/sys/unix"
 )
 
 const UnderlayPortNamePrefix = "u_"
@@ -33,6 +35,14 @@ type UnderlayPortMode string
 const (
 	PortModeAccelerated UnderlayPortMode = "accelerated"
 	PortModeTAP         UnderlayPortMode = "tap"
+	// TunnelEndpointPortName is the grout port carrying the tunnel endpoint
+	// addresses, playing the role of the loopback in the kernel datapath.
+	// The name can't be "lo", as grout creates a kernel interface named
+	// after each port.
+	TunnelEndpointPortName = "tunnel-ep"
+	// The tunnel endpoint port is a null device that never carries traffic,
+	// so its MTU does not matter.
+	tunnelEndpointPortMTU = 1500
 )
 
 // SetupUnderlay configures the underlay interfaces via the grout dataplane.
@@ -99,12 +109,18 @@ func SetupUnderlay(
 		}
 	}
 
-	if params.TunnelEndpoint != nil {
-		if err := setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint); err != nil {
-			return err
-		}
+	if params.TunnelEndpoint == nil {
+		return RemoveTunnelEndpoint(ctx, client)
 	}
+	return setupTunnelEndpoint(ctx, client, *params.TunnelEndpoint)
+}
 
+// RemoveTunnelEndpoint removes the grout port carrying the tunnel endpoint
+// addresses, together with the addresses.
+func RemoveTunnelEndpoint(ctx context.Context, client *Client) error {
+	if err := client.deletePort(ctx, TunnelEndpointPortName); err != nil {
+		return fmt.Errorf("failed to remove the tunnel endpoint port: %w", err)
+	}
 	return nil
 }
 
@@ -247,6 +263,10 @@ func setupTapUnderlay(
 	})
 }
 
+// setupTunnelEndpoint assigns the tunnel endpoint addresses to a dedicated
+// null port. Unlike the main VRF interface, which FRR sees as a VRF device,
+// the port is a regular interface IS-IS can advertise as passive, and
+// removing it takes the addresses away without touching the underlay ports.
 func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.UnderlayTunnelEndpointParams) error {
 	var addrs []string
 	for _, addr := range []string{ep.IPv4CIDR, ep.IPv6CIDR} {
@@ -258,9 +278,19 @@ func setupTunnelEndpoint(ctx context.Context, client *Client, ep hostnetwork.Und
 		return fmt.Errorf("at least one tunnel endpoint IP must be provided (IPv4 or IPv6)")
 	}
 
-	if err := assignAddressesToGroutPort(ctx, client, defaultVRFName, addrs); err != nil {
-		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout underlay: %w", err)
+	opts := portOptions{Devargs: "net_null_tunnel_ep,no-rx=1", MTU: tunnelEndpointPortMTU}
+	if err := client.ensurePort(ctx, TunnelEndpointPortName, opts); err != nil {
+		return fmt.Errorf("failed to create the tunnel endpoint port: %w", err)
 	}
+
+	if err := assignAddressesToGroutPort(ctx, client, TunnelEndpointPortName, addrs); err != nil {
+		return fmt.Errorf("failed to assign tunnel endpoint IPs to grout: %w", err)
+	}
+
+	if err := client.setPortUp(ctx, TunnelEndpointPortName); err != nil {
+		return fmt.Errorf("failed to set the tunnel endpoint port up: %w", err)
+	}
+
 	return nil
 }
 
@@ -322,6 +352,11 @@ func restoreNetdev(ctx context.Context, targetNS string, state devicestate.State
 
 func applyStateToLink(ctx context.Context, link netlink.Link, state devicestate.State) error {
 	name := link.Attrs().Name
+	// The configured name may itself be an alternative name, so nothing can
+	// find the device by it until the names are back.
+	if err := restoreAltNames(ctx, link, state.AltNames); err != nil {
+		return err
+	}
 	if err := restoreIPv6Settings(name, state); err != nil {
 		return err
 	}
@@ -335,6 +370,34 @@ func applyStateToLink(ctx context.Context, link netlink.Link, state devicestate.
 	return nil
 }
 
+// restoreAltNames re-adds the alternative names the device carried before it
+// was handed to grout. udev only re-applies the names that come from one of
+// its rules, so a name added by hand would otherwise be lost for good on the
+// first teardown.
+func restoreAltNames(ctx context.Context, link netlink.Link, altNames []string) error {
+	for _, altName := range altNames {
+		if slices.Contains(link.Attrs().AltNames, altName) {
+			continue
+		}
+		err := netlink.LinkAddAltName(link, altName)
+		// Names are unique across primary and alternative names alike, so
+		// EEXIST means something else claimed it while the device was bound
+		// to grout: report it rather than failing the teardown.
+		if errors.Is(err, syscall.EEXIST) {
+			slog.WarnContext(ctx, "alternative name is taken, not restoring",
+				"altName", altName, "interfaceName", link.Attrs().Name)
+			continue
+		}
+		if err != nil {
+			return fmt.Errorf("failed to restore alternative name %s on kernel netdev [%s]: %w",
+				altName, link.Attrs().Name, err)
+		}
+		slog.InfoContext(ctx, "restored alternative name to kernel netdev",
+			"altName", altName, "interfaceName", link.Attrs().Name)
+	}
+	return nil
+}
+
 func configureUnderlayTapPort(
 	ctx context.Context,
 	client *Client,
@@ -343,6 +406,10 @@ func configureUnderlayTapPort(
 ) error {
 	underlayInterface := state.InterfaceName
 	portName := UnderlayPortName(underlayInterface)
+
+	if err := hostnetwork.SuppressAutoconf(underlayInterface); err != nil {
+		return fmt.Errorf("failed to suppress autoconf on underlay interface %s: %w", underlayInterface, err)
+	}
 
 	// Suppress the netdev's kernel IPv6 link-local so it doesn't collide with
 	// the identical EUI-64 link-local on the grout port's kernel interface,
@@ -354,19 +421,20 @@ func configureUnderlayTapPort(
 		return fmt.Errorf("failed to suppress link-local on underlay interface %s: %w", underlayInterface, err)
 	}
 
-	opts.Devargs = fmt.Sprintf("net_tap%s,remote=%s,iface=%s",
-		makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
-	if err := client.ensurePort(ctx, portName, opts); err != nil {
-		return fmt.Errorf("failed to create grout underlay port: %w", err)
+	underlayLink, err := netlink.LinkByName(underlayInterface)
+	if err != nil {
+		return fmt.Errorf("failed to find underlay interface %s: %w", underlayInterface, err)
 	}
 
-	// Disable SLAAC on the underlying netlink interface: once the intended
-	// addresses are migrated to the grout port, the kernel must not
-	// autoconfigure new ones from Router Advertisements. A SLAAC address
-	// on the netlink device would be picked up on the next reconcile and
-	// clash with the existing connected route in grout's RIB (EBUSY).
-	if err := sysctl.Ensure(sysctl.DisableAcceptRA(underlayInterface)); err != nil {
-		return fmt.Errorf("failed to disable accept_ra on underlay interface %s: %w", underlayInterface, err)
+	// The TAP PMD applies the port MTU to the remote interface too: creating
+	// the port with grout's default MTU would silently shrink the underlay
+	// MTU, and neighbors relying on it (e.g. IS-IS hello padding) would no
+	// longer reach us.
+	opts.Devargs = fmt.Sprintf("net_tap%s,remote=%s,iface=%s",
+		makeTapRandomString(), underlayInterface, "tap_"+underlayInterface)
+	opts.MTU = underlayLink.Attrs().MTU
+	if err := client.ensurePort(ctx, portName, opts); err != nil {
+		return fmt.Errorf("failed to create grout underlay port: %w", err)
 	}
 
 	if err := assignAddressesToGroutPort(ctx, client, portName, state.Addresses); err != nil {
@@ -394,13 +462,22 @@ func retrieveDeviceState(
 ) (devicestate.State, error) {
 	state := devicestate.State{InterfaceName: interfaceName}
 
+	// interfaceName may be an alternative name, while sysfs and procfs are
+	// keyed by the primary name only.
+	link, err := netlink.LinkByName(interfaceName)
+	if err != nil {
+		return devicestate.State{}, fmt.Errorf("failed to find kernel interface %s: %w", interfaceName, err)
+	}
+	kernelName := link.Attrs().Name
+
 	if mode == PortModeAccelerated {
-		pciAddr, driver, err := retrievePCIState(interfaceName, sysfs)
+		pciAddr, driver, err := retrievePCIState(kernelName, sysfs)
 		if err != nil {
 			return devicestate.State{}, err
 		}
 		state.PCIAddress = pciAddr
 		state.OriginalDriver = driver
+		state.AltNames = link.Attrs().AltNames
 	}
 
 	netlinkAddrs, err := hostnetwork.AddressesForInterface(interfaceName, hostnetwork.ExcludeLinkLocal())
@@ -408,14 +485,18 @@ func retrieveDeviceState(
 		return devicestate.State{}, fmt.Errorf("failed to read addresses from %s: %w", interfaceName, err)
 	}
 	for _, a := range netlinkAddrs {
+		// SLAAC addresses must not be migrated or restored as static addresses.
+		if a.IP.To4() == nil && a.Flags&unix.IFA_F_PERMANENT == 0 {
+			continue
+		}
 		state.Addresses = append(state.Addresses, a.IPNet.String())
 	}
 
-	state.AddrGenMode, err = sysctl.Read(sysctl.AddrGenMode(interfaceName, ""))
+	state.AddrGenMode, err = sysctl.Read(sysctl.AddrGenMode(kernelName, ""))
 	if err != nil {
 		return devicestate.State{}, fmt.Errorf("failed to read addr_gen_mode of %s: %w", interfaceName, err)
 	}
-	state.AcceptRA, err = sysctl.Read(sysctl.AcceptRA(interfaceName, ""))
+	state.AcceptRA, err = sysctl.Read(sysctl.AcceptRA(kernelName, ""))
 	if err != nil {
 		return devicestate.State{}, fmt.Errorf("failed to read accept_ra of %s: %w", interfaceName, err)
 	}
