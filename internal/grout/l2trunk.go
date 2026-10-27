@@ -13,6 +13,7 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/openperouter/openperouter/internal/pci"
+	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -33,11 +34,27 @@ func L2TrunkPortName(params hostnetwork.L2TrunkParams, sysfs pci.Sysfs) (string,
 	if params.SRIOV == nil {
 		return "", errUnsupportedTrunk
 	}
-	pciAddr, err := sysfs.PCIAddressForVF(params.SRIOV.PFName, int(params.SRIOV.VFIndex))
+	pciAddr, err := trunkVFPCIAddress(params.SRIOV, sysfs)
 	if err != nil {
 		return "", err
 	}
 	return trunkPortName(pciAddr), nil
+}
+
+// trunkVFPCIAddress returns the PCI address of the trunk VF. The PF may be
+// selected by an alternative name, which sysfs does not expose, so the name
+// is resolved to the primary one through netlink first. A PF unknown to
+// netlink keeps its configured name, which the sysfs lookup then reports.
+func trunkVFPCIAddress(sriov *hostnetwork.SRIOVTrunkParams, sysfs pci.Sysfs) (string, error) {
+	pfName := sriov.PFName
+	link, err := netlink.LinkByName(pfName)
+	switch {
+	case err == nil:
+		pfName = link.Attrs().Name
+	case !errors.As(err, &netlink.LinkNotFoundError{}):
+		return "", fmt.Errorf("failed to find PF %s: %w", pfName, err)
+	}
+	return sysfs.PCIAddressForVF(pfName, int(sriov.VFIndex))
 }
 
 // SetupL2Trunk binds the VF of an SR-IOV L2Trunk to grout as a dedicated DPDK
@@ -60,7 +77,7 @@ func SetupL2Trunk(
 	}
 	// The PF's virtfn symlink resolves the VF even when it has no kernel
 	// netdev.
-	pciAddr, err := sysfs.PCIAddressForVF(params.SRIOV.PFName, int(params.SRIOV.VFIndex))
+	pciAddr, err := trunkVFPCIAddress(params.SRIOV, sysfs)
 	if err != nil {
 		return err
 	}

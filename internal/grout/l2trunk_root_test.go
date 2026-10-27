@@ -17,6 +17,7 @@ import (
 	"github.com/openperouter/openperouter/internal/hostnetwork"
 	"github.com/openperouter/openperouter/internal/pci"
 	"github.com/stretchr/testify/require"
+	"github.com/vishvananda/netlink"
 )
 
 var errInjectedTrunkSetup = errors.New("injected setup failure")
@@ -175,4 +176,28 @@ func recordTrunkPortSetup(t *testing.T, state devicestate.State, failure trunkSe
 		return nil, nil
 	}
 	return got
+}
+
+func TestL2TrunkPortNameByPFAltName(t *testing.T) {
+	const (
+		pfName    = "pfprimary0"
+		pfAltName = "trunkpf"
+		vfPCIAddr = "0000:03:00.2"
+	)
+	pf := &netlink.Dummy{LinkAttrs: netlink.LinkAttrs{Name: pfName}}
+	require.NoError(t, netlink.LinkAdd(pf))
+	t.Cleanup(func() { require.NoError(t, netlink.LinkDel(pf)) })
+	require.NoError(t, netlink.LinkAddAltName(pf, pfAltName))
+
+	sysfs := pci.Sysfs{Root: t.TempDir()}
+	deviceDir := filepath.Join(sysfs.Root, "class", "net", pfName, "device")
+	require.NoError(t, os.MkdirAll(deviceDir, 0o755))
+	require.NoError(t, os.Symlink("../"+vfPCIAddr, filepath.Join(deviceDir, "virtfn1")))
+
+	for _, name := range []string{pfName, pfAltName} {
+		params := hostnetwork.L2TrunkParams{SRIOV: &hostnetwork.SRIOVTrunkParams{PFName: name, VFIndex: 1}}
+		got, err := L2TrunkPortName(params, sysfs)
+		require.NoError(t, err, name)
+		require.Equal(t, trunkPortName(vfPCIAddr), got, name)
+	}
 }
