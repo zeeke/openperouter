@@ -32,6 +32,8 @@ var (
 	leafAVRFRedPrefixes  = []string{"192.168.20.0/24", "2001:db8:20::/64"}
 )
 
+const underlayAltName = "pe-uplink0"
+
 var AcceleratedUnderlay = v1alpha1.Underlay{
 	ObjectMeta: metav1.ObjectMeta{
 		Name:      "underlay",
@@ -43,7 +45,7 @@ var AcceleratedUnderlay = v1alpha1.Underlay{
 			{
 				Type: "NetworkDevice",
 				NetworkDevice: &v1alpha1.NetworkDevice{
-					InterfaceName: "toswitch1",
+					InterfaceName: underlayAltName,
 				},
 			},
 			{
@@ -124,6 +126,23 @@ var _ = Describe("HWEmulation", Ordered, GroutSupport, func() {
 			}
 			return openperouter.AreReady(routers)
 		}, 2*time.Minute, time.Second).ShouldNot(HaveOccurred())
+
+		By("Verifying the alternative name is restored on the kernel netdev")
+		for _, node := range nodes {
+			nodeExec := executor.ForNode(node.Name)
+			Eventually(func(g Gomega) {
+				out, err := nodeExec.Exec("ip", "-j", "link", "show", "dev", underlayAltName)
+				g.Expect(err).NotTo(HaveOccurred(), out)
+				var links []struct {
+					Name     string   `json:"ifname"`
+					AltNames []string `json:"altnames"`
+				}
+				g.Expect(json.Unmarshal([]byte(out), &links)).To(Succeed(), out)
+				g.Expect(links).To(HaveLen(1))
+				g.Expect(links[0].Name).To(Equal("toswitch1"))
+				g.Expect(links[0].AltNames).To(ContainElement(underlayAltName))
+			}, time.Minute, time.Second).Should(Succeed(), "node %s", node.Name)
+		}
 	})
 
 	AfterEach(func() {
@@ -131,6 +150,21 @@ var _ = Describe("HWEmulation", Ordered, GroutSupport, func() {
 		Expect(Updater.CleanButUnderlay()).To(Succeed())
 		Expect(infra.LeafAConfig.Reset()).To(Succeed())
 		Expect(infra.LeafBConfig.Reset()).To(Succeed())
+	})
+
+	It("should select an accelerated underlay by alternative name", func() {
+		portName := "u_" + underlayAltName
+		for router := range routers.GetExecutors() {
+			Eventually(func(g Gomega) {
+				port := showGroutPort(g, router, portName)
+				expectBoundToVFIO(g, router, port.Devargs)
+				out, err := router.Exec("vtysh", "-c", "show interface "+portName+" json")
+				g.Expect(err).NotTo(HaveOccurred(), out)
+				var interfaces map[string]json.RawMessage
+				g.Expect(json.Unmarshal([]byte(out), &interfaces)).To(Succeed(), out)
+				g.Expect(interfaces).To(HaveKey(portName))
+			}, time.Minute, time.Second).Should(Succeed(), "router %s", router.Name())
+		}
 	})
 
 	It("should configure L3Passthrough host session in FRR", func() {
