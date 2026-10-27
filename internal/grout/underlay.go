@@ -371,7 +371,7 @@ func configureUnderlayTapPort(
 	// autoconfigure new ones from Router Advertisements. A SLAAC address
 	// on the netlink device would be picked up on the next reconcile and
 	// clash with the existing connected route in grout's RIB (EBUSY).
-	if err := sysctl.Ensure(sysctl.DisableAcceptRA(underlayInterface)); err != nil {
+	if err := hostnetwork.DisableAcceptRA(underlayInterface); err != nil {
 		return fmt.Errorf("failed to disable accept_ra on underlay interface %s: %w", underlayInterface, err)
 	}
 
@@ -398,10 +398,15 @@ func retrieveDeviceState(
 	mode UnderlayPortMode,
 	sysfs pci.Sysfs,
 ) (devicestate.State, error) {
+	link, err := netlink.LinkByName(interfaceName)
+	if err != nil {
+		return devicestate.State{}, fmt.Errorf("failed to find interface %s: %w", interfaceName, err)
+	}
+	primaryName := link.Attrs().Name
 	state := devicestate.State{InterfaceName: interfaceName}
 
 	if mode == PortModeAccelerated {
-		pciAddr, driver, err := retrievePCIState(interfaceName, sysfs)
+		pciAddr, driver, err := retrievePCIState(primaryName, sysfs)
 		if err != nil {
 			return devicestate.State{}, err
 		}
@@ -409,10 +414,6 @@ func retrieveDeviceState(
 		state.OriginalDriver = driver
 	}
 
-	link, err := netlink.LinkByName(interfaceName)
-	if err != nil {
-		return devicestate.State{}, fmt.Errorf("failed to find interface %s: %w", interfaceName, err)
-	}
 	state.MTU = link.Attrs().MTU
 
 	netlinkAddrs, err := hostnetwork.AddressesForInterface(interfaceName, hostnetwork.ExcludeLinkLocal())
@@ -423,11 +424,11 @@ func retrieveDeviceState(
 		state.Addresses = append(state.Addresses, a.IPNet.String())
 	}
 
-	state.AddrGenMode, err = sysctl.Read(sysctl.AddrGenMode(interfaceName, ""))
+	state.AddrGenMode, err = sysctl.Read(sysctl.AddrGenMode(primaryName, ""))
 	if err != nil {
 		return devicestate.State{}, fmt.Errorf("failed to read addr_gen_mode of %s: %w", interfaceName, err)
 	}
-	state.AcceptRA, err = sysctl.Read(sysctl.AcceptRA(interfaceName, ""))
+	state.AcceptRA, err = sysctl.Read(sysctl.AcceptRA(primaryName, ""))
 	if err != nil {
 		return devicestate.State{}, fmt.Errorf("failed to read accept_ra of %s: %w", interfaceName, err)
 	}

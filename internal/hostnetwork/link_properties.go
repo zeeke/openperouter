@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 	"golang.org/x/sys/unix"
@@ -137,6 +138,19 @@ func SuppressLinkLocal(ifaceName string) error {
 		if err := netlink.AddrDel(link, &addr); err != nil {
 			return fmt.Errorf("failed to remove link-local %s from %s: %w", addr.IPNet, ifaceName, err)
 		}
+	}
+	return nil
+}
+
+// DisableAcceptRA disables IPv6 Router Advertisements on the named interface.
+// The name may be a netlink alternative name; procfs requires the primary name.
+func DisableAcceptRA(ifaceName string) error {
+	link, err := netlink.LinkByName(ifaceName)
+	if err != nil {
+		return fmt.Errorf("failed to find interface %s: %w", ifaceName, err)
+	}
+	if err := sysctl.Ensure(sysctl.DisableAcceptRA(link.Attrs().Name)); err != nil {
+		return fmt.Errorf("failed to disable router advertisements on %s: %w", ifaceName, err)
 	}
 	return nil
 }
