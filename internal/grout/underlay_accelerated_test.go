@@ -14,6 +14,7 @@ import (
 	"github.com/openperouter/openperouter/internal/pci"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 )
 
@@ -85,6 +86,39 @@ func TestSetupInterfaceForHWAcceleration(t *testing.T) {
 			if tc.expectProbe {
 				assert.Equal(t, testPCIAddr, sysfs.read(filepath.Join(sysfs.Root, "bus", "pci", "drivers_probe")))
 			}
+		})
+	}
+}
+
+func TestIsBackedByPCIDevice(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name  string
+		attrs netlink.LinkAttrs
+		want  bool
+	}{
+		{
+			name:  "netdev of the PCI device",
+			attrs: netlink.LinkAttrs{ParentDevBus: "pci", ParentDev: testPCIAddr},
+			want:  true,
+		},
+		{
+			name:  "netdev of another PCI device",
+			attrs: netlink.LinkAttrs{ParentDevBus: "pci", ParentDev: "0000:03:00.1"},
+		},
+		{
+			name:  "same parent name on another bus",
+			attrs: netlink.LinkAttrs{ParentDevBus: "virtio", ParentDev: testPCIAddr},
+		},
+		{
+			name: "virtual interface without a parent device",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, tc.want, isBackedByPCIDevice(&tc.attrs, testPCIAddr))
 		})
 	}
 }
