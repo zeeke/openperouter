@@ -12,7 +12,6 @@ import (
 
 	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
-	"github.com/openperouter/openperouter/internal/netnamespace"
 	"github.com/openperouter/openperouter/internal/pci"
 	"github.com/vishvananda/netns"
 )
@@ -175,13 +174,7 @@ func prepareAndBindTrunkVF(
 	if err := client.ensurePort(ctx, portName, portOptions{Devargs: state.PCIAddress}); err != nil {
 		return fmt.Errorf("failed to create grout trunk port %s: %w", portName, err)
 	}
-
-	if !pci.IsBifurcated(state.OriginalDriver) {
-		return nil
-	}
-	return netnamespace.In(perouterNetNS, func() error {
-		return quiesceBifurcatedNetdev(netdev)
-	})
+	return nil
 }
 
 // restoreStaleTrunkVFs hands the trunk VFs whose grout port is not
