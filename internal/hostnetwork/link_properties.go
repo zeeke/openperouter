@@ -154,14 +154,16 @@ func SuppressLinkLocal(ifaceName string) error {
 // already autoconfigured. Autoconfigured addresses are told apart by their
 // finite lifetime, as the ones configured explicitly are permanent.
 func SuppressAutoconf(ifaceName string) error {
-	if err := sysctl.Ensure(sysctl.DisableAcceptRA(ifaceName)); err != nil {
-		return fmt.Errorf("failed to disable router advertisements on %s: %w", ifaceName, err)
-	}
-
 	link, err := netlink.LinkByName(ifaceName)
 	if err != nil {
 		return fmt.Errorf("failed to find interface %s: %w", ifaceName, err)
 	}
+	// ifaceName may be an alternative name, while procfs is keyed by the
+	// primary name only.
+	if err := sysctl.Ensure(sysctl.DisableAcceptRA(link.Attrs().Name)); err != nil {
+		return fmt.Errorf("failed to disable router advertisements on %s: %w", ifaceName, err)
+	}
+
 	addrs, err := netlink.AddrList(link, netlink.FAMILY_V6)
 	if err != nil {
 		return fmt.Errorf("failed to list addresses on %s: %w", ifaceName, err)

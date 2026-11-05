@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/openperouter/openperouter/internal/hostnetwork"
+	"github.com/openperouter/openperouter/internal/sysctl"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/vishvananda/netlink"
@@ -72,6 +74,25 @@ func TestRestoreAltNames(t *testing.T) {
 
 		assert.Empty(t, altNamesOf(t, deviceName))
 	})
+}
+
+// TestSuppressAutoconfByAltName covers an underlay configured by one of its
+// alternative names: netlink resolves it, procfs does not.
+func TestSuppressAutoconfByAltName(t *testing.T) {
+	const (
+		deviceName = "probe0"
+		altName    = "pe-uplink0"
+	)
+	defer inProbeNetns(t)()
+	link := addProbeVeth(t, deviceName)
+	require.NoError(t, netlink.LinkAddAltName(link, altName))
+	require.NoError(t, sysctl.Ensure(sysctl.AcceptRA(deviceName, "2")))
+
+	require.NoError(t, hostnetwork.SuppressAutoconf(altName))
+
+	acceptRA, err := sysctl.Read(sysctl.AcceptRA(deviceName, ""))
+	require.NoError(t, err)
+	assert.Equal(t, "0", acceptRA)
 }
 
 func addProbeVeth(t *testing.T, name string) netlink.Link {
