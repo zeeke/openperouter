@@ -327,7 +327,10 @@ func (c *Client) ensureBridge(ctx context.Context, name, vrf string) error {
 	// FRR advertises MAC-only type-2 routes and the remote VTEPs have nothing to
 	// suppress with. A disconnected L2VNI has no address on the bridge, so
 	// snooping is the only way its neighbors get learned.
-	args = append(args, "neigh_suppress", "on", "neigh_snoop", "on")
+	// args = append(args, "neigh_suppress", "on", "neigh_snoop", "on")
+
+	// workaround for https://github.com/DPDK/grout/issues/779
+	args = append(args, "neigh_snoop", "on")
 	slog.InfoContext(ctx, "creating grout bridge", "name", name, "vrf", vrf)
 	if err := c.run(ctx, args...); err != nil {
 		return fmt.Errorf("creating grout bridge %s: %w", name, err)
