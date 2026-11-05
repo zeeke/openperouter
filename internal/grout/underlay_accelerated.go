@@ -4,6 +4,7 @@ package grout
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -46,7 +47,8 @@ func setupAcceleratedUnderlay(
 // setupInterfaceForHWAcceleration inspects the driver bound to a PCI device and
 // takes the appropriate action:
 //   - vfio-pci: already bound, nothing to do
-//   - bifurcated (e.g. mlx5_core): move the kernel netdev to the perouter namespace
+//   - bifurcated (e.g. mlx5_core): move the kernel netdev to the perouter
+//     namespace and quiesce it
 //   - any other driver, or none: bind to vfio-pci
 func setupInterfaceForHWAcceleration(
 	ctx context.Context,
@@ -64,13 +66,7 @@ func setupInterfaceForHWAcceleration(
 		return nil
 
 	case pci.IsBifurcated(driver):
-		if err := hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
-			InterfaceName: netdev,
-			Kind:          hostnetwork.UnderlayInterfaceNetDev,
-		}); err != nil {
-			return fmt.Errorf("failed to move bifurcated netlink device %s to namespace: %w", netdev, err)
-		}
-		return nil
+		return setupBifurcatedNetdev(ctx, perouterNetNS, pciAddr, netdev)
 
 	default:
 		slog.InfoContext(ctx, "binding GroutPort PCI device to vfio-pci",
@@ -99,12 +95,6 @@ func configureUnderlayAcceleratedPort(
 		return fmt.Errorf("failed to create grout DPDK port %s: %w", portName, err)
 	}
 
-	if pci.IsBifurcated(state.OriginalDriver) {
-		if err := quiesceBifurcatedNetdev(state.InterfaceName); err != nil {
-			return err
-		}
-	}
-
 	if err := assignAddressesToGroutPort(ctx, client, portName, state.Addresses); err != nil {
 		return err
 	}
@@ -113,22 +103,6 @@ func configureUnderlayAcceleratedPort(
 		return fmt.Errorf("failed to set grout DPDK port %s up: %w", portName, err)
 	}
 
-	return nil
-}
-
-// quiesceBifurcatedNetdev stops the kernel netdev of a bifurcated device from
-// holding addresses of its own. The netdev lives on in the router namespace
-// next to the DPDK port, so, as on the TAP path, it must give up its
-// link-local and stop autoconfiguring new addresses from Router
-// Advertisements: otherwise they clash with grout's connected routes (EBUSY)
-// and with the identical link-local of the port sharing its MAC.
-func quiesceBifurcatedNetdev(netdev string) error {
-	if err := hostnetwork.SuppressLinkLocal(netdev); err != nil {
-		return fmt.Errorf("failed to suppress link-local on bifurcated netdev %s: %w", netdev, err)
-	}
-	if err := hostnetwork.SuppressAutoconf(netdev); err != nil {
-		return fmt.Errorf("failed to suppress autoconf on bifurcated netdev %s: %w", netdev, err)
-	}
 	return nil
 }
 
@@ -157,6 +131,73 @@ func restoreAcceleratedDevice(
 		return err
 	}
 	return applyStateToLink(ctx, link, state)
+}
+
+// setupBifurcatedNetdev moves the kernel netdev of a bifurcated device to the
+// perouter namespace, unless it is already there, and quiesces it. It must run
+// before the grout port is created: grout renames the netdev while the port
+// exists, so from that point on it is found by its PCI device only.
+func setupBifurcatedNetdev(ctx context.Context, perouterNetNS netns.NsHandle, pciAddr, netdev string) error {
+	err := netnamespace.In(perouterNetNS, func() error {
+		_, err := bifurcatedNetdev(pciAddr, netdev)
+		return err
+	})
+	if errors.As(err, &netlink.LinkNotFoundError{}) {
+		err = hostnetwork.SetupUnderlayNetDevInterface(ctx, perouterNetNS, hostnetwork.UnderlayInterface{
+			InterfaceName: netdev,
+			Kind:          hostnetwork.UnderlayInterfaceNetDev,
+		})
+	}
+	if err != nil {
+		return fmt.Errorf("failed to move bifurcated netlink device %s to namespace: %w", netdev, err)
+	}
+
+	return netnamespace.In(perouterNetNS, func() error {
+		link, err := bifurcatedNetdev(pciAddr, netdev)
+		if err != nil {
+			return fmt.Errorf("failed to find bifurcated netdev %s: %w", netdev, err)
+		}
+		return quiesceBifurcatedNetdev(link.Attrs().Name)
+	})
+}
+
+// quiesceBifurcatedNetdev stops the kernel netdev of a bifurcated device from
+// holding addresses of its own. The netdev lives on in the router namespace
+// next to the kernel interface grout creates for the port, which shares its
+// MAC, so, as on the TAP path, it must give up its link-local and stop
+// autoconfiguring new addresses from Router Advertisements: otherwise they
+// clash with grout's connected routes (EBUSY) and with the identical
+// link-local of the port's interface. Both settings belong to the device, so
+// they survive grout renaming it.
+func quiesceBifurcatedNetdev(netdev string) error {
+	if err := hostnetwork.SuppressLinkLocal(netdev); err != nil {
+		return fmt.Errorf("failed to suppress link-local on bifurcated netdev %s: %w", netdev, err)
+	}
+	if err := hostnetwork.SuppressAutoconf(netdev); err != nil {
+		return fmt.Errorf("failed to suppress autoconf on bifurcated netdev %s: %w", netdev, err)
+	}
+	return nil
+}
+
+// bifurcatedNetdev returns the kernel netdev of a bifurcated device in the
+// current namespace. grout renames the netdev while the port exists, so it is
+// matched by the PCI device backing it, falling back to its name for netdevs
+// that do not report their parent device.
+func bifurcatedNetdev(pciAddr, name string) (netlink.Link, error) {
+	links, err := netlink.LinkList()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list links: %w", err)
+	}
+	for _, link := range links {
+		if isBackedByPCIDevice(link.Attrs(), pciAddr) {
+			return link, nil
+		}
+	}
+	return netlink.LinkByName(name)
+}
+
+func isBackedByPCIDevice(attrs *netlink.LinkAttrs, pciAddr string) bool {
+	return attrs.ParentDevBus == "pci" && attrs.ParentDev == pciAddr
 }
 
 // waitForPCINetdev returns the netdev of a PCI device just rebound to its
