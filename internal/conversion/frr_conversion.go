@@ -461,7 +461,7 @@ func (c APIToFRRConverter) underlayISISToFRR(isisConfig *v1alpha1.ISISConfig,
 			(*intf.IPFamily == v1alpha1.IPFamilyIPv6 || *intf.IPFamily == v1alpha1.IPFamilyDualStack)
 
 		name := c.InterfaceNames.InterfaceNameForFRR(intf.Name)
-		isisInterfaces[intf.Name] = frr.ISISInterface{
+		isisInterfaces[name] = frr.ISISInterface{
 			Name:         name,
 			IPv4:         hasIPv4,
 			IPv6:         hasIPv6,
