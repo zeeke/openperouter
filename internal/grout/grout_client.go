@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os/exec"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -28,14 +29,15 @@ type groutAddress struct {
 }
 
 type groutInterface struct {
-	Name    string `json:"name"`
-	Type    string `json:"type"`
-	VRF     string `json:"vrf"`
-	Devargs string `json:"devargs"`
-	MAC     string `json:"mac"`
-	NRxq    int32  `json:"n_rxq"`
-	RxqSize int32  `json:"rxq_size"`
-	MTU     int    `json:"mtu"`
+	Name    string   `json:"name"`
+	Type    string   `json:"type"`
+	Flags   []string `json:"flags"`
+	VRF     string   `json:"vrf"`
+	Devargs string   `json:"devargs"`
+	MAC     string   `json:"mac"`
+	NRxq    int32    `json:"n_rxq"`
+	RxqSize int32    `json:"rxq_size"`
+	MTU     int      `json:"mtu"`
 }
 
 type groutVXLANInfo struct {
@@ -112,6 +114,14 @@ func (c *Client) createPort(ctx context.Context, name string, opts portOptions) 
 }
 
 func (c *Client) setPortUp(ctx context.Context, name string) error {
+	info, err := c.getInterfaceInfo(ctx, name)
+	if err != nil {
+		return fmt.Errorf("checking if grout port %s is up: %w", name, err)
+	}
+	if info != nil && info.Type == "port" && slices.Contains(info.Flags, "up") {
+		return nil
+	}
+
 	slog.InfoContext(ctx, "setting grout port up", "name", name)
 	if err := c.run(ctx, "interface", "set", "port", name, "up"); err != nil {
 		return fmt.Errorf("setting grout port %s up: %w", name, err)

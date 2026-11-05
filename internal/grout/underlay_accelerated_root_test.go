@@ -54,7 +54,7 @@ func TestSetupTunnelEndpointKeepsExistingPort(t *testing.T) {
 				hostnetwork.UnderlayTunnelEndpointParams{IPv4CIDR: accelCIDR})
 		}))
 	}
-	assert.Len(t, *calls, 6)
+	assert.Len(t, *calls, 8)
 	assert.True(t, hasSubnetRoute(t, ns, "192.168.50.0/24"))
 }
 

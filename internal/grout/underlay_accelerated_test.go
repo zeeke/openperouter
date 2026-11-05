@@ -112,7 +112,7 @@ func TestConfigureAcceleratedPort(t *testing.T) {
 			Addresses:     []string{"192.168.11.3/32", "2001:db8::3/128"},
 		}
 		require.NoError(t, configureUnderlayAcceleratedPort(context.Background(), NewClient("sock"), portOptions{}, state))
-		assert.Len(t, *calls, 5)
+		assert.Len(t, *calls, 6)
 	})
 
 	t.Run("applies the accelerated config options", func(t *testing.T) {
@@ -132,7 +132,7 @@ func TestConfigureAcceleratedPort(t *testing.T) {
 		opts := portOptions{RXQueues: new(int32(4)), QSize: new(int32(1024))}
 		state := devicestate.State{InterfaceName: "ens1f0", PCIAddress: testPCIAddr}
 		require.NoError(t, configureUnderlayAcceleratedPort(context.Background(), NewClient("sock"), opts, state))
-		assert.Len(t, *calls, 3)
+		assert.Len(t, *calls, 4)
 	})
 
 	t.Run("existing matching port is kept", func(t *testing.T) {
@@ -147,7 +147,7 @@ func TestConfigureAcceleratedPort(t *testing.T) {
 
 		state := devicestate.State{InterfaceName: "ens1f0", PCIAddress: testPCIAddr}
 		require.NoError(t, configureUnderlayAcceleratedPort(context.Background(), NewClient("sock"), portOptions{}, state))
-		assert.Len(t, *calls, 2)
+		assert.Len(t, *calls, 3)
 	})
 }
 
