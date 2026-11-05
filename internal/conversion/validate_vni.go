@@ -189,8 +189,11 @@ func FilterUniqueL2VNIRDNumbers(vnis []v1alpha1.L2VNI) ([]v1alpha1.L2VNI, error)
 	return valid, errors.Join(errs...)
 }
 
-// validateL2VNI validates a single L2VNI's fields (HostMaster, GatewayIPs, route targets).
+// validateL2VNI validates a single L2VNI's fields (HostMaster, SRIOVVFPair, GatewayIPs, route targets).
 func validateL2VNI(l2Vni v1alpha1.L2VNI) error {
+	if l2Vni.Spec.HostMaster != nil && l2Vni.Spec.SRIOVVFPair != nil {
+		return fmt.Errorf("L2VNI %s: hostmaster and sriovVFPair are mutually exclusive", l2Vni.Name)
+	}
 	if l2Vni.Spec.HostMaster != nil {
 		if err := validateHostMaster(l2Vni.Name, l2Vni.Spec.HostMaster); err != nil {
 			return err

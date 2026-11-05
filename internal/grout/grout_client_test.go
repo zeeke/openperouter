@@ -705,3 +705,43 @@ func TestDevargsMatch(t *testing.T) {
 		})
 	}
 }
+
+func TestEnsureVLANSubInterface(t *testing.T) {
+	t.Run("creates VLAN sub-interface when none exists", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name t_bq2vcy.10",
+				output: interfaceNotFoundOutput,
+				err:    fmt.Errorf("exit status 1"),
+			},
+			cmdCall{
+				cmd: "grcli --err-exit --json --socket sock interface add vlan t_bq2vcy.10 parent t_bq2vcy vlan_id 10",
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensureVLANSubInterface(
+				context.Background(),
+				"t_bq2vcy.10",
+				"t_bq2vcy",
+				10,
+			),
+		)
+	})
+
+	t.Run("no-op when VLAN sub-interface already exists", func(t *testing.T) {
+		defer mockCmdExec(
+			cmdCall{
+				cmd:    "grcli --err-exit --json --socket sock interface show name t_bq2vcy.10",
+				output: `{"name": "t_bq2vcy.10", "type": "vlan"}`,
+			})()
+
+		assert.NoError(t,
+			NewClient("sock").ensureVLANSubInterface(
+				context.Background(),
+				"t_bq2vcy.10",
+				"t_bq2vcy",
+				10,
+			),
+		)
+	})
+}

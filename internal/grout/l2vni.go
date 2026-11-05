@@ -8,7 +8,9 @@ import (
 	"log/slog"
 	"net"
 
+	"github.com/openperouter/openperouter/internal/grout/devicestate"
 	"github.com/openperouter/openperouter/internal/hostnetwork"
+	"github.com/openperouter/openperouter/internal/pci"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netns"
 	"k8s.io/utils/ptr"
@@ -16,7 +18,14 @@ import (
 
 // SetupL2VNI creates a Grout bridge domain backed by a VXLAN interface and
 // exposes it to the host through a TAP device.
-func SetupL2VNI(ctx context.Context, client *Client, ovsClient *hostnetwork.OVSClient, params hostnetwork.L2VNIParams) error {
+func SetupL2VNI(
+	ctx context.Context,
+	client *Client,
+	ovsClient *hostnetwork.OVSClient,
+	params hostnetwork.L2VNIParams,
+	store devicestate.Store,
+	sysfs pci.Sysfs,
+) error {
 	slog.DebugContext(ctx, "setup L2VNI", "vni", params.VNI, "vrf", params.VRF)
 	defer slog.DebugContext(ctx, "setup L2VNI done", "vni", params.VNI)
 
@@ -52,6 +61,19 @@ func SetupL2VNI(ctx context.Context, client *Client, ovsClient *hostnetwork.OVSC
 		return fmt.Errorf("SetupL2VNI: failed to age neighbors like the kernel: %w", err)
 	}
 
+	if params.VFPair != nil {
+		return setupL2VNIVFPair(ctx, client, params, bridgeName, store, sysfs)
+	}
+	return setupL2VNITAP(ctx, client, ovsClient, params, vrf, bridgeName)
+}
+
+func setupL2VNITAP(
+	ctx context.Context,
+	client *Client,
+	ovsClient *hostnetwork.OVSClient,
+	params hostnetwork.L2VNIParams,
+	vrf, bridgeName string,
+) error {
 	linkPair := linkPairFromVNI(params.VNI)
 	ns, err := netns.GetFromPath(params.TargetNS)
 	if err != nil {
