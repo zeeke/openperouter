@@ -103,6 +103,9 @@ for nic in "${NICS[@]}"; do
     slot=$((slot + 1))
 done
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/create-vfs.sh"
+
 echo "Launching QEMU with ${#NICS[@]} NICs (virtio: ${VIRTIO_NICS[*]})..."
 MGMT_NETDEV="user,id=mgmt,hostfwd=tcp::${SSH_PORT}-:22,hostfwd=tcp::${K8S_PORT}-:6443"
 
