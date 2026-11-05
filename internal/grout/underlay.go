@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"slices"
 	"syscall"
 
 	"github.com/openperouter/openperouter/internal/grout/devicestate"
@@ -338,6 +339,11 @@ func restoreNetdev(ctx context.Context, targetNS string, state devicestate.State
 
 func applyStateToLink(ctx context.Context, link netlink.Link, state devicestate.State) error {
 	name := link.Attrs().Name
+	// The configured name may itself be an alternative name, so nothing can
+	// find the device by it until the names are back.
+	if err := restoreAltNames(ctx, link, state.AltNames); err != nil {
+		return err
+	}
 	if state.MTU > 0 {
 		if err := netlink.LinkSetMTU(link, state.MTU); err != nil {
 			return fmt.Errorf("failed to restore MTU %d on kernel netdev [%s]: %w", state.MTU, name, err)
@@ -352,6 +358,34 @@ func applyStateToLink(ctx context.Context, link netlink.Link, state devicestate.
 		}
 		slog.InfoContext(ctx, "restored IP addresses to kernel netdev",
 			"interfaceName", name, "addresses", addr)
+	}
+	return nil
+}
+
+// restoreAltNames re-adds the alternative names the device carried before it
+// was handed to grout. udev only re-applies the names that come from one of
+// its rules, so a name added by hand would otherwise be lost for good on the
+// first teardown.
+func restoreAltNames(ctx context.Context, link netlink.Link, altNames []string) error {
+	for _, altName := range altNames {
+		if slices.Contains(link.Attrs().AltNames, altName) {
+			continue
+		}
+		err := netlink.LinkAddAltName(link, altName)
+		// Names are unique across primary and alternative names alike, so
+		// EEXIST means something else claimed it while the device was bound
+		// to grout: report it rather than failing the teardown.
+		if errors.Is(err, syscall.EEXIST) {
+			slog.WarnContext(ctx, "alternative name is taken, not restoring",
+				"altName", altName, "interfaceName", link.Attrs().Name)
+			continue
+		}
+		if err != nil {
+			return fmt.Errorf("failed to restore alternative name %s on kernel netdev [%s]: %w",
+				altName, link.Attrs().Name, err)
+		}
+		slog.InfoContext(ctx, "restored alternative name to kernel netdev",
+			"altName", altName, "interfaceName", link.Attrs().Name)
 	}
 	return nil
 }
@@ -411,19 +445,24 @@ func retrieveDeviceState(
 ) (devicestate.State, error) {
 	state := devicestate.State{InterfaceName: interfaceName}
 
+	// interfaceName may be an alternative name, while sysfs and procfs are
+	// keyed by the primary name only.
+	link, err := netlink.LinkByName(interfaceName)
+	if err != nil {
+		return devicestate.State{}, fmt.Errorf("failed to find kernel interface %s: %w", interfaceName, err)
+	}
+	kernelName := link.Attrs().Name
+
 	if mode == PortModeAccelerated {
-		pciAddr, driver, err := retrievePCIState(interfaceName, sysfs)
+		pciAddr, driver, err := retrievePCIState(kernelName, sysfs)
 		if err != nil {
 			return devicestate.State{}, err
 		}
 		state.PCIAddress = pciAddr
 		state.OriginalDriver = driver
+		state.AltNames = link.Attrs().AltNames
 	}
 
-	link, err := netlink.LinkByName(interfaceName)
-	if err != nil {
-		return devicestate.State{}, fmt.Errorf("failed to find interface %s: %w", interfaceName, err)
-	}
 	state.MTU = link.Attrs().MTU
 
 	netlinkAddrs, err := hostnetwork.AddressesForInterface(interfaceName, hostnetwork.ExcludeLinkLocal())
@@ -438,11 +477,11 @@ func retrieveDeviceState(
 		state.Addresses = append(state.Addresses, a.IPNet.String())
 	}
 
-	state.AddrGenMode, err = sysctl.Read(sysctl.AddrGenMode(interfaceName, ""))
+	state.AddrGenMode, err = sysctl.Read(sysctl.AddrGenMode(kernelName, ""))
 	if err != nil {
 		return devicestate.State{}, fmt.Errorf("failed to read addr_gen_mode of %s: %w", interfaceName, err)
 	}
-	state.AcceptRA, err = sysctl.Read(sysctl.AcceptRA(interfaceName, ""))
+	state.AcceptRA, err = sysctl.Read(sysctl.AcceptRA(kernelName, ""))
 	if err != nil {
 		return devicestate.State{}, fmt.Errorf("failed to read accept_ra of %s: %w", interfaceName, err)
 	}

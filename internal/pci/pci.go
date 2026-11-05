@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+
+	"github.com/vishvananda/netlink"
 )
 
 const (
@@ -30,6 +32,17 @@ var virtioDeviceRegex = regexp.MustCompile(`^virtio[0-9]+$`)
 // DPDK (e.g. mlx5) instead of requiring a vfio-pci rebind.
 func IsBifurcated(driver string) bool {
 	return driver == DriverMlx5Core
+}
+
+// PCIAddressForNetlinkName resolves a netlink device name, primary or
+// alternative, to its PCI address. sysfs is keyed by the primary name only,
+// so the name is resolved through netlink first.
+func (s Sysfs) PCIAddressForNetlinkName(name string) (string, error) {
+	link, err := netlink.LinkByName(name)
+	if err != nil {
+		return "", fmt.Errorf("failed to find network device %q: %w", name, err)
+	}
+	return s.PCIAddressForNetDevice(link.Attrs().Name)
 }
 
 // PCIAddressForNetDevice takes a kernel netlink device name and returns its PCI
