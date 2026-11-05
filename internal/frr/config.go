@@ -104,8 +104,11 @@ type UnderlayISIS struct {
 
 type UnderlaySegmentRouting struct {
 	SourceAddress string
-	Locator       SRV6Locator
-	EncapBehavior string
+	// EncapSourceAddress sets SourceAddress as the source of the SRv6
+	// encapsulated packets.
+	EncapSourceAddress bool
+	Locator            SRV6Locator
+	EncapBehavior      string
 }
 
 type SRV6Locator struct {
