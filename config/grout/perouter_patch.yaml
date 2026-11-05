@@ -25,6 +25,10 @@ spec:
         - name: grout-socket
           mountPath: /var/run/grout
       - name: grout
+        # Grout tunes its kernel control-plane interfaces through /proc/sys
+        # (e.g. accept_ra=0), which the runtime mounts read-only unless the
+        # container is privileged. Without it, router advertisements flooded
+        # over an L2VNI can install a default route that hijacks multihop BGP.
         securityContext:
           privileged: true
         image: quay.io/openperouter/router
