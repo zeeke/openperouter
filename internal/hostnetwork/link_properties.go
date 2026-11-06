@@ -193,16 +193,17 @@ func linkSetMaster(link, master netlink.Link) error {
 	return netlink.LinkSetMaster(link, master)
 }
 
-// moveInterfaceToNamespace takes the given interface and moves it from the given to the given namespace.
+// MoveInterfaceToNamespace moves an interface to the target namespace and
+// ensures its group and link state, including when it is already there.
 func MoveInterfaceToNamespace(ctx context.Context, intf string, fromHandle, toHandle *netlink.Handle,
 	toNS netns.NsHandle, groupID uint32) error {
 	slog.DebugContext(ctx, "move intf to namespace", "intf", intf, "toNS", toNS.String())
 	defer slog.DebugContext(ctx, "move intf to namespace end", "intf", intf, "toNS", toNS.String())
 
-	// Nothing to do for us if the interface is already inside the target namespace.
-	if _, err := toHandle.LinkByName(intf); err == nil {
+	// The move may have succeeded before group assignment or activation failed.
+	if link, err := toHandle.LinkByName(intf); err == nil {
 		slog.DebugContext(ctx, "intf is already in namespace", "intf", intf, "namespace", toNS.String())
-		return nil
+		return configureMovedInterface(toHandle, link, groupID)
 	}
 
 	// Get the link, store its current addresses so that we can later restore them (addresses are lost upon moving),
@@ -245,19 +246,7 @@ func MoveInterfaceToNamespace(ctx context.Context, intf string, fromHandle, toHa
 		return errors.Join(errs...)
 	}
 
-	// Set group ID only if not already set (idempotent)
-	if nsLink.Attrs().Group != groupID {
-		if err := toHandle.LinkSetGroup(nsLink, int(groupID)); err != nil {
-			return fmt.Errorf("moveInterfaceToNamespace: Failed to set group ID %d on interface %s: %w", groupID, intf, err)
-		}
-	}
-
-	err = toHandle.LinkSetUp(nsLink)
-	if err != nil {
-		return fmt.Errorf("moveInterfaceToNamespace: Failed to set %s up in network namespace %s: %w", nsLink.Attrs().Name, toNS.String(), err)
-	}
-
-	return nil
+	return configureMovedInterface(toHandle, nsLink, groupID)
 }
 
 func DeleteAddressFromInterface(ifaceName string, addr netlink.Addr) error {
@@ -277,4 +266,19 @@ func LinkExists(name string) (bool, error) {
 		return false, fmt.Errorf("failed to find link %s: %w", name, err)
 	}
 	return true, nil
+}
+
+func configureMovedInterface(handle *netlink.Handle, link netlink.Link, groupID uint32) error {
+	if link.Attrs().Group != groupID {
+		if err := handle.LinkSetGroup(link, int(groupID)); err != nil {
+			return fmt.Errorf("moveInterfaceToNamespace: failed to set group ID %d on interface %s: %w",
+				groupID, link.Attrs().Name, err)
+		}
+	}
+	if link.Attrs().Flags&net.FlagUp == 0 {
+		if err := handle.LinkSetUp(link); err != nil {
+			return fmt.Errorf("moveInterfaceToNamespace: failed to set %s up: %w", link.Attrs().Name, err)
+		}
+	}
+	return nil
 }
