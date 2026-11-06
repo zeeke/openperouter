@@ -282,6 +282,14 @@ together with its addresses and the original driver.
 
 `acceleratedConfig` is rejected when `--datapath=kernel`.
 
+> **Note**: The DPDK `mlx5` driver opens a `mlx5_core` device through its RDMA
+> device as well as its netdev. The controller moves only the netdev into the
+> router namespace, so the RDMA subsystem must run in shared network namespace
+> mode, the kernel default: `rdma system show` must report `netns shared`. In
+> exclusive mode, set for example by the sriov-network-operator for RDMA
+> exclusive pools, the RDMA device stays in the host namespace and grout fails
+> to open the port. This applies to underlay ports and to `SRIOV` trunk VFs.
+
 ```yaml
 apiVersion: network.openperouter.io/v1alpha1
 kind: Underlay
@@ -363,6 +371,9 @@ When the trunk is created, the controller:
 3. Binds the VF to `vfio-pci`, or moves `mlx5_core` VFs into the router
    namespace, and creates the grout port `t_<pci address without separators>`
 
+`mlx5_core` VFs need the RDMA subsystem in shared network namespace mode, see
+[DPDK-Accelerated Underlay Ports](#dpdk-accelerated-underlay-ports).
+
 Each L2VNI carried by the trunk gets a VLAN interface on the trunk port, named
 `t<pci address without separators>.<tag>`.
 
@@ -385,12 +396,15 @@ Prerequisites:
 - The trunk VF is not an underlay `NetworkDevice`: DPDK opens a PCI device
   only once. A trunk selecting an underlay's VF fails, and an underlay
   selecting a trunk's VF fails the underlay setup
+- The PF is not an underlay `NetworkDevice`: using the PF as the underlay
+  breaks the VF-to-VF traffic of the trunk. Use another VF of the PF, or
+  another NIC, as the underlay
 - The workload VFs are configured with the VLAN tags of their L2VNIs, by the
   user or by the sriov-network-operator
 
-Two trunks applying to the same node cannot select the same VF, and two L2VNIs
-cannot use the same tag on the same trunk. `SRIOV` trunks are rejected when
-`--datapath=kernel`.
+Two trunks applying to the same node cannot select the same PF, as each trunk VF
+uplinks its whole PF, and two L2VNIs cannot use the same tag on the same trunk.
+`SRIOV` trunks are rejected when `--datapath=kernel`.
 
 For a complete workload setup, including `SriovNetworkNodePolicy`,
 `SriovNetwork`, and DPDK pods, see the [Layer 2 SR-IOV with Grout
