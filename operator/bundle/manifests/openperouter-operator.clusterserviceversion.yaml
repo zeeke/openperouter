@@ -4,17 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2026-10-19T17:36:48Z"
-    features.operators.openshift.io/csi: "false"
-    features.operators.openshift.io/disconnected: "true"
-    features.operators.openshift.io/fips-compliant: "true"
-    features.operators.openshift.io/proxy-aware: "false"
-    features.operators.openshift.io/tls-profiles: "false"
-    features.operators.openshift.io/token-auth-aws: "false"
-    features.operators.openshift.io/token-auth-azure: "false"
-    features.operators.openshift.io/token-auth-gcp: "false"
-    operators.openshift.io/valid-subscription: '["OpenShift Container Platform", "OpenShift
-      Platform Plus"]'
+    createdAt: "2026-11-04T12:05:36Z"
     operators.operatorframework.io/builder: operator-sdk-v1.41.1
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
   name: openperouter-operator.v0.0.0
@@ -23,6 +13,9 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
+    - kind: L2Trunk
+      name: l2trunks.network.openperouter.io
+      version: v1alpha1
     - kind: L2VNI
       name: l2vnis.network.openperouter.io
       version: v1alpha1
@@ -76,6 +69,7 @@ spec:
         - apiGroups:
           - network.openperouter.io
           resources:
+          - l2trunks
           - l2vnis
           - l3passthroughs
           - l3vnis
@@ -147,6 +141,7 @@ spec:
         - apiGroups:
           - network.openperouter.io
           resources:
+          - l2trunks
           - l2vnis
           - l3passthroughs
           - l3vnis
@@ -424,6 +419,26 @@ spec:
     url: https://github.com/openperouter/openperouter
   version: 0.0.0
   webhookdefinitions:
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: webhook
+    failurePolicy: Fail
+    generateName: l2trunkvalidationwebhook.openperouter.io
+    rules:
+    - apiGroups:
+      - network.openperouter.io
+      apiVersions:
+      - v1alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - l2trunks
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-openperouter-io-v1alpha1-l2trunk
   - admissionReviewVersions:
     - v1
     containerPort: 443
