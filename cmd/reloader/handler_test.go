@@ -8,7 +8,9 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/openperouter/openperouter/internal/frrconfig"
 )
@@ -20,6 +22,18 @@ func TestHandler(t *testing.T) {
 
 	reloadFails := func(_ string) error {
 		return errors.New("failed")
+	}
+
+	// An AS mismatch the fallback recovered from is indistinguishable from
+	// a plain success at the HTTP layer: bgpd was restarted and the reload
+	// converged.
+	asMismatchRecovered := func(_ string) error {
+		return nil
+	}
+
+	asMismatchRecoveryFailed := func(_ string) error {
+		return errors.New("failed to reload after clearing the BGP instances: frr update reload failed: " +
+			"bgpd is running a different AS than the desired configuration")
 	}
 
 	tests := []struct {
@@ -46,6 +60,18 @@ func TestHandler(t *testing.T) {
 			http.MethodPost,
 			http.StatusInternalServerError,
 		},
+		{
+			"AS mismatch recovered by the fallback",
+			asMismatchRecovered,
+			http.MethodPost,
+			200,
+		},
+		{
+			"AS mismatch recovery failed",
+			asMismatchRecoveryFailed,
+			http.MethodPost,
+			http.StatusInternalServerError,
+		},
 	}
 
 	t.Cleanup(func() {
@@ -67,6 +93,60 @@ func TestHandler(t *testing.T) {
 				t.Fatalf("expecting %d, got %d", res.StatusCode, tc.httpStatus)
 			}
 		})
+	}
+}
+
+// TestHandlerSerializesReloads asserts that concurrent reload requests are
+// served one at a time: the bgpd restart fallback must not interleave with
+// other reloads.
+func TestHandlerSerializesReloads(t *testing.T) {
+	t.Cleanup(func() {
+		updateConfig = frrconfig.Update
+	})
+
+	var running sync.Mutex
+	inFlight := 0
+	overlapped := false
+	updateConfig = func(_ string) error {
+		running.Lock()
+		inFlight++
+		if inFlight > 1 {
+			overlapped = true
+		}
+		running.Unlock()
+
+		time.Sleep(10 * time.Millisecond) //nolint:forbidigo // holding the handler busy to detect overlap
+
+		running.Lock()
+		inFlight--
+		running.Unlock()
+		return nil
+	}
+
+	handler := http.HandlerFunc(reloadHandler("/etc/frr/frr.conf"))
+
+	const requests = 5
+	var wg sync.WaitGroup
+	for range requests {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			req, _ := http.NewRequest(http.MethodPost, "/", nil)
+			w := httptest.NewRecorder()
+			handler.ServeHTTP(w, req)
+			res := w.Result()
+			if err := res.Body.Close(); err != nil {
+				t.Errorf("Body.Close() failed: %s", err)
+			}
+			if res.StatusCode != http.StatusOK {
+				t.Errorf("expecting 200, got %d", res.StatusCode)
+			}
+		}()
+	}
+	wg.Wait()
+
+	if overlapped {
+		t.Fatal("expecting reload requests to be serialized, got overlapping executions")
 	}
 }
 
