@@ -31,6 +31,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -181,12 +182,18 @@ func removeFile(path string) error {
 var updateConfig = frrconfig.Update
 
 func reloadHandler(frrConfigPath string) func(w http.ResponseWriter, req *http.Request) {
+	// Reload requests can arrive concurrently or in rapid succession while
+	// the controller retries. Serving them one at a time keeps the AS
+	// mismatch recovery from interleaving with other reloads.
+	var reloadMutex sync.Mutex
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodPost {
 			http.Error(w, "invalid method", http.StatusBadRequest)
 			return
 		}
 		slog.Info("reload handler", "event", "received request")
+		reloadMutex.Lock()
+		defer reloadMutex.Unlock()
 		err := updateConfig(frrConfigPath)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
