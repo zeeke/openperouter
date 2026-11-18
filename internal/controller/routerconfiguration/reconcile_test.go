@@ -25,7 +25,9 @@ var failingUpdater = frr.ConfigUpdater(func(_ context.Context, _ string) error {
 	return fmt.Errorf("frr-reload failed")
 })
 
-type noopDatapathConfigurator struct{}
+type noopDatapathConfigurator struct {
+	conversion.GroutDatapathConfigValidator
+}
 
 func (n *noopDatapathConfigurator) Configure(_ context.Context, _ interfacesConfiguration) error {
 	return nil
@@ -46,6 +48,7 @@ func TestReconcilePerResourceErrors(t *testing.T) {
 		l3VNIs           []v1alpha1.L3VNI
 		l3VPNs           []v1alpha1.L3VPN
 		l2VNIs           []v1alpha1.L2VNI
+		l2Trunks         []v1alpha1.L2Trunk
 		l3Passthroughs   []v1alpha1.L3Passthrough
 		expectedFailures []v1alpha1.FailedResource
 		wantConfig       conversion.APIConfigData
@@ -289,6 +292,59 @@ func TestReconcilePerResourceErrors(t *testing.T) {
 				},
 				L3VNIs: nil,
 				L2VNIs: nil,
+			},
+		},
+		{
+			name: "L2VNI referencing a missing L2Trunk reports DependencyFailed",
+			l2VNIs: []v1alpha1.L2VNI{
+				trunkL2VNI("on-trunk", 100, "workloads", 33),
+				trunkL2VNI("orphan", 200, "missing", 44),
+			},
+			l2Trunks: []v1alpha1.L2Trunk{sriovL2Trunk("workloads")},
+			expectedFailures: []v1alpha1.FailedResource{
+				{Kind: openpeerrors.KindL2VNI, Name: "orphan", Reason: v1alpha1.FailedResourceReasonDependencyFailed,
+					Message: `referenced L2Trunk "missing" not found`},
+			},
+			wantConfig: conversion.APIConfigData{
+				L2VNIs:   []v1alpha1.L2VNI{trunkL2VNI("on-trunk", 100, "workloads", 33)},
+				L2Trunks: []v1alpha1.L2Trunk{sriovL2Trunk("workloads")},
+			},
+		},
+		{
+			name: "L2Trunk reusing a PF drops it and its L2VNIs",
+			l2VNIs: []v1alpha1.L2VNI{
+				trunkL2VNI("on-first", 100, "first", 33),
+				trunkL2VNI("on-second", 200, "second", 44),
+			},
+			l2Trunks: []v1alpha1.L2Trunk{
+				sriovL2Trunk("first"),
+				sriovL2Trunk("second"),
+			},
+			expectedFailures: []v1alpha1.FailedResource{
+				{Kind: openpeerrors.KindL2Trunk, Name: "second", Reason: v1alpha1.FailedResourceReasonValidationFailed,
+					Message: "PF enp1s0 is already used by L2Trunk first"},
+				{Kind: openpeerrors.KindL2VNI, Name: "on-second", Reason: v1alpha1.FailedResourceReasonDependencyFailed,
+					Message: `referenced L2Trunk "second" not found`},
+			},
+			wantConfig: conversion.APIConfigData{
+				L2VNIs:   []v1alpha1.L2VNI{trunkL2VNI("on-first", 100, "first", 33)},
+				L2Trunks: []v1alpha1.L2Trunk{sriovL2Trunk("first")},
+			},
+		},
+		{
+			name: "L2VNI reusing a VLAN tag on its trunk is skipped",
+			l2VNIs: []v1alpha1.L2VNI{
+				trunkL2VNI("a", 100, "workloads", 33),
+				trunkL2VNI("b", 200, "workloads", 33),
+			},
+			l2Trunks: []v1alpha1.L2Trunk{sriovL2Trunk("workloads")},
+			expectedFailures: []v1alpha1.FailedResource{
+				{Kind: openpeerrors.KindL2VNI, Name: "b", Reason: v1alpha1.FailedResourceReasonValidationFailed,
+					Message: "VLAN 33 on L2Trunk workloads is already used by L2VNI a"},
+			},
+			wantConfig: conversion.APIConfigData{
+				L2VNIs:   []v1alpha1.L2VNI{trunkL2VNI("a", 100, "workloads", 33)},
+				L2Trunks: []v1alpha1.L2Trunk{sriovL2Trunk("workloads")},
 			},
 		},
 		{
@@ -673,6 +729,7 @@ func TestReconcilePerResourceErrors(t *testing.T) {
 				L3VNIs:        tt.l3VNIs,
 				L3VPNs:        tt.l3VPNs,
 				L2VNIs:        tt.l2VNIs,
+				L2Trunks:      tt.l2Trunks,
 				L3Passthrough: tt.l3Passthroughs,
 			}
 
@@ -714,6 +771,7 @@ func TestReconcileFrrReloadFailure(t *testing.T) {
 // recordingDatapathConfigurator appends to a shared list every time the datapath
 // is configured, so that tests can assert the order of the reconcile steps.
 type recordingDatapathConfigurator struct {
+	conversion.GroutDatapathConfigValidator
 	steps *[]string
 }
 
@@ -841,4 +899,76 @@ func l2VNIWithGateway(name string, rd *v1alpha1.RoutingDomain, vni int32, gatewa
 	l2 := l2VNI(name, rd, vni)
 	l2.Spec.GatewayIPs = gatewayIPs
 	return l2
+}
+
+func trunkL2VNI(name string, vni int32, trunk string, tag int32) v1alpha1.L2VNI {
+	return v1alpha1.L2VNI{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: v1alpha1.L2VNISpec{
+			VNI:   vni,
+			Trunk: &v1alpha1.L2TrunkReference{Name: trunk, VLAN: v1alpha1.VLANConfig{Tag: tag}},
+		},
+	}
+}
+
+// sriovL2Trunk returns an SR-IOV trunk on VF 1 of enp1s0.
+func sriovL2Trunk(name string) v1alpha1.L2Trunk {
+	return v1alpha1.L2Trunk{
+		ObjectMeta: metav1.ObjectMeta{Name: name},
+		Spec: v1alpha1.L2TrunkSpec{
+			Type:  v1alpha1.L2TrunkTypeSRIOV,
+			SRIOV: &v1alpha1.SRIOVTrunkConfig{PFName: "enp1s0", VFIndex: new(int32(1))},
+		},
+	}
+}
+
+func TestReconcileFiltersKernelTrunks(t *testing.T) {
+	trunk := sriovL2Trunk("workloads")
+	config := conversion.APIConfigData{
+		L2Trunks: []v1alpha1.L2Trunk{trunk},
+		L2VNIs: []v1alpha1.L2VNI{
+			trunkL2VNI("trunked", 100, trunk.Name, 33),
+		},
+		L3VNIs: []v1alpha1.L3VNI{l3VNI("unrelated", "red", 200)},
+	}
+	var frrConfig conversion.APIConfigData
+	datapath := &kernelRecordingConfigurator{}
+	err := Reconcile(context.Background(), config, 0, "", "", "", noopUpdater, datapath,
+		func(_ context.Context, data frrConfigData) error {
+			frrConfig = data.APIConfigData
+			return nil
+		})
+	wantFailures := []v1alpha1.FailedResource{
+		{Kind: openpeerrors.KindL2Trunk, Name: "workloads",
+			Reason:  v1alpha1.FailedResourceReasonValidationFailed,
+			Message: "l2trunk workloads: L2Trunks are only supported with the grout datapath"},
+		{Kind: openpeerrors.KindL2VNI, Name: "trunked",
+			Reason:  v1alpha1.FailedResourceReasonDependencyFailed,
+			Message: `referenced L2Trunk "workloads" not found`},
+	}
+	if diff := cmp.Diff(wantFailures, openpeerrors.CollectFailures(err)); diff != "" {
+		t.Fatalf("failures (-want +got):\n%s", diff)
+	}
+	want := conversion.APIConfigData{
+		L3VNIs: config.L3VNIs, L2VNIs: []v1alpha1.L2VNI{}, L2Trunks: []v1alpha1.L2Trunk{},
+	}
+	for name, got := range map[string]conversion.APIConfigData{"frr": frrConfig, "datapath": datapath.config} {
+		if diff := cmp.Diff(want, got); diff != "" {
+			t.Errorf("%s configuration (-want +got):\n%s", name, diff)
+		}
+	}
+}
+
+type kernelRecordingConfigurator struct {
+	conversion.KernelDatapathConfigValidator
+	config conversion.APIConfigData
+}
+
+func (k *kernelRecordingConfigurator) Configure(_ context.Context, config interfacesConfiguration) error {
+	k.config = config.APIConfigData
+	return nil
+}
+
+func (k *kernelRecordingConfigurator) InterfaceNameForFRR(name string) string {
+	return name
 }

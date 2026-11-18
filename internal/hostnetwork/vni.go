@@ -53,11 +53,41 @@ type LinkIPs struct {
 	NSIPv6   string
 }
 
+type L2VNIAttachment int
+
+const (
+	L2VNIAttachmentHost L2VNIAttachment = iota
+	L2VNIAttachmentVFTrunk
+)
+
 type L2VNIParams struct {
+	Attachment L2VNIAttachment
 	VNIParams
 	Name         string
 	L2GatewayIPs []string
 	HostMaster   *HostMaster
+	Trunk        *L2VNITrunkParams
+}
+
+// L2VNITrunkParams maps an L2VNI to a VLAN tag on an L2Trunk.
+type L2VNITrunkParams struct {
+	Name string
+	VLAN int32
+}
+
+// L2TrunkParams describes the port carrying the VLAN-tagged traffic of the
+// L2VNIs referencing an L2Trunk.
+type L2TrunkParams struct {
+	Name     string
+	TargetNS string
+	SRIOV    *SRIOVTrunkParams
+}
+
+// SRIOVTrunkParams identifies the SR-IOV VF used as the trunk port.
+type SRIOVTrunkParams struct {
+	PFName            string
+	VFIndex           int32
+	AcceleratedConfig *AcceleratedConfigParams
 }
 
 // VNIConfigurator sets up VNIs in the router namespace. It borrows the
