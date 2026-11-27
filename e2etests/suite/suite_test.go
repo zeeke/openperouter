@@ -69,7 +69,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	log.SetLogger(zap.New(zap.WriteTo(ginkgo.GinkgoWriter), zap.UseDevMode(true)))
 	clientconfig, err := k8sclient.RestConfig()
 	Expect(err).NotTo(HaveOccurred(), "failed to load kubeconfig (KUBECONFIG=%s)", os.Getenv("KUBECONFIG"))
-	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace)
+	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace, tests.HostMode)
 	Expect(err).NotTo(HaveOccurred())
 	tests.Updater = updater
 	tests.InspectReporter = k8s.NewInspectReporter(
@@ -90,11 +90,12 @@ var _ = ginkgo.BeforeSuite(func() {
 })
 
 var _ = ginkgo.AfterSuite(func() {
-	Expect(executor.TeardownNodeExec()).NotTo(HaveOccurred())
-
-	if updater == nil {
-		return
+	// CleanAll needs the node-exec helper to reach the routers in host mode,
+	// so it must run before the helper is torn down.
+	if updater != nil {
+		err := updater.CleanAll()
+		Expect(err).NotTo(HaveOccurred())
 	}
-	err := updater.CleanAll()
-	Expect(err).NotTo(HaveOccurred())
+
+	Expect(executor.TeardownNodeExec()).NotTo(HaveOccurred())
 })
