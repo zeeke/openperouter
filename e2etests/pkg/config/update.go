@@ -30,6 +30,12 @@ type Updater struct {
 	cli             client.Client
 	openpeNamespace string
 	frrk8sNamespace string
+	// OnUnderlayReset runs when CleanAll tears the resources down, and
+	// before Update creates underlays on a cluster that runs none. It
+	// lets the caller reset state that only lives inside the routers
+	// around an underlay transition. See tests.RestartBGPD for why the
+	// e2e suites set it.
+	OnUnderlayReset func() error
 }
 
 func UpdaterForCRs(r *rest.Config, openpeNs, frrk8sNs string) (*Updater, error) {
@@ -63,6 +69,9 @@ func UpdaterForCRs(r *rest.Config, openpeNs, frrk8sNs string) (*Updater, error) 
 }
 
 func (o Updater) Update(r Resources) error {
+	if err := o.runUnderlayResetHook(r); err != nil {
+		return err
+	}
 	// we fill a map of objects to keep the order we add the resources random, as
 	// it would happen by throwing a set of manifests against a cluster, hoping to
 	// find corner cases that we would not find by adding them always in the same
@@ -162,8 +171,62 @@ func (o Updater) Update(r Resources) error {
 	return nil
 }
 
+// runUnderlayResetHook invokes OnUnderlayReset when Update carries
+// underlays whose ASNs differ from the running ones, or when none is
+// running. Rewriting "router bgp" with a different ASN forces FRR
+// through the delete-and-recreate path that triggers the bug the hook
+// works around; same-ASN updates (adding a neighbor, toggling BFD)
+// keep the instance alive and are safe, and resetting on them would
+// churn the sessions the following spec validates.
+func (o Updater) runUnderlayResetHook(r Resources) error {
+	if o.OnUnderlayReset == nil || len(r.Underlays) == 0 {
+		return nil
+	}
+	underlayList := v1alpha1.UnderlayList{}
+	if err := o.cli.List(context.Background(), &underlayList,
+		client.InNamespace(o.openpeNamespace)); err != nil {
+		return fmt.Errorf("failed to list underlays: %w", err)
+	}
+	liveASNs := map[int64]struct{}{}
+	for _, underlay := range underlayList.Items {
+		if underlay.DeletionTimestamp == nil {
+			liveASNs[underlay.Spec.ASN] = struct{}{}
+		}
+	}
+	desiredASNs := map[int64]struct{}{}
+	for _, underlay := range r.Underlays {
+		desiredASNs[underlay.Spec.ASN] = struct{}{}
+	}
+	if len(liveASNs) > 0 && sameASNs(liveASNs, desiredASNs) {
+		return nil
+	}
+	return o.OnUnderlayReset()
+}
+
+func sameASNs(a, b map[int64]struct{}) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for asn := range a {
+		if _, ok := b[asn]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
 // CleanAll deletes all relevant resources in the namespace.
 func (o Updater) CleanAll() error {
+	// Reset the routers before deleting the CRs: the config removal the
+	// deletion triggers would otherwise race the reset, hitting the old
+	// daemons with populated VPN tables and leaving the broken BGP
+	// instances behind. On the reset (empty) daemons the removal is a
+	// no-op.
+	if o.OnUnderlayReset != nil {
+		if err := o.OnUnderlayReset(); err != nil {
+			return err
+		}
+	}
 	if err := o.cli.DeleteAllOf(context.Background(), &v1alpha1.Underlay{},
 		client.InNamespace(o.openpeNamespace)); err != nil {
 		return err

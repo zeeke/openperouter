@@ -71,6 +71,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred(), "failed to load kubeconfig (KUBECONFIG=%s)", os.Getenv("KUBECONFIG"))
 	updater, err = config.UpdaterForCRs(clientconfig, openperouter.Namespace, frrk8s.Namespace)
 	Expect(err).NotTo(HaveOccurred())
+	updater.OnUnderlayReset = tests.RestartBGPD
 	tests.Updater = updater
 	tests.InspectReporter = k8s.NewInspectReporter(
 		inspectPath,
@@ -95,6 +96,10 @@ var _ = ginkgo.AfterSuite(func() {
 	if updater == nil {
 		return
 	}
+	// The final cleanup has no following config churn to protect, and the
+	// node exec helper it would run through may already be gone: don't
+	// reset the routers.
+	updater.OnUnderlayReset = nil
 	err := updater.CleanAll()
 	Expect(err).NotTo(HaveOccurred())
 })
