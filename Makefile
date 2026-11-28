@@ -747,6 +747,10 @@ deploy-olm: operator-sdk ## deploys OLM on the cluster
 		$(OPERATOR_SDK) olm install --version $(OLM_VERSION) --timeout 5m0s; \
 		$(OPERATOR_SDK) olm status; \
 	fi
+	# The default community catalog is never used by the suite, its registry
+	# pod keeps the whole index in memory, and the resolver churn on it has
+	# hung the catalog operator in CI.
+	$(KUBECTL) delete catalogsource operatorhubio-catalog -n olm --ignore-not-found
 
 build-and-push-bundle-images: bundle-build bundle-push catalog-build catalog-push
 
