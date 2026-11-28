@@ -8,13 +8,13 @@ KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-"pe-kind"}
 kubectl apply -k $(dirname ${BASH_SOURCE[0]})
 kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/multus-cni/refs/tags/${MULTUS_VERSION}/deployments/multus-daemonset.yml
 
-# The upstream daemonset ships without resource requests, leaving kube-multus
-# in the BestEffort QoS class. Under runner memory pressure the OOM killer
-# targets BestEffort pods first, and a crash-looping multus breaks the
-# secondary interface of every NAD-attached pod on the node. A small memory
-# request moves it to Burstable and out of the killer's crosshairs.
+# The upstream daemonset caps kube-multus at 50Mi of memory. The e2e suites
+# churn NADs and namespaces constantly, and multus' watch cache grows past
+# the cap: the cgroup OOM killer takes the container down (exit 137, memory
+# peak exactly at the limit) and while it crash-loops every NAD-attached pod
+# on the node silently loses its secondary interface. Give it headroom.
 kubectl -n kube-system patch daemonset kube-multus-ds --type=strategic \
-  -p '{"spec":{"template":{"spec":{"containers":[{"name":"kube-multus","resources":{"requests":{"memory":"50Mi"}}}]}}}}'
+  -p '{"spec":{"template":{"spec":{"containers":[{"name":"kube-multus","resources":{"requests":{"memory":"100Mi"},"limits":{"memory":"512Mi"}}}]}}}}'
 
 sleep 2s
 echo "Waiting for frr-k8s-system pods to be ready"
