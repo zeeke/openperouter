@@ -10,10 +10,18 @@ csv_created=false
 until $csv_created || [ $ATTEMPTS -eq $MAX_ATTEMPTS ]
 do
     echo "waiting for csv to be created attempt:${ATTEMPTS}"
+    # A healthy cluster creates the csv in well under a minute. If it is
+    # still missing this far in, the catalog operator is hung on resolution
+    # and a restart is the only way forward; the cluster is a throwaway CI
+    # environment.
+    if [ $ATTEMPTS -eq 24 ]; then
+        echo "csv still missing after two minutes, restarting the catalog operator"
+        kubectl -n olm rollout restart deployment catalog-operator
+    fi
     if kubectl get csv -n $NAMESPACE $CSV_NAME; then
         echo "csv created!"
         csv_created=true
-    else    
+    else
         echo "failed, retrying"
         sleep 5
     fi
